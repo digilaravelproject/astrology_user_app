@@ -57,7 +57,7 @@ class ErrorScreen extends StatelessWidget {
 
               // 📝 Title
               Text(
-                title ?? "Something went wrong!",
+                title ?? AppStrings.somethingWentWrong,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -95,8 +95,8 @@ class ErrorScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Retry',
+                    child: Text(
+                      AppStrings.retry,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -122,7 +122,7 @@ class ErrorScreen extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Go Back',
+                      AppStrings.goBack,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

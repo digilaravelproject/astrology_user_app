@@ -3,19 +3,15 @@ import '../constants/image_constants.dart';
 
 class AppLogo extends StatelessWidget {
   final double size;
-  const AppLogo({Key? key, this.size = 120}) : super(key: key);
+  const AppLogo({super.key, this.size = 120});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
+    return Image.asset(
+      ImageConstants.logo,
       height: size,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(ImageConstants.logo),
-          fit: BoxFit.contain,
-        ),
-      ),
+      width: size,
+      fit: BoxFit.contain,
     );
   }
 }

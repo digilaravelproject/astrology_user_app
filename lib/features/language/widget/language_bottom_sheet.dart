@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../controllers/localization_controller.dart';
 
 class LanguageBottomSheet extends StatelessWidget {
   final LocalizationController controller;
 
-  const LanguageBottomSheet({Key? key, required this.controller}) : super(key: key);
+  const LanguageBottomSheet({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,7 @@ class LanguageBottomSheet extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: isDark ? Colors.black54 : Colors.grey.withOpacity(0.2),
+            color: isDark ? Colors.black54 : Colors.grey.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
@@ -68,7 +69,7 @@ class LanguageBottomSheet extends StatelessWidget {
           Obx(() => ListView.separated(
             shrinkWrap: true,
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemCount: controller.languages.length,
             itemBuilder: (context, index) {
               final language = controller.languages[index];
@@ -76,7 +77,7 @@ class LanguageBottomSheet extends StatelessWidget {
 
               return Material(
                 color: isSelected
-                    ? theme.colorScheme.primary.withOpacity(0.1)
+                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
                 child: InkWell(
@@ -89,8 +90,8 @@ class LanguageBottomSheet extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                     child: Row(
                       children: [
-                        Image.asset(
-                          language.imageUrl,
+                        CustomImageWidget(
+                          imagePath: language.imageUrl,
                           width: 32,
                           height: 20,
                           fit: BoxFit.cover,

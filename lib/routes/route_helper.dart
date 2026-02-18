@@ -7,6 +7,8 @@ import '../features/auth/screens/name_screen.dart';
 import '../features/auth/screens/gender_screen.dart';
 import '../features/auth/screens/birth_details_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
+import '../features/auth/screens/complete_profile_screen.dart';
+import '../features/auth/screens/registration_success_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/language/screens/language_selection_screen.dart';
 import '../features/home/screens/home_screen.dart';
@@ -21,6 +23,8 @@ class RouteHelper {
   static String getNameSetupRoute() => AppRoutes.nameSetup;
   static String getGenderSetupRoute() => AppRoutes.genderSetup;
   static String getBirthDetailsRoute() => AppRoutes.birthDetails;
+  static String getCompleteProfileRoute() => AppRoutes.completeProfile;
+  static String getRegistrationSuccessRoute() => AppRoutes.registrationSuccess;
   static String getHomeRoute() => AppRoutes.home;
   static String getLanguageSelectionRoute() => AppRoutes.languageSelection;
   static String getDashboardRoute() => AppRoutes.dashboard;
@@ -64,6 +68,16 @@ class RouteHelper {
       name: AppRoutes.birthDetails,
       page: () => const BirthDetailsScreen(),
       transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.completeProfile,
+      page: () => const CompleteProfileScreen(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.registrationSuccess,
+      page: () => const RegistrationSuccessScreen(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: AppRoutes.home,

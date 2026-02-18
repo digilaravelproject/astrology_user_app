@@ -1,0 +1,49 @@
+<svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pink gradient background -->
+  <defs>
+    <linearGradient id="pinkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FDE7F3;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FCE4EC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FAD4E4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="375" height="812" fill="url(#pinkGradient)"/>
+  
+  <!-- Zodiac symbols scattered across background -->
+  <!-- Aries - top left -->
+  <text x="30" y="90" font-family="serif" font-size="70" fill="white" opacity="0.12">♈</text>
+  
+  <!-- Taurus - top right -->
+  <text x="300" y="150" font-family="serif" font-size="90" fill="white" opacity="0.15">♉</text>
+  
+  <!-- Gemini - middle left -->
+  <text x="15" y="330" font-family="serif" font-size="60" fill="white" opacity="0.10">♊</text>
+  
+  <!-- Cancer - middle right -->
+  <text x="320" y="380" font-family="serif" font-size="75" fill="white" opacity="0.12">♋</text>
+  
+  <!-- Leo - bottom left large -->
+  <text x="25" y="580" font-family="serif" font-size="100" fill="white" opacity="0.15">♌</text>
+  
+  <!-- Virgo - bottom right -->
+  <text x="295" y="650" font-family="serif" font-size="80" fill="white" opacity="0.13">♍</text>
+  
+  <!-- Libra - bottom center -->
+  <text x="90" y="720" font-family="serif" font-size="65" fill="white" opacity="0.10">♎</text>
+  
+  <!-- Scorpio - top center -->
+  <text x="180" y="230" font-family="serif" font-size="55" fill="white" opacity="0.08">♏</text>
+  
+  <!-- Sagittarius - middle center -->
+  <text x="200" y="450" font-family="serif" font-size="65" fill="white" opacity="0.09">♐</text>
+  
+  <!-- Capricorn - top right small -->
+  <text x="280" y="120" font-family="serif" font-size="50" fill="white" opacity="0.11">♑</text>
+  
+  <!-- Aquarius - bottom left small -->
+  <text x="50" y="750" font-family="serif" font-size="55" fill="white" opacity="0.12">♒</text>
+  
+  <!-- Pisces - middle right small -->
+  <text x="310" y="500" font-family="serif" font-size="60" fill="white" opacity="0.10">♓</text>
+</svg>

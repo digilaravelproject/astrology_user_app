@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import '../services/network/network_info.dart';
+import '../constants/app_strings.dart';
 
 class NoInternetScreen extends StatefulWidget {
   const NoInternetScreen({Key? key}) : super(key: key);
@@ -23,8 +24,8 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
     if (isConnected) {
       Get.back(); // close the screen
       Get.snackbar(
-        'Connected',
-        'Internet connection restored',
+        AppStrings.connected,
+        AppStrings.internetRestored,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -32,8 +33,8 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
       );
     } else {
       Get.snackbar(
-        'No Internet',
-        'Still no internet connection. Please check your network.',
+        AppStrings.noInternet,
+        AppStrings.stillNoInternet,
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -87,8 +88,8 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
                 const SizedBox(height: 24),
 
                 // 📝 Title
-                const Text(
-                  'No Internet Connection',
+                Text(
+                  AppStrings.noInternetConnection,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
 
                 // 💬 Description
                 Text(
-                  'Please check your internet connection and try again.',
+                  AppStrings.checkInternetConnection,
                   style: TextStyle(fontSize: 15, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
@@ -130,8 +131,8 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
                         AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                        : const Text(
-                      'Retry',
+                        : Text(
+                      AppStrings.retry,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -156,7 +157,7 @@ class _NoInternetScreenState extends State<NoInternetScreen> {
                       ),
                     ),
                     child: Text(
-                      'Open Settings',
+                      AppStrings.openSettings,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/widgets/gradient_button.dart';
-import '../../../routes/app_routes.dart';
-
-import '../../../core/constants/image_constants.dart';
+import '../../../routes/route_helper.dart';
 import '../../language/controllers/localization_controller.dart';
 import '../../language/domain/models/language_model.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/custom_button.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({Key? key}) : super(key: key);
@@ -48,25 +48,23 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         
                         const SizedBox(height: 30),
                         
-                        Text(
+                        AppText(
                           AppStrings.selectLanguageTitle,
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            color: const Color(0xFF2E1A47),
-                            height: 1.2,
+                          style: GoogleFonts.dmSerifDisplay(
+                            fontSize: 38,
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.deepPink,
+                            height: 1.1,
                           ),
                         ),
                         
                         const SizedBox(height: 12),
                         
-                        Text(
+                        AppText(
                           AppStrings.selectLanguageSubtitle,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black.withOpacity(0.4),
-                            fontWeight: FontWeight.w500,
-                          ),
+                          fontSize: 16,
+                          color: Colors.black.withOpacity(0.4),
+                          fontWeight: FontWeight.w400,
                         ),
                         
                         const SizedBox(height: 40),
@@ -103,18 +101,18 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 Container(
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: AppColors.black.withOpacity(0.04),
                         blurRadius: 20,
                         offset: const Offset(0, -5),
                       ),
                     ],
                   ),
-                  child: GradientButton(
+                  child: CustomButton(
                     text: AppStrings.next,
-                    onTap: () => Get.toNamed(AppRoutes.dashboard),
+                    onTap: () => Get.toNamed(RouteHelper.getNameSetupRoute()),
                   ),
                 ),
               ],
@@ -143,13 +141,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               color: isSelected ? Colors.white : Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? const Color(0xFFFF8F00) : Colors.black.withOpacity(0.06),
+                color: isSelected ? AppColors.deepPink : Colors.black.withOpacity(0.06),
                 width: isSelected ? 2.5 : 1.2,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected 
-                      ? const Color(0xFFFF8F00).withOpacity(0.12)
+                      ? AppColors.deepPink.withOpacity(0.12)
                       : Colors.black.withOpacity(0.02),
                   blurRadius: isSelected ? 15 : 5,
                   offset: isSelected ? const Offset(0, 8) : const Offset(0, 2),
@@ -165,8 +163,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                     right: 10,
                     child: Container(
                       padding: const EdgeInsets.all(2),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFFF8F00),
+                      decoration: BoxDecoration(
+                        color: AppColors.deepPink,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -182,14 +180,12 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      AppText(
                         language.languageName,
-                        style: GoogleFonts.poppins(
-                          fontSize: 18,
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                          color: isSelected ? const Color(0xFF2D2D2D) : Colors.black54,
-                          letterSpacing: 0.2,
-                        ),
+                        fontSize: 18,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color: isSelected ? const Color(0xFF2D2D2D) : Colors.black54,
+                        letterSpacing: 0.2,
                       ),
                       if (isSelected)
                         Container(
@@ -197,7 +193,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                           height: 2.5,
                           width: 25,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF8F00),
+                            color: AppColors.deepPink,
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -207,25 +203,25 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               ],
             ),
           ),
-
-          // Overlapping Character (Now on Top)
-          Positioned(
-            bottom: -15,
-            right: -10,
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: isSelected ? 0.30 : 0.12,
-                child: Text(
-                  firstChar,
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 100,
-                    fontWeight: FontWeight.w900,
-                    color: isSelected ? const Color(0xFFFF0000) : const Color(0xFFFF9933),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          //
+          // // Overlapping Character (Now on Top)
+          // Positioned(
+          //   bottom: -15,
+          //   right: -10,
+          //   child: IgnorePointer(
+          //     child: Opacity(
+          //       opacity: isSelected ? 0.35 : 0.15,
+          //       child: Text(
+          //         firstChar,
+          //         style: GoogleFonts.playfairDisplay(
+          //           fontSize: 100,
+          //           fontWeight: FontWeight.w900,
+          //           color: isSelected ? AppColors.primaryColor : Colors.grey,
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -240,7 +236,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         child: Icon(
           Icons.language,
           size: 400,
-          color: const Color(0xFFFF9933),
+          color: AppColors.primaryColor,
         ),
       ),
     );

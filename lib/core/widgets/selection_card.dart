@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../theme/app_colors.dart';
 
 /// Reusable selection card widget (e.g., for Gender selection)
 class SelectionCard extends StatelessWidget {
@@ -20,52 +22,37 @@ class SelectionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(vertical: 28),
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? const Color(0xFFFF9933).withOpacity(0.12) 
-              : Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          color: isSelected ? AppColors.primaryColor.withOpacity(0.08) : const Color(0xFFF9F9F9),
+          borderRadius: BorderRadius.circular(30),
           border: Border.all(
             color: isSelected 
-                ? const Color(0xFFFF8F00) 
-                : Colors.black.withOpacity(0.08),
-            width: isSelected ? 3 : 1.5,
+                ? AppColors.primaryColor 
+                : Colors.black.withOpacity(0.05),
+            width: 1.2,
           ),
-          boxShadow: [
-            if (isSelected)
-              BoxShadow(
-                color: const Color(0xFFFF8F00).withOpacity(0.2),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            if (!isSelected)
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-          ],
         ),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              size: isSelected ? 60 : 52,
+              size: 20,
               color: isSelected 
-                  ? const Color(0xFFFF6D00) 
-                  : Colors.black.withOpacity(0.25),
+                  ? AppColors.primaryColor 
+                  : Colors.black.withOpacity(0.3),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected 
-                    ? const Color(0xFF2E1A47) 
-                    : Colors.black.withOpacity(0.35),
+                    ? AppColors.primaryColor
+                    : Colors.black.withOpacity(0.5),
               ),
             ),
           ],

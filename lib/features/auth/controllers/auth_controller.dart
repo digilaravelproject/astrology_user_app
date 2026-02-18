@@ -85,11 +85,7 @@ class AuthController extends GetxController {
 
   Future<void> login() async {
     print('Login called');
-    if (!formKey.currentState!.validate()) {
-      print('Validation failed');
-      return;
-    }
-
+    
     try {
       print('Bypassing API: Direct navigation to OTP');
       isLoading.value = true;
@@ -101,14 +97,6 @@ class AuthController extends GetxController {
       print('Navigating to OTP Screen');
       Get.toNamed(RouteHelper.getOtpRoute());
       
-      /* 
-      final user = await _loginUseCase.execute(mobileController.text.trim());
-      if (user != null) {
-        currentUser.value = user;
-        currentMobile.value = mobileController.text.trim();
-        Get.toNamed(RouteHelper.getOtpRoute());
-      }
-      */
     } catch (e) {
       print('Login error: $e');
     } finally {
@@ -128,8 +116,8 @@ class AuthController extends GetxController {
       await Future.delayed(const Duration(milliseconds: 800));
       
       otpController.clear();
-      // Directly navigate to Arrival screen for profile completion setup
-      Get.offAllNamed(RouteHelper.getArrivalRoute());
+      // Navigate to Registration Success screen
+      Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
 
       /*
       final user = await _verifyOtpUseCase.execute(

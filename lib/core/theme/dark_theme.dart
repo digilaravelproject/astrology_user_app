@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'text_theme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 ThemeData darkTheme = ThemeData(
   brightness: Brightness.dark,
+  fontFamily: GoogleFonts.poppins().fontFamily,
   primaryColor: AppColors.darkPrimaryColor,
   scaffoldBackgroundColor: AppColors.darkScaffoldBackgroundColor,
   colorScheme: ColorScheme.dark(
     primary: AppColors.darkPrimaryColor,
-    secondary: AppColors.darkSecondaryColor,
-    onPrimary: Colors.white,
-    onSecondary: Colors.white,
-    background: AppColors.darkBackgroundColor,
+    secondary: AppColors.secondaryColor,
+    onPrimary: AppColors.white,
+    onSecondary: AppColors.white,
     surface: AppColors.darkCardColor,
     error: AppColors.errorColor,
   ),

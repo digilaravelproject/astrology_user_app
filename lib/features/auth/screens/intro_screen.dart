@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../routes/route_helper.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class IntroScreen extends StatefulWidget {
-  const IntroScreen({Key? key}) : super(key: key);
+  const IntroScreen({super.key});
 
   @override
   State<IntroScreen> createState() => _IntroScreenState();
@@ -56,13 +59,10 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: Stack(
         children: [
-          // 1. Precise Background Watermark Pattern (Centered behind text)
-          _buildBackgroundPattern(),
-
-          // 2. Main Onboarding Content
+          // Onboarding Content
           PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
@@ -102,12 +102,12 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                       width: _currentPage == _pages.length - 1 ? 160 : 50,
                       height: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(_currentPage == _pages.length - 1 ? 25 : 12),
-                        border: Border.all(color: const Color(0xFFF58220), width: 2.2),
+                        border: Border.all(color: AppColors.primaryColor, width: 2.2),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFF58220).withOpacity(0.12),
+                            color: AppColors.primaryColor.withOpacity(0.12),
                             blurRadius: 8,
                             offset: const Offset(2, 2),
                           ),
@@ -117,9 +117,9 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                         child: _currentPage == _pages.length - 1
                             ? Text(
                                 AppStrings.getStarted,
-                                style: const TextStyle(
-                                  color: Color(0xFFF58220),
-                                  fontWeight: FontWeight.w900,
+                                style: GoogleFonts.poppins(
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.w600,
                                   fontSize: 13,
                                   letterSpacing: 1.2,
                                 ),
@@ -128,7 +128,7 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                                 angle: -45 * 3.14159 / 180,
                                 child: const Icon(
                                   Icons.arrow_forward_rounded,
-                                  color: Color(0xFFF58220),
+                                  color: AppColors.primaryColor,
                                   size: 28,
                                 ),
                               ),
@@ -149,8 +149,8 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                       height: 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index 
-                            ? const Color(0xFFFF9933) 
-                            : const Color(0xFFFF9933).withOpacity(0.15),
+                            ? AppColors.primaryColor 
+                            : AppColors.primaryColor.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -166,11 +166,11 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
             right: 20,
             child: TextButton(
               onPressed: () => Get.offAllNamed(RouteHelper.getLoginRoute()),
-              child: const Text(
+              child: Text(
                 'SKIP',
-                style: TextStyle(
-                  color: Color(0xFFFF9933),
-                  fontWeight: FontWeight.w900,
+                style: GoogleFonts.poppins(
+                  color: AppColors.primaryColor,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 2,
                   fontSize: 14,
                 ),
@@ -182,51 +182,13 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildBackgroundPattern() {
-    return Center(
-      child: Transform.translate(
-        offset: const Offset(0, 100), // Center it roughly around the text area
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            _rotatedText(AppStrings.zodiacLeo, 0.5, 120, -50),
-            _rotatedText(AppStrings.zodiacScorpio, -0.3, -130, 80),
-            _rotatedText(AppStrings.zodiacVirgo, 1.2, 100, 120),
-            _rotatedText(AppStrings.zodiacLibra, -1.1, -100, -140),
-            _rotatedText(AppStrings.zodiacAquarius, 0, 0, 0, opacity: 0.01),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _rotatedText(String text, double angle, double dx, double dy, {double opacity = 0.015}) {
-    return Transform.translate(
-      offset: Offset(dx, dy),
-      child: Transform.rotate(
-        angle: angle,
-        child: Opacity(
-          opacity: opacity,
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 100,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFFFF9933),
-              letterSpacing: 10,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildPage(OnboardingData data) {
     final size = MediaQuery.of(context).size;
     return Column(
       children: [
         // Top Arched Section (Enlarged)
-        Container(
+        SizedBox(
           height: size.height * 0.6,
           width: double.infinity,
           child: Stack(
@@ -258,14 +220,10 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                             child: Padding(
                               padding: const EdgeInsets.all(25.0),
                               child: ShaderMask(
-                                shaderCallback: (bounds) => const LinearGradient(
-                                  colors: [Color(0xFFD32F2F), Color(0xFFFF9933)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ).createShader(bounds),
+                                shaderCallback: (bounds) => AppColors.primaryGradient.createShader(bounds),
                                 blendMode: BlendMode.srcIn,
-                                child: Image.asset(
-                                  data.image,
+                                child: CustomImageWidget(
+                                  imagePath: data.image,
                                   fit: BoxFit.contain,
                                 ),
                               ),
@@ -285,18 +243,18 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.transparent,
-                                  const Color(0xFFF58220).withOpacity(0.05),
-                                  const Color(0xFFF58220).withOpacity(0.2),
+                                  AppColors.transparent,
+                                  AppColors.primaryColor.withOpacity(0.05),
+                                  AppColors.primaryColor.withOpacity(0.2),
                                 ],
                               ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Icon(Icons.star_rounded, color: Colors.white.withOpacity(0.05), size: 40),
-                                Icon(Icons.auto_awesome_rounded, color: Colors.white.withOpacity(0.1), size: 60),
-                                Icon(Icons.star_rounded, color: Colors.white.withOpacity(0.05), size: 40),
+                                Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
+                                Icon(Icons.auto_awesome_rounded, color: Colors.white.withValues(alpha: 0.1), size: 60),
+                                Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
                               ],
                             ),
                           ),
@@ -332,11 +290,11 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                   Text(
                     "KNOW YOUR\nFUTURE FROM",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 14,
                       letterSpacing: 4,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black.withOpacity(0.7),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black.withOpacity(0.7),
                       height: 1.4,
                     ),
                   ),
@@ -344,10 +302,10 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                   Text(
                     data.title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 38,
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF2E1A47),
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryColor,
                       height: 1.1,
                     ),
                   ),
@@ -355,9 +313,9 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                   Text(
                     data.description,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: Colors.black.withOpacity(0.35),
+                      color: AppColors.black.withOpacity(0.35),
                       height: 1.6,
                     ),
                   ),
@@ -397,9 +355,9 @@ class DualArchBorderPainter extends CustomPainter {
     path.quadraticBezierTo(size.width, 0, size.width, 160);
     path.lineTo(size.width, size.height);
 
-    canvas.drawPath(path, Paint()..color = const Color(0xFFF58220)..style = PaintingStyle.stroke..strokeWidth = 6);
+    canvas.drawPath(path, Paint()..color = AppColors.primaryColor..style = PaintingStyle.stroke..strokeWidth = 6);
     canvas.drawPath(path, Paint()..color = const Color(0xFF030A29)..style = PaintingStyle.stroke..strokeWidth = 3);
-    canvas.drawPath(path, Paint()..color = Colors.white.withOpacity(0.1)..style = PaintingStyle.stroke..strokeWidth = 1);
+    canvas.drawPath(path, Paint()..color = AppColors.white.withOpacity(0.1)..style = PaintingStyle.stroke..strokeWidth = 1);
   }
 
   @override
@@ -409,7 +367,7 @@ class DualArchBorderPainter extends CustomPainter {
 class ConcaveCutoutPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()..color = Colors.white;
+    Paint paint = Paint()..color = AppColors.white;
     Path path = Path();
     path.moveTo(0, size.height);
     path.lineTo(0, size.height * 0.5);

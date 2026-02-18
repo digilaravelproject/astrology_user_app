@@ -1,0 +1,83 @@
+Bengali (bn_IN):
+"PRO": "প্রো",
+"Name": "নাম",
+"Gender": "লিঙ্গ",
+"Under Development": "উন্নয়নাধীন",
+"Go Back": "ফিরে যান",
+"Something went wrong!": "কিছু ভুল হয়েছে!",
+"Retry": "পুনরায় চেষ্টা করুন",
+"No Internet Connection": "ইন্টারনেট সংযোগ নেই",
+"Open Settings": "সেটিংস খুলুন",
+"Connected": "সংযুক্ত",
+"Wallet Recharge": "ওয়ালেট রিচার্জ",
+"Kundali Report": "কুন্ডলী রিপোর্ট"
+
+Gujarati (gu_IN):
+"PRO": "પ્રો",
+"Name": "નામ",
+"Gender": "લિંગ",
+"Under Development": "વિકાસ હેઠળ",
+"Go Back": "પાછા જાઓ",
+"Something went wrong!": "કંઈક ખોટું થયું!",
+"Retry": "ફરી પ્રયાસ કરો",
+"No Internet Connection": "ઇન્ટરનેટ કનેક્શન નથી",
+"Open Settings": "સેટિંગ્સ ખોલો",
+"Connected": "કનેક્ટેડ",
+"Wallet Recharge": "વૉલેટ રિચાર્જ",
+"Kundali Report": "કુંડળી રિપોર્ટ"
+
+Kannada (kn_IN):
+"PRO": "ಪ್ರೊ",
+"Name": "ಹೆಸರು",
+"Gender": "ಲಿಂಗ",
+"Under Development": "ಅಭಿವೃದ್ಧಿಯಲ್ಲಿದೆ",
+"Go Back": "ಹಿಂತಿರುಗಿ",
+"Something went wrong!": "ಏನೋ ತಪ್ಪಾಗಿದೆ!",
+"Retry": "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+"No Internet Connection": "ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವಿಲ್ಲ",
+"Open Settings": "ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ",
+"Connected": "ಸಂಪರ್ಕಗೊಂಡಿದೆ",
+"Wallet Recharge": "ವಾಲೆಟ್ ರೀಚಾರ್ಜ್",
+"Kundali Report": "ಕುಂಡಲಿ ವರದಿ"
+
+Malayalam (ml_IN):
+"PRO": "പ്രോ",
+"Name": "പേര്",
+"Gender": "ലിംഗം",
+"Under Development": "വികസനത്തിലാണ്",
+"Go Back": "തിരികെ പോകുക",
+"Something went wrong!": "എന്തോ തെറ്റ് സംഭവിച്ചു!",
+"Retry": "വീണ്ടും ശ്രമിക്കുക",
+"No Internet Connection": "ഇന്റർനെറ്റ് കണക്ഷൻ ഇല്ല",
+"Open Settings": "ക്രമീകരണങ്ങൾ തുറക്കുക",
+"Connected": "കണക്റ്റുചെയ്തു",
+"Wallet Recharge": "വാലറ്റ് റീചാർജ്",
+"Kundali Report": "കുണ്ഡലി റിപ്പോർട്ട്"
+
+Tamil (ta_IN):
+"PRO": "ப்ரோ",
+"Name": "பெயர்",
+"Gender": "பாலினம்",
+"Under Development": "மேம்பாட்டில் உள்ளது",
+"Go Back": "திரும்பிச் செல்",
+"Something went wrong!": "ஏதோ தவறு நடந்துவிட்டது!",
+"Retry": "மீண்டும் முயற்சிக்கவும்",
+"No Internet Connection": "இணைய இணைப்பு இல்லை",
+"Open Settings": "அமைப்புகளைத் திறக்கவும்",
+"Connected": "இணைக்கப்பட்டது",
+"Wallet Recharge": "வாலட் ரீசார்ஜ்",
+"Kundali Report": "குண்டலி அறிக்கை"
+
+Telugu (te_IN):
+"PRO": "ప్రో",
+"Name": "పేరు",
+"Gender": "లింగం",
+"Under Development": "అభివృద్ధిలో ఉంది",
+"Go Back": "వెనక్కి వెళ్ళు",
+"Something went wrong!": "ఏదో తప్పు జరిగింది!",
+"Retry": "మళ్లీ ప్రయత్నించండి",
+"No Internet Connection": "ఇంటర్నెట్ కనెక్షన్ లేదు",
+"Open Settings": "సెట్టింగ్‌లను తెరవండి",
+"Connected": "కనెక్ట్ చేయబడింది",
+"Wallet Recharge": "వాలెట్ రీఛార్జ్",
+"Kundali Report": "కుండలి నివేదిక"

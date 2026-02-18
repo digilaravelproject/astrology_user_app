@@ -3,9 +3,12 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../routes/route_helper.dart';
 import '../../../routes/app_routes.dart';
-import '../../../core/widgets/gradient_button.dart';
 import '../../../core/widgets/picker_tile.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/custom_button.dart';
+import '../controllers/auth_controller.dart';
 
 class BirthDetailsScreen extends StatefulWidget {
   const BirthDetailsScreen({Key? key}) : super(key: key);
@@ -28,10 +31,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFFF8F00),
+            colorScheme: ColorScheme.light(
+              primary: AppColors.deepPink,
               onPrimary: Colors.white,
-              onSurface: Color(0xFF2E1A47),
+              onSurface: AppColors.textColorPrimary,
             ),
           ),
           child: child!,
@@ -48,10 +51,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFFF8F00),
+            colorScheme: ColorScheme.light(
+              primary: AppColors.deepPink,
               onPrimary: Colors.white,
-              onSurface: Color(0xFF2E1A47),
+              onSurface: AppColors.textColorPrimary,
             ),
           ),
           child: child!,
@@ -64,92 +67,85 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          _buildBackgroundPattern(context),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () => Get.back(),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFFFF9933).withOpacity(0.05),
-                      ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Color(0xFF2E1A47)),
-                    ),
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.fieldBackground,
                   ),
-                  const SizedBox(height: 30),
-                  Text(
-                    AppStrings.birthDetailsTitle,
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF2E1A47),
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.birthDetailsSubtitle,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black.withOpacity(0.4),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-
-                  // DOB Input
-                  _buildInputLabel(AppStrings.dateOfBirth),
-                  _buildReadOnlyField(
-                    hint: selectedDate != null
-                        ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                        : AppStrings.selectDate,
-                    icon: Icons.calendar_today_rounded,
-                    onTap: () => _selectDate(context),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // TOB Input
-                  _buildInputLabel(AppStrings.timeOfBirth),
-                  _buildReadOnlyField(
-                    hint: selectedTime != null
-                        ? selectedTime!.format(context)
-                        : AppStrings.selectTime,
-                    icon: Icons.access_time_rounded,
-                    onTap: () => _selectTime(context),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // POB Input
-                  _buildInputLabel(AppStrings.placeOfBirth),
-                  _buildPlaceField(),
-
-                  const SizedBox(height: 60),
-
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: GradientButton(
-                      text: AppStrings.finish,
-                      onTap: () => Get.toNamed(RouteHelper.getLanguageSelectionRoute()),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.primaryColor),
+                ),
               ),
-            ),
+              const SizedBox(height: 30),
+              AppText(
+                AppStrings.birthDetailsTitle,
+                style: GoogleFonts.dmSerifDisplay(
+                  fontSize: 38,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.deepPink,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 12),
+              AppText(
+                AppStrings.birthDetailsSubtitle,
+                fontSize: 16,
+                color: AppColors.black.withOpacity(0.4),
+                fontWeight: FontWeight.w400,
+              ),
+              const SizedBox(height: 40),
+
+              // DOB Input
+              _buildInputLabel(AppStrings.dateOfBirth),
+              _buildReadOnlyField(
+                hint: selectedDate != null
+                    ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                    : AppStrings.selectDate,
+                icon: Icons.calendar_today_rounded,
+                onTap: () => _selectDate(context),
+              ),
+
+              const SizedBox(height: 25),
+
+              // TOB Input
+              _buildInputLabel(AppStrings.timeOfBirth),
+              _buildReadOnlyField(
+                hint: selectedTime != null
+                    ? selectedTime!.format(context)
+                    : AppStrings.selectTime,
+                icon: Icons.access_time_rounded,
+                onTap: () => _selectTime(context),
+              ),
+
+              const SizedBox(height: 25),
+
+              // POB Input
+              _buildInputLabel(AppStrings.placeOfBirth),
+              _buildPlaceField(),
+
+              const SizedBox(height: 60),
+
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: CustomButton(
+                  text: AppStrings.finish,
+                  onTap: () => Get.offAllNamed(RouteHelper.getDashboardRoute()),
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -157,14 +153,12 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   Widget _buildInputLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
-      child: Text(
+      child: AppText(
         label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: Color(0xFF2E1A47),
-          letterSpacing: 0.5,
-        ),
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: AppColors.deepPink,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -174,11 +168,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.transparent,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFF8F00).withOpacity(0.05),
+              color: AppColors.primaryColor.withOpacity(0.05),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -188,8 +182,8 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
           enabled: false,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xFF2E1A47), fontWeight: FontWeight.w600, fontSize: 16),
-            prefixIcon: Icon(icon, color: const Color(0xFFFF8F00)),
+            hintStyle: const TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.w600, fontSize: 16),
+            prefixIcon: Icon(icon, color: AppColors.deepPink),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
@@ -204,11 +198,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   Widget _buildPlaceField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF8F00).withOpacity(0.05),
+            color: AppColors.primaryColor.withOpacity(0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -220,7 +214,7 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
         decoration: InputDecoration(
           hintText: AppStrings.enterCity,
           hintStyle: TextStyle(color: Colors.black.withOpacity(0.2)),
-          prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFFFF8F00)),
+          prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.deepPink),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
@@ -231,7 +225,7 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Color(0xFFFF8F00), width: 1.5),
+            borderSide: const BorderSide(color: AppColors.deepPink, width: 2.0),
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         ),
@@ -240,7 +234,7 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   }
 
   Widget _buildBackgroundPattern(BuildContext context) {
-    final iconColor = const Color(0xFFFF9933).withOpacity(0.06);
+    final iconColor = AppColors.primaryColor.withOpacity(0.06);
 
     return Stack(
       children: [

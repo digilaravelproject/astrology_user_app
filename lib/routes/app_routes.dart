@@ -7,6 +7,8 @@ class AppRoutes {
   static const String nameSetup = '/name-setup';
   static const String genderSetup = '/gender-setup';
   static const String birthDetails = '/birth-details';
+  static const String completeProfile = '/complete-profile';
+  static const String registrationSuccess = '/registration-success';
   static const String languageSelection = '/language-selection';
   static const String dashboard = '/dashboard';
   static const String home = '/home';

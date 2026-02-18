@@ -38,7 +38,7 @@ extension ImageTypeExtension on String {
 /// A reusable custom image widget
 class CustomImageWidget extends StatelessWidget {
   const CustomImageWidget({
-    Key? key,
+    super.key,
     this.imagePath,
     this.height,
     this.width,
@@ -50,7 +50,7 @@ class CustomImageWidget extends StatelessWidget {
     this.margin,
     this.border,
     this.placeHolder = ImageConstants.imageNotFound,
-  }) : super(key: key);
+  });
 
   final String? imagePath;
   final double? height;
@@ -225,7 +225,6 @@ class CustomImageWidget extends StatelessWidget {
             );
           }
         case ImageType.unknown:
-        default:
           return Image.asset(
             placeHolder,
             height: height,

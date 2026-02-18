@@ -5,9 +5,17 @@ import '../../../core/constants/dimensions.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_image_widget.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../routes/route_helper.dart';
 import '../../../core/widgets/loading_widget.dart';
+import '../../../core/widgets/cosmic_background.dart';
+import '../../../core/widgets/custom_button.dart';
 import '../controllers/auth_controller.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_text.dart';
 
 class OtpScreen extends StatelessWidget {
   const OtpScreen({Key? key}) : super(key: key);
@@ -17,237 +25,195 @@ class OtpScreen extends StatelessWidget {
     final authController = Get.find<AuthController>();
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+      ),
+      child: Stack(
         children: [
-          // 1. Subtle Cosmic Background
-          _buildBackgroundWatermarks(),
-
-          // 2. Main Content
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                   SizedBox(height: size.height * 0.05),
-
-                  // Header Section
-                  Text(
-                    AppStrings.verification,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2D2D2D), // Warm charcoal
-                      fontFamily: 'Playfair Display',
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      '${AppStrings.enterOtpSent}\n+91 ${authController.currentMobile.value}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black54,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: size.height * 0.06),
-
-                  // OTP Input Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(
-                      4,
-                      (index) => Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFFF8F00).withOpacity(0.08),
-                              blurRadius: 15,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFFF8F00), // Bhagwa
-                          ),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(1),
-                          ],
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Color(0xFFFF8F00), width: 1.5),
-                            ),
-                            counterText: "",
-                          ),
-                          onChanged: (value) {
-                            if (value.isNotEmpty) {
-                              if (index < 3) FocusScope.of(context).nextFocus();
-                              
-                              String currentOtp = authController.otpController.text;
-                              if (currentOtp.length <= index) {
-                                authController.otpController.text = currentOtp + value;
-                              } else {
-                                List<String> chars = currentOtp.split('');
-                                chars[index] = value;
-                                authController.otpController.text = chars.join('');
-                              }
-                            } else {
-                              if (index > 0) FocusScope.of(context).previousFocus();
-                              String currentOtp = authController.otpController.text;
-                              if (currentOtp.length > index) {
-                                List<String> chars = currentOtp.split('');
-                                chars.removeAt(index);
-                                authController.otpController.text = chars.join('');
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(height: size.height * 0.08),
-
-                  // Verify Button (Pill shaped, Gradient)
-                  Obx(() => authController.isLoading.value 
-                    ? const LoadingWidget()
-                    : GestureDetector(
-                        onTap: authController.verifyOtp,
-                        child: Container(
-                          width: double.infinity,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFFFF8F00), // Bhagwa
-                                Color(0xFFFF6D00), // Bhagwa
-                                Color(0xFFD32F2F), // Red (30%)
-                              ],
-                              stops: [0.0, 0.6, 1.0],
-                            ),
-                            borderRadius: BorderRadius.circular(27),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFF8F00).withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                               AppStrings.verify,
-                               style: const TextStyle(
-                                 color: Colors.white,
-                                 fontSize: 18,
-                                 fontWeight: FontWeight.w600,
-                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-                  ),
-
-                  const SizedBox(height: 35),
-
-                  // Resend Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        AppStrings.didntReceiveCode,
-                        style: TextStyle(color: Colors.black45, fontSize: 14),
-                      ),
-                      GestureDetector(
-                        onTap: () => authController.login(),
-                        child: Text(
-                          AppStrings.resend,
-                          style: const TextStyle(
-                            color: Color(0xFFFF6D00),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          // Fixed white background layer
+          Positioned.fill(
+            child: Container(color: Colors.white),
+          ),
+          // Background image - Fixed
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.4,
+              child: Image.asset(
+                ImageConstants.loginBackground,
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          
-          // Back Button
-          Positioned(
-            top: 50,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black87),
-              onPressed: () => Get.back(),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            resizeToAvoidBottomInset: false,
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 25, 
+                  right: 25,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                     SizedBox(height: size.height * 0.06),
+    
+                    AppText(
+                      AppStrings.verification,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                      height: 1.1,
+                      letterSpacing: -1,
+                    ),
+                    
+                    const SizedBox(height: 15),
+                    
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: AppText(
+                        '${AppStrings.enterOtpSent}\n${AppStrings.countryCodePrefix} ${authController.currentMobile.value}',
+                        textAlign: TextAlign.center,
+                        fontSize: 14,
+                        color: AppColors.black.withOpacity(0.3),
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+    
+                    SizedBox(height: size.height * 0.08),
+    
+                    _buildOtpInput(context, authController),
+    
+                    SizedBox(height: size.height * 0.08),
+    
+                    Obx(() => CustomButton(
+                      text: AppStrings.verify,
+                      onTap: authController.verifyOtp,
+                      isLoading: authController.isLoading.value,
+                    )),
+    
+                    const SizedBox(height: 40),
+    
+                    _buildResendSection(authController),
+                  ],
+                ),
+              ),
             ),
           ),
+          _buildBackButton(),
         ],
       ),
     );
   }
 
-  Widget _buildBackgroundWatermarks() {
-    return Stack(
+
+  Widget _buildOtpInput(BuildContext context, AuthController authController) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: List.generate(
+        4,
+        (index) => Container(
+          width: 70,
+          height: 70,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: AppColors.deepPink.withOpacity(0.3),
+              width: 0.9,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.deepPink.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: TextField(
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+              style: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textColorPrimary,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(1),
+              ],
+              decoration: InputDecoration(
+                filled: false,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                counterText: "",
+                contentPadding: EdgeInsets.zero,
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  if (index < 3) FocusScope.of(context).nextFocus();
+
+                  String currentOtp = authController.otpController.text;
+                  if (currentOtp.length <= index) {
+                    authController.otpController.text = currentOtp + value;
+                  } else {
+                    List<String> chars = currentOtp.split('');
+                    chars[index] = value;
+                    authController.otpController.text = chars.join('');
+                  }
+                } else {
+                  if (index > 0) FocusScope.of(context).previousFocus();
+                  String currentOtp = authController.otpController.text;
+                  if (currentOtp.length > index) {
+                    List<String> chars = currentOtp.split('');
+                    chars.removeAt(index);
+                    authController.otpController.text = chars.join('');
+                  }
+                }
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResendSection(AuthController authController) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _watermarkText("♈", 60, 20, size: 45, rotation: 0.2),
-        _watermarkText("☀️", 120, -10, size: 70, rotation: 0),
-        _watermarkText("🌙", 80, 280, size: 50, rotation: -0.4),
-        _watermarkText("✨", 180, 320, size: 22, rotation: 0.1),
-        _watermarkText("♉", 380, -20, size: 65, rotation: -0.1),
-        _watermarkText("✨", 450, 40, size: 18, rotation: 0.5),
-        _watermarkText("♊", 350, 300, size: 55, rotation: 0.5),
-        _watermarkText("🪐", 520, 280, size: 75, rotation: 0.2),
-        _watermarkText("♋", 650, 30, size: 60, rotation: -0.2),
+        AppText(
+          AppStrings.didntReceiveCode,
+          color: AppColors.textColorSecondary,
+          fontSize: 14,
+        ),
+        GestureDetector(
+          onTap: () => authController.login(),
+          child: AppText(
+            AppStrings.resend,
+            color: AppColors.deepPink,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _watermarkText(String symbol, double top, double left, {double size = 60, double rotation = 0}) {
+  Widget _buildBackButton() {
     return Positioned(
-      top: top,
-      left: left,
-      child: Transform.rotate(
-        angle: rotation,
-        child: Opacity(
-          opacity: 0.045,
-          child: Text(
-            symbol,
-            style: TextStyle(
-              fontSize: size,
-              color: const Color(0xFFFF8F00),
-            ),
-          ),
-        ),
+      top: 50,
+      left: 20,
+      child: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: AppColors.black),
+        onPressed: () => Get.back(),
       ),
     );
   }

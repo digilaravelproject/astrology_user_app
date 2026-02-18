@@ -1,103 +1,187 @@
 import 'package:flutter/material.dart';
-
-import '../constants/dimensions.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
-import '../utils/ui_spacer.dart';
-import 'custom_image_widget.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'app_text.dart';
 
 class NavItem {
-  final String icon;
+  final IconData icon;
   final String label;
 
   NavItem({required this.icon, required this.label});
 }
 
-class CustomBottomNavBar extends StatelessWidget {
+class CustomBottomNavBar extends StatefulWidget {
   final int selectedIndex;
   final List<NavItem> items;
   final Function(int) onItemSelected;
+  final Color? gradientColor;
 
   const CustomBottomNavBar({
     Key? key,
     required this.selectedIndex,
     required this.items,
     required this.onItemSelected,
+    this.gradientColor,
   }) : super(key: key);
 
   @override
+  State<CustomBottomNavBar> createState() => _CustomBottomNavBarState();
+}
+
+class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        // margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        decoration: BoxDecoration(
-          color: Color(0xFF1E1E1E), // AppColors.primaryColor,
-          // borderRadius: BorderRadius.only(
-          //   topLeft: Radius.circular(20),
-          //   topRight: Radius.circular(20),
-          // ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
+    final Color fadeColor = widget.gradientColor ?? Colors.white;
+
+    return Container(
+      height: 140,
+      padding: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            fadeColor.withOpacity(0.0),
+            fadeColor.withOpacity(0.9),
+            fadeColor,
           ],
+          stops: const [0.0, 0.5, 1.0],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(
-            items.length,
-                (index) =>
-                _buildNavItem(items[index].icon, items[index].label, index),
+      ),
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        clipBehavior: Clip.none,
+        children: [
+          // Main Nav Bar Container
+          Container(
+            height: 70,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(40),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 20,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildNormalItem(0),
+                _buildNormalItem(1),
+                const SizedBox(width: 50),
+                _buildNormalItem(3),
+                _buildNormalItem(4),
+              ],
+            ),
           ),
-        ),
+
+          // Central Elevated Button with Pulse Animation
+          Positioned(
+            top: 25,
+            child: GestureDetector(
+              onTap: () => widget.onItemSelected(2),
+              child: ScaleTransition(
+                scale: _pulseAnimation,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            AppColors.primaryColor,
+                            AppColors.accentColor, 
+                          ],
+                          stops: [0.0, 1.0],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryColor.withOpacity(0.35),
+                            blurRadius: 18,
+                            spreadRadius: 3,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                        border: Border.all(color: Colors.white, width: 4),
+                      ),
+                      child: Icon(
+                        widget.items[2].icon,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    AppText(
+                      widget.items[2].label,
+                      fontSize: 10,
+                      fontWeight: widget.selectedIndex == 2 ? FontWeight.w700 : FontWeight.w500,
+                      color: widget.selectedIndex == 2 ? AppColors.accentColor : Colors.grey.shade500,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildNavItem(String icon, String label, int index) {
-    final bool isSelected = selectedIndex == index;
+  Widget _buildNormalItem(int index) {
+    final bool isSelected = widget.selectedIndex == index;
+    final item = widget.items[index];
 
     return GestureDetector(
-      onTap: () => onItemSelected(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primaryColor
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon(
-            //   icon,
-            //   color: isSelected ? Colors.black : Colors.white,
-            //   size: 24,
-            // ),
-            CustomImageWidget(
-              height: 20,
-              width: 20,
-              imagePath: icon,
-              color: isSelected ? Colors.black : Colors.white,
-            ),
-            UiSpacer.verticalSpace(
-              space: 5,
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.black  : Colors.white,
-                fontSize:Dimensions.font12,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
+      onTap: () => widget.onItemSelected(index),
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            item.icon,
+            color: isSelected ? AppColors.accentColor : Colors.grey.shade400,
+            size: 24,
+          ),
+          const SizedBox(height: 4),
+          AppText(
+            item.label,
+            fontSize: 10,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? AppColors.accentColor : Colors.grey.shade400,
+          ),
+        ],
       ),
     );
   }
