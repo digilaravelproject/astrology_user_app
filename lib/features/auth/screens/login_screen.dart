@@ -17,6 +17,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final errorMessage = ''.obs;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -94,7 +95,20 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       
                       // Phone Input
-                      _buildPhoneInput(authController),
+                      _buildPhoneInput(authController, errorMessage),
+                      
+                      // Error message
+                      Obx(() => errorMessage.value.isNotEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 8, left: 20),
+                              child: AppText(
+                                errorMessage.value,
+                                fontSize: 12,
+                                color: Colors.red,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                          : const SizedBox.shrink()),
                       
                       const SizedBox(height: 30),
                       
@@ -105,28 +119,17 @@ class LoginScreen extends StatelessWidget {
                         onTap: () {
                           // Validate mobile number before proceeding
                           if (authController.mobileController.text.isEmpty) {
-                            Get.snackbar(
-                              AppStrings.error,
-                              AppStrings.pleaseEnterMobile,
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
+                            errorMessage.value = AppStrings.pleaseEnterMobile;
                             return;
                           }
                           
                           if (authController.mobileController.text.length != 10) {
-                            Get.snackbar(
-                              AppStrings.error,
-                              AppStrings.enterValidMobile,
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
+                            errorMessage.value = AppStrings.enterValidMobile;
                             return;
                           }
                           
-                          // Call login method which will navigate to OTP screen
+                          // Clear error and proceed
+                          errorMessage.value = '';
                           authController.login();
                         },
                       )),
@@ -190,7 +193,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneInput(AuthController authController) {
+  Widget _buildPhoneInput(AuthController authController, RxString errorMessage) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -210,6 +213,12 @@ class LoginScreen extends StatelessWidget {
                   controller: authController.mobileController,
                   keyboardType: TextInputType.phone,
                   maxLength: 10,
+                  onChanged: (value) {
+                    // Clear error when user starts typing
+                    if (errorMessage.value.isNotEmpty) {
+                      errorMessage.value = '';
+                    }
+                  },
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

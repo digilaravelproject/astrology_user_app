@@ -14,6 +14,8 @@ class NameSetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final errorMessage = ''.obs;
+    
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -74,6 +76,12 @@ class NameSetupScreen extends StatelessWidget {
                 ),
                 child: TextField(
                   controller: authController.nameController,
+                  onChanged: (value) {
+                    // Clear error when user starts typing
+                    if (errorMessage.value.isNotEmpty) {
+                      errorMessage.value = '';
+                    }
+                  },
                   style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
                   decoration: InputDecoration(
                     hintText: AppStrings.nameHint,
@@ -96,6 +104,19 @@ class NameSetupScreen extends StatelessWidget {
                 ),
               ),
               
+              // Error message
+              Obx(() => errorMessage.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8, left: 4),
+                      child: AppText(
+                        errorMessage.value,
+                        fontSize: 12,
+                        color: Colors.red,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  : const SizedBox.shrink()),
+              
               const Spacer(),
 
               // Premium Gradient Button
@@ -103,7 +124,22 @@ class NameSetupScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 30),
                 child: CustomButton(
                   text: AppStrings.next,
-                  onTap: () => Get.toNamed(RouteHelper.getGenderSetupRoute()),
+                  onTap: () {
+                    // Validate name before proceeding
+                    if (authController.nameController.text.trim().isEmpty) {
+                      errorMessage.value = AppStrings.pleaseEnterName;
+                      return;
+                    }
+                    
+                    if (authController.nameController.text.trim().length < 2) {
+                      errorMessage.value = AppStrings.nameMinLength;
+                      return;
+                    }
+                    
+                    // Clear error and proceed
+                    errorMessage.value = '';
+                    Get.toNamed(RouteHelper.getGenderSetupRoute());
+                  },
                 ),
               ),
             ],

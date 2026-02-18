@@ -36,11 +36,26 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.lightPink.withOpacity(0.3),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 16,
+              color: AppColors.deepPink,
+            ),
+          ),
+          onPressed: () => Get.back(),
+        ),
         title: AppText(
-          "History",
-          fontSize: 18,
+          AppStrings.navHistory,
+          fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: Colors.black,
+          color: AppColors.deepPink,
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),

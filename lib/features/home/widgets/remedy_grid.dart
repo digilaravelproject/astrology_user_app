@@ -74,25 +74,27 @@ class RemedyGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(), // agar parent scroll hai
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 columns
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 1.2, // height control
+    return SizedBox(
+      height: 150,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        scrollDirection: Axis.horizontal,
+        itemCount: remedies.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              Get.to(() => RemedyDetailScreen(remedy: remedies[index]));
+            },
+            child: Container(
+              width: 200,
+              margin: EdgeInsets.only(
+                right: index < remedies.length - 1 ? 12 : 0,
+              ),
+              child: _buildRemedyCard(remedies[index]),
+            ),
+          );
+        },
       ),
-      itemCount: remedies.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            Get.to(() => RemedyDetailScreen(remedy: remedies[index]));
-          },
-          child: _buildRemedyCard(remedies[index]),
-        );
-      },
     );
   }
 

@@ -373,5 +373,9 @@
   "₹0 - ₹200": "₹0 - ₹200",
   "₹200 - ₹400": "₹200 - ₹400",
   "₹400 - ₹600": "₹400 - ₹600",
-  "₹600+": "₹600+"
+  "₹600+": "₹600+",
+  "Please enter OTP": "Please enter OTP",
+  "Please enter a valid 4-digit OTP": "Please enter a valid 4-digit OTP",
+  "Please enter your name": "Please enter your name",
+  "Name must be at least 2 characters": "Name must be at least 2 characters"
 }

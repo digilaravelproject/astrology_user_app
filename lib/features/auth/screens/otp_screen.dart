@@ -24,6 +24,7 @@ class OtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
     final size = MediaQuery.of(context).size;
+    final errorMessage = ''.obs;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -87,13 +88,42 @@ class OtpScreen extends StatelessWidget {
     
                     SizedBox(height: size.height * 0.08),
     
-                    _buildOtpInput(context, authController),
+                    _buildOtpInput(context, authController, errorMessage),
+    
+                    // Error message
+                    Obx(() => errorMessage.value.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: AppText(
+                              errorMessage.value,
+                              fontSize: 12,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : const SizedBox.shrink()),
     
                     SizedBox(height: size.height * 0.08),
     
                     Obx(() => CustomButton(
                       text: AppStrings.verify,
-                      onTap: authController.verifyOtp,
+                      onTap: () {
+                        // Validate OTP before proceeding
+                        if (authController.otpController.text.isEmpty) {
+                          errorMessage.value = AppStrings.pleaseEnterOtp;
+                          return;
+                        }
+                        
+                        if (authController.otpController.text.length != 4) {
+                          errorMessage.value = AppStrings.enterValidOtp;
+                          return;
+                        }
+                        
+                        // Clear error and proceed
+                        errorMessage.value = '';
+                        authController.verifyOtp();
+                      },
                       isLoading: authController.isLoading.value,
                     )),
     
@@ -112,7 +142,7 @@ class OtpScreen extends StatelessWidget {
   }
 
 
-  Widget _buildOtpInput(BuildContext context, AuthController authController) {
+  Widget _buildOtpInput(BuildContext context, AuthController authController, RxString errorMessage) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(
@@ -157,6 +187,11 @@ class OtpScreen extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
               ),
               onChanged: (value) {
+                // Clear error when user starts typing
+                if (errorMessage.value.isNotEmpty) {
+                  errorMessage.value = '';
+                }
+                
                 if (value.isNotEmpty) {
                   if (index < 3) FocusScope.of(context).nextFocus();
 

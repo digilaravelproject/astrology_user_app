@@ -38,6 +38,8 @@ class AppStrings {
   static String get nameTitle => 'What is your\nname?'.tr;
   static String get nameSubtitle => 'Please enter your full name'.tr;
   static String get nameHint => 'Full Name Hint'.tr;
+  static String get pleaseEnterName => 'Please enter your name'.tr;
+  static String get nameMinLength => 'Name must be at least 2 characters'.tr;
   // Gender Screen
   static String get genderTitle => 'Select\nGender'.tr;
   static String get genderSubtitle => 'Choose your gender to personalize your experience'.tr;
@@ -134,6 +136,8 @@ class AppStrings {
   static String get verify => 'Verify'.tr;
   static String get didntReceiveCode => 'Didn\'t receive the code? '.tr;
   static String get resend => 'Resend'.tr;
+  static String get pleaseEnterOtp => 'Please enter OTP'.tr;
+  static String get enterValidOtp => 'Please enter a valid 4-digit OTP'.tr;
   // Arrival Screen
   static String get welcome => 'Welcome!'.tr;
   static String get registrationSuccessful => 'Registration Successful'.tr;

@@ -16,7 +16,8 @@ import '../widgets/shop_services_section.dart';
 import '../widgets/astrology_blogs_section.dart';
 import '../widgets/astrologers_preview_section.dart';
 import '../widgets/live_session_section.dart';
-import '../widgets/matrimony_section.dart';
+import '../../matrimony/widgets/matrimony_section.dart';
+import '../widgets/remedy_services_section.dart';
 import '../../wallet/screens/wallet_screen.dart';
 import '../../notification/screens/notification_screen.dart';
 import '../../profile/screens/profile_screen.dart';
@@ -70,18 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
               background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFFFFD1D1),
-                      Color(0xFFFFF8F9),
-                    ],
-                  ),
-                ),
-
-
+                color: Colors.white,
               ),
             ),
           ),
@@ -138,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
             pinned: true,
             delegate: _FilterBarDelegate(
               child: Container(
-                height: 80,
+                height: 60,
                 alignment: Alignment.center,
                 child: _buildFilterBarUI(),
               ),
@@ -159,6 +149,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const SizedBox(height: 35),
                     const LiveSessionSection(),
+                    const SizedBox(height: 35),
+                    const RemedyServicesSection(),
                     const SizedBox(height: 150),
                   ],
                 )
@@ -192,14 +184,43 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            onTap: () => Get.to(() => const ProfileScreen()),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primaryColor,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.sort_rounded, size: 24, color: Color(0xFF2E1A47)),
+              child: ClipOval(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                  ),
+                  child: Center(
+                    child: Text(
+                      authController.currentUser.value?.name.isNotEmpty == true
+                          ? authController.currentUser.value!.name[0].toUpperCase()
+                          : 'U',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                      ),
+              ),
             ),
           ),
           Row(
@@ -229,10 +250,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildFilterBarUI() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 15),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: const BoxDecoration(
         color: Colors.white,
-
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -243,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             
             return Container(
-              padding:  EdgeInsets.only(right: 12 , left: isFilter? 12:0),
+              padding:  EdgeInsets.only(right: 10 , left: isFilter? 12:0),
               child: GestureDetector(
                 onTap: () {
                   if (filter == AppStrings.homeFilter) {
@@ -259,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     gradient: isFilter || isSelected
                         ? const LinearGradient(
@@ -269,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         : null,
                     color: isFilter || isSelected ? null : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: isFilter || isSelected ? Colors.transparent : AppColors.deepPink.withOpacity(0.3),
                       width: 1,
@@ -278,13 +298,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (isFilter || isSelected)
                         BoxShadow(
                           color: AppColors.deepPink.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
                         )
                       else
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 5,
+                          blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
                     ],
@@ -294,8 +314,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       if (isFilter) ...[
                         Container(
-                          width: 15,
-                          height: 15,
+                          width: 14,
+                          height: 14,
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
@@ -304,42 +324,42 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: AppText(
                               '1',
                               color: AppColors.deepPink,
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                       ],
                       if (filter == AppStrings.homeAll) ...[
                         Icon(
                           Icons.apps,
                           color: isSelected ? Colors.white : AppColors.deepPink,
-                          size: 16,
+                          size: 14,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                       ],
                       if (filter == AppStrings.homeFavourite) ...[
                         Icon(
                           Icons.star_outline,
                           color: isSelected ? Colors.white : AppColors.deepPink,
-                          size: 16,
+                          size: 14,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                       ],
                       if (filter == AppStrings.homeNew) ...[
                         Icon(
                           Icons.auto_awesome,
                           color: isSelected ? Colors.white : AppColors.deepPink,
-                          size: 16,
+                          size: 14,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 5),
                       ],
                       AppText(
                         filter == AppStrings.homeFilter ? AppStrings.homeFilter : (filter == AppStrings.homeAll ? AppStrings.homeAll : (filter == AppStrings.homeFavourite ? AppStrings.homeFavourite : (filter == AppStrings.homeNew ? AppStrings.homeNew : filter))),
                         color: isFilter || isSelected ? Colors.white : AppColors.deepPink,
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                       ),
                     ],
@@ -727,16 +747,16 @@ class _FilterBarDelegate extends SliverPersistentHeaderDelegate {
   _FilterBarDelegate({required this.child});
 
   @override
-  double get minExtent => 80;
+  double get minExtent => 60;
 
   @override
-  double get maxExtent => 80;
+  double get maxExtent => 60;
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox(
-      height: 80,
+      height: 60,
       child: Container(
         color: Colors.white,
         child: child,

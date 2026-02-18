@@ -17,6 +17,7 @@ class GenderSetupScreen extends StatefulWidget {
 
 class _GenderSetupScreenState extends State<GenderSetupScreen> {
   String selectedGender = "";
+  final errorMessage = ''.obs;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +73,13 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                       label: AppStrings.male,
                       icon: Icons.male_rounded,
                       isSelected: selectedGender == "male",
-                      onTap: () => setState(() => selectedGender = "male"),
+                      onTap: () {
+                        setState(() => selectedGender = "male");
+                        // Clear error when gender is selected
+                        if (errorMessage.value.isNotEmpty) {
+                          errorMessage.value = '';
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -81,11 +88,31 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                       label: AppStrings.female,
                       icon: Icons.female_rounded,
                       isSelected: selectedGender == "female",
-                      onTap: () => setState(() => selectedGender = "female"),
+                      onTap: () {
+                        setState(() => selectedGender = "female");
+                        // Clear error when gender is selected
+                        if (errorMessage.value.isNotEmpty) {
+                          errorMessage.value = '';
+                        }
+                      },
                     ),
                   ),
                 ],
               ),
+              
+              // Error message
+              Obx(() => errorMessage.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: AppText(
+                        errorMessage.value,
+                        fontSize: 12,
+                        color: Colors.red,
+                        fontWeight: FontWeight.w500,
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : const SizedBox.shrink()),
               
               const SizedBox(height: 60),
 
@@ -95,13 +122,10 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                   text: AppStrings.next,
                   onTap: () {
                     if (selectedGender.isNotEmpty) {
+                      errorMessage.value = '';
                       Get.toNamed(RouteHelper.getBirthDetailsRoute());
                     } else {
-                      Get.snackbar(
-                        AppStrings.error,
-                        AppStrings.selectGenderError,
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
+                      errorMessage.value = AppStrings.selectGenderError;
                     }
                   },
                 ),

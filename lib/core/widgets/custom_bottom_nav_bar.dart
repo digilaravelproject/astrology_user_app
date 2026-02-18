@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 import '../theme/app_colors.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'app_text.dart';
@@ -77,7 +78,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
           // Main Nav Bar Container
           Container(
             height: 70,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(40),
@@ -92,75 +93,28 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNormalItem(0),
-                _buildNormalItem(1),
-                const SizedBox(width: 50),
-                _buildNormalItem(3),
-                _buildNormalItem(4),
-              ],
+              children: List.generate(6, (index) {
+                return Expanded(
+                  child: widget.selectedIndex == index
+                      ? const SizedBox.shrink()
+                      : _buildNavItem(index),
+                );
+              }),
             ),
           ),
 
-          // Central Elevated Button with Pulse Animation
+          // Elevated selected item
           Positioned(
-            top: 25,
-            child: GestureDetector(
-              onTap: () => widget.onItemSelected(2),
-              child: ScaleTransition(
-                scale: _pulseAnimation,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.primaryColor,
-                            AppColors.accentColor, 
-                          ],
-                          stops: [0.0, 1.0],
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryColor.withOpacity(0.35),
-                            blurRadius: 18,
-                            spreadRadius: 3,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                        border: Border.all(color: Colors.white, width: 4),
-                      ),
-                      child: Icon(
-                        widget.items[2].icon,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    AppText(
-                      widget.items[2].label,
-                      fontSize: 10,
-                      fontWeight: widget.selectedIndex == 2 ? FontWeight.w700 : FontWeight.w500,
-                      color: widget.selectedIndex == 2 ? AppColors.accentColor : Colors.grey.shade500,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            left: 16 + ((Get.width - 32) / 6) * widget.selectedIndex + ((Get.width - 32) / 12) - 25,
+            top: 30,
+            child: _buildElevatedItem(widget.selectedIndex),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildNormalItem(int index) {
-    final bool isSelected = widget.selectedIndex == index;
+  Widget _buildNavItem(int index) {
     final item = widget.items[index];
 
     return GestureDetector(
@@ -171,17 +125,70 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
         children: [
           Icon(
             item.icon,
-            color: isSelected ? AppColors.accentColor : Colors.grey.shade400,
+            color: Colors.grey.shade400,
             size: 24,
           ),
           const SizedBox(height: 4),
           AppText(
             item.label,
-            fontSize: 10,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? AppColors.accentColor : Colors.grey.shade400,
+            fontSize: 8,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade400,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildElevatedItem(int index) {
+    final item = widget.items[index];
+
+    return GestureDetector(
+      onTap: () => widget.onItemSelected(index),
+      child: ScaleTransition(
+        scale: _pulseAnimation,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.primaryColor,
+                    AppColors.accentColor,
+                  ],
+                  stops: [0.0, 1.0],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.3),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(color: Colors.white, width: 3),
+              ),
+              child: Icon(
+                item.icon,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+            const SizedBox(height: 4),
+            AppText(
+              item.label,
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              color: AppColors.accentColor,
+            ),
+          ],
+        ),
       ),
     );
   }

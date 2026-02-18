@@ -109,22 +109,29 @@ class _AstrologersPreviewSectionState extends State<AstrologersPreviewSection> {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: AppColors.deepPink,
-          width: .8,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.deepPink.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.deepPink.withOpacity(0.2),
+            width: 1,
           ),
-        ],
-      ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.deepPink.withOpacity(0.08),
+              blurRadius: 15,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
       child: Stack(
         children: [
 
@@ -256,6 +263,40 @@ class _AstrologersPreviewSectionState extends State<AstrologersPreviewSection> {
                       color: AppColors.deepPink.withOpacity(0.8),
                     ),
 
+                    const SizedBox(height: 5),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primaryColor,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.access_time_rounded,
+                            color: AppColors.primaryColor,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: AppText(
+                              '₹${astro['price']}/min • 30 min session',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColor,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 15),
 
                     // Action Buttons (Right side)
                     Row(
@@ -300,49 +341,6 @@ class _AstrologersPreviewSectionState extends State<AstrologersPreviewSection> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.deepPink,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.deepPink.withOpacity(0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.bolt, // Added icon for extra flair
-                                  color: Colors.yellow,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: AppText(
-                                    '₹ ${astro['price']}/${AppStrings.sessionCompleteGuide}',
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
                   ],
                 ),
               ),

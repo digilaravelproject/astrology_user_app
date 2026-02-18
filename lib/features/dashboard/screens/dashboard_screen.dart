@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../home/screens/home_screen.dart';
-import '../../home/screens/matrimony_screen.dart';
+import '../../chat/screens/chat_list_screen.dart';
+import '../../call/screens/call_list_screen.dart';
+import '../../live/screens/live_astrologer_screen.dart';
+import '../../matching/screens/matching_screen.dart';
+import '../../matrimony/screens/matrimony_screen.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/custom_bottom_nav_bar.dart';
-import '../../live/screens/live_astrologer_screen.dart';
-import '../../history/screens/history_screen.dart';
-import '../../profile/screens/profile_screen.dart';
 import '../../matrimony/controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
 
@@ -25,17 +26,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const MatrimonyScreen(),
+    const ChatListScreen(),
+    const CallListScreen(),
     const LiveAstrologerScreen(),
-    const HistoryScreen(),
-    const ProfileScreen(),
+    const MatchingScreen(),
   ];
 
   final List<NavItem> _navItems = [
     NavItem(icon: Iconsax.home_2_copy, label: AppStrings.navHome),
-    NavItem(icon: Iconsax.heart_copy, label: AppStrings.navMatrimony),
+    NavItem(icon: Iconsax.lovely_copy, label: AppStrings.navMatrimony),
+    NavItem(icon: Iconsax.message_copy, label: 'Chat'),
+    NavItem(icon: Iconsax.call_copy, label: 'Call'),
     NavItem(icon: Iconsax.play_circle_copy, label: AppStrings.navLive),
-    NavItem(icon: Iconsax.timer_1_copy, label: AppStrings.navHistory),
-    NavItem(icon: Iconsax.user_copy, label: AppStrings.navProfile),
+    NavItem(icon: Iconsax.heart_copy, label: 'Matching'),
   ];
 
   void _onItemTapped(int index) {

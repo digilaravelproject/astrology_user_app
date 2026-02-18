@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../wallet/screens/wallet_screen.dart';
+import '../../history/screens/history_screen.dart';
 import 'edit_profile_screen.dart';
 import 'change_language_screen.dart';
 import '../../../core/widgets/simple_content_screen.dart';
@@ -70,6 +71,34 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Close Icon at top right
+          Align(
+            alignment: Alignment.topRight,
+            child: GestureDetector(
+              onTap: () => Get.back(),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.close,
+                  color: AppColors.deepPink,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          
           // Profile Image
           Stack(
             alignment: Alignment.bottomRight,
@@ -132,6 +161,11 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       children: [
         _buildSectionHeader(AppStrings.accountSettings),
+        _buildMenuItem(
+          icon: Iconsax.timer_1_copy,
+          title: AppStrings.navHistory,
+          onTap: () => Get.to(() => const HistoryScreen()),
+        ),
         _buildMenuItem(
           icon: Icons.translate_rounded,
           title: AppStrings.changeLanguage,
