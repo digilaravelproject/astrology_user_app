@@ -196,3 +196,4 @@ flutter pub get
 ## 📸 Optional: Screenshots / Demo GIF
 
 You can add screenshots or GIFs of your app here to make your README visually appealing.
+# astrology_user_app
