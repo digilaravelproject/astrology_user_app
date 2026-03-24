@@ -188,6 +188,7 @@ class AppStrings {
   static String get kundali => "Kundali".tr;
   static String get matchMaking => "Match Making".tr;
   static String get freeKundli => "Free Kundli".tr;
+  static String get dailyHoroscope => "Daily Horoscope".tr;
   static String get dailyPanchang => "Daily Panchang".tr;
   static String get interestingAstrologyBlogs => "Interesting Astrology Blogs".tr;
   static String get payAmountPrefix => "Pay".tr;

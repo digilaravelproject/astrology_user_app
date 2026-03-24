@@ -76,14 +76,14 @@ class OtpScreen extends StatelessWidget {
                     
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: AppText(
+                      child: Obx(() => AppText(
                         '${AppStrings.enterOtpSent}\n${AppStrings.countryCodePrefix} ${authController.currentMobile.value}',
                         textAlign: TextAlign.center,
                         fontSize: 14,
                         color: AppColors.black.withOpacity(0.3),
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.5,
-                      ),
+                      )),
                     ),
     
                     SizedBox(height: size.height * 0.08),
@@ -230,7 +230,7 @@ class OtpScreen extends StatelessWidget {
           fontSize: 14,
         ),
         GestureDetector(
-          onTap: () => authController.login(),
+          onTap: () => authController.resendOtp(),
           child: AppText(
             AppStrings.resend,
             color: AppColors.deepPink,

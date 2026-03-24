@@ -11,6 +11,9 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../../core/constants/app_urls.dart';
+import 'package:image_picker/image_picker.dart';
+import '../controllers/profile_controller.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -34,16 +37,80 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _initData();
+  }
+
+  void _initData() {
     final user = _authController.currentUser.value;
     
     _nameController = TextEditingController(text: user?.name ?? AppStrings.guest);
     _phoneController = TextEditingController(text: user?.mobile ?? "+91 9876543210");
-    _placeController = TextEditingController(text: "New Delhi, India"); // Dummy default
+    _placeController = TextEditingController(text: user?.placeOfBirth ?? "New Delhi, India"); 
     
-    // Initialize other fields if available in user model, else defaults
-    _selectedGender = AppStrings.male; 
-    _selectedDate = DateTime(1995, 8, 15);
-    _selectedTime = const TimeOfDay(hour: 10, minute: 30);
+    _selectedGender = _parseGender(user?.gender);
+    
+    if (user?.dateOfBirth != null && user!.dateOfBirth!.isNotEmpty) {
+      try {
+        _selectedDate = DateTime.parse(user.dateOfBirth!);
+      } catch (_) {
+        _selectedDate = DateTime(1995, 8, 15);
+      }
+    } else {
+      _selectedDate = DateTime(1995, 8, 15);
+    }
+    
+    if (user?.timeOfBirth != null && user!.timeOfBirth!.isNotEmpty) {
+      final parts = user.timeOfBirth!.split(':');
+      if (parts.length >= 2) {
+        _selectedTime = TimeOfDay(hour: int.tryParse(parts[0]) ?? 10, minute: int.tryParse(parts[1]) ?? 30);
+      } else {
+        _selectedTime = const TimeOfDay(hour: 10, minute: 30);
+      }
+    } else {
+      _selectedTime = const TimeOfDay(hour: 10, minute: 30);
+    }
+
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    final user = _authController.currentUser.value;
+    if (user != null) {
+      final profileController = Get.find<ProfileController>();
+      final freshUser = await profileController.getProfileData(user.id);
+      if (freshUser != null) {
+        _authController.currentUser.value = freshUser;
+        if (mounted) {
+          setState(() {
+            _nameController.text = freshUser.name.isNotEmpty ? freshUser.name : _nameController.text;
+            _phoneController.text = freshUser.mobile.isNotEmpty ? freshUser.mobile : _phoneController.text;
+            _placeController.text = (freshUser.placeOfBirth != null && freshUser.placeOfBirth!.isNotEmpty) ? freshUser.placeOfBirth! : _placeController.text;
+            _selectedGender = _parseGender(freshUser.gender);
+            
+            if (freshUser.dateOfBirth != null && freshUser.dateOfBirth!.isNotEmpty) {
+              try {
+                _selectedDate = DateTime.parse(freshUser.dateOfBirth!);
+              } catch (_) {}
+            }
+            if (freshUser.timeOfBirth != null && freshUser.timeOfBirth!.isNotEmpty) {
+              final parts = freshUser.timeOfBirth!.split(':');
+              if (parts.length >= 2) {
+                _selectedTime = TimeOfDay(hour: int.tryParse(parts[0]) ?? 10, minute: int.tryParse(parts[1]) ?? 30);
+              }
+            }
+          });
+        }
+      }
+    }
+  }
+
+  String _parseGender(String? genderValue) {
+    if (genderValue == null || genderValue.isEmpty) return AppStrings.male;
+    final lower = genderValue.toLowerCase();
+    if (lower == 'male') return AppStrings.male;
+    if (lower == 'female') return AppStrings.female;
+    if (lower == 'other' || lower == 'others') return AppStrings.other;
+    return AppStrings.male; // fallback
   }
 
   @override
@@ -139,19 +206,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _buildTextField(AppStrings.pobLabel, _placeController, Iconsax.location_copy),
 
             const SizedBox(height: 40),
-            CustomButton(
-              text: AppStrings.saveChanges,
-              onTap: () {
-                // Simulate save
-                Get.back();
-                Get.snackbar(AppStrings.success, AppStrings.profileUpdated, 
-                  backgroundColor: Colors.green.withOpacity(0.1),
-                  colorText: Colors.green,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(20),
-                );
-              },
-            ),
+            Obx(() {
+              final profileController = Get.find<ProfileController>();
+              return CustomButton(
+                text: AppStrings.saveChanges,
+                isLoading: profileController.isLoading.value,
+                onTap: () async {
+                  final genderLower = _selectedGender?.toLowerCase() ?? 'male';
+                  final dobString = _selectedDate != null
+                      ? "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}"
+                      : '';
+                  final tobString = _selectedTime != null
+                      ? "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}"
+                      : '';
+
+                  final data = {
+                    "name": _nameController.text.trim(),
+                    "phone": _phoneController.text.trim(),
+                    "gender": genderLower,
+                    "date_of_birth": dobString,
+                    "time_of_birth": tobString,
+                    "place_of_birth": _placeController.text.trim(),
+                    "languages": ["English"],
+                  };
+
+                  final success = await profileController.updateProfileInApp(data);
+                  if (success) Get.back();
+                },
+              );
+            }),
             const SizedBox(height: 20),
           ],
         ),
@@ -170,29 +253,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Container(
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: _imageFile != null
-                    ? DecorationImage(
-                        image: FileImage(_imageFile!),
-                        fit: BoxFit.cover,
-                      )
-                    : const DecorationImage(
-                        image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
-                        fit: BoxFit.cover,
-                      ),
-                border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
-              ),
-            ),
+            child: Obx(() {
+              final user = _authController.currentUser.value;
+              return Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: _imageFile != null
+                      ? DecorationImage(
+                          image: FileImage(_imageFile!),
+                          fit: BoxFit.cover,
+                        )
+                      : (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
+                          ? DecorationImage(
+                              image: NetworkImage("${AppUrls.baseImageUrl}${user.profilePhoto!}"),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
+                              fit: BoxFit.cover,
+                            ),
+                  border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
+                ),
+              );
+            }),
           ),
           GestureDetector(
             onTap: () async {
               final file = await ImagePickerHelper.showImagePickerSheet(context);
               if (file != null) {
                 setState(() => _imageFile = file);
+                final profileController = Get.find<ProfileController>();
+                await profileController.updateProfilePhoto(XFile(file.path));
               }
             },
             child: Container(
@@ -202,7 +295,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.white, width: 2),
               ),
-              child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
+              child: Obx(() {
+                final profileController = Get.find<ProfileController>();
+                if (profileController.isLoading.value) {
+                  return const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+                return const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16);
+              }),
             ),
           ),
         ],

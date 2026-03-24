@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../controllers/auth_controller.dart';
 
 class GenderSetupScreen extends StatefulWidget {
   const GenderSetupScreen({Key? key}) : super(key: key);
@@ -123,6 +124,7 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                   onTap: () {
                     if (selectedGender.isNotEmpty) {
                       errorMessage.value = '';
+                      Get.find<AuthController>().selectedGender.value = selectedGender;
                       Get.toNamed(RouteHelper.getBirthDetailsRoute());
                     } else {
                       errorMessage.value = AppStrings.selectGenderError;

@@ -10,40 +10,50 @@ import '../../features/splash/controllers/splash_controller.dart';
 import '../../features/splash/domain/repositories/splash_repository.dart';
 import '../../features/splash/domain/services/splash_service.dart';
 import '../theme/theme_controller.dart';
+import '../../features/profile/bindings/profile_binding.dart';
 
 class InitialBindings extends Bindings {
   @override
   void dependencies() {
     // Core services
-    Get.lazyPut(() => Dio(), fenix: true);
-    Get.lazyPut(() => ApiClient(), fenix: true);
-    Get.lazyPut(() => Connectivity(), fenix: true);
-    Get.lazyPut(() => NetworkInfo(Get.find<Connectivity>()), fenix: true);
+    Get.put(Dio(), permanent: true);
+    Get.put(ApiClient(), permanent: true);
+    Get.put(Connectivity(), permanent: true);
+    Get.put(NetworkInfo(Get.find<Connectivity>()), permanent: true);
 
     // Splash
-    Get.lazyPut(() => SplashRepository(Get.find<ApiClient>()), fenix: true);
-    Get.lazyPut(() => SplashService(Get.find<SplashRepository>()), fenix: true);
-    Get.lazyPut(() => SplashController(Get.find<SplashService>()), fenix: true);
+    Get.put(SplashRepository(Get.find<ApiClient>()), permanent: true);
+    Get.put(SplashService(Get.find<SplashRepository>()), permanent: true);
+    Get.put(SplashController(Get.find<SplashService>()), permanent: true);
 
     // Auth
-    Get.lazyPut(() => AuthRepository(Get.find<ApiClient>()), fenix: true);
-    Get.lazyPut(() => AuthService(Get.find<AuthRepository>()), fenix: true);
-    Get.lazyPut(() => LoginUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(() => RegisterUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(() => VerifyOtpUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(() => LogoutUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(() => CheckLoginStatusUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(() => GetUserInfoUseCase(Get.find<AuthService>()), fenix: true);
-    Get.lazyPut(
-          () => AuthController(
+    Get.put(AuthRepository(Get.find<ApiClient>()), permanent: true);
+    Get.put(AuthService(Get.find<AuthRepository>()), permanent: true);
+    Get.put(LoginUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(RegisterUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(VerifyOtpUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(LogoutUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(CheckLoginStatusUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(GetUserInfoUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(SendOtpUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(ResendOtpUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(UpdateProfileUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(
+      AuthController(
         loginUseCase: Get.find<LoginUseCase>(),
         registerUseCase: Get.find<RegisterUseCase>(),
         verifyOtpUseCase: Get.find<VerifyOtpUseCase>(),
         logoutUseCase: Get.find<LogoutUseCase>(),
         checkLoginStatusUseCase: Get.find<CheckLoginStatusUseCase>(),
         getUserInfoUseCase: Get.find<GetUserInfoUseCase>(),
+        sendOtpUseCase: Get.find<SendOtpUseCase>(),
+        resendOtpUseCase: Get.find<ResendOtpUseCase>(),
+        updateProfileUseCase: Get.find<UpdateProfileUseCase>(),
       ),
-      fenix: true,
+      permanent: true,
     );
+
+    // Profile
+    ProfileBinding().dependencies();
   }
 }

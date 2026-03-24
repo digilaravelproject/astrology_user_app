@@ -4,6 +4,7 @@ class ResponseModel {
   final dynamic body;
   final int? statusCode;
   final List<ErrorDetail>? errors;
+  final String? token;
 
   const ResponseModel({
     required this.isSuccess,
@@ -11,12 +12,14 @@ class ResponseModel {
     this.body,
     this.statusCode,
     this.errors,
+    this.token,
   });
 
   /// Factory method to create ResponseModel from JSON
   factory ResponseModel.fromJson(Map<String, dynamic> json, {int? statusCode}) {
     final res = json['res']?.toString().toLowerCase();
-    final success = res == 'success' || (json['success'] == true);
+    final status = json['status']?.toString().toLowerCase();
+    final success = res == 'success' || status == 'success' || (json['success'] == true);
 
     List<ErrorDetail>? errors;
     if (json['errors'] is List) {
@@ -33,6 +36,7 @@ class ResponseModel {
       body: json['data'],
       statusCode: statusCode,
       errors: errors,
+      token: json['token']?.toString(),
     );
   }
 
@@ -52,6 +56,7 @@ class ResponseModel {
     dynamic body,
     int? statusCode,
     List<ErrorDetail>? errors,
+    String? token,
   }) {
     return ResponseModel(
       isSuccess: isSuccess ?? this.isSuccess,
@@ -59,6 +64,7 @@ class ResponseModel {
       body: body ?? this.body,
       statusCode: statusCode ?? this.statusCode,
       errors: errors ?? this.errors,
+      token: token ?? this.token,
     );
   }
 

@@ -12,6 +12,21 @@ class AuthService implements AuthServiceInterface {
   AuthService(this._authRepository);
 
   @override
+  Future<ResponseModel> updateProfile(int userId, Map<String, dynamic> data) async {
+    return await _authRepository.updateProfile(userId, data);
+  }
+
+  @override
+  Future<ResponseModel> sendOtp(String phone) async {
+    return await _authRepository.sendOtp(phone);
+  }
+
+  @override
+  Future<ResponseModel> resendOtp(String phone) async {
+    return await _authRepository.resendOtp(phone);
+  }
+
+  @override
   Future<ResponseModel> signup(String name, String mobile) async {
     return await _authRepository.signup(name, mobile);
   }
@@ -29,6 +44,7 @@ class AuthService implements AuthServiceInterface {
   @override
   Future<void> saveUserInfo(UserModel user) async {
     await SharedPrefs.setString(AppConstants.userData, user.toJsonString());
+    await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
   }
 
   @override

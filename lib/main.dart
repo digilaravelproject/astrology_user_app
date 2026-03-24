@@ -1,6 +1,7 @@
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/theme/dark_theme.dart';
 import 'package:astro_user/core/theme/light_theme.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/theme/theme_controller.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       navigatorKey: Get.key,
+      scaffoldMessengerKey: CustomSnackbar.messengerKey,
       initialBinding: InitialBindings(),
       theme: lightTheme,
       darkTheme: darkTheme,

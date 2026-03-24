@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../theme/app_colors.dart';
 
 class CustomSnackbar {
+  static final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
   /// Generic method so all snackbar styles are consistent
   static void _show({
     required String title,

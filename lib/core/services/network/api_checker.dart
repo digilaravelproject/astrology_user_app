@@ -15,7 +15,9 @@ class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
     switch (response.statusCode) {
       case 200:
-        if (response.data['res'] == 'success') {
+        final res = response.data['res']?.toString().toLowerCase();
+        final status = response.data['status']?.toString().toLowerCase();
+        if (res == 'success' || status == 'success' || response.data['success'] == true) {
           return response;
         } else {
           if (showToaster) _showErrorMessage(response);
@@ -23,7 +25,7 @@ class ApiChecker {
             requestOptions: response.requestOptions,
             response: response,
             type: DioExceptionType.badResponse,
-            error: response.data['msg'] ?? 'Something went wrong',
+            error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
           );
         }
       case 401:
@@ -321,23 +323,29 @@ class ApiChecker {
       }
     }
 
-    if (response.data is Map && (response.data['res']?.toString().toLowerCase() != 'success')) {
-      final message = response.data['msg']?.toString() ?? 'Something went wrong';
-      if (showToaster) CustomSnackbar.showError(message);
+    if (response.data is Map) {
+      final res = response.data['res']?.toString().toLowerCase();
+      final status = response.data['status']?.toString().toLowerCase();
+      final isSuccess = res == 'success' || status == 'success' || response.data['success'] == true;
+      
+      if (!isSuccess) {
+        final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
+        if (showToaster) CustomSnackbar.showError(message);
 
-      return ResponseModel(
-        isSuccess: false,
-        message: message,
-        body: response.data['data'],
-        statusCode: statusCode,
-      );
+        return ResponseModel(
+          isSuccess: false,
+          message: message,
+          body: response.data['data'],
+          statusCode: statusCode,
+        );
+      }
     }
 
     return ResponseModel.fromJson(response.data, statusCode: statusCode);
   }
 
   static void _showErrorMessage(Response response, [String? defaultMessage]) {
-    final message = response.data['msg'] ?? defaultMessage ?? 'Something went wrong';
+    final message = response.data['msg'] ?? response.data['message'] ?? defaultMessage ?? 'Something went wrong';
     CustomSnackbar.showError(message);
   }
 

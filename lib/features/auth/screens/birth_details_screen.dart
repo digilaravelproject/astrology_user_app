@@ -7,7 +7,9 @@ import '../../../core/widgets/picker_tile.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../../../core/utils/custom_snackbar.dart';
 import '../controllers/auth_controller.dart';
 
 class BirthDetailsScreen extends StatefulWidget {
@@ -137,10 +139,33 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
 
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
-                child: CustomButton(
-                  text: AppStrings.finish,
-                  onTap: () => Get.offAllNamed(RouteHelper.getDashboardRoute()),
-                ),
+                child: Obx(() {
+                  final authController = Get.find<AuthController>();
+                  return CustomButton(
+                    text: AppStrings.finish,
+                    isLoading: authController.isLoading.value,
+                    onTap: () {
+                      if (selectedDate == null) {
+                        CustomSnackbar.showError('Please select Date of Birth');
+                        return;
+                      }
+                      if (selectedTime == null) {
+                        CustomSnackbar.showError('Please select Time of Birth');
+                        return;
+                      }
+                      if (_placeController.text.trim().isEmpty) {
+                        CustomSnackbar.showError('Please enter Place of Birth');
+                        return;
+                      }
+                      
+                      authController.updateProfile(
+                        dob: selectedDate!,
+                        tob: selectedTime!,
+                        placeOfBirth: _placeController.text.trim(),
+                      );
+                    },
+                  );
+                }),
               ),
               const SizedBox(height: 30),
             ],

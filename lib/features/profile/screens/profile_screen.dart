@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/constants/app_urls.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -109,18 +110,26 @@ class ProfileScreen extends StatelessWidget {
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: const DecorationImage(
-                      image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
-                      fit: BoxFit.cover,
+                child: Obx(() {
+                  final user = authController.currentUser.value;
+                  return Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
+                          ? DecorationImage(
+                              image: NetworkImage("${AppUrls.baseImageUrl}${user.profilePhoto!}"),
+                              fit: BoxFit.cover,
+                            )
+                          : const DecorationImage(
+                              image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
+                              fit: BoxFit.cover,
+                            ),
+                      border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
                     ),
-                    border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
-                  ),
-                ),
+                  );
+                }),
               ),
               GestureDetector(
                 onTap: () => Get.to(() => const EditProfileScreen()),
@@ -146,12 +155,12 @@ class ProfileScreen extends StatelessWidget {
             color: const Color(0xFF2E1A47),
           )),
           const SizedBox(height: 4),
-          AppText(
+          Obx(() => AppText(
             authController.currentUser.value?.mobile ?? "+91 9876543210",
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Colors.black54,
-          ),
+          )),
         ],
       ),
     );
@@ -323,25 +332,98 @@ class ProfileScreen extends StatelessWidget {
         children: [
           // Logout Button
           OutlinedButton(
-            onPressed: () => authController.logout(),
+            onPressed: () {
+              Get.dialog(
+                Dialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
+                        ),
+                        const SizedBox(height: 20),
+                        const AppText(
+                          'Logout',
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2E1A47),
+                        ),
+                        const SizedBox(height: 12),
+                        AppText(
+                          'Are you sure you want to logout from your account?',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 30),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Get.back(),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  side: BorderSide(color: Colors.grey[300]!),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: AppText('Cancel', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Get.back();
+                                  authController.logout();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  backgroundColor: Colors.red,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: const AppText('Logout', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: AppColors.errorColor),
+              side: const BorderSide(color: Colors.red),
               padding: const EdgeInsets.symmetric(vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              backgroundColor: AppColors.errorColor.withOpacity(0.05),
+              backgroundColor: Colors.red.withOpacity(0.05),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.logout_rounded, color: AppColors.errorColor, size: 20),
+                const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
                 const SizedBox(width: 8),
                 AppText(
-                  AppStrings.logOut,
+                  'Log Out',
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.errorColor,
+                  color: Colors.red,
                 ),
               ],
             ),
@@ -349,26 +431,25 @@ class ProfileScreen extends StatelessWidget {
           
           const SizedBox(height: 15),
 
-          // Delete Account Button (Text Button to be less prominent but visible)
+          // Delete Account Button
           TextButton(
             onPressed: () {
-              // Add delete account logic
               Get.defaultDialog(
-                title: AppStrings.deleteAccountTitle,
-                middleText: AppStrings.deleteAccountConfirmation,
-                textConfirm: AppStrings.delete,
-                textCancel: AppStrings.cancel,
+                title: 'Delete Account',
+                middleText: 'Are you sure you want to delete your account? This action cannot be undone.',
+                textConfirm: 'Delete',
+                textCancel: 'Cancel',
                 confirmTextColor: Colors.white,
                 buttonColor: Colors.red,
                 cancelTextColor: Colors.black,
                 onConfirm: () {
                    Get.back();
-                   authController.logout(); // Navigate to login for now
+                   authController.logout();
                 }
               );
             },
-            child: AppText(
-              AppStrings.deleteAccount,
+            child: const AppText(
+              'Delete Account',
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.red,
