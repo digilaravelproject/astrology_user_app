@@ -58,7 +58,7 @@ class ApiClient {
         Logger.d('|✅ API RESPONSE');
         Logger.d('|📍 URL: ${response.requestOptions.baseUrl}${response.requestOptions.path}');
         Logger.d('|📊 Status Code: ${response.statusCode}');
-        Logger.d('|📨 Response: ${response.data}');
+        Logger.d('|📨 Response1234: ${response.data}');
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         return handler.next(response);

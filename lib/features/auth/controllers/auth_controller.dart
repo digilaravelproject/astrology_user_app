@@ -160,7 +160,7 @@ class AuthController extends GetxController {
       if (user != null) {
         currentUser.value = user;
         otpController.clear();
-        
+
         CustomSnackbar.showSuccess('OTP Verified!');
         //Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
         

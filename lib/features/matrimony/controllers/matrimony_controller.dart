@@ -1,7 +1,16 @@
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import '../domain/models/matrimony_profile_model.dart';
+import '../domain/usecases/save_matrimony_profile_usecase.dart';
 
 class MatrimonyController extends GetxController {
+  final SaveMatrimonyProfileUseCase _saveMatrimonyProfileUseCase;
+
+  MatrimonyController({required SaveMatrimonyProfileUseCase saveMatrimonyProfileUseCase})
+      : _saveMatrimonyProfileUseCase = saveMatrimonyProfileUseCase;
+
   final RxBool isRegistered = false.obs;
+  final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
 
   // Full customer list
@@ -11,6 +20,27 @@ class MatrimonyController extends GetxController {
   void onInit() {
     super.onInit();
     _loadDummyData();
+  }
+
+  Future<bool> saveProfile(MatrimonyProfileModel profile, XFile? photo) async {
+    try {
+      isLoading.value = true;
+      final response = await _saveMatrimonyProfileUseCase.execute(profile, photo);
+      if (response.isSuccess) {
+        isRegistered.value = true;
+        Get.snackbar('Success', response.message ?? 'Profile saved successfully');
+        return true;
+      } else {
+        Get.snackbar('Error', response.message ?? 'Failed to save profile');
+        return false;
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An unexpected error occurred');
+      print('Error saving matrimony profile: $e');
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void _loadDummyData() {

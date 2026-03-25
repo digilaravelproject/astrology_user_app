@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../controllers/wallet_controller.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class RechargeBottomSheet extends StatefulWidget {
   const RechargeBottomSheet({super.key});
@@ -12,10 +15,17 @@ class RechargeBottomSheet extends StatefulWidget {
 }
 
 class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
+  final WalletController walletController = Get.find<WalletController>();
   final TextEditingController _amountController = TextEditingController();
   String selectedAmount = '100';
 
   final List<String> amounts = ['50', '100', '200', '500', '1000', '2000'];
+
+  @override
+  void initState() {
+    super.initState();
+    _amountController.text = selectedAmount;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,16 +49,31 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
           _buildCustomInput(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: CustomButton(
+            child: Obx(() => CustomButton(
               text: AppStrings.proceedToPay,
               fontSize: 16,
               height: 55,
+              isLoading: walletController.isLoading.value,
               borderRadius: 15,
-              onTap: () {
-                // Proceed to payment logic
-                Navigator.pop(context);
+              onTap: () async {
+                if (_amountController.text.isEmpty) {
+                  CustomSnackbar.showError('Please enter an amount');
+                  return;
+                }
+                double? amount = double.tryParse(_amountController.text);
+                if (amount == null || amount <= 0) {
+                  CustomSnackbar.showError('Please enter a valid amount');
+                  return;
+                }
+
+                await walletController.startTopUp(amount);
+                // The bottom sheet can stay open or close based on success callback in controller
+                // If you want it to close here, you can, but it's better handled in controller or after verification
+                if (!walletController.isLoading.value) {
+                  Navigator.pop(context);
+                }
               },
-            ),
+            )),
           ),
           const SizedBox(height: 30),
         ],
@@ -113,7 +138,7 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
                 onTap: () {
                   setState(() {
                     selectedAmount = amount;
-                    _amountController.clear();
+                    _amountController.text = amount;
                   });
                 },
                 child: Container(

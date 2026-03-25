@@ -17,7 +17,7 @@ class MatrimonyScreen extends StatefulWidget {
 }
 
 class _MatrimonyScreenState extends State<MatrimonyScreen> {
-  final MatrimonyController _controller = Get.put(MatrimonyController());
+  final MatrimonyController _controller = Get.find<MatrimonyController>();
   final TextEditingController _searchController = TextEditingController();
   final RxBool _isSearching = false.obs;
   

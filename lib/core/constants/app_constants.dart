@@ -27,4 +27,5 @@ class AppConstants {
     
     // Default Settings
     static const String defaultLanguage = 'en';
+
 }

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../../core/utils/image_picker_helper.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../controllers/matrimony_controller.dart';
+import '../domain/models/matrimony_profile_model.dart';
 
 class MatrimonyRegistrationScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -18,6 +21,7 @@ class MatrimonyRegistrationScreen extends StatefulWidget {
 
 class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScreen> {
   final PageController _pageController = PageController();
+  final MatrimonyController _controller = Get.find<MatrimonyController>();
   int _currentStep = 0;
   final int _totalSteps = 4;
 
@@ -27,8 +31,22 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
+  
+  final TextEditingController _dayController = TextEditingController();
+  final TextEditingController _monthController = TextEditingController();
+  final TextEditingController _yearController = TextEditingController();
+  
+  final TextEditingController _heightController = TextEditingController();
+  String? _selectedMaritalStatus;
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _educationController = TextEditingController();
+  final TextEditingController _jobTitleController = TextEditingController();
+  final TextEditingController _incomeController = TextEditingController();
+  final TextEditingController _aboutController = TextEditingController();
+  String _selectedGender = "Female";
+
   String _countryCode = "+91";
-  File? _matrimonyPhoto;
+  XFile? _matrimonyPhoto;
 
   final List<String> _profileForOptions = [
     AppStrings.myself, AppStrings.mySon, AppStrings.myDaughter, 
@@ -36,7 +54,11 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     AppStrings.myRelative
   ];
 
-  void _nextStep() {
+  final List<String> _maritalStatusOptions = [
+    'Never married', 'Divorced', 'Widowed', 'Awaiting Divorce', 'Annulled'
+  ];
+
+  void _nextStep() async {
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -44,14 +66,54 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       );
     } else {
       // Final Submit
-      widget.onComplete();
+      final dob = "${_yearController.text}-${_monthController.text.padLeft(2, '0')}-${_dayController.text.padLeft(2, '0')}";
+      
+      final profile = MatrimonyProfileModel(
+        createdFor: _selectedProfileFor ?? 'Myself',
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        email: _emailController.text,
+        phone: _mobileController.text,
+        dateOfBirth: dob,
+        gender: _selectedGender,
+        height: _heightController.text,
+        maritalStatus: _selectedMaritalStatus ?? 'Never married',
+        location: _locationController.text,
+        education: _educationController.text,
+        jobTitle: _jobTitleController.text,
+        annualIncome: _incomeController.text,
+        about: _aboutController.text,
+      );
+
+      final success = await _controller.saveProfile(profile, _matrimonyPhoto);
+      if (success) {
+        widget.onComplete();
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _mobileController.dispose();
+    _dayController.dispose();
+    _monthController.dispose();
+    _yearController.dispose();
+    _heightController.dispose();
+    _locationController.dispose();
+    _educationController.dispose();
+    _jobTitleController.dispose();
+    _incomeController.dispose();
+    _aboutController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F8), // Soft pink background from screenshots
+      backgroundColor: const Color(0xFFFFF5F8),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -80,34 +142,45 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             ),
         ],
       ),
-      body: Column(
+      body: Obx(() => Stack(
         children: [
-          // Progress Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: LinearProgressIndicator(
-              value: (_currentStep + 1) / _totalSteps,
-              backgroundColor: Colors.grey.shade200,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.deepPink),
-              borderRadius: BorderRadius.circular(10),
-              minHeight: 4,
-            ),
+          Column(
+            children: [
+              // Progress Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: LinearProgressIndicator(
+                  value: (_currentStep + 1) / _totalSteps,
+                  backgroundColor: Colors.grey.shade200,
+                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.deepPink),
+                  borderRadius: BorderRadius.circular(10),
+                  minHeight: 4,
+                ),
+              ),
+              Expanded(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onPageChanged: (index) => setState(() => _currentStep = index),
+                  children: [
+                    _buildStep1(),
+                    _buildStep2(),
+                    _buildStep3(),
+                    _buildStep4(),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (index) => setState(() => _currentStep = index),
-              children: [
-                _buildStep1(),
-                _buildStep2(),
-                _buildStep3(),
-                _buildStep4(),
-              ],
+          if (_controller.isLoading.value)
+            Container(
+              color: Colors.black26,
+              child: const Center(
+                child: CircularProgressIndicator(color: AppColors.deepPink),
+              ),
             ),
-          ),
         ],
-      ),
+      )),
     );
   }
 
@@ -186,7 +259,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.mobileReq, _mobileController)),
+              Expanded(child: _buildTextField(AppStrings.mobileReq, _mobileController, keyboardType: TextInputType.phone)),
             ],
           ),
           const SizedBox(height: 8),
@@ -201,7 +274,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           CustomButton(
             text: AppStrings.next,
             onTap: _nextStep,
-            backgroundColor: const Color(0xFFB01D53), // Darker pink from screenshot
+            backgroundColor: const Color(0xFFB01D53),
             textColor: Colors.white,
           ),
         ],
@@ -222,27 +295,33 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             color: const Color(0xFF4A1010),
           ),
           const SizedBox(height: 32),
+          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16),
+          const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _buildTextField(AppStrings.day, TextEditingController())),
+              Expanded(child: _buildTextField(AppStrings.day, _dayController, keyboardType: TextInputType.number)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.month, TextEditingController())),
+              Expanded(child: _buildTextField(AppStrings.month, _monthController, keyboardType: TextInputType.number)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.year, TextEditingController())),
+              Expanded(child: _buildTextField(AppStrings.year, _yearController, keyboardType: TextInputType.number)),
             ],
           ),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.heightReq),
+          _buildGenderSelection(),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.maritalStatusReq),
+          _buildTextField(AppStrings.heightReq, _heightController),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.currentLocationReq),
+          _buildDropdownField(AppStrings.maritalStatusReq, _maritalStatusOptions, (val) => setState(() => _selectedMaritalStatus = val), _selectedMaritalStatus),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.highestEducationReq),
+          _buildTextField(AppStrings.currentLocationReq, _locationController),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.jobTitleReq),
+          _buildTextField(AppStrings.highestEducationReq, _educationController),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.annualIncomeReq),
+          _buildTextField(AppStrings.jobTitleReq, _jobTitleController),
+          const SizedBox(height: 16),
+          _buildTextField(AppStrings.annualIncomeReq, _incomeController),
+          const SizedBox(height: 16),
+          _buildTextField("About Myself", _aboutController, maxLines: 3),
           const SizedBox(height: 40),
           CustomButton(
             text: AppStrings.next,
@@ -251,6 +330,43 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             textColor: Colors.white,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGenderSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            _buildGenderChip("Female"),
+            const SizedBox(width: 12),
+            _buildGenderChip("Male"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderChip(String gender) {
+    final isSelected = _selectedGender == gender;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedGender = gender),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.deepPink : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? Colors.transparent : Colors.grey.shade300),
+        ),
+        child: AppText(
+          gender,
+          color: isSelected ? Colors.white : Colors.black87,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -332,7 +448,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               onTap: () async {
                 final file = await ImagePickerHelper.showImagePickerSheet(context);
                 if (file != null) {
-                  setState(() => _matrimonyPhoto = file);
+                  setState(() => _matrimonyPhoto = XFile(file.path));
                 }
               },
               child: Container(
@@ -344,7 +460,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                   border: Border.all(color: Colors.grey.shade200),
                   image: _matrimonyPhoto != null
                       ? DecorationImage(
-                          image: FileImage(_matrimonyPhoto!),
+                          image: FileImage(File(_matrimonyPhoto!.path)),
                           fit: BoxFit.cover,
                         )
                       : null,
@@ -386,7 +502,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller) {
+  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1}) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -395,9 +511,11 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       ),
       child: TextField(
         controller: controller,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.inter(color: Colors.grey),
+          labelStyle: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -405,7 +523,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     );
   }
 
-  Widget _buildDropdownField(String label) {
+  Widget _buildDropdownField(String label, List<String> options, Function(String?) onChanged, String? selectedValue) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
@@ -416,9 +534,15 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
-          hint: AppText(label, color: Colors.grey),
-          items: [],
-          onChanged: (val) {},
+          hint: AppText(label, color: Colors.grey, fontSize: 14),
+          value: selectedValue,
+          items: options.map((option) {
+            return DropdownMenuItem(
+              value: option,
+              child: Text(option, style: GoogleFonts.inter(fontSize: 14)),
+            );
+          }).toList(),
+          onChanged: onChanged,
         ),
       ),
     );

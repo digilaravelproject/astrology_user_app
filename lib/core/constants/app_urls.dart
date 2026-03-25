@@ -10,4 +10,11 @@ class AppUrls {
   static String updateProfilePhoto = "/api/v1/user/profile/photo";
   static String getProfile(int id) => "/api/v1/user/profile/$id";
   static String updateProfileInApp = "/api/v1/user/profileInAppUpdate";
+  static String remedies = "/api/v1/user/remedies";
+  static const String blogs = '/api/v1/user/blogs';
+  static const String astrologers = '/api/v1/user/astrologers';
+  static const String wallet = '/api/v1/user/wallet';
+  static const String walletTopup = '/api/v1/user/wallet/topup';
+  static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
+  static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
 }

@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controllers/wallet_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
@@ -10,23 +13,30 @@ class WalletScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final walletController = Get.find<WalletController>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         title: AppStrings.myWallet,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildBalanceCard(context),
-            _buildTransactionHistory(context),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () => walletController.fetchWallet(),
+        color: AppColors.primaryColor,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            children: [
+              _buildBalanceCard(context, walletController),
+              _buildTransactionHistory(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildBalanceCard(BuildContext context) {
+  Widget _buildBalanceCard(BuildContext context, WalletController controller) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       padding: const EdgeInsets.all(28),
@@ -63,12 +73,12 @@ class WalletScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              AppText(
-                "₹100",
+              Obx(() => AppText(
+                "₹${controller.balance}",
                 color: Colors.white,
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
-              ),
+              )),
               GestureDetector(
                 onTap: () {
                   showModalBottomSheet(

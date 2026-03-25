@@ -1,54 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
-import 'package:get/get.dart';
 import '../screens/blog_detail_screen.dart';
+import '../controllers/blog_controller.dart';
+import '../domain/models/blog_model.dart';
 
 class AstrologyBlogsSection extends StatelessWidget {
   const AstrologyBlogsSection({Key? key}) : super(key: key);
 
-  final List<Map<String, dynamic>> blogs = const [
-    {
-      "title": "Rahu-Ketu Axis:\nLife Turning Points",
-      "description": "Nundi ge besones mme Hoge astrologhts ppn gou in tte sars.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
-      "color": Color(0xFFD32F2F),
-    },
-    {
-      "title": "Pomnali\nDelay\nMon Nazar",
-      "description": "Nundi hoteolog e tha, honas at asstrologs.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/3094/3094651.png",
-      "color": Color(0xFFD84315),
-    },
-    {
-      "title": "Kundli Me Love\nDelay Kyun Hotahi?",
-      "description": "Nundi hooc it norrohg alog up hie kundit ammogy for mezan hae Caa.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/2917/2917999.png",
-      "color": Color(0xFFC2185B),
-    },
-    {
-      "title": "Business Success\n& Astrology\nSecret ✨✨",
-      "description": "Nandi t Nelcyoor diog the sks, astrologhe bowre hao, Caa.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/3094/3094673.png",
-      "color": Color(0xFFD32F2F),
-    },
-    {
-      "title": "Nazar &\nAstrology\nConnection",
-      "description": "Nandi bou toaec made wit thse ttoghts heore.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
-      "color": Color(0xFFD32F2F),
-    },
-    {
-      "title": "Destiny Change\nKab Hoti Hai?",
-      "description": "Bere gor guonts, aumeees mids, stragy tio dose a the start.",
-      "icon": "https://cdn-icons-png.flaticon.com/512/3094/3094679.png",
-      "color": Color(0xFFD84315),
-    },
+  static const List<Color> _blogColors = [
+    Color(0xFFD32F2F),
+    Color(0xFFD84315),
+    Color(0xFFC2185B),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final blogController = Get.find<BlogController>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -69,7 +40,7 @@ class AstrologyBlogsSection extends StatelessWidget {
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
                   color: const Color(0xFF2E1A47),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -77,33 +48,71 @@ class AstrologyBlogsSection extends StatelessWidget {
           ),
         ),
         // Blog Grid - Horizontal Scroll with 2 Rows
-        SizedBox(
-          height: 300, // Adjusted height
-          child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            scrollDirection: Axis.horizontal,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.75, // Wide cards (ratio < 1) for horizontal scroll
+        Obx(() {
+          if (blogController.isLoading.value) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.deepPink,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          }
+
+          if (blogController.blogs.isEmpty) {
+            return const SizedBox(
+              height: 300,
+              child: Center(
+                child: AppText(
+                  'No blogs available',
+                  fontSize: 14,
+                  color: Colors.black45,
+                ),
+              ),
+            );
+          }
+
+          final bool isSingleItem = blogController.blogs.length == 1;
+          final double dynamicHeight = isSingleItem ? 160 : 300;
+
+          return SizedBox(
+            height: dynamicHeight,
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              scrollDirection: Axis.horizontal,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: isSingleItem ? 1 : 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: isSingleItem ? 0.65 : 0.75,
+              ),
+              itemCount: blogController.blogs.length,
+              itemBuilder: (context, index) {
+                final blog = blogController.blogs[index];
+                final color = _blogColors[index % _blogColors.length];
+                final icon = blogController.getBlogImage(index);
+                
+                return GestureDetector(
+                  onTap: () {
+                    Get.to(() => BlogDetailScreen(
+                      blogId: blog.id,
+                      blogColor: color,
+                      icon: icon,
+                    ));
+                  },
+                  child: _buildBlogCard(blog, color, icon),
+                );
+              },
             ),
-            itemCount: blogs.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Get.to(() => BlogDetailScreen(blog: blogs[index]));
-                },
-                child: _buildBlogCard(blogs[index]),
-              );
-            },
-          ),
-        ),
+          );
+        }),
       ],
     );
   }
 
-  Widget _buildBlogCard(Map<String, dynamic> blog) {
+  Widget _buildBlogCard(BlogModel blog, Color color, String icon) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -116,7 +125,7 @@ class AstrologyBlogsSection extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: (blog['color'] as Color).withOpacity(0.12),
+          color: color.withOpacity(0.12),
           width: 1.2,
         ),
       ),
@@ -125,27 +134,26 @@ class AstrologyBlogsSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon and Title in one Row
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (blog['color'] as Color).withOpacity(0.12),
+                    color: color.withOpacity(0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Hero(
-                    tag: 'blog_icon_${blog['title']}',
+                    tag: 'blog_icon_${blog.id}',
                     child: Image.network(
-                      blog['icon'] as String,
+                      icon,
                       width: 24,
                       height: 24,
-                      color: blog['color'] as Color,
+                      color: color,
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           Icons.article_rounded,
-                          color: blog['color'] as Color,
+                          color: color,
                           size: 22,
                         );
                       },
@@ -155,10 +163,9 @@ class AstrologyBlogsSection extends StatelessWidget {
                 
                 const SizedBox(width: 10),
                 
-                // Title
                 Expanded(
                   child: AppText(
-                    blog['title'] as String,
+                    blog.title,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: const Color(0xFF2E1A47),
@@ -172,10 +179,9 @@ class AstrologyBlogsSection extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Description
             Expanded(
               child: AppText(
-                blog['description'] as String,
+                blog.subtitle,
                 fontSize: 10,
                 fontWeight: FontWeight.w400,
                 color: Colors.black54,
@@ -192,7 +198,7 @@ class AstrologyBlogsSection extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_rounded,
                   size: 16,
-                  color: (blog['color'] as Color).withOpacity(0.6),
+                  color: color.withOpacity(0.6),
                 ),
               ],
             ),

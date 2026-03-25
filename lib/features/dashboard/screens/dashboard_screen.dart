@@ -21,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
-  final MatrimonyController _matrimonyController = Get.put(MatrimonyController());
+  final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
 
   final List<Widget> _screens = [
     const HomeScreen(),
