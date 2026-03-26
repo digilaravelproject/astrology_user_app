@@ -79,7 +79,45 @@ class TransactionModel {
       providerOrderId: json['provider_order_id'] ?? '',
       description: json['description'] ?? '',
       updatedAt: json['updated_at'] ?? '',
-      createdAt: json['created_at'] ?? '',
+      createdAt: json['createdAt'] ?? json['created_at'] ?? '',
+    );
+  }
+}
+
+class WalletTransactionsResponseModel {
+  final String status;
+  final WalletTransactionsData data;
+
+  WalletTransactionsResponseModel({
+    required this.status,
+    required this.data,
+  });
+
+  factory WalletTransactionsResponseModel.fromJson(Map<String, dynamic> json) {
+    return WalletTransactionsResponseModel(
+      status: json['status'] ?? '',
+      data: WalletTransactionsData.fromJson(json['data'] ?? {}),
+    );
+  }
+}
+
+class WalletTransactionsData {
+  final WalletModel wallet;
+  final List<TransactionModel> transactions;
+
+  WalletTransactionsData({
+    required this.wallet,
+    required this.transactions,
+  });
+
+  factory WalletTransactionsData.fromJson(Map<String, dynamic> json) {
+    var list = json['transactions'] as List?;
+    List<TransactionModel> transactionsList = list != null
+        ? list.map((i) => TransactionModel.fromJson(i)).toList()
+        : [];
+    return WalletTransactionsData(
+      wallet: WalletModel.fromJson(json['wallet'] ?? {}),
+      transactions: transactionsList,
     );
   }
 }

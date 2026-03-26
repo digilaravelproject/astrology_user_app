@@ -285,6 +285,34 @@ class ApiChecker {
       );
     }
 
+    // Handle 201 status code (created) as success
+    if (statusCode == 201) {
+      if (response.data != null) {
+        try {
+          final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
+          return responseModel;
+        } catch (e) {
+          if (showToaster) {
+            CustomSnackbar.showError('Something went wrong');
+          }
+          return ResponseModel(
+            isSuccess: false,
+            message: 'Something went wrong',
+            statusCode: statusCode,
+          );
+        }
+      } else {
+        if (showToaster) {
+          CustomSnackbar.showError('Something went wrong');
+        }
+        return ResponseModel(
+          isSuccess: false,
+          message: 'Something went wrong',
+          statusCode: statusCode,
+        );
+      }
+    }
+
     if (statusCode != 200) {
       if (response.data != null) {
         try {

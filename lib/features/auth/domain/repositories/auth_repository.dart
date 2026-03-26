@@ -59,6 +59,11 @@ class AuthRepository implements AuthRepositoryInterface {
       },
     );
   }
+
+  @override
+  Future<ResponseModel> logout() async {
+    return await _apiClient.post(AppUrls.logout);
+  }
 }
 
 

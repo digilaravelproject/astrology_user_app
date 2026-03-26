@@ -1,3 +1,4 @@
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -6,114 +7,154 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
+import '../../astrologers/controllers/astrologer_controller.dart';
+import '../../astrologers/domain/models/astrologer_model.dart';
+import '../../astrologers/domain/models/review_model.dart';
+import '../../astrologers/screens/all_reviews_screen.dart';
 import '../../chat/screens/chat_screen.dart';
 import '../../call/screens/call_screen.dart';
 import '../../../core/utils/wallet_helper.dart';
+import '../../../core/constants/app_urls.dart';
 
-class AstrologerDetailScreen extends StatelessWidget {
-  final String name;
-  final String skills;
-  final String languages;
-  final String experience;
-  final double rating;
-  final String price;
-  final String discountPrice;
-  final String orders;
-  final String minutes;
-  final String imageUrl;
-  final String bio;
-  final bool isRisingStar;
-  final bool isVerified;
+class AstrologerDetailScreen extends StatefulWidget {
+  final int astrologerId;
 
   const AstrologerDetailScreen({
     Key? key,
-    required this.name,
-    required this.skills,
-    required this.languages,
-    required this.experience,
-    required this.rating,
-    required this.price,
-    required this.discountPrice,
-    required this.orders,
-    required this.minutes,
-    required this.imageUrl,
-    required this.bio,
-    this.isRisingStar = false,
-    this.isVerified = true,
+    required this.astrologerId,
   }) : super(key: key);
+
+  @override
+  State<AstrologerDetailScreen> createState() => _AstrologerDetailScreenState();
+}
+
+class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
+  final AstrologerController _controller = Get.find<AstrologerController>();
+  AstrologerModel? _astrologer;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchAstrologer();
+      _controller.fetchReviews(widget.astrologerId);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant AstrologerDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.astrologerId != widget.astrologerId) {
+      _fetchAstrologer();
+      _controller.fetchReviews(widget.astrologerId);
+    }
+  }
+
+  Future<void> _fetchAstrologer() async {
+    setState(() {
+      _isLoading = true;
+      _astrologer = null;
+    });
+    
+    try {
+      final result = await _controller.fetchAstrologerById(widget.astrologerId);
+      if (mounted && result != null) {
+        setState(() {
+          _astrologer = result;
+          _isLoading = false;
+        });
+      } else if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          // AppBar
-          SliverAppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            pinned: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: [
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D)),
-                onSelected: (value) {
-                  // Handle menu selection
-                  if (value == 'Block') {
-                    _showBlockBottomSheet(context);
-                  } else if (value == 'Report') {
-                     _showReportBottomSheet(context);
-                  }
-                },
-                itemBuilder: (BuildContext context) {
-                  return {'Block', 'Report'}.map((String choice) {
-                    return PopupMenuItem<String>(
-                      value: choice,
-                      child: AppText(
-                        choice,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    );
-                  }).toList();
-                },
-              ),
-            ],
-          ),
-          // Content
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Profile Header Card - EXACT MATCH
-                _buildProfileHeaderCard(),
-                const SizedBox(height: 16),
-                // Gallery Section
-                _buildGallerySection(),
-                const SizedBox(height: 16),
-                // Reviews Section
-                _buildReviewsSection(),
-                const SizedBox(height: 16),
-                // Chat with Assistant
-                _buildChatAssistantSection(),
-                const SizedBox(height: 16),
-                // Send Gift
-                _buildGiftSection(),
-                const SizedBox(height: 100),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : CustomScrollView(
+              slivers: [
+                // AppBar
+                SliverAppBar(
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  pinned: true,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  actions: [
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D)),
+                      onSelected: (value) {
+                        // Handle menu selection
+                        if (value == 'Block') {
+                          _showBlockBottomSheet(context, _astrologer!.name);
+                        } else if (value == 'Report') {
+                          _showReportBottomSheet(context, _astrologer!.name);
+                        }
+                        else if (value == 'Review') {
+                          _showReviewBottomSheet(context, _astrologer!.name);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return {'Block', 'Report','Review'}.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: AppText(
+                              choice,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColorPrimary,
+                            ),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ],
+                ),
+                // Content
+                SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Profile Header Card
+                      _buildProfileHeaderCard(_astrologer!),
+                      const SizedBox(height: 16),
+                      // Gallery Section - commented out
+                      // _buildGallerySection(),
+                      // const SizedBox(height: 16),
+                      // Reviews Section
+                      Obx(() => _buildReviewsSection()),
+                      const SizedBox(height: 16),
+                      // Chat with Assistant
+                      _buildChatAssistantSection(),
+                      const SizedBox(height: 16),
+                      // Send Gift
+                      _buildGiftSection(),
+                      const SizedBox(height: 100),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
-      ),
       bottomNavigationBar: _buildBottomActions(context),
     );
   }
 
-  void _showBlockBottomSheet(BuildContext context) {
+  void _showBlockBottomSheet(BuildContext context, String name) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -165,16 +206,20 @@ class AstrologerDetailScreen extends StatelessWidget {
                     child: CustomButton(
                       text: "Block",
                       backgroundColor: Colors.red,
-                      onTap: () {
+                      onTap: () async {
                         Get.back();
-                        Get.snackbar(
-                          "Blocked",
-                          "You have blocked $name",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.black87,
-                          colorText: Colors.white,
-                          margin: const EdgeInsets.all(20),
-                        );
+                        try {
+                          final result = await _controller.blockAstrologer(widget.astrologerId);
+                          if (result.isSuccess) {
+                            CustomSnackbar.showSuccess(result.message);
+                            // Navigate back after blocking
+                            Navigator.pop(context);
+                          } else {
+                            CustomSnackbar.showSuccess(result.message);
+                          }
+                        } catch (e) {
+                          CustomSnackbar.showSuccess("Failed to block astrologer");
+                        }
                       },
                     ),
                   ),
@@ -188,218 +233,290 @@ class AstrologerDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showReportBottomSheet(BuildContext context) {
+  void _showReportBottomSheet(BuildContext context, String name) {
+    final TextEditingController _reasonController = TextEditingController();
+    String? _selectedReason;
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      isScrollControlled: true, // Allow full height if needed
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: AppText(
-                    "Report Astrologer",
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
-                ),
-                 const SizedBox(height: 20),
-                 AppText(
-                  "Why do you want to report?",
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                const SizedBox(height: 12),
-                
-                ...["Inappropriate Behavior", "Spam", "Fake Profile", "Other"].map((reason) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () {
-                         Get.back();
-                         Get.snackbar(
-                            "Reported",
-                            "Thank you for reporting. We will investigate.",
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                            margin: const EdgeInsets.all(20),
-                          );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade200),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            AppText(reason, fontSize: 14, color: Colors.black87),
-                            const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showAddReviewBottomSheet(BuildContext context) {
-    double _selectedRating = 0;
-    final TextEditingController _reviewController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 20,
-                right: 20,
-                top: 20,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: AppText(
-                      "Write a Review",
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                    const SizedBox(height: 20),
+                    Center(
+                      child: AppText(
+                        "Report Astrologer",
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    AppText(
+                      "Why do you want to report?",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(5, (index) {
-                        return IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedRating = index + 1.0;
-                            });
-                          },
-                          icon: Icon(
-                            index < _selectedRating ? Icons.star_rounded : Icons.star_border_rounded,
-                            color: Colors.amber,
-                            size: 32,
-                          ),
-                        );
-                      }),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  AppText(
-                    "Share your experience",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: TextField(
-                      controller: _reviewController,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: "How was your session with $name?",
-                        border: InputBorder.none,
+                    const SizedBox(height: 16),
+
+                    // Text field for custom reason
+                    Container(
+                      width: double.infinity,
+                     // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: TextField(
+                        controller: _reasonController,
+                        decoration: InputDecoration(
+                          hintText: "Enter reason for reporting...",
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: CustomButton(
-                      text: "Submit Review",
-                      backgroundColor: AppColors.deepPink,
-                      textColor: Colors.white,
-                      onTap: () {
-                        if (_selectedRating == 0) {
-                          Get.snackbar("Error", "Please select a rating",
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                             margin: const EdgeInsets.all(20),
-                          );
-                          return;
-                        }
-                        Get.back();
-                        Get.snackbar(
-                          "Success",
-                          "Review submitted successfully!",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                          margin: const EdgeInsets.all(20),
-                        );
-                      },
+                    const SizedBox(height: 16),
+
+                    // Predefined reasons
+                    // ...["Inappropriate Behavior", "Spam", "Fake Profile", "Other"].map((reason) {
+                    //   return Padding(
+                    //     padding: const EdgeInsets.only(bottom: 12),
+                    //     child: InkWell(
+                    //       onTap: () {
+                    //         setState(() {
+                    //           _selectedReason = reason;
+                    //           _reasonController.text = reason;
+                    //         });
+                    //       },
+                    //       child: Container(
+                    //         padding: const EdgeInsets.all(16),
+                    //         decoration: BoxDecoration(
+                    //           color: _selectedReason == reason ? const Color(0xFFFFF0F5) : Colors.grey.shade100,
+                    //           borderRadius: BorderRadius.circular(12),
+                    //           border: Border.all(
+                    //             color: _selectedReason == reason ? const Color(0xFFFFCDD2) : Colors.grey.shade300,
+                    //           ),
+                    //         ),
+                    //         child: Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             AppText(reason, fontSize: 14, color: Colors.black87),
+                    //             if (_selectedReason == reason)
+                    //               const Icon(Icons.check, size: 16, color: Color(0xFF4CAF50)),
+                    //           ],
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   );
+                    // }).toList(),
+                    // const SizedBox(height: 20),
+
+                    // Report button
+                    SizedBox(
+                      width: double.infinity,
+                      child: CustomButton(
+                        text: "Report",
+                        backgroundColor: AppColors.primaryColor,
+                        onTap: () async {
+                          final reason = _reasonController.text.trim();
+                          if (reason.isEmpty) {
+                            Get.snackbar(
+                              "Error",
+                              "Please enter a reason for reporting",
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.primaryColor,
+                              colorText: Colors.white,
+                              margin: const EdgeInsets.all(20),
+                            );
+                            return;
+                          }
+
+                          Get.back(); // Close bottom sheet
+                          try {
+                            final result = await _controller.reportAstrologer(widget.astrologerId, reason);
+                            if (result.isSuccess) {
+                              CustomSnackbar.showSuccess(result.message);
+
+                              Navigator.pop(context); // Close detail screen
+                            } else {
+                              CustomSnackbar.showError(result.message);
+                            }
+                          } catch (e) {
+                            CustomSnackbar.showError("Failed to report astrologer");
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             );
-          }
+          },
         );
       },
     );
   }
 
-  Widget _buildProfileHeaderCard() {
+  void _showReviewBottomSheet(BuildContext context, String name) {
+    double _selectedRating = 0.0;
+    final TextEditingController _reviewController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: AppText(
+                        "Write a Review",
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(5, (index) {
+                          return IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedRating = index + 1.0;
+                              });
+                            },
+                            icon: Icon(
+                              index < _selectedRating ? Icons.star_rounded : Icons.star_border_rounded,
+                              color: Colors.amber,
+                              size: 32,
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    AppText(
+                      "Share your experience",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                    //  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: TextField(
+                        controller: _reviewController,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                          hintText: "How was your session with $name?",
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: CustomButton(
+                        text: "Post Review",
+                        backgroundColor: AppColors.deepPink,
+                        textColor: Colors.white,
+                        onTap: () async {
+                          if (_selectedRating == 0) {
+                            CustomSnackbar.showError("Please select a rating");
+                            return;
+                          }
+
+                          final review = _reviewController.text.trim();
+                          if (review.isEmpty) {
+                            CustomSnackbar.showError("Please enter a review");
+                            return;
+                          }
+                          Get.back(); // Close bottom sheet
+                          try {
+                            final result = await _controller.postReview(
+                              widget.astrologerId,
+                              _selectedRating.toInt(),
+                              review,
+                            );
+                            print("hhgcgewbsj : $result");
+                            if (result.isSuccess) {
+                              CustomSnackbar.showSuccess(result.message);
+                              Navigator.pop(context); // Close detail screen
+                            } else {
+                              CustomSnackbar.showError(result.message);
+                            }
+                          } catch (e) {
+                           // CustomSnackbar.showError("Failed to post review");
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildProfileHeaderCard(AstrologerModel astro) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -420,88 +537,40 @@ class AstrologerDetailScreen extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Avatar with Golden Border
               Column(
                 children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      width: 75,
-                      height: 75,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFFFD700),
-                          Color(0xFFFFA000),
-                        ],
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(3),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
-                        image: DecorationImage(
-                          image: NetworkImage(imageUrl),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Rising Star Badge
-                  if (isRisingStar)
-                    Positioned(
-                      top: -4,
-                      left: -4,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 75,
+                        height: 75,
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.deepPink,
-                              AppColors.primaryColor,
-                            ],
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
                           ),
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: Colors.white,
-                              size: 10,
+                        padding: const EdgeInsets.all(3),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            image: DecorationImage(
+                              image: NetworkImage(astro.profilePhoto != null ? '${AppUrls.baseImageUrl}/${astro.profilePhoto}' : ''),
+                              fit: BoxFit.cover,
                             ),
-                            const SizedBox(width: 2),
-                            Text(
-                              'Rising Star',
-                              style: GoogleFonts.inter(
-                                fontSize: 8,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                CustomRatingBar(
-                  rating: rating,
-                  size: 14,
-                ),
-              ],
-            ),
-          const SizedBox(width: 12),
-          // Details
-          Expanded(
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const CustomRatingBar(rating: 5.0, size: 14),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -517,7 +586,7 @@ class AstrologerDetailScreen extends StatelessWidget {
                                 children: [
                                   Flexible(
                                     child: AppText(
-                                      name,
+                                      astro.name,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w900,
                                       color: AppColors.textColorPrimary,
@@ -525,19 +594,13 @@ class AstrologerDetailScreen extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  if (isVerified) ...[
-                                    const SizedBox(width: 4),
-                                    const Icon(
-                                      Icons.verified,
-                                      color: Color(0xFF4CAF50),
-                                      size: 16,
-                                    ),
-                                  ],
+                                  const SizedBox(width: 4),
+                                  const Icon(Icons.verified, color: Color(0xFF4CAF50), size: 16),
                                 ],
                               ),
                               const SizedBox(height: 4),
                               AppText(
-                                skills,
+                                astro.areasOfExpertise.join(', '),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textColorSecondary,
@@ -549,72 +612,73 @@ class AstrologerDetailScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 4),
-                        // Follow and Menu Group
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
+                            Obx(() => Container(
                               width: 70,
                               height: 28,
                               child: CustomButton(
-                                text: 'Follow',
+                                text: _controller.isFollowing.value ? 'Following' : 'Follow',
                                 fontSize: 10,
                                 height: 28,
                                 borderRadius: 14,
-                                onTap: () {},
+                                backgroundColor: _controller.isFollowing.value ? Colors.grey : AppColors.deepPink,
+                                textColor: Colors.white,
+                                onTap: () async {
+                                  final result = await _controller.followAstrologer(widget.astrologerId);
+                                  if (result.isSuccess) {
+                                    _controller.isFollowing.value = !_controller.isFollowing.value;
+                                    CustomSnackbar.showSuccess(result.message);
+                                  } else {
+                                    CustomSnackbar.showError(result.message);
+                                  }
+                                },
                               ),
-                            ),
+                            )),
                           ],
                         ),
                       ],
                     ),
                     const SizedBox(height: 4),
                     AppText(
-                      languages,
+                      astro.languages.join(', '),
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textColorHint,
                     ),
                     const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      AppText(
-                        'Exp: $experience',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textColorPrimary,
-                      ),
-                      const SizedBox(width: 8),
-                      // Price Information
-                      AppText(
-                        '₹$price',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textColorSecondary,
-                        style: GoogleFonts.inter(decoration: TextDecoration.lineThrough),
-                      ),
-                      const SizedBox(width: 6),
-                      AppText(
-                        '₹$discountPrice',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.deepPink,
-                      ),
-                      AppText(
-                        '/min',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    ],
-                  ),
+                    Row(
+                      children: [
+                        AppText(
+                          'Exp: ${astro.yearsOfExperience} Years',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textColorPrimary,
+                        ),
+                        const SizedBox(width: 8),
+                        AppText(
+                          '₹${astro.chatRate ?? '0'}',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textColorSecondary,
+                          style: GoogleFonts.inter(decoration: TextDecoration.lineThrough),
+                        ),
+                        const SizedBox(width: 6),
+                        AppText(
+                          '₹${astro.chatRate ?? '0'}',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.deepPink,
+                        ),
+                        AppText('/min', fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
-
-
           const SizedBox(height: 12),
           Row(
             children: [
@@ -635,11 +699,7 @@ class AstrologerDetailScreen extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.bolt,
-                        color: Colors.yellow,
-                        size: 14,
-                      ),
+                      const Icon(Icons.bolt, color: Colors.yellow, size: 14),
                       const SizedBox(width: 6),
                       Flexible(
                         child: AppText(
@@ -658,100 +718,24 @@ class AstrologerDetailScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Divider
-          Container(
-            height: 1,
-            color: const Color(0xFFEEEEEE),
-          ),
+          Container(height: 1, color: const Color(0xFFEEEEEE)),
           const SizedBox(height: 12),
-          // Bio Description
-          _BioText(bio: bio),
+          _BioText(bio: astro.bio),
         ],
       ),
     );
   }
 
-
-
-  Widget _buildGallerySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              const Icon(Icons.photo_library, color: Color(0xFFE91E63), size: 20),
-              const SizedBox(width: 8),
-              AppText(
-                'Gallery',
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textColorPrimary,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 160,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => _showFullScreenGallery(context, List.generate(3, (index) => imageUrl), index),
-                child: Container(
-                  width: 140,
-                  margin: const EdgeInsets.only(right: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildReviewsSection() {
-    final reviews = [
-      {
-        "name": "Dipti",
-        "avatar": "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
-        "rating": 5.0,
-        "review": "veeraji aapa kamal hoo...aur kuch bhi me bata nahi sakati itana achaa experience aata hai muze ki kya bolu.... 🧿🙏👏💐🎉",
-        "reply": "😊 Thank you so much dipti ji🫂💗 May god bless you 🌞🙏"
-      },
-      {
-        "name": "Shweta",
-        "avatar": "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
-        "rating": 5.0,
-        "review": "all my questions are always answered very nicely and gave me the best advice and make me feel good",
-        "reply": "Thank you so much Shweta mam💗 May god bless you 🌞🙏"
-      },
-      {
-        "name": "Shweta",
-        "avatar": "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
-        "rating": 5.0,
-        "review": "Genius consultant and answered all my questions very nicely, realy good guidance, her k knowledge and skills shows she is doing great in her field.",
-        "reply": "Awwww 🥰😌 Thank you so much Shweta mam💗 May god bless you dear and you have all the happiness in the world 🫂💗"
-      },
-      {
-        "name": "Sibangi",
-        "avatar": "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
-        "rating": 5.0,
-        "review": "She is the most sweetest reader I have interacted. It's been a year that after connecting with her I haven't changed my Tarot reader. Her readings are accurate.",
-        "reply": null
-      },
-    ];
+    final reviews = _controller.reviews;
+
+    // Only show if there are reviews
+    if (reviews.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Show only first 5 reviews
+    final displayReviews = reviews.take(5).toList();
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -764,7 +748,6 @@ class AstrologerDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Reviews Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -780,88 +763,84 @@ class AstrologerDetailScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              AppText(
-                'View All',
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textColorSecondary,
+              GestureDetector(
+                onTap: () => _navigateToAllReviews(),
+                child: AppText(
+                  'View All',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textColorSecondary,
+                ),
               ),
             ],
           ),
-          
           const SizedBox(height: 16),
-          
-          // Reviews List
-          ...reviews.map((review) => _buildReviewCard(review)).toList(),
-          
-          // See all reviews link
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: AppText(
-              'See all reviews',
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.deepPink,
-            ),
-          ),
+          ...displayReviews.map((review) => _buildReviewCard(review)).toList(),
+          if (reviews.length > 5)
+            const SizedBox(height: 8),
+            if (reviews.length > 5)
+              GestureDetector(
+                onTap: () => _navigateToAllReviews(),
+                child: AppText(
+                  'See all ${reviews.length} reviews',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepPink,
+                ),
+              ),
         ],
       ),
     );
   }
 
-  Widget _buildReviewCard(Map<String, dynamic> review) {
+  void _navigateToAllReviews() {
+    Get.to(() => AllReviewsScreen(astrologerId: widget.astrologerId));
+  }
+
+  Widget _buildReviewCard(ReviewModel review) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F5), // Light pink background
+        color: const Color(0xFFFFF0F5),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFFFCDD2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundImage: NetworkImage(review['avatar'] as String),
+                backgroundImage: NetworkImage(
+                  AppUrls.baseImageUrl + (review.user?.profilePhoto ?? ''),
+                ),
+               // backgroundImage: NetworkImage(AppUrls.baseImageUrl+review.user!.profilePhoto ?? ''),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: AppText(
-                  review['name'] as String,
+                  review.user?.name ?? 'Unknown',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF880E4F),
                 ),
               ),
-              const Icon(Icons.more_vert, size: 20, color: Colors.grey),
+             // const Icon(Icons.more_vert, size: 20, color: Colors.grey),
             ],
           ),
-          
           const SizedBox(height: 8),
-          
-          // Rating
-          CustomRatingBar(
-            rating: (review['rating'] as num).toDouble(),
-            size: 16,
-          ),
-          
+          CustomRatingBar(rating: review.rating, size: 16),
           const SizedBox(height: 8),
-          
-          // Review Text
           AppText(
-            review['review'] as String,
+            review.review,
             fontSize: 13,
             fontWeight: FontWeight.w400,
             color: const Color(0xFF880E4F),
             style: const TextStyle(height: 1.4),
           ),
-          
-          // Reply Section (if exists)
-          if (review['reply'] != null) ...[
+          if (review.reply != null) ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -872,15 +851,10 @@ class AstrologerDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText(
-                    'Vera',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4A148C),
-                  ),
+                  AppText('Vera', fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF4A148C)),
                   const SizedBox(height: 4),
                   AppText(
-                    review['reply'] as String,
+                    review.reply!,
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                     color: const Color(0xFF4A148C),
@@ -927,10 +901,7 @@ class AstrologerDetailScreen extends StatelessWidget {
               height: 50,
               width: 50,
               alignment: Alignment.center,
-              child: AppText(
-                gift['icon']!,
-                fontSize: 32,
-              ),
+              child: AppText(gift['icon']!, fontSize: 32),
             ),
             const SizedBox(height: 4),
             AppText(
@@ -975,17 +946,15 @@ class AstrologerDetailScreen extends StatelessWidget {
               onTap: () => WalletHelper.checkBalanceAndProceed(
                 context: context,
                 type: 'chat',
-                name: name,
-                imageUrl: imageUrl,
-                price: discountPrice,
-                simulatedBalance: 500.0, // Force sufficient balance
+                name: 'Astrologer',
+                imageUrl: '',
+                price: '0',
+                simulatedBalance: 500.0,
               ),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
-                  ),
+                  gradient: const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -998,32 +967,14 @@ class AstrologerDetailScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.message_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
+                    const Icon(Icons.message_rounded, color: Colors.white, size: 18),
                     const SizedBox(width: 8),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Chat',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          '₹$discountPrice/min',
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
-                        ),
+                        Text('Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                        Text('₹0/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
                       ],
                     ),
                   ],
@@ -1037,17 +988,15 @@ class AstrologerDetailScreen extends StatelessWidget {
               onTap: () => WalletHelper.checkBalanceAndProceed(
                 context: context,
                 type: 'call',
-                name: name,
-                imageUrl: imageUrl,
-                price: discountPrice,
-                simulatedBalance: 500.0, // Force sufficient balance
+                name: 'Astrologer',
+                imageUrl: '',
+                price: '0',
+                simulatedBalance: 500.0,
               ),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)],
-                  ),
+                  gradient: const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -1066,22 +1015,8 @@ class AstrologerDetailScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Call',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          '₹$discountPrice/min',
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
-                        ),
+                        Text('Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                        Text('₹0/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
                       ],
                     ),
                   ],
@@ -1093,8 +1028,6 @@ class AstrologerDetailScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _buildChatAssistantSection() {
     return Container(
@@ -1116,12 +1049,7 @@ class AstrologerDetailScreen extends StatelessWidget {
         children: [
           const Icon(Icons.support_agent, color: Color(0xFFE91E63), size: 24),
           const SizedBox(width: 8),
-          AppText(
-            'Chat with Assistant',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFFC2185B),
-          ),
+          AppText('Chat with Assistant', fontSize: 16, fontWeight: FontWeight.w500, color: const Color(0xFFC2185B)),
           const Spacer(),
           const Icon(Icons.chevron_right, color: Color(0xFFE91E63)),
         ],
@@ -1144,21 +1072,11 @@ class AstrologerDetailScreen extends StatelessWidget {
             children: [
               const Icon(Icons.card_giftcard, color: Color(0xFFE91E63), size: 20),
               const SizedBox(width: 8),
-              AppText(
-                'Send Gift to Vera',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFFC2185B),
-              ),
+              AppText('Send Gift to Astrologer', fontSize: 16, fontWeight: FontWeight.w500, color: const Color(0xFFC2185B)),
               const SizedBox(width: 4),
               const Icon(Icons.info_outline, size: 16, color: Colors.grey),
               const Spacer(),
-              AppText(
-                '₹ 3',
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFFC2185B),
-              ),
+              AppText('₹ 3', fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFFC2185B)),
             ],
           ),
           const SizedBox(height: 16),
@@ -1174,34 +1092,18 @@ class AstrologerDetailScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => Scaffold(
           backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.black,
-            leading: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
+          appBar: AppBar(backgroundColor: Colors.black, leading: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context))),
           body: PageView.builder(
             itemCount: images.length,
             controller: PageController(initialPage: initialIndex),
             itemBuilder: (context, index) {
-              return InteractiveViewer(
-                minScale: 0.5,
-                maxScale: 4.0,
-                child: Center(
-                  child: Image.network(
-                    images[index],
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              );
+              return InteractiveViewer(minScale: 0.5, maxScale: 4.0, child: Center(child: Image.network(images[index], fit: BoxFit.contain)));
             },
           ),
         ),
       ),
     );
   }
-
 }
 
 class _BioText extends StatefulWidget {
@@ -1229,7 +1131,7 @@ class _BioTextState extends State<_BioText> {
           overflow: isExpanded ? null : TextOverflow.ellipsis,
           style: const TextStyle(height: 1.6),
         ),
-        if (widget.bio.length > 100) ...[ // Simple heuristic to show button
+        if (widget.bio.length > 100) ...[
           const SizedBox(height: 4),
           GestureDetector(
             onTap: () {

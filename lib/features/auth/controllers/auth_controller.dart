@@ -228,7 +228,9 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     try {
       isLoading.value = true;
+      print('AuthController.logout() called');
       await _logoutUseCase.execute();
+      print('AuthController.logout() completed');
       currentUser.value = null;
       currentMobile.value = '';
       mobileController.clear();

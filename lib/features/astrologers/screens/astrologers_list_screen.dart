@@ -120,27 +120,27 @@ class AstrologersListScreen extends StatelessWidget {
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => AstrologerDetailScreen(
-                  name: name,
-                  skills: primarySkills,
-                  languages: 'English, Hindi, Marathi',
-                  experience: '4 Years',
-                  rating: rating,
-                  price: '50',
-                  discountPrice: price,
-                  orders: reviews,
-                  minutes: '100k+',
-                  imageUrl: imageUrl,
-                  bio:
-                      '$name is a $primarySkills expert in India. She loves to help her clients when they are in need. Her readings are spirit-guided and she works according to Astrology ethics to bring stability in the lives of the people. However, her main motive is to give you clarity and insight regarding your life and also to empower you with the spiritual knowledge of different energies that are revolving around us.',
-                  isRisingStar: rating >= 4.7,
-                ),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder:
+        //         (context) => AstrologerDetailScreen(
+        //           name: name,
+        //           skills: primarySkills,
+        //           languages: 'English, Hindi, Marathi',
+        //           experience: '4 Years',
+        //           rating: rating,
+        //           price: '50',
+        //           discountPrice: price,
+        //           orders: reviews,
+        //           minutes: '100k+',
+        //           imageUrl: imageUrl,
+        //           bio:
+        //               '$name is a $primarySkills expert in India. She loves to help her clients when they are in need. Her readings are spirit-guided and she works according to Astrology ethics to bring stability in the lives of the people. However, her main motive is to give you clarity and insight regarding your life and also to empower you with the spiritual knowledge of different energies that are revolving around us.',
+        //           isRisingStar: rating >= 4.7,
+        //         ),
+        //   ),
+        // );
       },
       child: Container(
         padding: const EdgeInsets.all(16),

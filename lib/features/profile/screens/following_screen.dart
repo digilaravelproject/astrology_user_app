@@ -35,21 +35,21 @@ class FollowingScreen extends StatelessWidget {
     
     return GestureDetector(
       onTap: () {
-        Get.to(() => AstrologerDetailScreen(
-          name: "Astrologer ${index + 1}",
-          skills: "Vedic • Tarot • Palmistry",
-          languages: "English, Hindi",
-          experience: "1${index + 2} Years",
-          rating: 4.9,
-          price: "50",
-          discountPrice: "30",
-          orders: "50${index}0",
-          minutes: "2000",
-          imageUrl: imageUrl,
-          bio: "Expert in Vedic Astrology and Tarot Reading with over 10 years of experience.",
-          isRisingStar: index % 2 == 0,
-          isVerified: true,
-        ));
+        // Get.to(() => AstrologerDetailScreen(
+        //   name: "Astrologer ${index + 1}",
+        //   skills: "Vedic • Tarot • Palmistry",
+        //   languages: "English, Hindi",
+        //   experience: "1${index + 2} Years",
+        //   rating: 4.9,
+        //   price: "50",
+        //   discountPrice: "30",
+        //   orders: "50${index}0",
+        //   minutes: "2000",
+        //   imageUrl: imageUrl,
+        //   bio: "Expert in Vedic Astrology and Tarot Reading with over 10 years of experience.",
+        //   isRisingStar: index % 2 == 0,
+        //   isVerified: true,
+        // ));
       },
       child: Container(
         padding: const EdgeInsets.all(12),

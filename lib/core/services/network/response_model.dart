@@ -29,7 +29,7 @@ class ResponseModel {
     }
 
     return ResponseModel(
-      isSuccess: success && (statusCode == 200 || statusCode == null),
+      isSuccess: success && (statusCode == 200 || statusCode == 201 || statusCode == null),
       message: json['msg']?.toString() ??
           json['message']?.toString() ??
           (success ? 'Success' : 'Something went wrong'),

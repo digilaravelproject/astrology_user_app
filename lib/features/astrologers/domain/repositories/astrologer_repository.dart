@@ -10,4 +10,32 @@ class AstrologerRepository {
   Future<ResponseModel> getAstrologers() async {
     return await apiClient.get(AppUrls.astrologers);
   }
+
+  Future<ResponseModel> getAstrologerById(int id) async {
+    return await apiClient.get('${AppUrls.astrologers}/$id');
+  }
+
+  Future<ResponseModel> blockAstrologer(int id) async {
+    return await apiClient.post('${AppUrls.astrologers}/$id/block');
+  }
+
+  Future<ResponseModel> reportAstrologer(int id, String reason) async {
+    return await apiClient.post('${AppUrls.astrologers}/$id/report', data: {'reason': reason});
+  }
+
+  Future<ResponseModel> postReview(int astrologerId, int rating, String review) async {
+    return await apiClient.post('/api/v1/user/reviews', data: {
+      'astrologer_id': astrologerId,
+      'rating': rating,
+      'review': review,
+    });
+  }
+
+  Future<ResponseModel> getReviews(int astrologerId) async {
+    return await apiClient.get('/api/v1/user/reviews', queryParameters: {'astrologer_id': astrologerId});
+  }
+
+  Future<ResponseModel> followAstrologer(int id) async {
+    return await apiClient.post('${AppUrls.astrologers}/$id/follow');
+  }
 }

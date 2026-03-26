@@ -72,4 +72,23 @@ class AuthService implements AuthServiceInterface {
     }
     return UserModel.fromJsonString(userJsonString);
   }
+
+  @override
+  Future<ResponseModel> logout() async {
+    final response = await _authRepository.logout();
+    // Clear user info after successful logout
+    if (response.isSuccess) {
+      await SharedPrefs.remove(AppConstants.userData);
+      await TokenManager.clearToken();
+      await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+    }
+    return response;
+  }
+
+  /*@override
+  Future<void> clearUserInfo() async {
+    await SharedPrefs.remove(AppConstants.userData);
+    await TokenManager.clearToken();
+    await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+  }*/
 }

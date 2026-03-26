@@ -12,6 +12,7 @@ abstract class WalletRepositoryInterface {
     required String providerPaymentId,
     required String signature,
   });
+  Future<WalletTransactionsResponseModel?> getTransactions();
 }
 
 class WalletRepository implements WalletRepositoryInterface {
@@ -23,11 +24,14 @@ class WalletRepository implements WalletRepositoryInterface {
   Future<WalletModel?> getWallet() async {
     try {
       final response = await apiClient.get(AppUrls.wallet);
-      if (response.statusCode == 200 && response.body['status'] == 'success') {
-        return WalletModel.fromJson(response.body['data']['wallet']);
+      if (response.isSuccess && response.body != null) {
+        print('[PCB_APP] [DEBUG] | getWallet body: ${response.body}');
+        final wallet = WalletModel.fromJson(response.body['wallet']);
+        print('[PCB_APP] [DEBUG] | Parsed Wallet: ${wallet.balance}');
+        return wallet;
       }
     } catch (e) {
-      print('Error getting wallet: $e');
+      print('[PCB_APP] [DEBUG] | Error getting wallet in Repo: $e');
     }
     return null;
   }
@@ -39,15 +43,15 @@ class WalletRepository implements WalletRepositoryInterface {
         'amount': amount,
       });
       print('[PCB_APP] [DEBUG] | topUpWallet Status: ${response.statusCode}');
-      print('[PCB_APP] [DEBUG] | topUpWallet Body: ${response.body}');
-      
-      final isSuccess = (response.statusCode == 200 || response.statusCode == 201) && 
-                       (response.body != null);
-      
-      print('[PCB_APP] [DEBUG] | topUpWallet isSuccess: $isSuccess');
+      print('[PCB_APP] [DEBUG] | topUpWallet isSuccess: ${response.isSuccess}');
 
-      if (isSuccess) {
-        return WalletTopUpResponseModel.fromJson(response.body);
+      if (response.isSuccess && response.body != null) {
+        // Since apiClient returns only the 'data' part as body
+        return WalletTopUpResponseModel(
+          status: 'success',
+          message: response.message,
+          data: WalletTopUpData.fromJson(response.body),
+        );
       }
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error topping up wallet: $e');
@@ -69,14 +73,31 @@ class WalletRepository implements WalletRepositoryInterface {
       });
       print('[PCB_APP] [DEBUG] | verifyTopUp Status: ${response.statusCode}');
       
-      final isSuccess = (response.statusCode == 200 || response.statusCode == 201) && 
-                       (response.body != null && response.body['status'] == 'success');
-
-      if (isSuccess) {
-        return WalletTopUpResponseModel.fromJson(response.body);
+      if (response.isSuccess && response.body != null) {
+        return WalletTopUpResponseModel(
+          status: 'success',
+          message: response.message,
+          data: WalletTopUpData.fromJson(response.body),
+        );
       }
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error verifying top-up: $e');
+    }
+    return null;
+  }
+
+  @override
+  Future<WalletTransactionsResponseModel?> getTransactions() async {
+    try {
+      final response = await apiClient.get(AppUrls.walletTransactions);
+      if (response.isSuccess && response.body != null) {
+        return WalletTransactionsResponseModel(
+          status: 'success',
+          data: WalletTransactionsData.fromJson(response.body),
+        );
+      }
+    } catch (e) {
+      print('[PCB_APP] [DEBUG] | Error fetching transactions: $e');
     }
     return null;
   }

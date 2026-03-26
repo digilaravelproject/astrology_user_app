@@ -13,8 +13,11 @@ class AppUrls {
   static String remedies = "/api/v1/user/remedies";
   static const String blogs = '/api/v1/user/blogs';
   static const String astrologers = '/api/v1/user/astrologers';
+  static String getAstrologerDetails(int id) => '/api/v1/user/astrologers/$id';
   static const String wallet = '/api/v1/user/wallet';
   static const String walletTopup = '/api/v1/user/wallet/topup';
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
+  static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
+  static const String logout = '/api/v1/user/logout';
 }

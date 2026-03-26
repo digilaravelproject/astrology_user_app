@@ -10,6 +10,7 @@ abstract class WalletServiceInterface {
     required String providerPaymentId,
     required String signature,
   });
+  Future<WalletTransactionsResponseModel?> getTransactions();
 }
 
 class WalletService implements WalletServiceInterface {
@@ -38,5 +39,10 @@ class WalletService implements WalletServiceInterface {
       providerPaymentId: providerPaymentId,
       signature: signature,
     );
+  }
+
+  @override
+  Future<WalletTransactionsResponseModel?> getTransactions() {
+    return repository.getTransactions();
   }
 }

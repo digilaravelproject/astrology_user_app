@@ -13,7 +13,7 @@ class AppConstants {
     static const bool showToaster = false; // manages UI-level notifications.
 
     // API base URLs
-    static  String imageUrl = '$baseUrl';
+    static String imageUrl = '$baseUrl';
 
     // API endpoints
     // Add your endpoints here
@@ -27,5 +27,4 @@ class AppConstants {
     
     // Default Settings
     static const String defaultLanguage = 'en';
-
 }

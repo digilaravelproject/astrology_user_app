@@ -45,11 +45,19 @@ class RazorpayService {
     required String email,
     required String contact,
   }) {
+    // Strip redundant prefix if present (Razorpay SDK expects 'order_...')
+    String finalOrderId = orderId;
+    if (orderId.startsWith('razorpay_order_')) {
+      finalOrderId = orderId.replaceFirst('razorpay_order_', 'order_');
+    } else if (orderId.startsWith('razorpay_')) {
+      finalOrderId = orderId.replaceFirst('razorpay_', '');
+    }
+
     print('[PCB_APP] [DEBUG] | Generating Razorpay options...');
     final options = RazorpayConfig.getDefaultOptions(
       key: RazorpayConfig.razorpayKey,
       amount: amount,
-      orderId: orderId,
+      orderId: finalOrderId,
       name: name,
       description: description,
       email: email,
@@ -59,8 +67,11 @@ class RazorpayService {
     print('[PCB_APP] [DEBUG] | Razorpay Options: $options');
 
     try {
-      print('[PCB_APP] [DEBUG] | Calling _razorpay.open(options)...');
-      _razorpay.open(options);
+      print('[PCB_APP] [DEBUG] | Calling _razorpay.open(options) with delay...');
+      // Small delay ensures the UI is ready and doesn't block the main thread transition
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _razorpay.open(options);
+      });
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error in _razorpay.open: $e');
       CustomSnackbar.showError('Could not open Razorpay checkout: $e');

@@ -86,7 +86,7 @@ class _AstrologersPreviewSectionState extends State<AstrologersPreviewSection> {
   Widget _buildAstrologerCard(Map<String, dynamic> astro) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
+        /*Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AstrologerDetailScreen(
@@ -105,7 +105,7 @@ class _AstrologersPreviewSectionState extends State<AstrologersPreviewSection> {
               isVerified: true,
             ),
           ),
-        );
+        );*/
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),

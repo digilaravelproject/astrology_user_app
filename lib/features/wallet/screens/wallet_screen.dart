@@ -21,14 +21,17 @@ class WalletScreen extends StatelessWidget {
         title: AppStrings.myWallet,
       ),
       body: RefreshIndicator(
-        onRefresh: () => walletController.fetchWallet(),
+        onRefresh: () async {
+          await walletController.fetchWallet();
+          await walletController.fetchTransactions();
+        },
         color: AppColors.primaryColor,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               _buildBalanceCard(context, walletController),
-              _buildTransactionHistory(context),
+              _buildTransactionHistory(context, walletController),
             ],
           ),
         ),
@@ -117,13 +120,7 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionHistory(BuildContext context) {
-    final List<Map<String, dynamic>> transactions = [
-      {"title": AppStrings.walletRecharge, "date": "18 Feb, 2026", "amount": "+ ₹100", "type": "credit"},
-      {"title": AppStrings.consultationDrSharma, "date": "17 Feb, 2026", "amount": "- ₹50", "type": "debit"},
-      {"title": AppStrings.kundaliReport, "date": "16 Feb, 2026", "amount": "- ₹20", "type": "debit"},
-    ];
-
+  Widget _buildTransactionHistory(BuildContext context, WalletController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -142,76 +139,111 @@ class WalletScreen extends StatelessWidget {
             ],
           ),
         ),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: transactions.length,
-          itemBuilder: (context, index) {
-            final tx = transactions[index];
-            final isCredit = tx["type"] == "credit";
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade100),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: (isCredit ? Colors.green : Colors.red).withOpacity(0.1),
-                      shape: BoxShape.circle,
+        Obx(() {
+          if (controller.transactions.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: Column(
+                  children: [
+                    Icon(Icons.history_rounded, size: 64, color: Colors.grey.shade300),
+                    const SizedBox(height: 16),
+                    AppText(
+                      "No transactions found",
+                      fontSize: 14,
+                      color: Colors.grey.shade500,
+                      fontWeight: FontWeight.w500,
                     ),
-                    child: Icon(
-                      isCredit ? Icons.add_rounded : Icons.remove_rounded,
-                      color: isCredit ? Colors.green : Colors.red,
-                      size: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          tx["title"],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2E1A47).withOpacity(0.9),
-                        ),
-                        const SizedBox(height: 2),
-                        AppText(
-                          tx["date"],
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ],
-                    ),
-                  ),
-                  AppText(
-                    tx["amount"],
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: isCredit ? Colors.green : const Color(0xFF2E1A47),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
-          },
-        ),
+          }
+
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.transactions.length,
+            itemBuilder: (context, index) {
+              final tx = controller.transactions[index];
+              final isCredit = tx.transactionType == "credit";
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade100),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: (isCredit ? Colors.green : Colors.red).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isCredit ? Icons.add_rounded : Icons.remove_rounded,
+                        color: isCredit ? Colors.green : Colors.red,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            tx.description.isNotEmpty ? tx.description : (isCredit ? "Wallet Recharge" : "Consultation"),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2E1A47).withOpacity(0.9),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          AppText(
+                            _formatDate(tx.createdAt),
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
+                    ),
+                    AppText(
+                      "${isCredit ? '+' : '-'} ₹${tx.amount}",
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: isCredit ? Colors.green : const Color(0xFF2E1A47),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }),
         const SizedBox(height: 30),
       ],
     );
+  }
+
+  String _formatDate(String dateString) {
+    try {
+      if (dateString.isEmpty) return "";
+      final dateTime = DateTime.parse(dateString);
+      final months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return "${dateTime.day} ${months[dateTime.month - 1]}, ${dateTime.year}";
+    } catch (e) {
+      return dateString.split('T')[0];
+    }
   }
 }

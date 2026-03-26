@@ -10,6 +10,9 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../controllers/matrimony_controller.dart';
 import '../domain/models/matrimony_profile_model.dart';
+import '../widgets/matrimony_section.dart';
+import 'matrimony_profile_screen.dart';
+import 'matrimony_screen.dart';
 
 class MatrimonyRegistrationScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -493,7 +496,10 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           const SizedBox(height: 32),
           CustomButton(
             text: AppStrings.uploadPhotos,
-            onTap: _nextStep,
+            onTap: (){
+              Get.to(() => MatrimonySection());
+            },
+           // onTap: _nextStep,
             backgroundColor: const Color(0xFFB01D53),
             textColor: Colors.white,
           ),

@@ -3,6 +3,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import '../../../core/services/payment/razorpay/razorpay_service.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../auth/domain/services/auth_service_interface.dart';
+import '../domain/usecases/get_transactions_usecase.dart';
 import '../domain/usecases/get_wallet_usecase.dart';
 import '../domain/usecases/top_up_wallet_usecase.dart';
 import '../domain/usecases/verify_top_up_usecase.dart';
@@ -15,6 +16,7 @@ class WalletController extends GetxController {
   final GetWalletUseCase getWalletUseCase;
   final TopUpWalletUseCase topUpWalletUseCase;
   final VerifyTopUpUseCase verifyTopUpUseCase;
+  final GetTransactionsUseCase getTransactionsUseCase;
   final AuthServiceInterface authService;
   final RazorpayService razorpayService;
 
@@ -22,17 +24,20 @@ class WalletController extends GetxController {
     required this.getWalletUseCase,
     required this.topUpWalletUseCase,
     required this.verifyTopUpUseCase,
+    required this.getTransactionsUseCase,
     required this.authService,
     required this.razorpayService,
   });
 
   final wallet = Rxn<WalletModel>();
+  final transactions = <TransactionModel>[].obs;
   final isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
     fetchWallet();
+    fetchTransactions();
     razorpayService.init(
       onSuccess: _handlePaymentSuccess,
       onFailure: _handlePaymentError,
@@ -50,13 +55,26 @@ class WalletController extends GetxController {
     isLoading.value = true;
     try {
       final result = await getWalletUseCase.execute();
+      print('[PCB_APP] [DEBUG] | fetchWallet result: ${result?.balance}');
       if (result != null) {
         wallet.value = result;
+        print('[PCB_APP] [DEBUG] | wallet.value updated: ${wallet.value?.balance}');
       }
     } catch (e) {
-      print('Error fetching wallet: $e');
+      print('[PCB_APP] [DEBUG] | Error fetching wallet in Controller: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchTransactions() async {
+    try {
+      final result = await getTransactionsUseCase.execute();
+      if (result != null) {
+        transactions.assignAll(result.data.transactions);
+      }
+    } catch (e) {
+      print('Error fetching transactions: $e');
     }
   }
 
@@ -102,6 +120,7 @@ class WalletController extends GetxController {
       if (result != null && result.status == 'success') {
         CustomSnackbar.showSuccess(result.message);
         fetchWallet();
+        fetchTransactions();
       } else {
         CustomSnackbar.showError(result?.message ?? 'Payment verification failed');
       }
