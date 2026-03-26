@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
+import '../../astrologers/bindings/astrologers_binding.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_rating_bar.dart';

@@ -14,6 +14,8 @@ import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
 import 'chat_screen.dart';
+import '../../astrologers/bindings/astrologers_binding.dart';
+import 'package:astro_user/routes/route_helper.dart';
 
 class ChatListScreen extends StatelessWidget {
   const ChatListScreen({super.key});
@@ -21,6 +23,10 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final astrologerController = Get.find<AstrologerController>();
+    // Fetch astrologers once when screen is first accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      astrologerController.fetchAstrologers();
+    });
     final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
@@ -311,11 +317,10 @@ Widget _buildActionItem(IconData icon, VoidCallback onTap) {
 Widget _buildAstrologerCard(BuildContext context, AstrologerModel astro) {
   return GestureDetector(
     onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AstrologerDetailScreen(astrologerId: astro.id),
-        ),
+      Get.to(
+        () => AstrologerDetailScreen(astrologerId: astro.id),
+        binding: AstrologersBinding(),
+        transition: Transition.rightToLeft,
       );
     },
     child: Container(

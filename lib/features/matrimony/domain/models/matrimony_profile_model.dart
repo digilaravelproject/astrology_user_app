@@ -16,6 +16,9 @@ class MatrimonyProfileModel {
   final String annualIncome;
   final String about;
   final String? profilePhoto;
+  final String? panCardNumber;
+  final String? drivingLicenceNumber;
+  final String? aadhaarCardNumber;
   final String? updatedAt;
   final String? createdAt;
 
@@ -37,6 +40,9 @@ class MatrimonyProfileModel {
     required this.annualIncome,
     required this.about,
     this.profilePhoto,
+    this.panCardNumber,
+    this.drivingLicenceNumber,
+    this.aadhaarCardNumber,
     this.updatedAt,
     this.createdAt,
   });
@@ -60,6 +66,9 @@ class MatrimonyProfileModel {
       annualIncome: json['annual_income'] ?? '',
       about: json['about'] ?? '',
       profilePhoto: json['profile_photo'],
+      panCardNumber: json['pan_card_number'],
+      drivingLicenceNumber: json['driving_licence_number'],
+      aadhaarCardNumber: json['aadhar_card_number'],
       updatedAt: json['updated_at'],
       createdAt: json['created_at'],
     );
@@ -81,6 +90,9 @@ class MatrimonyProfileModel {
       'job_title': jobTitle,
       'annual_income': annualIncome,
       'about': about,
+      if (panCardNumber != null) 'pan_card_number': panCardNumber!,
+      if (drivingLicenceNumber != null) 'driving_licence_number': drivingLicenceNumber!,
+      if (aadhaarCardNumber != null) 'aadhar_card_number': aadhaarCardNumber!,
     };
   }
 }

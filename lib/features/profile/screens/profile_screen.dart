@@ -4,6 +4,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_urls.dart';
+import '../../../routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../auth/controllers/auth_controller.dart';
@@ -132,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
                 }),
               ),
               GestureDetector(
-                onTap: () => Get.to(() => const EditProfileScreen()),
+                onTap: () => Get.toNamed(AppRoutes.editProfile),
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -183,17 +184,17 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.user_copy,
           title: AppStrings.myAccount,
-          onTap: () => Get.to(() => const EditProfileScreen()),
+          onTap: () => Get.toNamed(AppRoutes.editProfile),
         ),
         _buildMenuItem(
           icon: Iconsax.wallet_3_copy,
           title: AppStrings.wallet,
-          onTap: () => Get.to(() => const WalletScreen()),
+          onTap: () => Get.toNamed(AppRoutes.wallet),
         ),
         _buildMenuItem(
           icon: Iconsax.crown_1_copy,
           title: AppStrings.manageSubscription,
-          onTap: () => Get.to(() => const SubscriptionScreen()),
+          onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
@@ -206,7 +207,7 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.arrow_circle_up_copy,
           title: AppStrings.upgradePlan,
-          onTap: () => Get.to(() => const SubscriptionScreen()),
+          onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
         ),
         
         const SizedBox(height: 10),
@@ -219,7 +220,7 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.people_copy,
           title: AppStrings.following,
-          onTap: () => Get.to(() => const FollowingScreen()),
+          onTap: () => Get.toNamed(AppRoutes.followingScreen),
         ),
          _buildMenuItem(
           icon: Iconsax.user_add_copy,

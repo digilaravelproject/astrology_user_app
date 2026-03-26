@@ -11,6 +11,7 @@ import '../domain/models/wallet_model.dart';
 import '../domain/models/wallet_top_up_response_model.dart';
 
 import '../../../core/utils/custom_snackbar.dart';
+import '../../../core/widgets/payment_success_dialog.dart';
 
 class WalletController extends GetxController {
   final GetWalletUseCase getWalletUseCase;
@@ -118,9 +119,20 @@ class WalletController extends GetxController {
       );
 
       if (result != null && result.status == 'success') {
-        CustomSnackbar.showSuccess(result.message);
-        fetchWallet();
-        fetchTransactions();
+        // Show success dialog
+        Get.dialog(
+          PaymentSuccessDialog(
+            title: 'Payment Successful',
+            message: 'Amount added to your wallet successfully',
+            orderId: response.orderId,
+            amount: result.data.transaction.amount,
+            onOk: () {
+              Get.back();
+              fetchWallet();
+              fetchTransactions();
+            },
+          ),
+        );
       } else {
         CustomSnackbar.showError(result?.message ?? 'Payment verification failed');
       }

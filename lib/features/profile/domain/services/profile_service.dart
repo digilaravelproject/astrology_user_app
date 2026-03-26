@@ -18,4 +18,8 @@ class ProfileService {
   Future<ResponseModel> updateProfileInApp(Map<String, dynamic> data) async {
     return await repository.updateProfileInApp(data);
   }
+
+  Future<ResponseModel> getFollowing() async {
+    return await repository.getFollowing();
+  }
 }

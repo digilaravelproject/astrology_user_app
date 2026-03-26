@@ -14,29 +14,22 @@ import '../controllers/blog_controller.dart';
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(RemedyRepository(Get.find<ApiClient>()), permanent: true);
-    Get.put(RemedyService(Get.find<RemedyRepository>()), permanent: true);
-    Get.put(GetRemediesUseCase(Get.find<RemedyService>()), permanent: true);
-    Get.put(GetRemedyByIdUseCase(Get.find<RemedyService>()), permanent: true);
-    Get.put(
-      RemedyController(
-        getRemediesUseCase: Get.find<GetRemediesUseCase>(),
-        getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
-      ),
-      permanent: true,
-    );
+    Get.lazyPut(() => RemedyRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => RemedyService(Get.find<RemedyRepository>()));
+    Get.lazyPut(() => GetRemediesUseCase(Get.find<RemedyService>()));
+    Get.lazyPut(() => GetRemedyByIdUseCase(Get.find<RemedyService>()));
+    Get.lazyPut(() => RemedyController(
+      getRemediesUseCase: Get.find<GetRemediesUseCase>(),
+      getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
+    ));
 
-    // Blogs
-    Get.put(BlogRepository(Get.find<ApiClient>()), permanent: true);
-    Get.put(BlogService(Get.find<BlogRepository>()), permanent: true);
-    Get.put(GetBlogsUseCase(Get.find<BlogService>()), permanent: true);
-    Get.put(GetBlogByIdUseCase(Get.find<BlogService>()), permanent: true);
-    Get.put(
-      BlogController(
-        getBlogsUseCase: Get.find<GetBlogsUseCase>(),
-        getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
-      ),
-      permanent: true,
-    );
+    Get.lazyPut(() => BlogRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => BlogService(Get.find<BlogRepository>()));
+    Get.lazyPut(() => GetBlogsUseCase(Get.find<BlogService>()));
+    Get.lazyPut(() => GetBlogByIdUseCase(Get.find<BlogService>()));
+    Get.lazyPut(() => BlogController(
+      getBlogsUseCase: Get.find<GetBlogsUseCase>(),
+      getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
+    ));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../domain/models/matrimony_profile_model.dart';
@@ -28,14 +29,15 @@ class MatrimonyController extends GetxController {
       final response = await _saveMatrimonyProfileUseCase.execute(profile, photo);
       if (response.isSuccess) {
         isRegistered.value = true;
-        Get.snackbar('Success', response.message ?? 'Profile saved successfully');
+        CustomSnackbar.showSuccess(response.message ?? 'Profile saved successfully');
         return true;
       } else {
-        Get.snackbar('Error', response.message ?? 'Failed to save profile');
+        CustomSnackbar.showError(response.message ?? 'Failed to save profile');
         return false;
       }
     } catch (e) {
-      Get.snackbar('Error', 'An unexpected error occurred');
+      CustomSnackbar.showError('An unexpected error occurred');
+      //Get.snackbar('Error', 'An unexpected error occurred');
       print('Error saving matrimony profile: $e');
       return false;
     } finally {

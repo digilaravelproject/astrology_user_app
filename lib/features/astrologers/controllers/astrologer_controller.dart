@@ -45,7 +45,7 @@ class AstrologerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchAstrologers();
+    // Don't fetch astrologers here - fetch only when screen is accessed
   }
 
   Future<void> fetchAstrologers() async {

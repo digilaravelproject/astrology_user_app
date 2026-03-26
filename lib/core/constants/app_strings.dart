@@ -384,6 +384,8 @@ class AppStrings {
   static String get drivingLicence => 'Driving Licence'.tr;
   static String get aadhaarCard => 'Aadhaar Card'.tr;
   static String get panNumber => 'PAN Number'.tr;
+  static String get drivingLicenceNumber => 'Driving Licence Number'.tr;
+  static String get aadhaarCardNumber => 'Aadhaar Card Number'.tr;
   static String get infoSafePrivate => 'Your information will be 100% safe & private.'.tr;
   static String get verifyNow => 'Verify Now'.tr;
   static String get profilesWithPhotosMsg => 'Profiles with Photos get\n3x more Responses'.tr;

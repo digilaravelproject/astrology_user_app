@@ -50,6 +50,14 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
 
   String _countryCode = "+91";
   XFile? _matrimonyPhoto;
+  
+  final TextEditingController _panController = TextEditingController();
+  final TextEditingController _drivingLicenceController = TextEditingController();
+  final TextEditingController _aadhaarController = TextEditingController();
+  
+  bool _isPanSelected = false;
+  bool _isDrivingLicenceSelected = false;
+  bool _isAadhaarSelected = false;
 
   final List<String> _profileForOptions = [
     AppStrings.myself, AppStrings.mySon, AppStrings.myDaughter, 
@@ -86,6 +94,9 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         jobTitle: _jobTitleController.text,
         annualIncome: _incomeController.text,
         about: _aboutController.text,
+        panCardNumber: _isPanSelected ? _panController.text : null,
+        drivingLicenceNumber: _isDrivingLicenceSelected ? _drivingLicenceController.text : null,
+        aadhaarCardNumber: _isAadhaarSelected ? _aadhaarController.text : null,
       );
 
       final success = await _controller.saveProfile(profile, _matrimonyPhoto);
@@ -110,6 +121,9 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     _jobTitleController.dispose();
     _incomeController.dispose();
     _aboutController.dispose();
+    _panController.dispose();
+    _drivingLicenceController.dispose();
+    _aadhaarController.dispose();
     super.dispose();
   }
 
@@ -401,15 +415,17 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           const SizedBox(height: 32),
           Row(
             children: [
-              _buildSimpleChip(AppStrings.panCard, true),
+              _buildVerificationChip(AppStrings.panCard, _isPanSelected, () => setState(() => _isPanSelected = !_isPanSelected)),
               const SizedBox(width: 12),
-              _buildSimpleChip(AppStrings.drivingLicence, false),
+              _buildVerificationChip(AppStrings.drivingLicence, _isDrivingLicenceSelected, () => setState(() => _isDrivingLicenceSelected = !_isDrivingLicenceSelected)),
             ],
           ),
           const SizedBox(height: 12),
-          _buildSimpleChip(AppStrings.aadhaarCard, false),
+          _buildVerificationChip(AppStrings.aadhaarCard, _isAadhaarSelected, () => setState(() => _isAadhaarSelected = !_isAadhaarSelected)),
           const SizedBox(height: 32),
-          _buildTextField(AppStrings.panNumber, TextEditingController()),
+          if (_isPanSelected) _buildTextField(AppStrings.panNumber, _panController),
+          if (_isDrivingLicenceSelected) _buildTextField(AppStrings.drivingLicenceNumber, _drivingLicenceController),
+          if (_isAadhaarSelected) _buildTextField(AppStrings.aadhaarCardNumber, _aadhaarController),
           const Spacer(),
           Center(
             child: Row(
@@ -496,10 +512,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           const SizedBox(height: 32),
           CustomButton(
             text: AppStrings.uploadPhotos,
-            onTap: (){
-              Get.to(() => MatrimonySection());
-            },
-           // onTap: _nextStep,
+            onTap: _nextStep,
             backgroundColor: const Color(0xFFB01D53),
             textColor: Colors.white,
           ),
@@ -549,6 +562,25 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             );
           }).toList(),
           onChanged: onChanged,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVerificationChip(String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFB01D53) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? Colors.transparent : Colors.grey.shade300),
+        ),
+        child: AppText(
+          label,
+          color: isSelected ? Colors.white : Colors.black87,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

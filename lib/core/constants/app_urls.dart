@@ -20,4 +20,8 @@ class AppUrls {
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
   static const String logout = '/api/v1/user/logout';
+  static const String following = '/api/v1/user/following';
+  static const String plans = '/api/v1/user/plans';
+  static const String upgradePlans = '/api/v1/user/plans/upgrade';
+  static const String upgradePlansVerify = '/api/v1/user/plans/upgrade/verify';
 }

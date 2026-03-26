@@ -78,4 +78,13 @@ class AppColors {
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
+
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [primaryColor, accentColor,softPink],
+    stops: [0.0, 1.0,1.0],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+
+
 }

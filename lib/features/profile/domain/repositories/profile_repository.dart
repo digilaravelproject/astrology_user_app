@@ -27,4 +27,8 @@ class ProfileRepository {
   Future<ResponseModel> updateProfileInApp(Map<String, dynamic> data) async {
     return await apiClient.put(AppUrls.updateProfileInApp, data: data);
   }
+
+  Future<ResponseModel> getFollowing() async {
+    return await apiClient.get(AppUrls.following);
+  }
 }

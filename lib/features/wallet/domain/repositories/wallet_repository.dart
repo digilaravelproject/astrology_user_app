@@ -67,9 +67,9 @@ class WalletRepository implements WalletRepositoryInterface {
   }) async {
     try {
       final response = await apiClient.post(AppUrls.walletTopupVerify, data: {
-        'provider_order_id': providerOrderId,
-        'provider_payment_id': providerPaymentId,
-        'signature': signature,
+        'razorpay_order_id': providerOrderId,
+        'razorpay_payment_id': providerPaymentId,
+        'razorpay_signature': signature,
       });
       print('[PCB_APP] [DEBUG] | verifyTopUp Status: ${response.statusCode}');
       

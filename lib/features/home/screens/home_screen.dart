@@ -6,6 +6,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 import '../../../features/auth/controllers/auth_controller.dart';
+import '../../../routes/app_routes.dart';
 import '../widgets/animated_zodiac_wheel.dart';
 import '../widgets/home_greeting.dart';
 import '../widgets/horoscope_pill.dart';
@@ -226,7 +227,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen())),
+                onTap: () => Get.toNamed(AppRoutes.wallet),
+               // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen())),
                 child: _buildCoinWalletChip(),
               ),
               const SizedBox(width: 8),

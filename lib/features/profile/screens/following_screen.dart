@@ -1,10 +1,13 @@
+import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../controllers/profile_controller.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
 
 class FollowingScreen extends StatelessWidget {
@@ -12,6 +15,13 @@ class FollowingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profileController = Get.find<ProfileController>();
+    
+    // Fetch following list when screen is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      profileController.fetchFollowing();
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA), // Light grey background for better card contrast
       appBar: CustomAppBar(
@@ -19,37 +29,71 @@ class FollowingScreen extends StatelessWidget {
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: 8,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
-        itemBuilder: (context, index) {
-          return _buildAstrologerCard(index);
-        },
-      ),
+      body: Obx(() {
+        if (profileController.isLoading.value && profileController.followingList.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final followingList = profileController.followingList;
+
+        if (followingList.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.lightPink.withOpacity(0.1),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 50,
+                    color: AppColors.deepPink,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                AppText(
+                  'No Following',
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+                const SizedBox(height: 8),
+                AppText(
+                  'You are not following any astrologer yet.',
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: followingList.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            return _buildAstrologerCard(followingList[index]);
+          },
+        );
+      }),
     );
   }
 
-  Widget _buildAstrologerCard(int index) {
-    const imageUrl = "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg";
+  Widget _buildAstrologerCard(dynamic astro) {
+    final imageUrl = astro['profile_photo'] != null 
+        ? AppUrls.baseImageUrl+astro['profile_photo']
+        : null;
     
     return GestureDetector(
       onTap: () {
-        // Get.to(() => AstrologerDetailScreen(
-        //   name: "Astrologer ${index + 1}",
-        //   skills: "Vedic • Tarot • Palmistry",
-        //   languages: "English, Hindi",
-        //   experience: "1${index + 2} Years",
-        //   rating: 4.9,
-        //   price: "50",
-        //   discountPrice: "30",
-        //   orders: "50${index}0",
-        //   minutes: "2000",
-        //   imageUrl: imageUrl,
-        //   bio: "Expert in Vedic Astrology and Tarot Reading with over 10 years of experience.",
-        //   isRisingStar: index % 2 == 0,
-        //   isVerified: true,
-        // ));
+        // Navigate to astrologer detail screen
+        Get.to(() => AstrologerDetailScreen(astrologerId: astro['astrologer_id']));
       },
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -76,8 +120,10 @@ class FollowingScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 2),
-                    image: const DecorationImage(
-                      image: NetworkImage(imageUrl),
+                    image: DecorationImage(
+                      image: imageUrl != null 
+                          ? NetworkImage(imageUrl)
+                          : const NetworkImage('https://via.placeholder.com/65'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -108,7 +154,7 @@ class FollowingScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: AppText(
-                          "Astrologer ${index + 1}",
+                          astro['name'] ?? '',
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2E1A47),
@@ -122,7 +168,7 @@ class FollowingScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   AppText(
-                    "Vedic • Tarot • Palmistry",
+                    (astro['areas_of_expertise'] as List?)?.join(' • ') ?? '',
                     fontSize: 12,
                     color: Colors.grey.shade600,
                     fontWeight: FontWeight.w500,
@@ -143,7 +189,7 @@ class FollowingScreen extends StatelessWidget {
                       const SizedBox(width: 4),
                       Flexible(
                         child: AppText(
-                          "English, Hindi",
+                          (astro['languages'] as List?)?.join(', ') ?? '',
                           fontSize: 12,
                           color: Colors.grey.shade600,
                           overflow: TextOverflow.ellipsis,

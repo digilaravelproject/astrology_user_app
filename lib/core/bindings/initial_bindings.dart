@@ -1,11 +1,5 @@
 import 'package:get/get.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import '../../features/astrologers/domain/usecases/get_astrologer_by_id_usecase.dart';
-import '../../features/astrologers/domain/usecases/block_astrologer_usecase.dart';
-import '../../features/astrologers/domain/usecases/report_astrologer_usecase.dart';
-import '../../features/astrologers/domain/usecases/post_review_usecase.dart';
-import '../../features/astrologers/domain/usecases/get_reviews_usecase.dart';
-import '../../features/astrologers/domain/usecases/follow_astrologer_usecase.dart';
 import '../services/network/api_client.dart';
 import '../services/network/network_info.dart';
 import 'package:dio/dio.dart';
@@ -16,23 +10,6 @@ import '../../features/auth/domain/services/auth_service_interface.dart';
 import '../../features/splash/controllers/splash_controller.dart';
 import '../../features/splash/domain/repositories/splash_repository.dart';
 import '../../features/splash/domain/services/splash_service.dart';
-import '../../features/profile/bindings/profile_binding.dart';
-import '../../features/home/bindings/home_binding.dart';
-import '../../features/astrologers/domain/repositories/astrologer_repository.dart';
-import '../../features/astrologers/domain/services/astrologer_service.dart';
-import '../../features/astrologers/domain/usecases/get_astrologers_usecase.dart';
-import '../../features/astrologers/controllers/astrologer_controller.dart';
-import '../../features/wallet/domain/repositories/wallet_repository.dart';
-import '../../features/wallet/domain/services/wallet_service.dart';
-import '../../features/wallet/domain/usecases/get_wallet_usecase.dart';
-import '../../features/wallet/domain/usecases/top_up_wallet_usecase.dart';
-import '../../features/wallet/domain/usecases/verify_top_up_usecase.dart';
-import '../../features/wallet/domain/usecases/get_transactions_usecase.dart';
-import '../../features/wallet/controllers/wallet_controller.dart';
-import '../../features/matrimony/domain/repositories/matrimony_repository.dart';
-import '../../features/matrimony/domain/services/matrimony_service.dart';
-import '../../features/matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
-import '../../features/matrimony/controllers/matrimony_controller.dart';
 import '../services/payment/razorpay/razorpay_service.dart';
 
 class InitialBindings extends Bindings {
@@ -80,55 +57,5 @@ class InitialBindings extends Bindings {
       ),
       permanent: true,
     );
-
-    // Profile
-    ProfileBinding().dependencies();
-    
-    // Astrologers
-    Get.lazyPut(() => AstrologerRepository(apiClient: Get.find()));
-    Get.lazyPut(() => AstrologerService(repository: Get.find()));
-    Get.lazyPut(() => GetAstrologersUseCase(service: Get.find()));
-    Get.lazyPut(() => GetAstrologerByIdUseCase(service: Get.find()));
-    Get.lazyPut(() => BlockAstrologerUseCase(service: Get.find()));
-    Get.lazyPut(() => ReportAstrologerUseCase(service: Get.find()));
-    Get.lazyPut(() => PostReviewUseCase(service: Get.find()));
-    Get.lazyPut(() => GetReviewsUseCase(service: Get.find()));
-    Get.lazyPut(() => FollowAstrologerUseCase(service: Get.find()));
-    Get.put(AstrologerController(
-      getAstrologersUseCase: Get.find(),
-      getAstrologerByIdUseCase: Get.find(),
-      blockAstrologerUseCase: Get.find(),
-      reportAstrologerUseCase: Get.find(),
-      postReviewUseCase: Get.find(),
-      getReviewsUseCase: Get.find(),
-      followAstrologerUseCase: Get.find(),
-    ));
-
-    // Wallet
-    Get.lazyPut<WalletRepositoryInterface>(() => WalletRepository(apiClient: Get.find()));
-    Get.lazyPut<WalletServiceInterface>(() => WalletService(repository: Get.find()));
-    Get.lazyPut(() => GetWalletUseCase(service: Get.find()));
-    Get.lazyPut(() => TopUpWalletUseCase(service: Get.find()));
-    Get.lazyPut(() => VerifyTopUpUseCase(service: Get.find()));
-    Get.lazyPut(() => GetTransactionsUseCase(service: Get.find()));
-    Get.put(
-      WalletController(
-        getWalletUseCase: Get.find(),
-        topUpWalletUseCase: Get.find(),
-        verifyTopUpUseCase: Get.find(),
-        getTransactionsUseCase: Get.find(),
-        authService: Get.find<AuthServiceInterface>(),
-        razorpayService: Get.find<RazorpayService>(),
-      ),
-    );
-
-    // Matrimony
-    Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
-    Get.lazyPut<MatrimonyServiceInterface>(() => MatrimonyService(repository: Get.find()));
-    Get.lazyPut(() => SaveMatrimonyProfileUseCase(service: Get.find()));
-    Get.put(MatrimonyController(saveMatrimonyProfileUseCase: Get.find()));
-
-    // Home
-    HomeBinding().dependencies();
   }
 }
