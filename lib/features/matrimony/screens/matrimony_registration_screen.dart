@@ -13,6 +13,7 @@ import '../domain/models/matrimony_profile_model.dart';
 import '../widgets/matrimony_section.dart';
 import 'matrimony_profile_screen.dart';
 import 'matrimony_screen.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class MatrimonyRegistrationScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -101,6 +102,13 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
 
       final success = await _controller.saveProfile(profile, _matrimonyPhoto);
       if (success) {
+        // Refresh profile to update is_matrimony status
+        final profileController = Get.find<ProfileController>();
+        await profileController.refreshProfile();
+        
+        // Set isRegistered to true after successful registration
+        _controller.setRegistered(true);
+        
         widget.onComplete();
       }
     }

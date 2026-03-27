@@ -19,6 +19,11 @@ class AppUrls {
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
+  static const String getMatrimonyProfile = '/api/v1/user/matrimony/profiles';
+  static String getMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles/$id';
+  static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
+
+
   static const String logout = '/api/v1/user/logout';
   static const String following = '/api/v1/user/following';
   static const String plans = '/api/v1/user/plans';

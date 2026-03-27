@@ -105,6 +105,7 @@ class ProfileController extends GetxController {
 
   Future<void> _syncUser(UserModel updatedUser) async {
     final authController = Get.find<AuthController>();
+    print('_syncUser: planId=${updatedUser.planId}, isMatrimony=${updatedUser.isMatrimony}');
     authController.currentUser.value = updatedUser;
     await Get.find<AuthService>().saveUserInfo(updatedUser);
   }
@@ -162,6 +163,22 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error fetching plan: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> refreshProfile() async {
+    try {
+      isLoading.value = true;
+      final authController = Get.find<AuthController>();
+      final userId = authController.currentUser.value?.id ?? 0;
+      final updatedUser = await _getProfileUseCase.execute(userId);
+      if (updatedUser != null) {
+        await _syncUser(updatedUser);
+      }
+    } catch (e) {
+      print('Error refreshing profile: $e');
     } finally {
       isLoading.value = false;
     }

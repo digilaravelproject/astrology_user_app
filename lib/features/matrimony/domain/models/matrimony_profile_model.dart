@@ -74,6 +74,21 @@ class MatrimonyProfileModel {
     );
   }
 
+  int get age {
+    if (dateOfBirth.isEmpty) return 0;
+    try {
+      final dob = DateTime.parse(dateOfBirth);
+      final now = DateTime.now();
+      int age = now.year - dob.year;
+      if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   Map<String, String> toFormFields() {
     return {
       'created_for': createdFor,
@@ -96,3 +111,4 @@ class MatrimonyProfileModel {
     };
   }
 }
+

@@ -4,6 +4,10 @@ import '../../matrimony/controllers/matrimony_controller.dart';
 import '../../matrimony/domain/repositories/matrimony_repository.dart';
 import '../../matrimony/domain/services/matrimony_service.dart';
 import '../../matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
+import '../../matrimony/domain/usecases/get_matrimony_profile_usecase.dart';
+import '../../matrimony/domain/usecases/get_matrimony_profile_details_usecase.dart';
+import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
+
 import '../../home/domain/repositories/remedy_repository.dart';
 import '../../home/domain/services/remedy_service.dart';
 import '../../home/domain/usecases/get_remedies_usecase.dart';
@@ -32,7 +36,17 @@ class DashboardBinding extends Bindings {
     Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
     Get.lazyPut<MatrimonyServiceInterface>(() => MatrimonyService(repository: Get.find()));
     Get.lazyPut(() => SaveMatrimonyProfileUseCase(service: Get.find()));
-    Get.lazyPut(() => MatrimonyController(saveMatrimonyProfileUseCase: Get.find()));
+    Get.lazyPut(() => GetMatrimonyProfileUseCase(service: Get.find()));
+    Get.lazyPut<GetMatrimonyProfileDetailsUseCase>(() => GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.lazyPut<SearchMatrimonyProfilesUseCase>(() => SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.lazyPut<MatrimonyController>(
+      () => MatrimonyController(
+        getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
+        getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
+      ),
+    );
+
 
     // Home (Remedy & Blog)
     Get.lazyPut(() => RemedyRepository(Get.find<ApiClient>()));

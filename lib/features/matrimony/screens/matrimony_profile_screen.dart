@@ -2,41 +2,71 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../core/widgets/app_text.dart';
+import '../domain/models/matrimony_profile_model.dart';
+import '../../../core/constants/app_urls.dart';
+import '../controllers/matrimony_controller.dart';
+import 'package:get/get.dart';
+
+
 
 class MatrimonyProfileScreen extends StatefulWidget {
-  final Map<String, dynamic> profile;
+  final MatrimonyProfileModel profile;
 
   const MatrimonyProfileScreen({super.key, required this.profile});
+
 
   @override
   State<MatrimonyProfileScreen> createState() => _MatrimonyProfileScreenState();
 }
 
 class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
+  final MatrimonyController _controller = Get.find<MatrimonyController>();
   bool _showDetails = false;
   int _currentImageIndex = 0;
   final PageController _pageController = PageController();
   Timer? _autoSlideTimer;
+
   
-  final List<String> _images = [
-    'https://img.freepik.com/premium-photo/cute-girl-stock-photos-royalty-free-girl-images_152808-937.jpg',
-    'https://img.freepik.com/premium-photo/cute-girl-stock-photos-royalty-free-girl-images_152808-937.jpg',
-    'https://img.freepik.com/premium-photo/cute-girl-stock-photos-royalty-free-girl-images_152808-937.jpg',
-  ];
+  List<String> _getImages(MatrimonyProfileModel profile) {
+    final baseUrl = AppUrls.baseImageUrl;
+    if (profile.profilePhoto != null) {
+      return ['$baseUrl${profile.profilePhoto}'];
+    }
+    return [
+      profile.gender.toLowerCase() == 'male' 
+          ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
+          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png'
+    ];
+  }
+
+
 
   @override
   void initState() {
     super.initState();
     _startAutoSlide();
+    if (widget.profile.id != null) {
+      _controller.getMatrimonyProfileDetails(widget.profile.id!);
+    }
   }
 
+
   void _startAutoSlide() {
+    final profile = _controller.selectedProfile.value ?? widget.profile;
+    final images = _getImages(profile);
+    
+    if (images.length <= 1) return;
+
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_pageController.hasClients) {
-        int nextPage = (_currentImageIndex + 1) % _images.length;
+        final currentImages = _getImages(_controller.selectedProfile.value ?? widget.profile);
+        if (currentImages.length <= 1) {
+          timer.cancel();
+          return;
+        }
+        int nextPage = (_currentImageIndex + 1) % currentImages.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 400),
@@ -45,6 +75,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       }
     });
   }
+
 
   void _stopAutoSlide() {
     _autoSlideTimer?.cancel();
@@ -57,17 +88,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     super.dispose();
   }
 
-  void _showFullScreenImage(int index) {
+  void _showFullScreenImage(int index, MatrimonyProfileModel profile) {
+    final images = _getImages(profile);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => _FullScreenImageViewer(
-          images: _images,
+          images: images,
           initialIndex: index,
         ),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -187,36 +220,47 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           ),
         ],
       ),
-      body: _showDetails
-          ? SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildProfileHeader(),
-                  const SizedBox(height: 16),
-                  _buildPersonalInformation(),
-                  const SizedBox(height: 16),
-                  _buildContactInformation(),
-                  const SizedBox(height: 16),
-                  _buildAboutMyself(),
-                  const SizedBox(height: 16),
-                  _buildLifestyle(),
-                  const SizedBox(height: 16),
-                  _buildPartnerPreferencesHeader(),
-                  const SizedBox(height: 16),
-                  _buildIgnoredSection(),
-                  const SizedBox(height: 32),
-                ],
-              ),
-            )
-          : SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: _buildProfileHeader(),
-            ),
+      body: Obx(() {
+        if (_controller.isLoading.value && _controller.selectedProfile.value == null) {
+          return const Center(
+            child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+          );
+        }
+
+        final profile = _controller.selectedProfile.value ?? widget.profile;
+        
+        return _showDetails
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildProfileHeader(profile),
+                    const SizedBox(height: 16),
+                    _buildPersonalInformation(profile),
+                    const SizedBox(height: 16),
+                    _buildContactInformation(profile),
+                    const SizedBox(height: 16),
+                    _buildAboutMyself(profile),
+                    const SizedBox(height: 16),
+                    _buildLifestyle(profile),
+                    const SizedBox(height: 16),
+                    _buildPartnerPreferencesHeader(profile),
+                    const SizedBox(height: 16),
+                    _buildIgnoredSection(),
+                    const SizedBox(height: 32),
+                  ],
+                ),
+              )
+            : SingleChildScrollView(
+                physics: const NeverScrollableScrollPhysics(),
+                child: _buildProfileHeader(profile),
+              );
+      }),
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(MatrimonyProfileModel profile) {
     return Container(
+
       color: Colors.white,
       child: Column(
         children: [
@@ -224,79 +268,96 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           Stack(
             children: [
               GestureDetector(
-                onTap: () => _showFullScreenImage(_currentImageIndex),
+                onTap: () => _showFullScreenImage(_currentImageIndex, profile),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentImageIndex = index;
-                      });
-                    },
-                    itemCount: _images.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(30),
-                            bottomRight: Radius.circular(30),
-                          ),
-                          image: DecorationImage(
-                            image: NetworkImage(_images[index]),
-                            fit: BoxFit.cover,
+                  child: _getImages(profile).length > 1
+                      ? PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentImageIndex = index;
+                            });
+                          },
+                          itemCount: _getImages(profile).length,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(30),
+                                  bottomRight: Radius.circular(30),
+                                ),
+                                image: DecorationImage(
+                                  image: NetworkImage(_getImages(profile)[index]),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(30),
+                              bottomRight: Radius.circular(30),
+                            ),
+                            image: DecorationImage(
+                              image: NetworkImage(_getImages(profile)[0]),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  ),
                 ),
               ),
-              // Page indicators
-              Positioned(
-                bottom: 30,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _images.length,
-                    (index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: _currentImageIndex == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _currentImageIndex == index
-                            ? Colors.white
-                            : Colors.white.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(4),
+              // Page indicators (Only show for multiple images)
+              if (_getImages(profile).length > 1)
+                Positioned(
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _getImages(profile).length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentImageIndex == index ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: _currentImageIndex == index
+                              ? Colors.white
+                              : Colors.white.withOpacity(0.5),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              // Image counter
-              Positioned(
-                bottom: 50,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: AppText(
-                      '${_currentImageIndex + 1}/${_images.length}',
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+              // Image counter (Only show for multiple images)
+              if (_getImages(profile).length > 1)
+                Positioned(
+                  bottom: 50,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.6),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: AppText(
+                        '${_currentImageIndex + 1}/${_getImages(profile).length}',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
+
+
               // Action buttons overlay
               Positioned(
                 bottom: 50,
@@ -364,12 +425,13 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     children: [
                       Expanded(
                         child: AppText(
-                          'Ratnaprabha Rajendra Gawas',
+                          '${profile.firstName} ${profile.lastName}',
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: const Color(0xFF880E4F),
                           height: 1.3,
                         ),
+
                       ),
                       Image.asset(
                         'assets/icons/verify.png',
@@ -388,37 +450,43 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: AppText(
-                          'NSK576590',
+                          'ID: MT${profile.id ?? ""}',
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFFE91E63),
                         ),
+
+
                       ),
                       const SizedBox(width: 10),
-                      Icon(Icons.circle, size: 4, color: Colors.grey[400]),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: AppText(
-                          'Last seen few hours ago',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                      // Icon(Icons.circle, size: 4, color: Colors.grey[400]),
+                      // const SizedBox(width: 10),
+                      // Expanded(
+                      //   child: AppText(
+                      //     'Last seen few hours ago',
+                      //     fontSize: 12,
+                      //     fontWeight: FontWeight.w500,
+                      //     color: Colors.grey[600],
+                      //   ),
+                      // ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Divider(color: Colors.grey[200], thickness: 1),
                   const SizedBox(height: 16),
-                  _buildQuickInfo(Icons.favorite_border, 'Never married'),
+                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.cake_outlined, '36 Years • 5\'0"'),
+                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} Years  • ${profile.height} Feet'),
+
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.school_outlined, 'Bachelor Degree • Management'),
+                  _buildQuickInfo(Icons.school_outlined, profile.education),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.work_outline, 'Health Care Professional'),
+                  _buildQuickInfo(Icons.work_outline, profile.jobTitle),
+
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.location_on_outlined, 'Mumbai, Maharashtra'),
+                  _buildQuickInfo(Icons.location_on_outlined, profile.location),
+
+
                   const SizedBox(height: 20),
                   CustomButton(
                     fontSize: 16,
@@ -682,9 +750,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildPersonalInformation() {
+  Widget _buildPersonalInformation(MatrimonyProfileModel profile) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
+
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -722,17 +791,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          _buildDetailRow(AppStrings.age, '36 Years and 3 months'),
-          _buildDetailRow(AppStrings.height, '5\'0"'),
-          _buildDetailRow(AppStrings.spokenLanguages, 'Marathi (Mother Tongue)'),
-          _buildDetailRow(AppStrings.profileCreatedBy, 'Self'),
-          _buildDetailRow(AppStrings.maritalStatus, AppStrings.neverMarried),
-          _buildDetailRow(AppStrings.livesIn, 'Mumbai, Maharashtra'),
+          _buildDetailRow(AppStrings.age, '${profile.age} Years'),
+          _buildDetailRow(AppStrings.height, '${profile.height} Feet'),
+          _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'),
+          _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor),
+          _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus),
+          _buildDetailRow(AppStrings.livesIn, profile.location),
           _buildDetailRow(AppStrings.eatingHabits, 'Not specified'),
-          _buildDetailRow(AppStrings.religion, 'Hindu'),
-          _buildDetailRow(AppStrings.subcaste, '96 Kuli Koknastha'),
-          _buildDetailRow(AppStrings.manglik, 'No'),
-          _buildDetailRow(AppStrings.employment, 'Works in Private Sector', isLink: true),
+          _buildDetailRow(AppStrings.religion, 'Not specified'),
+          _buildDetailRow(AppStrings.subcaste, 'Not specified'),
+          _buildDetailRow(AppStrings.manglik, 'Not specified'),
+          _buildDetailRow(AppStrings.employment, profile.jobTitle, isLink: true),
+
+
         ],
       ),
     );
@@ -767,7 +838,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildContactInformation() {
+  Widget _buildContactInformation(MatrimonyProfileModel profile) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -818,7 +889,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               const SizedBox(width: 24),
               const AppText(':  '),
               AppText(
-                '+91 88*******',
+                profile.phone,
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: Colors.black,
@@ -826,6 +897,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
             ],
           ),
           const SizedBox(height: 12),
+
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -847,9 +919,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildAboutMyself() {
+  Widget _buildAboutMyself(MatrimonyProfileModel profile) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
+
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -888,20 +961,23 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           ),
           const SizedBox(height: 8),
           AppText(
-            AppStrings.aboutMyselfDescription,
+            profile.about,
             fontSize: 11,
             fontWeight: FontWeight.w400,
             color: Colors.black87,
             height: 1.3,
           ),
+
+
         ],
       ),
     );
   }
 
-  Widget _buildLifestyle() {
+  Widget _buildLifestyle(MatrimonyProfileModel profile) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
+
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -950,7 +1026,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildPartnerPreferencesHeader() {
+  Widget _buildPartnerPreferencesHeader(MatrimonyProfileModel profile) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       alignment: Alignment.center,
@@ -960,7 +1036,9 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           const Icon(Icons.star, color: Color(0xFFE1BEE7), size: 20), // Placeholder for sparkles
           const SizedBox(width: 8),
           AppText(
-            AppStrings.herPartnerPreferences,
+            profile.gender.toLowerCase() == 'male' 
+                ? AppStrings.hisPartnerPreferences 
+                : AppStrings.herPartnerPreferences,
             fontSize: 18,
             fontWeight: FontWeight.w700,
             color: const Color(0xFF880E4F),
@@ -971,6 +1049,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       ),
     );
   }
+
 
   Widget _buildIgnoredSection() {
     return Container(

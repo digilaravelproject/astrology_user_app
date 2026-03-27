@@ -5,7 +5,12 @@ import '../models/matrimony_profile_model.dart';
 
 abstract class MatrimonyServiceInterface {
   Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo);
+  Future<ResponseModel> getMatrimonyProfile();
+  Future<ResponseModel> getMatrimonyProfileDetails(int id);
+  Future<ResponseModel> searchMatrimonyProfiles(String query);
 }
+
+
 
 class MatrimonyService implements MatrimonyServiceInterface {
   final MatrimonyRepositoryInterface repository;
@@ -16,4 +21,21 @@ class MatrimonyService implements MatrimonyServiceInterface {
   Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo) {
     return repository.saveProfile(profile, photo);
   }
+
+  @override
+  Future<ResponseModel> getMatrimonyProfile() {
+    return repository.getMatrimonyProfile();
+  }
+
+  @override
+  Future<ResponseModel> getMatrimonyProfileDetails(int id) async {
+    return await repository.getMatrimonyProfileDetails(id);
+  }
+
+  @override
+  Future<ResponseModel> searchMatrimonyProfiles(String query) async {
+    return await repository.searchMatrimonyProfiles(query);
+  }
 }
+
+

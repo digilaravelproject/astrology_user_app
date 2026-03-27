@@ -250,7 +250,9 @@ class AppStrings {
   static String get upgradeToView => 'Upgrade to view'.tr;
   static String get aboutMyself => 'About Myself'.tr;
   static String get lifestyle => 'Lifestyle'.tr;
+  static String get hisPartnerPreferences => 'His Partner Preferences'.tr;
   static String get herPartnerPreferences => 'Her Partner Preferences'.tr;
+
   static String get youIgnoredThisProfile => 'You ignored this profile'.tr;
   static String get removeFromIgnoredList => 'Remove from Ignored list'.tr;
   static String get talkToAstrologer => 'Talk to Astrologer'.tr;

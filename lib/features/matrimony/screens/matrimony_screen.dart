@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/services/storage/shared_prefs.dart';
 import '../widgets/matrimony_section.dart';
 import '../../matrimony/screens/matrimony_registration_screen.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../../../routes/app_routes.dart';
+import '../../auth/controllers/auth_controller.dart';
 
 import '../../matrimony/controllers/matrimony_controller.dart';
 
@@ -27,6 +31,15 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   String _selectedEducation = 'All';
   String _selectedMaritalStatus = 'All';
   String _selectedLocation = 'All';
+
+  @override
+  void initState() {
+    super.initState();
+    // Refresh registration status when screen is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.checkRegistrationStatus();
+    });
+  }
 
   @override
   void dispose() {
@@ -90,6 +103,8 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                               _selectedMaritalStatus = 'All';
                               _selectedLocation = 'All';
                             });
+                            _controller.getMatrimonyProfile();
+
                           },
                           child: const AppText(
                             'CLEAR ALL',
@@ -199,6 +214,22 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
+                          
+                          // Construct query string
+                          List<String> queries = [];
+                          if (_selectedAgeRange != 'All') queries.add(_selectedAgeRange);
+                          if (_selectedReligion != 'All') queries.add(_selectedReligion);
+                          if (_selectedEducation != 'All') queries.add(_selectedEducation);
+                          if (_selectedMaritalStatus != 'All') queries.add(_selectedMaritalStatus);
+                          if (_selectedLocation != 'All') queries.add(_selectedLocation);
+                          
+                          String queryString = queries.join(' ');
+                          if (queryString.isEmpty) {
+                            _controller.getMatrimonyProfile();
+                          } else {
+                            _controller.searchMatrimonyProfiles(queryString);
+                          }
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Filters applied successfully!'),
@@ -338,10 +369,17 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (!_controller.isRegistered.value) {
-        return _buildLandingUI();
-      }
+      // isRegistered is now set based on plan_id and is_matrimony from shared preferences
+      debugPrint("MatrimonyScreen: isRegistered = ${_controller.isRegistered.value}");
+      debugPrint("MatrimonyScreen: pref is_matrimony = ${SharedPrefs.getBool("is_matrimony") ?? SharedPrefs.getString("is_matrimony")}");
 
+     /* if (!_controller.isRegistered.value) {
+        return _buildLandingUI();
+      }*/
+
+
+
+      // If both plan and matrimony registration are complete, show data screen
       return Scaffold(
         backgroundColor: const Color(0xFFFFF8F9),
         appBar: AppBar(
@@ -392,7 +430,22 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    onChanged: (value) => _controller.updateSearchQuery(value),
+                    onChanged: (value) {
+                      _controller.updateSearchQuery(value);
+                      if (value.length > 2) {
+                        _controller.searchMatrimonyProfiles(value);
+                      } else if (value.isEmpty) {
+                        _controller.getMatrimonyProfile();
+                      }
+                    },
+                    onSubmitted: (value) {
+                      if (value.isNotEmpty) {
+                        _controller.searchMatrimonyProfiles(value);
+                      } else {
+                        _controller.getMatrimonyProfile();
+                      }
+                    },
+
                   ),
                 )
               : Row(
@@ -453,7 +506,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                   if (!_isSearching.value) {
                     _searchController.clear();
                     _controller.updateSearchQuery('');
+                    _controller.getMatrimonyProfile();
                   }
+
                 },
               ),
             ),

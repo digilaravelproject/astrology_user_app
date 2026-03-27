@@ -5,7 +5,11 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import 'package:get/get.dart';
-import '../../matrimony/controllers/matrimony_controller.dart';
+import '../controllers/matrimony_controller.dart';
+import '../domain/models/matrimony_profile_model.dart';
+import '../../../core/constants/app_urls.dart';
+import '../../auth/controllers/auth_controller.dart';
+
 
 class MatrimonySection extends StatelessWidget {
   const MatrimonySection({super.key});
@@ -20,52 +24,75 @@ class MatrimonySection extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
-      child: Obx(() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...controller.filteredCustomers.map((c) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: _buildCompactCustomerCard(context, c),
-          )).toList(),
-          if (controller.filteredCustomers.isEmpty)
-             Center(
-               child: Padding(
-                 padding: const EdgeInsets.only(top: 100),
-                 child: AppText(
-                   AppStrings.noMatchesFound,
-                   fontSize: 16,
-                   color: Colors.grey,
-                   fontWeight: FontWeight.w500,
-                 ),
-               ),
-             ),
-          const SizedBox(height: 20),
-          Center(
-            child: CustomButton(
-              text: AppStrings.more,
-              height: 50,
-              width: 220,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              gradient: const LinearGradient(
-                colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              onTap: () {
-                // Future: Navigate to full list
-              },
+      child: Obx(() {
+        if (controller.isLoading.value && controller.allProfiles.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(50.0),
+              child: CircularProgressIndicator(color: Color(0xFFE91E63)),
             ),
-          ),
-        ],
-      )),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ...controller.filteredProfiles.map((p) =>
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _buildCompactCustomerCard(context, p),
+                )).toList(),
+            if (controller.filteredProfiles.isEmpty &&
+                !controller.isLoading.value)
+
+
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 100),
+                  child: AppText(
+                    AppStrings.noMatchesFound,
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 20),
+            // Center(
+            //   child: CustomButton(
+            //     text: AppStrings.more,
+            //     height: 50,
+            //     width: 220,
+            //     fontSize: 16,
+            //     fontWeight: FontWeight.w800,
+            //     gradient: const LinearGradient(
+            //       colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+            //       begin: Alignment.topLeft,
+            //       end: Alignment.bottomRight,
+            //     ),
+            //     onTap: () {
+            //       // Future: Navigate to full list
+            //     },
+            //   ),
+            // ),
+          ],
+        );
+      }
+        ),
     );
   }
 
 
 
-  Widget _buildCompactCustomerCard(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildCompactCustomerCard(BuildContext context, MatrimonyProfileModel data) {
+    final String imageUrl = data.profilePhoto != null 
+        ? '${AppUrls.baseImageUrl}${data.profilePhoto}'
+        : (data.gender.toLowerCase() == 'male' 
+            ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
+            : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+
     return GestureDetector(
+
       onTap: () {
         Navigator.push(
           context,
@@ -116,8 +143,10 @@ class MatrimonySection extends StatelessWidget {
                           ),
                           child: CircleAvatar(
                             radius: 40,
-                            backgroundImage: NetworkImage(data['imageUrl']),
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: NetworkImage(imageUrl),
                           ),
+
                         ),
                       ),
                       Image.asset(
@@ -139,7 +168,7 @@ class MatrimonySection extends StatelessWidget {
                           children: [
                             Expanded(
                               child: AppText(
-                                data['name'],
+                                '${data.firstName} ${data.lastName}',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF2D3142),
@@ -147,6 +176,7 @@ class MatrimonySection extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+
                           ],
                         ),
                         
@@ -158,7 +188,7 @@ class MatrimonySection extends StatelessWidget {
                             const Text('🇮🇳 ', style: TextStyle(fontSize: 12)),
                             Expanded(
                               child: AppText(
-                                '${data['age']} ${AppStrings.yrs.toLowerCase()}, ${data['religion']}, ${data['caste']}',
+                                '${data.age} ${AppStrings.yrs.toLowerCase()}, ${data.maritalStatus}',
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF7F8487),
@@ -166,6 +196,7 @@ class MatrimonySection extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+
                           ],
                         ),
                         
@@ -178,7 +209,7 @@ class MatrimonySection extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: AppText(
-                                data['city'],
+                                data.location,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFF7F8487),
@@ -186,6 +217,7 @@ class MatrimonySection extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
+
                           ],
                         ),
                         
@@ -194,11 +226,13 @@ class MatrimonySection extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         // Secondary Details
-                        _buildDetailItem(Icons.translate, data['language']),
+                        _buildDetailItem(Icons.translate, 'Mother Tongue: Not specified'), 
+
                         const SizedBox(height: 4),
-                        _buildDetailItem(Icons.school_outlined, data['education']),
+                        _buildDetailItem(Icons.school_outlined, data.education),
                         const SizedBox(height: 4),
-                        _buildDetailItem(Icons.work_outline, data['profession']),
+                        _buildDetailItem(Icons.work_outline, data.jobTitle),
+
                         const SizedBox(height: 4),
                        Row(
                          mainAxisAlignment: MainAxisAlignment.end,

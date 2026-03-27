@@ -116,10 +116,10 @@ class SubscriptionScreen extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.white, size: 16),
-                const SizedBox(width: 8),
+               // const SizedBox(width: 8),
                 AppText(
                   activePlan.description,
-                  fontSize: 14,
+                  fontSize: 12,
                   color: Colors.white,
                 ),
               ],
@@ -143,8 +143,8 @@ class SubscriptionScreen extends StatelessWidget {
   }
 
   Widget _buildPlanCard(PlanModel plan) {
-    final color = _getPlanColor(plan.name);
-    final isPopular = plan.name.toLowerCase().contains('premium');
+    //final color = _getPlanColor(plan.name);
+    //final isPopular = plan.name.toLowerCase().contains('premium');
 
     return GestureDetector(
       onTap: (){
@@ -155,11 +155,12 @@ class SubscriptionScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
+         border: Border.all(color: AppColors.deepPink, width: 1),
+         // border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
           boxShadow: [
-            if (isPopular)
+            //if (isPopular)
               BoxShadow(
-                color: AppColors.deepPink.withOpacity(0.1),
+                color: AppColors.deepPink.withOpacity(0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -168,28 +169,28 @@ class SubscriptionScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (isPopular)
-              Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.deepPink,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: AppText(
-                    "POPULAR",
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
+            // if (isPopular)
+            //   Align(
+            //     alignment: Alignment.topRight,
+            //     child: Container(
+            //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            //       decoration: BoxDecoration(
+            //         color: AppColors.deepPink,
+            //         borderRadius: BorderRadius.circular(4),
+            //       ),
+            //       child: AppText(
+            //         "POPULAR",
+            //         fontSize: 10,
+            //         fontWeight: FontWeight.w700,
+            //         color: Colors.white,
+            //       ),
+            //     ),
+            //   ),
             AppText(
               plan.name,
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: color,
+              color: AppColors.black,
             ),
             const SizedBox(height: 4),
             AppText(
@@ -204,7 +205,7 @@ class SubscriptionScreen extends StatelessWidget {
               fontSize: 12,
               color: Colors.grey.shade600,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             AppText(
               plan.description,
               fontSize: 14,
@@ -212,7 +213,7 @@ class SubscriptionScreen extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
           ],
         ),
       ),

@@ -477,6 +477,9 @@ class SubscriptionDetailScreen extends StatelessWidget {
       );
 
       if (result.isSuccess) {
+        // Refresh profile to update plan_id and is_matrimony status
+        await controller.refreshProfile();
+        
         // Show success dialog
         Get.dialog(
           PaymentSuccessDialog(
