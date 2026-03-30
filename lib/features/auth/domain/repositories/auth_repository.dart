@@ -64,6 +64,12 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<ResponseModel> logout() async {
     return await _apiClient.post(AppUrls.logout);
   }
+
+  @override
+  Future<ResponseModel> deleteAccount() async {
+    return await _apiClient.delete(AppUrls.deleteAccount);
+  }
 }
+
 
 

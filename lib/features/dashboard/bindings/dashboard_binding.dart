@@ -7,6 +7,16 @@ import '../../matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
+import '../../wallet/controllers/wallet_controller.dart';
+import '../../wallet/domain/repositories/wallet_repository.dart';
+import '../../wallet/domain/services/wallet_service.dart';
+import '../../wallet/domain/usecases/get_wallet_usecase.dart';
+import '../../wallet/domain/usecases/top_up_wallet_usecase.dart';
+import '../../wallet/domain/usecases/verify_top_up_usecase.dart';
+import '../../wallet/domain/usecases/get_transactions_usecase.dart';
+import '../../auth/domain/services/auth_service_interface.dart';
+import '../../../core/services/payment/razorpay/razorpay_service.dart';
+
 
 import '../../home/domain/repositories/remedy_repository.dart';
 import '../../home/domain/services/remedy_service.dart';
@@ -86,5 +96,22 @@ class DashboardBinding extends Bindings {
       getReviewsUseCase: Get.find(),
       followAstrologerUseCase: Get.find(),
     ));
+
+    // Wallet
+    Get.lazyPut<WalletRepositoryInterface>(() => WalletRepository(apiClient: Get.find()));
+    Get.lazyPut<WalletServiceInterface>(() => WalletService(repository: Get.find()));
+    Get.lazyPut(() => GetWalletUseCase(service: Get.find()));
+    Get.lazyPut(() => TopUpWalletUseCase(service: Get.find()));
+    Get.lazyPut(() => VerifyTopUpUseCase(service: Get.find()));
+    Get.lazyPut(() => GetTransactionsUseCase(service: Get.find()));
+    Get.lazyPut(() => WalletController(
+      getWalletUseCase: Get.find(),
+      topUpWalletUseCase: Get.find(),
+      verifyTopUpUseCase: Get.find(),
+      getTransactionsUseCase: Get.find(),
+      authService: Get.find<AuthServiceInterface>(),
+      razorpayService: Get.find<RazorpayService>(),
+    ));
   }
 }
+

@@ -135,10 +135,14 @@ class SendOtpModel {
 
 bool _parseBool(dynamic value) {
   print('_parseBool: value=$value (type: ${value?.runtimeType})');
+  if (value == null) return false;
   if (value is bool) return value;
-  if (value == 1 || value == '1') return true;
-  if (value == 0 || value == '0') return false;
-  if (value is String) return value.toLowerCase() == 'true';
+  if (value == 1 || value == '1' || value == 'true') return true;
+  if (value == 0 || value == '0' || value == 'false') return false;
+  if (value is String) {
+    final normalized = value.toLowerCase().trim();
+    return normalized == 'true' || normalized == '1';
+  }
   return false;
 }
 

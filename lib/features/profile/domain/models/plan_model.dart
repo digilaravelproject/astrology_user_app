@@ -8,6 +8,10 @@ class PlanModel {
   final List<String> features;
   final String? createdAt;
   final String? updatedAt;
+  final bool? purchased;
+
+
+
 
   PlanModel({
     required this.id,
@@ -19,6 +23,7 @@ class PlanModel {
     required this.features,
     this.createdAt,
     this.updatedAt,
+    this.purchased,
   });
 
   factory PlanModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +37,7 @@ class PlanModel {
       features: List<String>.from(json['features'] ?? []),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
+      purchased: json['purchased'],
     );
   }
 }

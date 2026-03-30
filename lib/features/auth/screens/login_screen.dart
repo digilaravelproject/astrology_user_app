@@ -172,13 +172,10 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
 
-          // Loading overlay on top of everything
-          Obx(() => authController.isLoading.value
-              ? LoadingWidget(type: LoadingType.overlay)
-              : const SizedBox.shrink()),
         ],
       ),
     );
+
   }
 
   Widget _buildZodiacSymbol(String symbol, double size) {

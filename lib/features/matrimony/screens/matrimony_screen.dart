@@ -371,11 +371,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
     return Obx(() {
       // isRegistered is now set based on plan_id and is_matrimony from shared preferences
       debugPrint("MatrimonyScreen: isRegistered = ${_controller.isRegistered.value}");
-      debugPrint("MatrimonyScreen: pref is_matrimony = ${SharedPrefs.getBool("is_matrimony") ?? SharedPrefs.getString("is_matrimony")}");
+      debugPrint("MatrimonyScreen: pref is_matrimony = ${SharedPrefs.getBool("is_matrimony")}");
+      debugPrint("MatrimonyScreen: pref plan_id = ${SharedPrefs.getInt("plan_id")}");
 
-     /* if (!_controller.isRegistered.value) {
-        return _buildLandingUI();
-      }*/
+      // if (!_controller.isRegistered.value) {
+      //   return _buildLandingUI();
+      // }
 
 
 

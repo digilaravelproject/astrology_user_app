@@ -40,7 +40,7 @@ class SubscriptionScreen extends StatelessWidget {
           child: Column(
             children: [
               _buildCurrentPlan(profileController.activePlan),
-              const SizedBox(height: 30),
+              const SizedBox(height: 16),
               AppText(
                 "Available Plans",
                 fontSize: 18,
@@ -144,77 +144,87 @@ class SubscriptionScreen extends StatelessWidget {
 
   Widget _buildPlanCard(PlanModel plan) {
     //final color = _getPlanColor(plan.name);
-    //final isPopular = plan.name.toLowerCase().contains('premium');
+    final bool isPurchased = plan.purchased.toString() == 'true';
 
-    return GestureDetector(
-      onTap: (){
-        Get.to(() => SubscriptionDetailScreen(planId: plan.id));
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-         border: Border.all(color: AppColors.deepPink, width: 1),
-         // border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
-          boxShadow: [
-            //if (isPopular)
-              BoxShadow(
-                color: AppColors.deepPink.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+    return Opacity(
+      opacity: isPurchased ? 0.5 : 1.0,
+      child: GestureDetector(
+        onTap: isPurchased ? null : (){
+          Get.to(() => SubscriptionDetailScreen(planId: plan.id));
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+           border: Border.all(color: AppColors.deepPink, width: 1),
+           // border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
+            boxShadow: [
+              //if (isPopular)
+                BoxShadow(
+                  color: AppColors.deepPink.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // if (isPopular)
+              //   Align(
+              //     alignment: Alignment.topRight,
+              //     child: Container(
+              //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              //       decoration: BoxDecoration(
+              //         color: AppColors.deepPink,
+              //         borderRadius: BorderRadius.circular(4),
+              //       ),
+              //       child: AppText(
+              //         "POPULAR",
+              //         fontSize: 10,
+              //         fontWeight: FontWeight.w700,
+              //         color: Colors.white,
+              //       ),
+              //     ),
+              //   ),
+              AppText(
+                plan.name,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.black,
               ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // if (isPopular)
-            //   Align(
-            //     alignment: Alignment.topRight,
-            //     child: Container(
-            //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            //       decoration: BoxDecoration(
-            //         color: AppColors.deepPink,
-            //         borderRadius: BorderRadius.circular(4),
-            //       ),
-            //       child: AppText(
-            //         "POPULAR",
-            //         fontSize: 10,
-            //         fontWeight: FontWeight.w700,
-            //         color: Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            AppText(
-              plan.name,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.black,
-            ),
-            const SizedBox(height: 4),
-            AppText(
-              '₹${plan.price}',
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              color: Colors.black87,
-            ),
-            const SizedBox(height: 8),
-            AppText(
-              '${plan.durationDays} days',
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-            const SizedBox(height: 10),
-            AppText(
-              plan.description,
-              fontSize: 14,
-              color: Colors.grey.shade700,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-          ],
+              const SizedBox(height: 4),
+              AppText(
+                '₹${plan.price}',
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: Colors.black87,
+              ),
+              const SizedBox(height: 8),
+              AppText(
+                '${plan.durationDays} days',
+                fontSize: 12,
+                color: Colors.grey.shade600,
+              ),
+              const SizedBox(height: 10),
+              AppText(
+                plan.description,
+                fontSize: 14,
+                color: Colors.grey.shade700,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              if (isPurchased)
+                AppText(
+                  'Already Purchased',
+                  fontSize: 12,
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w600,
+                ),
+            ],
+          ),
         ),
       ),
     );

@@ -432,23 +432,8 @@ class ProfileScreen extends StatelessWidget {
           
           const SizedBox(height: 15),
 
-          // Delete Account Button
           TextButton(
-            onPressed: () {
-              Get.defaultDialog(
-                title: 'Delete Account',
-                middleText: 'Are you sure you want to delete your account? This action cannot be undone.',
-                textConfirm: 'Delete',
-                textCancel: 'Cancel',
-                confirmTextColor: Colors.white,
-                buttonColor: Colors.red,
-                cancelTextColor: Colors.black,
-                onConfirm: () {
-                   Get.back();
-                   authController.logout();
-                }
-              );
-            },
+            onPressed: () => authController.deleteAccount(),
             child: const AppText(
               'Delete Account',
               fontSize: 14,
@@ -456,6 +441,7 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.red,
             ),
           ),
+
         ],
       ),
     );

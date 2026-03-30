@@ -495,8 +495,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                             print("hhgcgewbsj : $result");
                             if (result.isSuccess) {
                               CustomSnackbar.showSuccess(result.message);
-                              Navigator.pop(context); // Close detail screen
+                              _controller.fetchReviews(widget.astrologerId);
                             } else {
+
                               CustomSnackbar.showError(result.message);
                             }
                           } catch (e) {

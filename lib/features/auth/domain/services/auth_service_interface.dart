@@ -9,7 +9,9 @@ abstract class AuthServiceInterface {
   Future<ResponseModel> login(String mobile);
   Future<ResponseModel> verifyOtp(String mobile, String otp);
   Future<ResponseModel> logout();
+  Future<ResponseModel> deleteAccount();
   Future<void> saveUserToken(String userToken);
+
   Future<void> saveUserInfo(UserModel user);
   Future<void> clearUserInfo();
   Future<bool> isLoggedIn();

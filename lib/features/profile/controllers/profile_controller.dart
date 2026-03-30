@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/utils/custom_snackbar.dart';
 import '../../../core/services/network/response_model.dart';
+import '../../../core/services/storage/shared_prefs.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../auth/domain/services/auth_service.dart';
 import '../domain/usecases/get_plan_by_id_usecase.dart';
@@ -108,6 +109,22 @@ class ProfileController extends GetxController {
     print('_syncUser: planId=${updatedUser.planId}, isMatrimony=${updatedUser.isMatrimony}');
     authController.currentUser.value = updatedUser;
     await Get.find<AuthService>().saveUserInfo(updatedUser);
+    
+    // Store user data in SharedPreferences
+    SharedPrefs.setInt('user_id', updatedUser.id);
+    SharedPrefs.setString('user_name', updatedUser.name);
+    SharedPrefs.setString('user_mobile', updatedUser.mobile);
+    SharedPrefs.setBool('profile_completed', updatedUser.profileCompleted);
+    SharedPrefs.setBool('is_matrimony', updatedUser.isMatrimony);
+    if (updatedUser.planId != null) {
+      SharedPrefs.setInt('plan_id', updatedUser.planId!);
+    }
+    if (updatedUser.planStartedAt != null) {
+      SharedPrefs.setString('plan_started_at', updatedUser.planStartedAt!);
+    }
+    if (updatedUser.planExpiresAt != null) {
+      SharedPrefs.setString('plan_expires_at', updatedUser.planExpiresAt!);
+    }
   }
 
   Future<void> fetchFollowing() async {
@@ -205,11 +222,18 @@ class ProfileController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
-      return await _verifyUpgradeUseCase.execute(
+      final result = await _verifyUpgradeUseCase.execute(
         providerOrderId: providerOrderId,
         providerPaymentId: providerPaymentId,
         signature: signature,
       );
+      
+      // Refresh profile after successful upgrade
+      if (result.isSuccess) {
+        await refreshProfile();
+      }
+      
+      return result;
     } catch (e) {
       print('Error verifying upgrade: $e');
       return ResponseModel(

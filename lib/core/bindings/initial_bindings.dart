@@ -42,6 +42,7 @@ class InitialBindings extends Bindings {
     Get.put(SendOtpUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(ResendOtpUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(UpdateProfileUseCase(Get.find<AuthService>()), permanent: true);
+    Get.put(DeleteAccountUseCase(Get.find<AuthService>()), permanent: true);
     
     Get.put(
       AuthController(
@@ -54,8 +55,10 @@ class InitialBindings extends Bindings {
         sendOtpUseCase: Get.find<SendOtpUseCase>(),
         resendOtpUseCase: Get.find<ResendOtpUseCase>(),
         updateProfileUseCase: Get.find<UpdateProfileUseCase>(),
+        deleteAccountUseCase: Get.find<DeleteAccountUseCase>(),
       ),
       permanent: true,
     );
+
   }
 }

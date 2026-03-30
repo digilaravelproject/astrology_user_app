@@ -8,4 +8,5 @@ abstract class AuthRepositoryInterface {
   Future<ResponseModel> login(String mobile);
   Future<ResponseModel> verifyOtp(String mobile, String otp);
   Future<ResponseModel> logout();
+  Future<ResponseModel> deleteAccount();
 }

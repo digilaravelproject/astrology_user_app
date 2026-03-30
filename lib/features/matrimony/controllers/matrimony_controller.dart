@@ -8,6 +8,7 @@ import '../domain/usecases/save_matrimony_profile_usecase.dart';
 import '../domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 
 class MatrimonyController extends GetxController {
   final SaveMatrimonyProfileUseCase _saveMatrimonyProfileUseCase;
@@ -101,7 +102,6 @@ class MatrimonyController extends GetxController {
   }
 
   void checkRegistrationStatus() {
-
     final authController = Get.find<AuthController>();
     final user = authController.currentUser.value;
     
@@ -114,15 +114,27 @@ class MatrimonyController extends GetxController {
     final hasPlan = user.planId != null;
     final isMatrimonyRegistered = user.isMatrimony;
     
-    // Fallback to SharedPrefs if user is out of sync
-    final bool prefIsMatrimony = SharedPrefs.getBool('is_matrimony') ?? 
-                                (SharedPrefs.getString('is_matrimony') == 'true' || 
-                                 SharedPrefs.getString('is_matrimony') == '1');
-
-    print("checkRegistrationStatus: planId=${user.planId}, isMatrimony=$isMatrimonyRegistered, hasPlan=$hasPlan, prefIsMatrimony=$prefIsMatrimony");
+    // Store user data in SharedPreferences
+    SharedPrefs.setInt('user_id', user.id);
+    SharedPrefs.setString('user_name', user.name);
+    SharedPrefs.setString('user_mobile', user.mobile);
+    SharedPrefs.setBool('profile_completed', user.profileCompleted);
+    SharedPrefs.setBool('is_matrimony', user.isMatrimony);
+    if (user.planId != null) {
+      SharedPrefs.setInt('plan_id', user.planId!);
+    }
+    if (user.planStartedAt != null) {
+      SharedPrefs.setString('plan_started_at', user.planStartedAt!);
+    }
+    if (user.planExpiresAt != null) {
+      SharedPrefs.setString('plan_expires_at', user.planExpiresAt!);
+    }
+    
+    print("checkRegistrationStatus: planId=${user.planId}, isMatrimony=$isMatrimonyRegistered, hasPlan=$hasPlan");
+    print("SharedPrefs is_matrimony: ${SharedPrefs.getBool('is_matrimony')}");
     
     // Set isRegistered to true only if both plan is purchased and matrimony is registered
-    isRegistered.value = hasPlan && (isMatrimonyRegistered || prefIsMatrimony);
+    isRegistered.value = hasPlan && isMatrimonyRegistered;
   }
 
 
@@ -131,12 +143,13 @@ class MatrimonyController extends GetxController {
       isLoading.value = true;
       final response = await _saveMatrimonyProfileUseCase.execute(profile, photo);
       if (response.isSuccess) {
-        // Check if plan is purchased before setting isRegistered to true
-        final authController = Get.find<AuthController>();
-        final user = authController.currentUser.value;
-        final hasPlan = user?.planId != null;
-        final isMatrimonyRegistered = user?.isMatrimony ?? false;
-        isRegistered.value = hasPlan && isMatrimonyRegistered;
+        // Refresh profile to get updated user data
+        final profileController = Get.find<ProfileController>();
+        await profileController.refreshProfile();
+        
+        // Re-check registration status with updated data
+        checkRegistrationStatus();
+        
         CustomSnackbar.showSuccess(response.message ?? 'Profile saved successfully');
         return true;
       } else {
@@ -145,7 +158,6 @@ class MatrimonyController extends GetxController {
       }
     } catch (e) {
       CustomSnackbar.showError('An unexpected error occurred');
-      //Get.snackbar('Error', 'An unexpected error occurred');
       print('Error saving matrimony profile: $e');
       return false;
     } finally {

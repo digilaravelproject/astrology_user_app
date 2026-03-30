@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/custom_snackbar.dart';
+import '../../../core/widgets/app_text.dart';
 import '../domain/models/user_model.dart';
 import '../../../routes/route_helper.dart';
 import '../../language/controllers/localization_controller.dart';
 import '../domain/services/auth_service.dart';
+import '../../../core/services/network/response_model.dart';
+
 
 class AuthController extends GetxController {
   final LoginUseCase _loginUseCase;
@@ -16,6 +19,8 @@ class AuthController extends GetxController {
   final SendOtpUseCase _sendOtpUseCase;
   final ResendOtpUseCase _resendOtpUseCase;
   final UpdateProfileUseCase _updateProfileUseCase;
+  final DeleteAccountUseCase _deleteAccountUseCase;
+
 
   AuthController({
     required LoginUseCase loginUseCase,
@@ -27,6 +32,7 @@ class AuthController extends GetxController {
     required SendOtpUseCase sendOtpUseCase,
     required ResendOtpUseCase resendOtpUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
+    required DeleteAccountUseCase deleteAccountUseCase,
   })  : _loginUseCase = loginUseCase,
         _registerUseCase = registerUseCase,
         _verifyOtpUseCase = verifyOtpUseCase,
@@ -35,7 +41,9 @@ class AuthController extends GetxController {
         _getUserInfoUseCase = getUserInfoUseCase,
         _sendOtpUseCase = sendOtpUseCase,
         _resendOtpUseCase = resendOtpUseCase,
-        _updateProfileUseCase = updateProfileUseCase;
+        _updateProfileUseCase = updateProfileUseCase,
+        _deleteAccountUseCase = deleteAccountUseCase;
+
 
   final isLoading = false.obs;
   final currentMobile = ''.obs;
@@ -229,22 +237,132 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       print('AuthController.logout() called');
-      await _logoutUseCase.execute();
-      print('AuthController.logout() completed');
-      currentUser.value = null;
-      currentMobile.value = '';
-      mobileController.clear();
-      otpController.clear();
-      nameController.clear();
-      Get.offAllNamed(RouteHelper.getLoginRoute());
+      final response = await _logoutUseCase.execute();
+      
+      if (response.isSuccess) {
+        print('AuthController.logout() completed successfully');
+        currentUser.value = null;
+        currentMobile.value = '';
+        mobileController.clear();
+        otpController.clear();
+        nameController.clear();
+        Get.offAllNamed(RouteHelper.getLoginRoute());
+        
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CustomSnackbar.showSuccess('Logged out successfully');
+        });
+      } else {
+        CustomSnackbar.showError(response.message ?? 'Logout failed');
+      }
     } catch (e) {
-      CustomSnackbar.showError(e.toString());
+      print('Logout error: $e');
+      CustomSnackbar.showError('An error occurred during logout');
     } finally {
       isLoading.value = false;
     }
   }
 
+
+  Future<void> deleteAccount() async {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.delete_forever_rounded, color: Colors.red, size: 32),
+              ),
+              const SizedBox(height: 20),
+              const AppText(
+                'Delete Account',
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2E1A47),
+              ),
+              const SizedBox(height: 12),
+              AppText(
+                'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: BorderSide(color: Colors.grey[300]!),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: AppText('Cancel', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        Get.back(); // Close dialog
+                        try {
+                          isLoading.value = true;
+                          final response = await _deleteAccountUseCase.execute();
+                          
+                          if (response.isSuccess) {
+                            currentUser.value = null;
+                            currentMobile.value = '';
+                            mobileController.clear();
+                            otpController.clear();
+                            nameController.clear();
+                            Get.offAllNamed(RouteHelper.getLoginRoute());
+                            
+                            Future.delayed(const Duration(milliseconds: 300), () {
+                              CustomSnackbar.showSuccess(response.message ?? 'Account deleted successfully');
+                            });
+                          } else {
+                            CustomSnackbar.showError(response.message ?? 'Failed to delete account');
+                          }
+                        } catch (e) {
+                          print('Delete account error: $e');
+                          CustomSnackbar.showError('An error occurred during account deletion');
+                        } finally {
+                          isLoading.value = false;
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        backgroundColor: Colors.red,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const AppText('Delete', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   String? validateName(String? value) {
+
     if (value == null || value.isEmpty) {
       return 'Please enter your name';
     }
@@ -314,10 +432,11 @@ class LogoutUseCase {
 
   LogoutUseCase(this._authService);
 
-  Future<void> execute() async {
-    await _authService.clearUserInfo();
+  Future<ResponseModel> execute() async {
+    return await _authService.logout();
   }
 }
+
 
 
 class CheckLoginStatusUseCase {
@@ -427,6 +546,17 @@ class UpdateProfileUseCase {
     return null;
   }
 }
+
+class DeleteAccountUseCase {
+  final AuthService _authService;
+
+  DeleteAccountUseCase(this._authService);
+
+  Future<ResponseModel> execute() async {
+    return await _authService.deleteAccount();
+  }
+}
+
 
 
 

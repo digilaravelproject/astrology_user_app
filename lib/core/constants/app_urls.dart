@@ -24,7 +24,9 @@ class AppUrls {
   static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
 
 
+  static const String deleteAccount = '/api/v1/user/delete-account';
   static const String logout = '/api/v1/user/logout';
+
   static const String following = '/api/v1/user/following';
   static const String plans = '/api/v1/user/plans';
   static const String upgradePlans = '/api/v1/user/plans/upgrade';

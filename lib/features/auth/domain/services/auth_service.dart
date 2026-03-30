@@ -76,19 +76,25 @@ class AuthService implements AuthServiceInterface {
   @override
   Future<ResponseModel> logout() async {
     final response = await _authRepository.logout();
-    // Clear user info after successful logout
     if (response.isSuccess) {
-      await SharedPrefs.remove(AppConstants.userData);
-      await TokenManager.clearToken();
-      await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+      await clearUserInfo();
     }
     return response;
   }
 
-  /*@override
-  Future<void> clearUserInfo() async {
-    await SharedPrefs.remove(AppConstants.userData);
-    await TokenManager.clearToken();
-    await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
-  }*/
+  @override
+  Future<ResponseModel> deleteAccount() async {
+    final response = await _authRepository.deleteAccount();
+    if (response.isSuccess) {
+      await clearUserInfo();
+    }
+    return response;
+  }
+
+  // @override
+  // Future<void> clearUserInfo() async {
+  //   await SharedPrefs.remove(AppConstants.userData);
+  //   await TokenManager.clearToken();
+  //   await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+  // }
 }

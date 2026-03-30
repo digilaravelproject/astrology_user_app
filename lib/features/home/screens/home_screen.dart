@@ -23,6 +23,8 @@ import '../../wallet/screens/wallet_screen.dart';
 import '../../notification/screens/notification_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../../core/widgets/custom_drawer.dart';
+import '../../wallet/controllers/wallet_controller.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,6 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final walletController = Get.find<WalletController>();
+
+
+
+
 
 
     return Scaffold(
@@ -64,7 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Container(
 
               alignment: Alignment.center,
-              child: _buildStickyTopBar(authController),
+              child: _buildStickyTopBar(authController, walletController),
+
             ),
 
 
@@ -178,7 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
 
-  Widget _buildStickyTopBar(AuthController authController) {
+  Widget _buildStickyTopBar(AuthController authController, WalletController walletController) {
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
@@ -229,8 +238,11 @@ class _HomeScreenState extends State<HomeScreen> {
               GestureDetector(
                 onTap: () => Get.toNamed(AppRoutes.wallet),
                // onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen())),
-                child: _buildCoinWalletChip(),
+                child: Obx(() => _buildCoinWalletChip(walletController.balance)),
+
               ),
+
+
               const SizedBox(width: 8),
               GestureDetector(
                 onTap: () => Get.to(() => const NotificationScreen()),
@@ -405,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCoinWalletChip() {
+  Widget _buildCoinWalletChip(String balance) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -435,7 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(width: 6),
           AppText(
-            "100",
+            balance,
             fontSize: 13,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF2E1A47),
@@ -445,6 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 
 
   void _showFilterBottomSheet(BuildContext context) {

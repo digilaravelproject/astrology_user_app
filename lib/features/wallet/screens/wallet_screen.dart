@@ -135,7 +135,7 @@ class WalletScreen extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF2E1A47),
               ),
-              const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2E1A47)),
+            //  const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2E1A47)),
             ],
           ),
         ),
@@ -198,7 +198,50 @@ class WalletScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
+                      child:Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            tx.description.isNotEmpty
+                                ? tx.description
+                                : (isCredit ? "Wallet Recharge" : "Consultation"),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2E1A47).withOpacity(0.9),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          // ✅ STATUS BADGE
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: _getStatusColor(tx.status).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: AppText(
+                              tx.status.toUpperCase(),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: _getStatusColor(tx.status),
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          AppText(
+                            _formatDate(tx.createdAt),
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
+
+
+                      /*Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppText(
@@ -217,7 +260,7 @@ class WalletScreen extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ],
-                      ),
+                      ),*/
                     ),
                     AppText(
                       "${isCredit ? '+' : '-'} ₹${tx.amount}",
@@ -244,6 +287,19 @@ class WalletScreen extends StatelessWidget {
       return "${dateTime.day} ${months[dateTime.month - 1]}, ${dateTime.year}";
     } catch (e) {
       return dateString.split('T')[0];
+    }
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status?.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'pending':
+        return Colors.orange;
+      case 'failed':
+        return Colors.red;
+      default:
+        return Colors.grey;
     }
   }
 }

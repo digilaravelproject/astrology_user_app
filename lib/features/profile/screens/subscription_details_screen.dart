@@ -324,6 +324,23 @@ class SubscriptionDetailScreen extends StatelessWidget {
                 ),
               ),
 
+
+              /*Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+                child: CustomButton(
+                  text: plan.purchased.toString() == 'true' ? 'Subscribed' : 'Subscribe Now',
+                  onTap: plan.purchased.toString() == 'true'
+                      ? null // disable click if already purchased
+                      : () => _handleSubscribe(context, profileController, plan),
+                  backgroundColor: plan.purchased.toString() == 'true'
+                      ? Colors.grey.shade400 // faded color if purchased
+                      : AppColors.primaryColor,
+                  textColor: AppColors.white,
+                  height: 56,
+                  fontSize: 18,
+                ),
+              ),*/
+
               // Terms & Conditions
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
