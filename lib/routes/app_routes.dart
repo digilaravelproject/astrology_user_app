@@ -23,4 +23,8 @@ class AppRoutes {
   static const String astroDetailScreen = '/AstrologerDetailScreen';
   static const String subscriptionScreen = '/SubscriptionScreen';
   static const String subscriptionDetailScreen = '/SubscriptionDetailScreen';
+  static const String faq = '/faq';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String paymentPolicy = '/payment-policy';
+  static const String termsAndConditions = '/terms-and-conditions';
 }

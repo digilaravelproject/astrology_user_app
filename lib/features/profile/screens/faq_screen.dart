@@ -4,27 +4,49 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 
+import '../../support/presentation/controllers/support_controller.dart';
+
 class FaqScreen extends StatelessWidget {
   const FaqScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<SupportController>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
         title: AppStrings.faq,
         centerTitle: true,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          return const _FaqItem(
-            question: "How do I book a session?",
-            answer: "To book a session, browse our list of astrologers, select one, and choose a time slot that works for you.",
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator(color: Colors.pink));
+        }
+
+        final faqData = controller.faqData.value;
+        if (faqData == null || faqData.items.isEmpty) {
+          return const Center(
+            child: AppText(
+              "No FAQs available at the moment.",
+              fontSize: 16,
+              color: Colors.grey,
+            ),
           );
-        },
-      ),
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: faqData.items.length,
+          itemBuilder: (context, index) {
+            final item = faqData.items[index];
+            return _FaqItem(
+              question: item.question,
+              answer: item.answer,
+            );
+          },
+        );
+      }),
     );
   }
 }

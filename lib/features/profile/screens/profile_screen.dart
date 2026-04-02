@@ -238,22 +238,23 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.message_question_copy,
           title: AppStrings.faq,
-          onTap: () => Get.to(() => const FaqScreen()),
+          onTap: () => Get.toNamed(AppRoutes.faq),
         ),
         _buildMenuItem(
           icon: Iconsax.shield_tick_copy,
           title: AppStrings.privacyPolicyProfile,
-          onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.privacyPolicyProfile, content: "Privacy Policy Content Placeholder...")),
+          onTap: () => Get.toNamed(AppRoutes.privacyPolicy),
         ),
         _buildMenuItem(
           icon: Iconsax.document_text_copy,
           title: AppStrings.termsAndConditions,
-          onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.termsAndConditions, content: "Terms & Conditions Content Placeholder...")),
+          onTap: () => Get.toNamed(AppRoutes.termsAndConditions),
         ),
          _buildMenuItem(
           icon: Iconsax.money_change_copy,
-          title: AppStrings.refundPolicy,
-          onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.refundPolicy, content: "Refund Policy Content Placeholder...")),
+          title: AppStrings.paymentPolicy,
+         onTap: () => Get.toNamed(AppRoutes.paymentPolicy)
+         // onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.paymentPolicy, content: "Refund Policy Content Placeholder...")),
         ),
 
         const SizedBox(height: 10),

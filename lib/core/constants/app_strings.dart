@@ -275,7 +275,7 @@ class AppStrings {
   static String get customerSupport => 'Customer Support'.tr;
   static String get privacyPolicyProfile => privacyPolicy;
   static String get termsAndConditions => 'Terms & Conditions'.tr;
-  static String get refundPolicy => 'Refund Policy'.tr;
+  static String get paymentPolicy => 'Payment Policy'.tr;
   static String get faq => 'Frequently Asked Questions'.tr;
   static String get deleteAccount => 'Delete Account'.tr;
   static String get logOut => 'Log Out'.tr;

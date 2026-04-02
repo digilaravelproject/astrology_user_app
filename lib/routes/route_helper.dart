@@ -2,6 +2,7 @@ import 'package:astro_user/features/astrologers/screens/astrologer_detail_screen
 import 'package:astro_user/features/profile/bindings/profile_binding.dart';
 import 'package:astro_user/features/profile/screens/edit_profile_screen.dart';
 import 'package:astro_user/features/profile/screens/following_screen.dart';
+import 'package:astro_user/features/profile/screens/payment_policy_screen.dart';
 import 'package:astro_user/features/profile/screens/subscription_details_screen.dart';
 import 'package:astro_user/features/profile/screens/subscription_screen.dart';
 import 'package:get/get.dart';
@@ -29,6 +30,10 @@ import '../features/matrimony/bindings/matrimony_binding.dart';
 import '../features/dashboard/bindings/dashboard_binding.dart';
 import '../features/call/bindings/call_binding.dart';
 import '../features/chat/bindings/chat_binding.dart';
+import '../features/support/presentation/bindings/support_binding.dart';
+import '../features/profile/screens/faq_screen.dart';
+import '../features/profile/screens/privacy_policy_screen.dart';
+import '../features/profile/screens/terms_and_conditions_screen.dart';
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -171,6 +176,30 @@ class RouteHelper {
         name: AppRoutes.subscriptionDetailScreen,
         page: () => SubscriptionDetailScreen(planId: 0),
         transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.faq,
+      page: () => const FaqScreen(),
+      transition: Transition.rightToLeft,
+      binding: SupportBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.privacyPolicy,
+      page: () => const PrivacyPolicyScreen(),
+      transition: Transition.rightToLeft,
+      binding: SupportBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.paymentPolicy,
+      page: () => const PaymentPolicyScreen(),
+      transition: Transition.rightToLeft,
+      binding: SupportBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.termsAndConditions,
+      page: () => const TermsAndConditionsScreen(),
+      transition: Transition.rightToLeft,
+      binding: SupportBinding(),
     ),
   ];
 }
