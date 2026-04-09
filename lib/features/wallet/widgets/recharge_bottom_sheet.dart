@@ -8,7 +8,14 @@ import '../controllers/wallet_controller.dart';
 import '../../../core/utils/custom_snackbar.dart';
 
 class RechargeBottomSheet extends StatefulWidget {
-  const RechargeBottomSheet({super.key});
+  final double? neededAmount;
+  final String? serviceType;
+
+  const RechargeBottomSheet({
+    super.key,
+    this.neededAmount,
+    this.serviceType,
+  });
 
   @override
   State<RechargeBottomSheet> createState() => _RechargeBottomSheetState();
@@ -43,7 +50,7 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildHandle(),
+          if (widget.neededAmount != null) _buildLowBalanceWarning(),
           _buildHeader(),
           _buildAmountSelector(),
           _buildCustomInput(),
@@ -81,6 +88,65 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
     );
   }
 
+  Widget _buildLowBalanceWarning() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: BoxDecoration(
+        color: AppColors.deepPink.withOpacity(0.05),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 15),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.deepPink.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.warning_amber_rounded,
+                    color: AppColors.deepPink, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText(
+                      'Insufficient Balance',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.deepPink,
+                    ),
+                    AppText(
+                      'You need at least ₹${widget.neededAmount?.toStringAsFixed(2)} for this ${widget.serviceType ?? 'session'}.',
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHandle() {
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -95,21 +161,35 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
       child: Column(
         children: [
-          AppText(
-            AppStrings.rechargeWallet,
-            fontSize: 18,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xFF2E1A47),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              AppText(
+                AppStrings.rechargeWallet,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF2E1A47),
+              ),
+              Obx(() => AppText(
+                '₹${walletController.balance}',
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.deepPink,
+              )),
+            ],
           ),
-          const SizedBox(height: 6),
-          AppText(
-            AppStrings.selectAmountToAdd,
-            fontSize: 13,
-            color: Colors.grey.shade600,
-            textAlign: TextAlign.center,
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: AppText(
+              AppStrings.selectAmountToAdd,
+              fontSize: 13,
+              color: Colors.grey.shade600,
+              textAlign: TextAlign.left,
+            ),
           ),
         ],
       ),

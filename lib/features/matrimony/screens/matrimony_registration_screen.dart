@@ -59,6 +59,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   bool _isPanSelected = false;
   bool _isDrivingLicenceSelected = false;
   bool _isAadhaarSelected = false;
+  Map<String, String> _errors = {};
 
   final List<String> _profileForOptions = [
     AppStrings.myself, AppStrings.mySon, AppStrings.myDaughter, 
@@ -70,7 +71,112 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     'Never married', 'Divorced', 'Widowed', 'Awaiting Divorce', 'Annulled'
   ];
 
+  bool _validateCurrentStep() {
+    setState(() {
+      _errors.clear();
+    });
+    bool isValid = true;
+    
+    if (_currentStep == 0) {
+      if (_selectedProfileFor == null) {
+        _errors['profileFor'] = "Please select who you are creating the profile for";
+        isValid = false;
+      }
+      if (_firstNameController.text.isEmpty) {
+        _errors['firstName'] = "First name is required";
+        isValid = false;
+      }
+      if (_lastNameController.text.isEmpty) {
+        _errors['lastName'] = "Last name is required";
+        isValid = false;
+      }
+      if (_emailController.text.isEmpty || !_emailController.text.contains('@')) {
+        _errors['email'] = "Please enter a valid email address";
+        isValid = false;
+      }
+      if (_mobileController.text.isEmpty || _mobileController.text.length < 10) {
+        _errors['mobile'] = "Please enter a valid mobile number";
+        isValid = false;
+      }
+    } else if (_currentStep == 1) {
+      if (_dayController.text.isEmpty || _monthController.text.isEmpty || _yearController.text.isEmpty) {
+        _errors['dob'] = "Please enter complete date of birth";
+        isValid = false;
+      }
+      if (_heightController.text.isEmpty) {
+        _errors['height'] = "Please enter height";
+        isValid = false;
+      }
+      if (_selectedMaritalStatus == null) {
+        _errors['maritalStatus'] = "Please select marital status";
+        isValid = false;
+      }
+      if (_locationController.text.isEmpty) {
+        _errors['location'] = "Please enter current location";
+        isValid = false;
+      }
+      if (_educationController.text.isEmpty) {
+        _errors['education'] = "Please enter highest education";
+        isValid = false;
+      }
+      if (_jobTitleController.text.isEmpty) {
+        _errors['jobTitle'] = "Please enter job title";
+        isValid = false;
+      }
+      if (_incomeController.text.isEmpty) {
+        _errors['income'] = "Please enter annual income";
+        isValid = false;
+      }
+    } else if (_currentStep == 2) {
+      bool isDocSelected = _isPanSelected || _isDrivingLicenceSelected || _isAadhaarSelected;
+      if (!isDocSelected) {
+        _errors['documents'] = "Please select and provide at least one identity document";
+        isValid = false;
+      }
+      if (_isPanSelected) {
+        if (_panController.text.isEmpty) {
+          _errors['pan'] = "Please enter PAN number";
+          isValid = false;
+        } else if (!RegExp(r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$').hasMatch(_panController.text.toUpperCase())) {
+          _errors['pan'] = "Invalid PAN format (e.g. ABCDE1234F)";
+          isValid = false;
+        }
+      }
+      if (_isDrivingLicenceSelected) {
+        if (_drivingLicenceController.text.isEmpty) {
+          _errors['driving'] = "Please enter Driving Licence number";
+          isValid = false;
+        } else if (_drivingLicenceController.text.length < 10) {
+          _errors['driving'] = "Invalid Driving Licence number";
+          isValid = false;
+        }
+      }
+      if (_isAadhaarSelected) {
+        if (_aadhaarController.text.isEmpty) {
+          _errors['aadhaar'] = "Please enter Aadhaar number";
+          isValid = false;
+        } else if (!RegExp(r'^[0-9]{12}$').hasMatch(_aadhaarController.text)) {
+          _errors['aadhaar'] = "Invalid Aadhaar format (12 digits)";
+          isValid = false;
+        }
+      }
+    } else if (_currentStep == 3) {
+      if (_matrimonyPhoto == null) {
+        _errors['photo'] = "Please upload a profile photo";
+        isValid = false;
+      }
+    }
+    
+    if (!isValid) {
+      setState(() {});
+      return false;
+    }
+    return true;
+  }
+
   void _nextStep() async {
+    if (!_validateCurrentStep()) return;
+
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -85,7 +191,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
-        phone: _mobileController.text,
+        phone: "$_countryCode${_mobileController.text}",
         dateOfBirth: dob,
         gender: _selectedGender,
         height: _heightController.text,
@@ -102,9 +208,11 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
 
       final success = await _controller.saveProfile(profile, _matrimonyPhoto);
       if (success) {
-        // Refresh profile to update is_matrimony status
-        final profileController = Get.find<ProfileController>();
-        await profileController.refreshProfile();
+        // Refresh profile if controller exists
+        if (Get.isRegistered<ProfileController>()) {
+          final profileController = Get.find<ProfileController>();
+          await profileController.refreshProfile();
+        }
         
         // Set isRegistered to true after successful registration
         _controller.setRegistered(true);
@@ -138,12 +246,12 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF5F8),
+      backgroundColor: const Color(0xFF1A0A2E), // Match landing page theme
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF4A1010)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             if (_currentStep > 0) {
               _pageController.previousPage(
@@ -151,21 +259,11 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                 curve: Curves.easeInOut,
               );
             } else {
-              Get.back();
+              Navigator.of(context).pop();
             }
           },
         ),
-        actions: [
-          if (_currentStep == 2 || _currentStep == 3)
-            TextButton(
-              onPressed: _nextStep,
-              child: AppText(
-                AppStrings.skip,
-                color: AppColors.deepPink,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-        ],
+        actions: const [],
       ),
       body: Obx(() => Stack(
         children: [
@@ -219,14 +317,14 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.startWithIntro,
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF4A1010),
+            color: Colors.white,
           ),
           const SizedBox(height: 24),
           AppText(
             AppStrings.creatingProfileFor,
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF4A1010),
+            color: Colors.white,
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -235,63 +333,77 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             children: _profileForOptions.map((option) {
               final isSelected = _selectedProfileFor == option;
               return GestureDetector(
-                onTap: () => setState(() => _selectedProfileFor = option),
+                onTap: () {
+                  setState(() {
+                    _selectedProfileFor = option;
+                    _errors.remove('profileFor');
+                  });
+                },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.deepPink.withOpacity(0.1) : Colors.white,
+                    color: isSelected ? AppColors.deepPink.withOpacity(0.2) : Colors.white.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: isSelected ? AppColors.deepPink : Colors.grey.shade200,
+                      color: _errors['profileFor'] != null ? Colors.red : (isSelected ? AppColors.deepPink : Colors.white.withOpacity(0.1)),
                     ),
                   ),
                   child: AppText(
                     option,
-                    color: isSelected ? AppColors.deepPink : Colors.black87,
+                    color: isSelected ? AppColors.white : Colors.white70,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
               );
             }).toList(),
           ),
+          if (_errors['profileFor'] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8, left: 8),
+              child: AppText(_errors['profileFor']!, color: Colors.red, fontSize: 12),
+            ),
           const SizedBox(height: 32),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildTextField(AppStrings.firstNameReq, _firstNameController)),
+              Expanded(child: _buildTextField(AppStrings.firstNameReq, _firstNameController, errorKey: 'firstName')),
               const SizedBox(width: 16),
-              Expanded(child: _buildTextField(AppStrings.lastNameReq, _lastNameController)),
+              Expanded(child: _buildTextField(AppStrings.lastNameReq, _lastNameController, errorKey: 'lastName')),
             ],
           ),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.emailReq, _emailController),
+          _buildTextField(AppStrings.emailReq, _emailController, errorKey: 'email'),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
+          _buildTextField(
+            AppStrings.mobileReq,
+            _mobileController,
+            keyboardType: TextInputType.phone,
+            errorKey: 'mobile',
+            prefixIcon: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(left: 16),
+              child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _countryCode,
-                  underline: const SizedBox(),
+                  icon: const Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: Icon(Icons.arrow_drop_down, color: Colors.white60, size: 20),
+                  ),
+                  dropdownColor: const Color(0xFF1A0A2E),
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                   onChanged: (val) => setState(() => _countryCode = val!),
                   items: ["+91", "+1", "+44"].map((code) {
                     return DropdownMenuItem(value: code, child: Text(code));
                   }).toList(),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.mobileReq, _mobileController, keyboardType: TextInputType.phone)),
-            ],
+            ),
           ),
           const SizedBox(height: 8),
           AppText(
             AppStrings.matchesContactInfo,
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: Colors.white60,
           ),
           const SizedBox(height: 32),
           _buildSafetyBanner(),
@@ -317,34 +429,40 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.buildYourProfile,
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF4A1010),
+            color: Colors.white,
           ),
           const SizedBox(height: 32),
-          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16),
+          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
           const SizedBox(height: 8),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildTextField(AppStrings.day, _dayController, keyboardType: TextInputType.number)),
+              Expanded(child: _buildTextField(AppStrings.day, _dayController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.month, _monthController, keyboardType: TextInputType.number)),
+              Expanded(child: _buildTextField(AppStrings.month, _monthController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.year, _yearController, keyboardType: TextInputType.number)),
+              Expanded(child: _buildTextField(AppStrings.year, _yearController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
             ],
           ),
+          if (_errors['dob'] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 8),
+              child: AppText(_errors['dob']!, color: Colors.red, fontSize: 12),
+            ),
           const SizedBox(height: 16),
           _buildGenderSelection(),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.heightReq, _heightController),
+          _buildTextField(AppStrings.heightReq, _heightController, errorKey: 'height'),
           const SizedBox(height: 16),
-          _buildDropdownField(AppStrings.maritalStatusReq, _maritalStatusOptions, (val) => setState(() => _selectedMaritalStatus = val), _selectedMaritalStatus),
+          _buildDropdownField(AppStrings.maritalStatusReq, _maritalStatusOptions, (val) => setState(() => _selectedMaritalStatus = val), _selectedMaritalStatus, errorKey: 'maritalStatus'),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.currentLocationReq, _locationController),
+          _buildTextField(AppStrings.currentLocationReq, _locationController, errorKey: 'location'),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.highestEducationReq, _educationController),
+          _buildTextField(AppStrings.highestEducationReq, _educationController, errorKey: 'education'),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.jobTitleReq, _jobTitleController),
+          _buildTextField(AppStrings.jobTitleReq, _jobTitleController, errorKey: 'jobTitle'),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.annualIncomeReq, _incomeController),
+          _buildTextField(AppStrings.annualIncomeReq, _incomeController, errorKey: 'income'),
           const SizedBox(height: 16),
           _buildTextField("About Myself", _aboutController, maxLines: 3),
           const SizedBox(height: 40),
@@ -363,7 +481,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16),
+        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -383,13 +501,13 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.deepPink : Colors.white,
+          color: isSelected ? AppColors.deepPink : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? Colors.transparent : Colors.grey.shade300),
+          border: Border.all(color: isSelected ? Colors.transparent : Colors.white.withOpacity(0.1)),
         ),
         child: AppText(
           gender,
-          color: isSelected ? Colors.white : Colors.black87,
+          color: Colors.white,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -397,7 +515,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   }
 
   Widget _buildStep3() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +528,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                 AppStrings.verifyYourProfile,
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
-                color: const Color(0xFF4A1010),
+                color: Colors.white,
               ),
             ],
           ),
@@ -418,30 +536,53 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           AppText(
             AppStrings.verificationMsg,
             fontSize: 14,
-            color: Colors.grey.shade600,
+            color: Colors.white60,
           ),
           const SizedBox(height: 32),
           Row(
             children: [
-              _buildVerificationChip(AppStrings.panCard, _isPanSelected, () => setState(() => _isPanSelected = !_isPanSelected)),
+              _buildVerificationChip(AppStrings.panCard, _isPanSelected, () {
+                setState(() {
+                  _isPanSelected = !_isPanSelected;
+                  _errors.remove('documents');
+                  if (!_isPanSelected) _errors.remove('pan');
+                });
+              }),
               const SizedBox(width: 12),
-              _buildVerificationChip(AppStrings.drivingLicence, _isDrivingLicenceSelected, () => setState(() => _isDrivingLicenceSelected = !_isDrivingLicenceSelected)),
+              _buildVerificationChip(AppStrings.drivingLicence, _isDrivingLicenceSelected, () {
+                setState(() {
+                  _isDrivingLicenceSelected = !_isDrivingLicenceSelected;
+                  _errors.remove('documents');
+                  if (!_isDrivingLicenceSelected) _errors.remove('driving');
+                });
+              }),
             ],
           ),
           const SizedBox(height: 12),
-          _buildVerificationChip(AppStrings.aadhaarCard, _isAadhaarSelected, () => setState(() => _isAadhaarSelected = !_isAadhaarSelected)),
+          _buildVerificationChip(AppStrings.aadhaarCard, _isAadhaarSelected, () {
+            setState(() {
+              _isAadhaarSelected = !_isAadhaarSelected;
+              _errors.remove('documents');
+              if (!_isAadhaarSelected) _errors.remove('aadhaar');
+            });
+          }),
+          if (_errors['documents'] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8, left: 8),
+              child: AppText(_errors['documents']!, color: Colors.red, fontSize: 12),
+            ),
           const SizedBox(height: 32),
-          if (_isPanSelected) _buildTextField(AppStrings.panNumber, _panController),
-          if (_isDrivingLicenceSelected) _buildTextField(AppStrings.drivingLicenceNumber, _drivingLicenceController),
-          if (_isAadhaarSelected) _buildTextField(AppStrings.aadhaarCardNumber, _aadhaarController),
-          const Spacer(),
+          if (_isPanSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.panNumber, _panController, errorKey: 'pan', helperText: "Example: ABCDE1234F")),
+          if (_isDrivingLicenceSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.drivingLicenceNumber, _drivingLicenceController, errorKey: 'driving', helperText: "Example: DL-1420110012345")),
+          if (_isAadhaarSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.aadhaarCardNumber, _aadhaarController, errorKey: 'aadhaar', helperText: "Example: 1234 5678 9012")),
+          const SizedBox(height: 32),
           Center(
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.shield_outlined, size: 16, color: Colors.grey),
+                const Icon(Icons.shield_outlined, size: 16, color: Colors.white60),
                 const SizedBox(width: 8),
-                AppText(AppStrings.infoSafePrivate, fontSize: 12, color: Colors.grey),
+                AppText(AppStrings.infoSafePrivate, fontSize: 12, color: Colors.white60),
               ],
             ),
           ),
@@ -467,7 +608,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.profilesWithPhotosMsg,
             fontSize: 24,
             fontWeight: FontWeight.w900,
-            color: const Color(0xFF4A1010),
+            color: Colors.white,
           ),
           const SizedBox(height: 40),
           Center(
@@ -475,16 +616,19 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               onTap: () async {
                 final file = await ImagePickerHelper.showImagePickerSheet(context);
                 if (file != null) {
-                  setState(() => _matrimonyPhoto = XFile(file.path));
+                  setState(() {
+                    _matrimonyPhoto = XFile(file.path);
+                    _errors.remove('photo');
+                  });
                 }
               },
               child: Container(
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.white.withOpacity(0.05),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: _errors['photo'] != null ? Colors.red : Colors.white.withOpacity(0.1)),
                   image: _matrimonyPhoto != null
                       ? DecorationImage(
                           image: FileImage(File(_matrimonyPhoto!.path)),
@@ -496,7 +640,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                     ? Stack(
                         alignment: Alignment.center,
                         children: [
-                          Icon(Icons.person, size: 60, color: Colors.grey.shade300),
+                          Icon(Icons.person, size: 60, color: _errors['photo'] != null ? Colors.red.withOpacity(0.5) : Colors.white.withOpacity(0.2)),
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -512,11 +656,16 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               ),
             ),
           ),
+          if (_errors['photo'] != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Center(child: AppText(_errors['photo']!, color: Colors.red, fontSize: 12)),
+            ),
           const SizedBox(height: 16),
-          Center(child: AppText(AppStrings.addPhoto, fontWeight: FontWeight.w700, fontSize: 18)),
-          const Spacer(),
-          Center(child: AppText(AppStrings.photosSafeMsg, color: Colors.pink.shade200, fontSize: 14)),
-          Center(child: AppText(AppStrings.photoPrivacyMsg, color: Colors.pink.shade200, fontSize: 12)),
+          Center(child: AppText(AppStrings.addPhoto, fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white)),
+          const SizedBox(height: 32),
+          Center(child: AppText(AppStrings.photosSafeMsg, color: Colors.white60, fontSize: 14)),
+          Center(child: AppText(AppStrings.photoPrivacyMsg, color: Colors.white54, fontSize: 12)),
           const SizedBox(height: 32),
           CustomButton(
             text: AppStrings.uploadPhotos,
@@ -529,49 +678,93 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1, String? errorKey, Widget? prefixIcon, bool showErrorText = true, String? helperText}) {
+    final errorText = errorKey != null ? _errors[errorKey] : null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: errorText != null ? Colors.red : Colors.white.withOpacity(0.1)),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            style: const TextStyle(color: Colors.white),
+            onChanged: (val) {
+              if (errorKey != null && _errors.containsKey(errorKey)) {
+                setState(() => _errors.remove(errorKey));
+              }
+            },
+            decoration: InputDecoration(
+              prefixIcon: prefixIcon,
+              prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+              labelText: label,
+              labelStyle: GoogleFonts.inter(color: Colors.white60, fontSize: 14),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+          ),
         ),
-      ),
+        if (helperText != null && errorText == null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 8),
+            child: AppText(helperText, color: Colors.white38, fontSize: 11),
+          ),
+        if (showErrorText && errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 8),
+            child: AppText(errorText, color: Colors.red, fontSize: 12),
+          ),
+      ],
     );
   }
 
-  Widget _buildDropdownField(String label, List<String> options, Function(String?) onChanged, String? selectedValue) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          hint: AppText(label, color: Colors.grey, fontSize: 14),
-          value: selectedValue,
-          items: options.map((option) {
-            return DropdownMenuItem(
-              value: option,
-              child: Text(option, style: GoogleFonts.inter(fontSize: 14)),
-            );
-          }).toList(),
-          onChanged: onChanged,
+  Widget _buildDropdownField(String label, List<String> options, Function(String?) onChanged, String? selectedValue, {String? errorKey}) {
+    final errorText = errorKey != null ? _errors[errorKey] : null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: errorText != null ? Colors.red : Colors.white.withOpacity(0.1)),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              dropdownColor: const Color(0xFF1A0A2E),
+              hint: AppText(label, color: Colors.white60, fontSize: 14),
+              value: selectedValue,
+              style: const TextStyle(color: Colors.white),
+              items: options.map((option) {
+                return DropdownMenuItem(
+                  value: option,
+                  child: Text(option, style: GoogleFonts.inter(fontSize: 14, color: Colors.white)),
+                );
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) {
+                  onChanged(val);
+                  if (errorKey != null && _errors.containsKey(errorKey)) {
+                    setState(() => _errors.remove(errorKey));
+                  }
+                }
+              },
+            ),
+          ),
         ),
-      ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 8),
+            child: AppText(errorText, color: Colors.red, fontSize: 12),
+          ),
+      ],
     );
   }
 
@@ -614,18 +807,18 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.pink.shade50.withOpacity(0.5),
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.pink.shade100.withOpacity(0.5)),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.verified_user, color: Color(0xFFB01D53), size: 16),
+              const Icon(Icons.verified_user, color: Colors.white70, size: 16),
               const SizedBox(width: 8),
-              AppText(AppStrings.safetyFirst, fontWeight: FontWeight.w700, color: const Color(0xFFB01D53)),
+              AppText(AppStrings.safetyFirst, fontWeight: FontWeight.w700, color: Colors.white70),
             ],
           ),
           const SizedBox(height: 8),
@@ -633,7 +826,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.sangamSafetyMsg,
             fontSize: 12,
             textAlign: TextAlign.center,
-            color: const Color(0xFFB01D53),
+            color: Colors.white60,
           ),
         ],
       ),

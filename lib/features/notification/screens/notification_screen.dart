@@ -4,6 +4,8 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
+import '../controllers/notification_controller.dart';
+import '../domain/models/notification_model.dart';
 import 'notification_detail_screen.dart';
 
 class NotificationScreen extends StatelessWidget {
@@ -11,37 +13,12 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dummy Data for demonstration
-    final List<Map<String, dynamic>> notifications = [
-      {
-        'title': 'Live Session Started!',
-        'message': 'Astrologer Priya is now live! Join the session to get answers to your questions.',
-        'time': '2 min ago',
-        'isRead': false,
-        'type': 'live',
-      },
-      {
-        'title': 'Daily Horoscope Updated',
-        'message': 'Your daily horoscope for today is now available. Check it out!',
-        'time': '1 hour ago',
-        'isRead': true,
-        'type': 'horoscope',
-      },
-      {
-        'title': 'Offer Alert! 50% OFF',
-        'message': 'Get 50% off on your first consultation with any astrologer. Valid for today only.',
-        'time': '5 hours ago',
-        'isRead': true,
-        'type': 'offer',
-      },
-      {
-        'title': 'Order Successful',
-        'message': 'Your order for "Gemstone Ring" has been placed successfully.',
-        'time': '1 day ago',
-        'isRead': true,
-        'type': 'order',
-      },
-    ];
+    final controller = Get.find<NotificationController>();
+
+    // Fetch notifications if not already fetching
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchNotifications();
+    });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -63,24 +40,39 @@ class NotificationScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Iconsax.tick_circle, color: AppColors.deepPink),
             tooltip: "Mark all as read",
-            onPressed: () {},
+            onPressed: () {
+              // Mark all as read logic can be added to controller if needed
+              // For now, we can loop through unread notifications
+            },
           ),
         ],
       ),
-      body: notifications.isEmpty
-          ? _buildEmptyState()
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              itemCount: notifications.length,
-              separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                return GestureDetector(
-                  onTap: () => Get.to(() => NotificationDetailScreen(notification: notification)),
-                  child: _buildNotificationItem(notification),
-                );
-              },
-            ),
+      body: Obx(() {
+        if (controller.isLoading.value && controller.notifications.isEmpty) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+        }
+
+        if (controller.notifications.isEmpty) {
+          return _buildEmptyState();
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => controller.fetchNotifications(),
+          color: AppColors.primaryColor,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            itemCount: controller.notifications.length,
+            separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            itemBuilder: (context, index) {
+              final notification = controller.notifications[index];
+              return GestureDetector(
+                onTap: () => Get.to(() => NotificationDetailScreen(notification: notification)),
+                child: _buildNotificationItem(notification),
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 
@@ -124,11 +116,11 @@ class NotificationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationItem(Map<String, dynamic> notification) {
-    bool isRead = notification['isRead'];
+  Widget _buildNotificationItem(NotificationModel notification) {
+    bool isRead = notification.isRead;
     
-    IconData getIconForType(String type) {
-      switch (type) {
+    IconData getIconForType(String? type) {
+      switch (type?.toLowerCase()) {
         case 'live':
           return Iconsax.video_copy;
         case 'horoscope':
@@ -148,7 +140,6 @@ class NotificationScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Icon based on type
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -159,7 +150,7 @@ class NotificationScreen extends StatelessWidget {
               ),
             ),
             child: Icon(
-              getIconForType(notification['type']),
+              getIconForType(notification.type),
               size: 20,
               color: isRead ? Colors.grey : AppColors.deepPink,
             ),
@@ -174,14 +165,14 @@ class NotificationScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: AppText(
-                        notification['title'],
+                        notification.title ?? '',
                         fontSize: 15,
                         fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
                         color: Colors.black87,
                       ),
                     ),
                     AppText(
-                      notification['time'],
+                      _formatTimestamp(notification.createdAt),
                       fontSize: 11,
                       color: Colors.black45,
                       fontWeight: FontWeight.w500,
@@ -190,7 +181,7 @@ class NotificationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 AppText(
-                  notification['message'],
+                  notification.message ?? '',
                   fontSize: 13,
                   color: Colors.black54,
                   height: 1.4,
@@ -215,5 +206,19 @@ class NotificationScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatTimestamp(String? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      DateTime dateTime = DateTime.parse(timestamp);
+      // Very simple time ago logic
+      Duration diff = DateTime.now().difference(dateTime);
+      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+      if (diff.inHours < 24) return '${diff.inHours}h ago';
+      return '${diff.inDays}d ago';
+    } catch (e) {
+      return timestamp;
+    }
   }
 }

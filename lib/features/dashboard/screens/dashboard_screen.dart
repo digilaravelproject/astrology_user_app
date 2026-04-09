@@ -232,10 +232,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final isRegistered = _matrimonyController.isRegistered.value;
       
       if (_selectedIndex == 1) {
-        // Matrimony
-        navGradientColor = isRegistered 
-            ? Colors.white // List background
-            : const Color(0xFF1A0A2E); // Landing background
+        // Matrimony - Use dark color for landing page, white for registered section
+        navGradientColor = isRegistered ? Colors.white : const Color(0xFF1A0A2E);
       }
 
       return Scaffold(

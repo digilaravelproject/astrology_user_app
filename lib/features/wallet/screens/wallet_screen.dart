@@ -41,7 +41,7 @@ class WalletScreen extends StatelessWidget {
 
   Widget _buildBalanceCard(BuildContext context, WalletController controller) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
       padding: const EdgeInsets.all(28),
       width: double.infinity,
       decoration: BoxDecoration(
@@ -76,12 +76,16 @@ class WalletScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Obx(() => AppText(
-                "₹${controller.balance}",
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.w900,
-              )),
+              Expanded(
+                child: Obx(() => AppText(
+                  "₹${controller.balance}",
+                  color: Colors.white,
+                  fontSize: 25,
+                  fontWeight: FontWeight.w900,
+                  overflow: TextOverflow.ellipsis,
+                )),
+              ),
+              const SizedBox(width: 12),
               GestureDetector(
                 onTap: () {
                   showModalBottomSheet(
@@ -92,7 +96,7 @@ class WalletScreen extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -101,12 +105,12 @@ class WalletScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 16),
+                      const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 14),
                       const SizedBox(width: 6),
                       AppText(
                         AppStrings.addMoney,
                         color: Colors.white,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w700,
                       ),
                     ],
@@ -125,7 +129,7 @@ class WalletScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          padding: const EdgeInsets.fromLTRB(15, 24, 15, 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -168,7 +172,7 @@ class WalletScreen extends StatelessWidget {
               final tx = controller.transactions[index];
               final isCredit = tx.transactionType == "credit";
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -184,21 +188,25 @@ class WalletScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
+                    // Icon Circle
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        color: (isCredit ? Colors.green : Colors.red).withOpacity(0.1),
+                        color: (isCredit ? Colors.green : AppColors.primaryColor).withOpacity(0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isCredit ? Icons.add_rounded : Icons.remove_rounded,
-                        color: isCredit ? Colors.green : Colors.red,
-                        size: 16,
+                        isCredit ? Icons.south_west_rounded : Icons.north_east_rounded,
+                        color: isCredit ? Colors.green : AppColors.primaryColor,
+                        size: 18,
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 14),
+                    
+                    // Transaction details
                     Expanded(
-                      child:Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppText(
@@ -206,67 +214,40 @@ class WalletScreen extends StatelessWidget {
                                 ? tx.description
                                 : (isCredit ? "Wallet Recharge" : "Consultation"),
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF2E1A47).withOpacity(0.9),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          // ✅ STATUS BADGE
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(tx.status).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: AppText(
-                              tx.status.toUpperCase(),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: _getStatusColor(tx.status),
-                            ),
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          AppText(
-                            _formatDate(tx.createdAt),
-                            fontSize: 11,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ],
-                      ),
-
-
-                      /*Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText(
-                            tx.description.isNotEmpty ? tx.description : (isCredit ? "Wallet Recharge" : "Consultation"),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF2E1A47).withOpacity(0.9),
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF2E1A47),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
                           AppText(
                             _formatDate(tx.createdAt),
-                            fontSize: 11,
+                            fontSize: 12,
                             color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w400,
                           ),
                         ],
-                      ),*/
+                      ),
                     ),
-                    AppText(
-                      "${isCredit ? '+' : '-'} ₹${tx.amount}",
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: isCredit ? Colors.green : const Color(0xFF2E1A47),
+                    
+                    // Amount
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        AppText(
+                          "${isCredit ? '+' : '-'} ₹${tx.amount}",
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: isCredit ? Colors.green : const Color(0xFF2E1A47),
+                        ),
+                        if (tx.status?.toLowerCase() != 'completed')
+                          AppText(
+                            tx.status.capitalizeFirst ?? '',
+                            fontSize: 10,
+                            color: _getStatusColor(tx.status),
+                            fontWeight: FontWeight.w600,
+                          ),
+                      ],
                     ),
                   ],
                 ),

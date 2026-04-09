@@ -7,10 +7,18 @@ import '../domain/usecases/save_matrimony_profile_usecase.dart';
 import '../domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../controllers/matrimony_controller.dart';
+import '../../profile/domain/usecases/get_profile_usecase.dart';
+import '../../profile/domain/repositories/profile_repository.dart';
+import '../../profile/domain/services/profile_service.dart';
 
 class MatrimonyBinding extends Bindings {
   @override
   void dependencies() {
+    // Profile Dependencies (Shared)
+    Get.lazyPut(() => ProfileRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => ProfileService(Get.find<ProfileRepository>()));
+    Get.lazyPut(() => GetProfileUseCase(Get.find<ProfileService>()));
+
     Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
     Get.lazyPut<MatrimonyServiceInterface>(() => MatrimonyService(repository: Get.find()));
     Get.lazyPut(() => SaveMatrimonyProfileUseCase(service: Get.find()));
@@ -23,6 +31,7 @@ class MatrimonyBinding extends Bindings {
       getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
       getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
       searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
+      getProfileUseCase: Get.find<GetProfileUseCase>(),
     ));
   }
 }

@@ -115,7 +115,7 @@ class ProfileController extends GetxController {
     SharedPrefs.setString('user_name', updatedUser.name);
     SharedPrefs.setString('user_mobile', updatedUser.mobile);
     SharedPrefs.setBool('profile_completed', updatedUser.profileCompleted);
-    SharedPrefs.setBool('is_matrimony', updatedUser.isMatrimony);
+    SharedPrefs.setBool('isMatrimony', updatedUser.isMatrimony);
     if (updatedUser.planId != null) {
       SharedPrefs.setInt('plan_id', updatedUser.planId!);
     }

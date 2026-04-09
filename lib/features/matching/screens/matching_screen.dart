@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
@@ -567,23 +568,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       _boyTimeController.clear();
                       _boyPlaceController.clear();
                       Get.back();
-                      Get.snackbar(
-                        'Success',
-                        'Kundli saved successfully',
-                        backgroundColor: AppColors.successColor,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                        margin: const EdgeInsets.all(20),
-                      );
+                      CustomSnackbar.showSuccess('Kundli saved successfully');
                     } else {
-                      Get.snackbar(
-                        'Error',
-                        'Please fill all fields',
-                        backgroundColor: AppColors.errorColor,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                        margin: const EdgeInsets.all(20),
-                      );
+                      CustomSnackbar.showError('Please fill all fields');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -721,16 +708,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               child: ElevatedButton(
                 onPressed: () {
                   if (profile1Name != null && profile2Name != null) {
-                    // Navigate to compatibility result
+                    CustomSnackbar.showInfo('Compatibility results coming soon!', title: 'Coming Soon');
                   } else {
-                    Get.snackbar(
-                      'Add Profiles',
-                      'Please add both profiles to check compatibility',
-                      backgroundColor: AppColors.primaryColor,
-                      colorText: Colors.white,
-                      snackPosition: SnackPosition.BOTTOM,
-                      margin: const EdgeInsets.all(20),
-                    );
+                    CustomSnackbar.showWarning('Please add both profiles to check compatibility', title: 'Add Profiles');
                   }
                 },
                 style: ElevatedButton.styleFrom(

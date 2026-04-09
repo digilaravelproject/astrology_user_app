@@ -52,10 +52,25 @@ class HomeHeaderSimple extends StatelessWidget {
               border: Border.all(color: AppColors.primaryColor.withOpacity(0.2), width: 2),
             ),
             child: CustomImageWidget(
-              imagePath: profileImageUrl ?? 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+              imagePath: profileImageUrl,
               height: 48,
               width: 48,
               radius: BorderRadius.circular(24),
+              fallbackWidget: Container(
+                height: 48,
+                width: 48,
+                decoration: const BoxDecoration(
+                  color: AppColors.primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: AppText(
+                  userName.isNotEmpty ? userName[0].toUpperCase() : '?',
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],

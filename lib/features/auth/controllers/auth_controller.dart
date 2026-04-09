@@ -414,7 +414,10 @@ class VerifyOtpUseCase {
         if (token.isNotEmpty) {
           await _authService.saveUserToken(token);
         }
-        await _authService.saveUserInfo(userModel);
+        
+        if (userModel.profileCompleted == true) {
+          await _authService.saveUserInfo(userModel);
+        }
         
         return userModel;
       } catch (e) {

@@ -138,7 +138,7 @@ class RemedyGrid extends StatelessWidget {
                 fontWeight: FontWeight.w400,
                 color: Colors.black54,
                 height: 1.35,
-                maxLines: 4,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
             ),

@@ -9,6 +9,10 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../controllers/profile_controller.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
+import '../../astrologers/bindings/astrologers_binding.dart';
+import '../../astrologers/controllers/astrologer_controller.dart';
+import '../../../core/widgets/custom_image_widget.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class FollowingScreen extends StatelessWidget {
   const FollowingScreen({super.key});
@@ -16,6 +20,18 @@ class FollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profileController = Get.find<ProfileController>();
+    final astrologerController = Get.put(AstrologerController(
+      getAstrologersUseCase: Get.find(),
+      getAstrologerByIdUseCase: Get.find(),
+      blockAstrologerUseCase: Get.find(),
+      reportAstrologerUseCase: Get.find(),
+      postReviewUseCase: Get.find(),
+      getReviewsUseCase: Get.find(),
+      followAstrologerUseCase: Get.find(),
+      getGiftsUseCase: Get.find(),
+      sendGiftUseCase: Get.find(),
+      getGiftHistoryUseCase: Get.find(),
+    ));
     
     // Fetch following list when screen is accessed
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,14 +94,14 @@ class FollowingScreen extends StatelessWidget {
           itemCount: followingList.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
-            return _buildAstrologerCard(followingList[index]);
+            return _buildAstrologerCard(followingList[index], profileController, astrologerController);
           },
         );
       }),
     );
   }
 
-  Widget _buildAstrologerCard(dynamic astro) {
+  Widget _buildAstrologerCard(dynamic astro, ProfileController profileController, AstrologerController astrologerController) {
     final imageUrl = astro['profile_photo'] != null 
         ? AppUrls.baseImageUrl+astro['profile_photo']
         : null;
@@ -93,7 +109,11 @@ class FollowingScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Navigate to astrologer detail screen
-        Get.to(() => AstrologerDetailScreen(astrologerId: astro['astrologer_id']));
+        Get.to(
+          () => AstrologerDetailScreen(astrologerId: astro['astrologer_id'] ?? astro['user_id'] ?? 0),
+          binding: AstrologersBinding(),
+          transition: Transition.rightToLeft,
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -120,13 +140,17 @@ class FollowingScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 2),
-                    image: DecorationImage(
-                      image: imageUrl != null 
-                          ? NetworkImage(imageUrl)
-                          : const NetworkImage('https://via.placeholder.com/65'),
-                      fit: BoxFit.cover,
-                    ),
                   ),
+                  clipBehavior: Clip.antiAlias,
+                  child: imageUrl != null 
+                      ? CustomImageWidget(
+                          imagePath: imageUrl,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          color: AppColors.lightPink,
+                          child: const Icon(Icons.person, color: AppColors.primaryColor, size: 36),
+                        ),
                 ),
                 Positioned(
                   right: 2,
@@ -135,7 +159,7 @@ class FollowingScreen extends StatelessWidget {
                     height: 14,
                     width: 14,
                     decoration: BoxDecoration(
-                      color: Colors.green,
+                      color: (astro['is_online'] == true || astro['is_online'] == 1) ? Colors.green : Colors.grey,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
@@ -154,7 +178,7 @@ class FollowingScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: AppText(
-                          astro['name'] ?? '',
+                          (astro['name']?.toString() ?? '').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2E1A47),
@@ -179,7 +203,7 @@ class FollowingScreen extends StatelessWidget {
                       const Icon(Iconsax.star_1, size: 14, color: Colors.amber),
                       const SizedBox(width: 4),
                       AppText(
-                        "4.9",
+                        astro['avg_rating']?.toString() ?? '0',
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
@@ -204,18 +228,32 @@ class FollowingScreen extends StatelessWidget {
             
             // Action Button
             const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.lightPink.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
-              ),
-              child: AppText(
-                "Following",
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.deepPink,
+            GestureDetector(
+              onTap: () async {
+                final id = astro['astrologer_id'] ?? astro['user_id'] ?? 0;
+                if (id != 0) {
+                  final response = await astrologerController.followAstrologer(id);
+                  if (response.isSuccess) {
+                    CustomSnackbar.showSuccess(response.message);
+                    profileController.fetchFollowing();
+                  } else {
+                    CustomSnackbar.showError(response.message);
+                  }
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.lightPink.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                ),
+                child: AppText(
+                  "Following",
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepPink,
+                ),
               ),
             ),
           ],

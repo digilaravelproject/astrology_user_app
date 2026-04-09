@@ -3,11 +3,29 @@ import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
+import '../controllers/notification_controller.dart';
+import '../domain/models/notification_model.dart';
 
-class NotificationDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> notification;
+class NotificationDetailScreen extends StatefulWidget {
+  final NotificationModel notification;
 
   const NotificationDetailScreen({super.key, required this.notification});
+
+  @override
+  State<NotificationDetailScreen> createState() => _NotificationDetailScreenState();
+}
+
+class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
+  final controller = Get.find<NotificationController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Mark as read when opening details if not already read
+    if (!widget.notification.isRead) {
+      controller.markAsRead(widget.notification.id);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +61,14 @@ class NotificationDetailScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    _getIconForType(notification['type']),
+                    _getIconForType(widget.notification.type),
                     size: 24,
                     color: AppColors.deepPink,
                   ),
                 ),
                 const SizedBox(width: 12),
                 AppText(
-                  notification['time'],
+                  _formatTimestamp(widget.notification.createdAt),
                   fontSize: 14,
                   color: Colors.black54,
                   fontWeight: FontWeight.w500,
@@ -62,7 +80,7 @@ class NotificationDetailScreen extends StatelessWidget {
             
             // Title
             AppText(
-              notification['title'],
+              widget.notification.title ?? '',
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: Colors.black87,
@@ -75,7 +93,7 @@ class NotificationDetailScreen extends StatelessWidget {
             
             // Message Body
             AppText(
-              notification['message'],
+              widget.notification.message ?? '',
               fontSize: 16,
               color: Colors.black87,
               height: 1.6,
@@ -86,8 +104,8 @@ class NotificationDetailScreen extends StatelessWidget {
     );
   }
 
-  IconData _getIconForType(String type) {
-    switch (type) {
+  IconData _getIconForType(String? type) {
+    switch (type?.toLowerCase()) {
       case 'live':
         return Iconsax.video_copy;
       case 'horoscope':
@@ -98,6 +116,17 @@ class NotificationDetailScreen extends StatelessWidget {
         return Iconsax.bag_2_copy;
       default:
         return Iconsax.notification_bing_copy;
+    }
+  }
+
+  String _formatTimestamp(String? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      DateTime dateTime = DateTime.parse(timestamp);
+      // More descriptive date formatting can be used here
+      return "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour}:${dateTime.minute}";
+    } catch (e) {
+      return timestamp;
     }
   }
 }

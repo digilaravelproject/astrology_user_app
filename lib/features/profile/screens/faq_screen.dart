@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
@@ -75,12 +76,17 @@ class _FaqItem extends StatelessWidget {
         ),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         children: [
-          AppText(
-            answer,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Colors.grey.shade700,
-            height: 1.5,
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: HtmlWidget(
+              answer,
+              textStyle: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade700,
+                height: 1.5,
+              ),
+            ),
           ),
         ],
       ),

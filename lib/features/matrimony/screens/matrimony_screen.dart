@@ -12,6 +12,7 @@ import '../../../routes/app_routes.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 import '../../matrimony/controllers/matrimony_controller.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 
 class MatrimonyScreen extends StatefulWidget {
   const MatrimonyScreen({super.key});
@@ -35,9 +36,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   @override
   void initState() {
     super.initState();
-    // Refresh registration status when screen is opened
+    // Refresh registration status from server when screen is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _controller.checkRegistrationStatus();
+      _controller.refreshRegistrationStatusFromServer();
     });
   }
 
@@ -369,20 +370,20 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      // isRegistered is now set based on plan_id and is_matrimony from shared preferences
+      // isRegistered is now set based on plan_id and isMatrimony from shared preferences
       debugPrint("MatrimonyScreen: isRegistered = ${_controller.isRegistered.value}");
-      debugPrint("MatrimonyScreen: pref is_matrimony = ${SharedPrefs.getBool("is_matrimony")}");
+      debugPrint("MatrimonyScreen: pref isMatrimony = ${SharedPrefs.getBool("isMatrimony")}");
       debugPrint("MatrimonyScreen: pref plan_id = ${SharedPrefs.getInt("plan_id")}");
 
-      // if (!_controller.isRegistered.value) {
-      //   return _buildLandingUI();
-      // }
+      if (!_controller.isRegistered.value) {
+        return _buildLandingUI();
+      }
 
 
 
       // If both plan and matrimony registration are complete, show data screen
       return Scaffold(
-        backgroundColor: const Color(0xFFFFF8F9),
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
@@ -553,106 +554,111 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
           ),
           
           // Content
-          Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    children: [
-                      const Spacer(flex: 2),
-                      
-                      // Overlapping Profile Images
-                      SizedBox(
-                        height: 220,
-                        width: 220,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              height: 180,
-                              width: 180,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.amber.withOpacity(0.3),
-                                  width: 2,
+          SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 100), // Top spacing instead of Spacer for consistency
+                        
+                        // Overlapping Profile Images
+                        SizedBox(
+                          height: 220,
+                          width: 220,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                height: 180,
+                                width: 180,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.amber.withOpacity(0.3),
+                                    width: 2,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              child: _buildCircularProfile('https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: _buildCircularProfile('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 60),
-                      
-                      AppText(
-                        AppStrings.soulMatesTitle,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFFFF5E9D),
-                        textAlign: TextAlign.center,
-                      ),
-                      
-                      const Spacer(flex: 3),
-                      
-                      // Gradient "Get Started" Button
-                      GestureDetector(
-                        onTap: () {
-                          Get.to(() => MatrimonyRegistrationScreen(
-                            onComplete: () {
-                              _controller.setRegistered(true);
-                              Get.back();
-                            },
-                          ));
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFFE940BE),
-                                Color(0xFFFF5E5E),
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFFF5E5E).withOpacity(0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                child: _buildCircularProfile('https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: _buildCircularProfile('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: AppText(
-                              AppStrings.getStartedNormal,
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                        ),
+                        
+                        const SizedBox(height: 40),
+                        
+                        AppText(
+                          AppStrings.soulMatesTitle,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFFFF5E9D),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 60),
+                        
+                        // Gradient "Get Started" Button
+                        GestureDetector(
+                          onTap: () {
+                            Get.to(() => MatrimonyRegistrationScreen(
+                              onComplete: () {
+                                _controller.setRegistered(true);
+                                Get.back();
+                              },
+                            ));
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFFE940BE),
+                                  Color(0xFFFF5E5E),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFF5E5E).withOpacity(0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: AppText(
+                                AppStrings.getStartedNormal,
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 120), // Extra space for floating bottom nav
-                    ],
+                        const SizedBox(height: 150), // Increased space for floating bottom nav
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ],
       ),
@@ -666,9 +672,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
         color: Colors.amber, // Golden border
         shape: BoxShape.circle,
       ),
-      child: CircleAvatar(
-        radius: 45,
-        backgroundImage: NetworkImage(imageUrl),
+      child: CustomImageWidget(
+        imagePath: imageUrl,
+        height: 90,
+        width: 90,
+        radius: BorderRadius.circular(45),
+        fit: BoxFit.cover,
       ),
     );
   }

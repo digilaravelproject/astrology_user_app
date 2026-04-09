@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../constants/image_constants.dart';
+import 'shimmer_widget.dart';
 
 /// Enum to represent different image types
 enum ImageType { svg, svgString, png, network, file, gif, unknown }
@@ -49,6 +50,7 @@ class CustomImageWidget extends StatelessWidget {
     this.radius,
     this.margin,
     this.border,
+    this.fallbackWidget,
     this.placeHolder = ImageConstants.imageNotFound,
   });
 
@@ -63,6 +65,7 @@ class CustomImageWidget extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final BorderRadius? radius;
   final BoxBorder? border;
+  final Widget? fallbackWidget;
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +80,15 @@ class CustomImageWidget extends StatelessWidget {
   Widget _buildWidget() {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: InkWell(
-        onTap: onTap,
-        child: _buildCircleImage(),
-      ),
+      child: onTap != null
+          ? Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                child: _buildCircleImage(),
+              ),
+            )
+          : _buildCircleImage(),
     );
   }
 
@@ -108,7 +116,7 @@ class CustomImageWidget extends StatelessWidget {
   }
 
   Widget _buildImageView() {
-    if (imagePath != null) {
+    if (imagePath != null && imagePath!.isNotEmpty) {
       switch (imagePath!.imageType) {
         case ImageType.svg:
           return SvgPicture.asset(
@@ -145,17 +153,11 @@ class CustomImageWidget extends StatelessWidget {
             fit: fit,
             imageUrl: imagePath!,
             color: color,
-            placeholder: (context, url) => Center(
-              child: SizedBox(
-                height: 30,
-                width: 30,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.grey.shade200,
-                ),
-              ),
+            placeholder: (context, url) => ShimmerWidget.rectangular(
+              height: height ?? double.infinity,
+              width: width ?? double.infinity,
             ),
-            errorWidget: (context, url, error) => Image.asset(
+            errorWidget: (context, url, error) => fallbackWidget ?? Image.asset(
               placeHolder,
               height: height,
               width: width,
@@ -176,18 +178,11 @@ class CustomImageWidget extends StatelessWidget {
               future: DefaultCacheManager().getSingleFile(imagePath!),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: SizedBox(
-                      height: 30,
-                      width: 30,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.grey.shade200,
-                      ),
-                    ),
+                  return ShimmerWidget.rectangular(
+                    height: height ?? 30,
+                    width: width ?? 30,
                   );
                 } else if (snapshot.hasError || !snapshot.hasData) {
-                  // Agar cache fail ho gaya to normal network image use karo
                   return Image.network(
                     imagePath!,
                     height: height,
@@ -196,7 +191,6 @@ class CustomImageWidget extends StatelessWidget {
                     color: color,
                   );
                 } else {
-                  // Agar cache mil gaya to file se fast load
                   return Image.file(
                     snapshot.data!,
                     height: height,
@@ -225,7 +219,7 @@ class CustomImageWidget extends StatelessWidget {
             );
           }
         case ImageType.unknown:
-          return Image.asset(
+          return fallbackWidget ?? Image.asset(
             placeHolder,
             height: height,
             width: width,
@@ -233,6 +227,6 @@ class CustomImageWidget extends StatelessWidget {
           );
       }
     }
-    return const SizedBox();
+    return fallbackWidget ?? const SizedBox();
   }
 }

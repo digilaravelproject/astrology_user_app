@@ -183,6 +183,44 @@ class UserModel {
     required this.isMatrimony,
   });
 
+  UserModel copyWith({
+    int? id,
+    String? name,
+    String? mobile,
+    String? otp,
+    String? date,
+    String? gender,
+    String? dateOfBirth,
+    String? timeOfBirth,
+    String? placeOfBirth,
+    bool? profileCompleted,
+    String? profilePhoto,
+    List<String>? languages,
+    int? planId,
+    String? planStartedAt,
+    String? planExpiresAt,
+    bool? isMatrimony,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      mobile: mobile ?? this.mobile,
+      otp: otp ?? this.otp,
+      date: date ?? this.date,
+      gender: gender ?? this.gender,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      timeOfBirth: timeOfBirth ?? this.timeOfBirth,
+      placeOfBirth: placeOfBirth ?? this.placeOfBirth,
+      profileCompleted: profileCompleted ?? this.profileCompleted,
+      profilePhoto: profilePhoto ?? this.profilePhoto,
+      languages: languages ?? this.languages,
+      planId: planId ?? this.planId,
+      planStartedAt: planStartedAt ?? this.planStartedAt,
+      planExpiresAt: planExpiresAt ?? this.planExpiresAt,
+      isMatrimony: isMatrimony ?? this.isMatrimony,
+    );
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
@@ -198,7 +236,7 @@ class UserModel {
       profilePhoto: json['profile_photo']?.toString(),
 
       profileCompleted: _parseBool(json['profile_completed']),
-      isMatrimony: _parseBool(json['is_matrimony']),
+      isMatrimony: _parseBool(json['isMatrimony']),
 
       languages: json['languages'] is List
           ? List<String>.from(json['languages'].map((e) => e.toString()))
@@ -227,7 +265,7 @@ class UserModel {
       'plan_id': planId,
       'plan_started_at': planStartedAt,
       'plan_expires_at': planExpiresAt,
-      'is_matrimony': isMatrimony,
+      'isMatrimony': isMatrimony,
     };
   }
 

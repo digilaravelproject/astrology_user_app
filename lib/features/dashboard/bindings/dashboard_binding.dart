@@ -16,6 +16,9 @@ import '../../wallet/domain/usecases/verify_top_up_usecase.dart';
 import '../../wallet/domain/usecases/get_transactions_usecase.dart';
 import '../../auth/domain/services/auth_service_interface.dart';
 import '../../../core/services/payment/razorpay/razorpay_service.dart';
+import '../../profile/domain/repositories/profile_repository.dart';
+import '../../profile/domain/services/profile_service.dart';
+import '../../profile/domain/usecases/get_profile_usecase.dart';
 
 
 import '../../home/domain/repositories/remedy_repository.dart';
@@ -37,23 +40,38 @@ import '../../astrologers/domain/usecases/report_astrologer_usecase.dart';
 import '../../astrologers/domain/usecases/post_review_usecase.dart';
 import '../../astrologers/domain/usecases/get_reviews_usecase.dart';
 import '../../astrologers/domain/usecases/follow_astrologer_usecase.dart';
+import '../../astrologers/domain/usecases/get_gifts_usecase.dart';
+import '../../astrologers/domain/usecases/send_gift_usecase.dart';
+import '../../astrologers/domain/usecases/get_gift_history_usecase.dart';
+import '../../astrologers/domain/repositories/gift_repository.dart';
+import '../../astrologers/domain/services/gift_service.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
+import '../../notification/domain/repositories/notification_repository.dart';
+import '../../notification/controllers/notification_controller.dart';
 
 class DashboardBinding extends Bindings {
   @override
   void dependencies() {
+    // Profile Dependencies (Shared)
+    Get.lazyPut(() => ProfileRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => ProfileService(Get.find<ProfileRepository>()));
+    Get.lazyPut(() => GetProfileUseCase(Get.find<ProfileService>()));
+
     // Matrimony
     Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
-    Get.lazyPut<MatrimonyServiceInterface>(() => MatrimonyService(repository: Get.find()));
-    Get.lazyPut(() => SaveMatrimonyProfileUseCase(service: Get.find()));
-    Get.lazyPut(() => GetMatrimonyProfileUseCase(service: Get.find()));
-    Get.lazyPut<GetMatrimonyProfileDetailsUseCase>(() => GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut<SearchMatrimonyProfilesUseCase>(() => SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut<MatrimonyController>(
-      () => MatrimonyController(
+    Get.put<MatrimonyRepositoryInterface>(MatrimonyRepository(apiClient: Get.find()));
+    Get.put<MatrimonyServiceInterface>(MatrimonyService(repository: Get.find()));
+    Get.put(SaveMatrimonyProfileUseCase(service: Get.find()));
+    Get.put(GetMatrimonyProfileUseCase(service: Get.find()));
+    Get.put<GetMatrimonyProfileDetailsUseCase>(GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.put<SearchMatrimonyProfilesUseCase>(SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.put<MatrimonyController>(
+      MatrimonyController(
+        saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
         getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
         getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
         searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
+        getProfileUseCase: Get.find<GetProfileUseCase>(),
       ),
     );
 
@@ -87,6 +105,11 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => PostReviewUseCase(service: Get.find()));
     Get.lazyPut(() => GetReviewsUseCase(service: Get.find()));
     Get.lazyPut(() => FollowAstrologerUseCase(service: Get.find()));
+    Get.lazyPut(() => GiftRepository(apiClient: Get.find()));
+    Get.lazyPut(() => GiftService(repository: Get.find()));
+    Get.lazyPut(() => GetGiftsUseCase(service: Get.find()));
+    Get.lazyPut(() => SendGiftUseCase(service: Get.find()));
+    Get.lazyPut(() => GetGiftHistoryUseCase(service: Get.find()));
     Get.lazyPut(() => AstrologerController(
       getAstrologersUseCase: Get.find(),
       getAstrologerByIdUseCase: Get.find(),
@@ -95,6 +118,9 @@ class DashboardBinding extends Bindings {
       postReviewUseCase: Get.find(),
       getReviewsUseCase: Get.find(),
       followAstrologerUseCase: Get.find(),
+      getGiftsUseCase: Get.find(),
+      sendGiftUseCase: Get.find(),
+      getGiftHistoryUseCase: Get.find(),
     ));
 
     // Wallet
@@ -112,6 +138,10 @@ class DashboardBinding extends Bindings {
       authService: Get.find<AuthServiceInterface>(),
       razorpayService: Get.find<RazorpayService>(),
     ));
+
+    // Notifications
+    Get.lazyPut(() => NotificationRepository(apiClient: Get.find()));
+    Get.put(NotificationController(repository: Get.find()));
   }
 }
 

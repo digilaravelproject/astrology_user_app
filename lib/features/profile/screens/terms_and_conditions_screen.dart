@@ -4,6 +4,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../support/presentation/controllers/support_controller.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 class TermsAndConditionsScreen extends StatelessWidget {
   const TermsAndConditionsScreen({super.key});
@@ -39,21 +40,15 @@ class TermsAndConditionsScreen extends StatelessWidget {
           );
         }
 
-        // Simple formatting for HTML paragraphs
-        final formattedContent = termsData.content
-            .replaceAll(RegExp(r'</p>'), '\n\n')
-            .replaceAll(RegExp(r'<[^>]*>'), '')
-            .replaceAll(RegExp(r'&nbsp;'), ' ')
-            .trim();
-
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: AppText(
-            formattedContent,
-            fontSize: 14,
-            color: Colors.black87,
-            height: 1.6,
-            textAlign: TextAlign.justify,
+          child: HtmlWidget(
+            termsData.content,
+            textStyle: const TextStyle(
+              fontSize: 14,
+              color: Colors.black87,
+              height: 1.6,
+            ),
           ),
         );
       }),

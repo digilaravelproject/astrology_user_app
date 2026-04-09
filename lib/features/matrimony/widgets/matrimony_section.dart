@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import '../controllers/matrimony_controller.dart';
 import '../domain/models/matrimony_profile_model.dart';
 import '../../../core/constants/app_urls.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 
@@ -87,9 +88,7 @@ class MatrimonySection extends StatelessWidget {
   Widget _buildCompactCustomerCard(BuildContext context, MatrimonyProfileModel data) {
     final String imageUrl = data.profilePhoto != null 
         ? '${AppUrls.baseImageUrl}${data.profilePhoto}'
-        : (data.gender.toLowerCase() == 'male' 
-            ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
-            : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png');
+        : '';
 
     return GestureDetector(
 
@@ -135,18 +134,25 @@ class MatrimonySection extends StatelessWidget {
                             width: 2.0,
                           ),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
+                        child: CustomImageWidget(
+                          imagePath: imageUrl,
+                          height: 80,
+                          width: 80,
+                          radius: BorderRadius.circular(40),
+                          fallbackWidget: Container(
+                            height: 80,
+                            width: 80,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE91E63).withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.person_rounded,
+                              size: 48,
+                              color: const Color(0xFFE91E63).withOpacity(0.5),
+                            ),
                           ),
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: NetworkImage(imageUrl),
-                          ),
-
                         ),
                       ),
                       Image.asset(
@@ -168,7 +174,7 @@ class MatrimonySection extends StatelessWidget {
                           children: [
                             Expanded(
                               child: AppText(
-                                '${data.firstName} ${data.lastName}',
+                                '${data.firstName} ${data.lastName}'.split(' ').map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '').join(' '),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF2D3142),
@@ -226,12 +232,12 @@ class MatrimonySection extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         // Secondary Details
-                        _buildDetailItem(Icons.translate, 'Mother Tongue: Not specified'), 
+                        _buildDetailItem(Icons.translate, 'Mother Tongue', null), 
 
-                        const SizedBox(height: 4),
-                        _buildDetailItem(Icons.school_outlined, data.education),
-                        const SizedBox(height: 4),
-                        _buildDetailItem(Icons.work_outline, data.jobTitle),
+                        const SizedBox(height: 6),
+                        _buildDetailItem(Icons.school_outlined, 'Education', data.education),
+                        const SizedBox(height: 6),
+                        _buildDetailItem(Icons.work_outline, 'Profession', data.jobTitle),
 
                         const SizedBox(height: 4),
                        Row(
@@ -274,19 +280,41 @@ class MatrimonySection extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailItem(IconData icon, String text) {
+  Widget _buildDetailItem(IconData icon, String label, String? value) {
+    final displayValue = (value == null || value.isEmpty || value.toLowerCase() == 'not specified') ? 'N/A' : value;
+    
     return Row(
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF2D3142).withOpacity(0.6)),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE91E63).withOpacity(0.05),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Icon(icon, size: 12, color: const Color(0xFFE91E63).withOpacity(0.7)),
+        ),
         const SizedBox(width: 8),
         Expanded(
-          child: AppText(
-            text,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF2D3142).withOpacity(0.8),
+          child: RichText(
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF2D3142).withOpacity(0.6),
+              ),
+              children: [
+                TextSpan(text: '$label: '),
+                TextSpan(
+                  text: displayValue,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2D3142),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

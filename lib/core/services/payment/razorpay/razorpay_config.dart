@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import '../../../theme/app_colors.dart';
+import '../../../constants/app_constants.dart';
+
 class RazorpayConfig {
   static const String razorpayKey = 'rzp_test_S9yXFuXcf0S6Ll'; // Replace with actual Razorpay key
   
@@ -16,11 +20,14 @@ class RazorpayConfig {
     return {
       'key': key,
       'amount': (amount * 100).toInt(),
-      'name': name,
+      'name': AppConstants.appName,
       'order_id': orderId,
       'description': description,
       'timeout': timeout,
       'currency': currency,
+      'theme': {
+        'color': '#E91E63' // AppColors.primaryColor hex
+      },
       'prefill': {
         'contact': contact,
         'email': email,

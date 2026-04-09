@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
+import 'package:intl/intl.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../controllers/blog_controller.dart';
 import '../domain/models/blog_model.dart';
 
 class BlogDetailScreen extends StatefulWidget {
   final int blogId;
   final Color blogColor;
-  final String icon;
+  final String imageUrl;
 
   const BlogDetailScreen({
     Key? key,
     required this.blogId,
     required this.blogColor,
-    required this.icon,
+    required this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -45,21 +47,18 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Color blogColor = widget.blogColor;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
       appBar: CustomAppBar(
-        title: "",
-        backgroundColor: Colors.transparent,
-        iconColor: Colors.white,
-        elevation: 0,
+        title: "Blog Details",
+        backgroundColor: Colors.white,
+        iconColor: Colors.black,
+        elevation: 0.5,
       ),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: blogColor,
+                color: widget.blogColor,
                 strokeWidth: 2,
               ),
             )
@@ -73,226 +72,107 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                 )
               : SingleChildScrollView(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Premium Header with Gradient
-                      Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.bottomCenter,
-                        children: [
-                          // Gradient Background
-                          Container(
-                            height: 300,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  blogColor,
-                                  blogColor.withOpacity(0.7),
-                                ],
-                              ),
-                              borderRadius: const BorderRadius.only(
-                                bottomLeft: Radius.circular(40),
-                                bottomRight: Radius.circular(40),
-                              ),
-                            ),
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  top: -50,
-                                  right: -50,
-                                  child: CircleAvatar(
-                                    radius: 100,
-                                    backgroundColor: Colors.white.withOpacity(0.1),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 50,
-                                  left: -30,
-                                  child: CircleAvatar(
-                                    radius: 60,
-                                    backgroundColor: Colors.white.withOpacity(0.1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Floating Hero Icon
-                          Positioned(
-                            bottom: -50,
-                            child: Hero(
-                              tag: 'blog_icon_${_blog!.id}',
-                              child: Container(
-                                padding: const EdgeInsets.all(25),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.network(
-                                  widget.icon,
-                                  width: 70,
-                                  height: 70,
-                                  color: blogColor,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.article_rounded,
-                                      size: 70,
-                                      color: blogColor,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      // Simple Large Image Hero
+                      Hero(
+                        tag: 'blog_image_${_blog!.id}',
+                        child: CustomImageWidget(
+                          imagePath: widget.imageUrl,
+                          width: double.infinity,
+                          height: 250,
+                          fit: BoxFit.cover,
+                        ),
                       ),
 
-                      const SizedBox(height: 70),
-
-                      // Content Section
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        padding: const EdgeInsets.all(20),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: blogColor.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(20),
+                            // Category/Type Chip
+                            if (_blog!.type != null && _blog!.type!.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: widget.blogColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: AppText(
+                                  _blog!.type!.toUpperCase(),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: widget.blogColor,
+                                ),
                               ),
-                              child: AppText(
-                                "ASTROLOGY INSIGHTS",
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: blogColor,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 12),
 
                             // Title
                             AppText(
                               _blog!.title,
-                              fontSize: 26,
+                              fontSize: 22,
                               fontWeight: FontWeight.w800,
-                              textAlign: TextAlign.center,
                               color: const Color(0xFF2E1A47),
                               height: 1.3,
                             ),
 
-                            const SizedBox(height: 16),
-                            
+                            const SizedBox(height: 12),
+
+                            // Metadata (Author & Date)
+                            Row(
+                              children: [
+                                Icon(Icons.person_outline_rounded, size: 16, color: Colors.grey.shade600),
+                                const SizedBox(width: 6),
+                                AppText(
+                                  _blog!.author,
+                                  fontSize: 13,
+                                  color: Colors.grey.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                const SizedBox(width: 15),
+                                Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey.shade600),
+                                const SizedBox(width: 6),
+                                AppText(
+                                  DateFormat('MMM dd, yyyy').format(_blog!.createdAt),
+                                  fontSize: 13,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+                            const Divider(height: 1),
+                            const SizedBox(height: 20),
+
+                            // Subtitle if available
                             if (_blog!.subtitle.isNotEmpty) ...[
                               AppText(
                                 _blog!.subtitle,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                textAlign: TextAlign.center,
-                                color: Colors.black54,
-                                height: 1.4,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                                height: 1.5,
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 15),
                             ],
 
-                            // Metadata
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _buildMetaItem(Icons.person_rounded, _blog!.author),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 15),
-                                  height: 4,
-                                  width: 4,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade400,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                _buildMetaItem(Icons.calendar_today_rounded, "Today"),
-                              ],
+                            // Main Content
+                            AppText(
+                              _blog!.content,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black87,
+                              height: 1.6,
                             ),
 
-                            const SizedBox(height: 30),
-
-                            // Blog Content
-                            SizedBox(
-                              width: double.infinity,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildBodyText(_blog!.content),
-                                  const SizedBox(height: 30),
-                                  
-                                  // Disclaimer Box
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF8F9FA),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.black.withOpacity(0.05)),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.info_outline, color: Colors.grey.shade600, size: 20),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: AppText(
-                                            "For personalized advice, please consult a certified astrologer.",
-                                            fontSize: 12,
-                                            color: Colors.grey.shade600,
-                                            fontStyle: FontStyle.italic,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 40),
-                                ],
-                              ),
-                            ),
+                            const SizedBox(height: 40),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-    );
-  }
-
-  Widget _buildMetaItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: Colors.grey.shade500),
-        const SizedBox(width: 6),
-        AppText(
-          text,
-          fontSize: 12,
-          color: Colors.grey.shade600,
-          fontWeight: FontWeight.w500,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBodyText(String text) {
-    return AppText(
-      text,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-      color: Colors.black87,
-      height: 1.7,
     );
   }
 }

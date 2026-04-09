@@ -12,6 +12,7 @@ import '../domain/models/wallet_top_up_response_model.dart';
 
 import '../../../core/utils/custom_snackbar.dart';
 import '../../../core/widgets/payment_success_dialog.dart';
+import '../../../routes/route_helper.dart';
 
 class WalletController extends GetxController {
   final GetWalletUseCase getWalletUseCase;
@@ -87,6 +88,11 @@ class WalletController extends GetxController {
       print("[PCB_APP] [DEBUG] | startTopUp called with result: $result");
       if (result != null) {
         print('[PCB_APP] [DEBUG] | Top-up order created successfully. Provider Order ID: ${result.data.transaction.providerOrderId}');
+        
+        // Refresh to show the pending transaction immediately
+        fetchWallet();
+        fetchTransactions();
+
         final user = await authService.getUserInfo();
         print('[PCB_APP] [DEBUG] | Opening Razorpay Checkout...');
         razorpayService.openCheckout(
@@ -119,19 +125,17 @@ class WalletController extends GetxController {
       );
 
       if (result != null && result.status == 'success') {
-        // Show success dialog
-        Get.dialog(
-          PaymentSuccessDialog(
-            title: 'Payment Successful',
-            message: 'Amount added to your wallet successfully',
-            orderId: response.orderId,
-            amount: result.data.transaction.amount,
-            onOk: () {
-              Get.back();
-              fetchWallet();
-              fetchTransactions();
-            },
-          ),
+        // Refresh data immediately
+        fetchWallet();
+        fetchTransactions();
+
+        // Navigate to success screen instead of dialog
+        Get.offNamed(
+          RouteHelper.getPaymentSuccessRoute(),
+          arguments: {
+            'amount': result.data.transaction.amount,
+            'orderId': response.orderId,
+          },
         );
       } else {
         CustomSnackbar.showError(result?.message ?? 'Payment verification failed');

@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_urls.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../wallet/screens/wallet_screen.dart';
 import '../../history/screens/history_screen.dart';
 import 'edit_profile_screen.dart';
@@ -113,21 +117,34 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 child: Obx(() {
                   final user = authController.currentUser.value;
-                  return Container(
+                  return CustomImageWidget(
+                    imagePath: (() {
+                      final photo = user?.profilePhoto;
+                      if (photo == null || photo.isEmpty) return null;
+                      if (photo.startsWith('http')) return photo;
+                      final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
+                      return '${AppUrls.baseImageUrl}$cleanPhoto';
+                    })(),
                     height: 100,
                     width: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
-                          ? DecorationImage(
-                              image: NetworkImage("${AppUrls.baseImageUrl}${user.profilePhoto!}"),
-                              fit: BoxFit.cover,
-                            )
-                          : const DecorationImage(
-                              image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
-                              fit: BoxFit.cover,
-                            ),
-                      border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
+                    radius: BorderRadius.circular(50),
+                    fit: BoxFit.cover,
+                    fallbackWidget: Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : '?',
+                        style: GoogleFonts.poppins(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   );
                 }),
@@ -204,19 +221,19 @@ class ProfileScreen extends StatelessWidget {
             child: AppText(AppStrings.proBadge, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber[800]),
           ),
         ),
-        _buildMenuItem(
-          icon: Iconsax.arrow_circle_up_copy,
-          title: AppStrings.upgradePlan,
-          onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
-        ),
+        // _buildMenuItem(
+        //   icon: Iconsax.arrow_circle_up_copy,
+        //   title: AppStrings.upgradePlan,
+        //   onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
+        // ),
         
         const SizedBox(height: 10),
         _buildSectionHeader(AppStrings.referralsCommunity),
-        _buildMenuItem(
-          icon: Iconsax.gift_copy,
-          title: AppStrings.referAndEarn,
-          onTap: () => Get.to(() => const ReferralScreen()),
-        ),
+        // _buildMenuItem(
+        //   icon: Iconsax.gift_copy,
+        //   title: AppStrings.referAndEarn,
+        //   onTap: () => Get.to(() => const ReferralScreen()),
+        // ),
         _buildMenuItem(
           icon: Iconsax.people_copy,
           title: AppStrings.following,
@@ -267,12 +284,12 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.star_1_copy,
           title: AppStrings.rateUs,
-          onTap: () {},
+          onTap: () => _rateUs(),
         ),
          _buildMenuItem(
           icon: Iconsax.share_copy,
           title: AppStrings.share,
-          onTap: () {},
+          onTap: () => _shareApp(),
         ),
         _buildMenuItem(
           icon: Iconsax.info_circle_copy,
@@ -445,6 +462,19 @@ class ProfileScreen extends StatelessWidget {
 
         ],
       ),
+    );
+  }
+
+  void _rateUs() async {
+    final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.astro.user');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch Play Store');
+    }
+  }
+
+  void _shareApp() {
+    Share.share(
+      'Download ${AppConstants.appName} app for accurate astrology predictions and consultations: https://play.google.com/store/apps/details?id=com.astro.user',
     );
   }
 }

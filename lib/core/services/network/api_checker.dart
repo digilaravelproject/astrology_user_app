@@ -15,18 +15,22 @@ class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
     switch (response.statusCode) {
       case 200:
-        final res = response.data['res']?.toString().toLowerCase();
-        final status = response.data['status']?.toString().toLowerCase();
-        if (res == 'success' || status == 'success' || response.data['success'] == true) {
-          return response;
+        if (response.data is Map) {
+          final res = response.data['res']?.toString().toLowerCase();
+          final status = response.data['status']?.toString().toLowerCase();
+          if (res == 'success' || status == 'success' || response.data['success'] == true) {
+            return response;
+          } else {
+            if (showToaster) _showErrorMessage(response);
+            throw DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+              type: DioExceptionType.badResponse,
+              error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
+            );
+          }
         } else {
-          if (showToaster) _showErrorMessage(response);
-          throw DioException(
-            requestOptions: response.requestOptions,
-            response: response,
-            type: DioExceptionType.badResponse,
-            error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
-          );
+          return response; // Return as is if not a map
         }
       case 401:
         _showErrorMessage(response, 'Unauthorized');
@@ -156,8 +160,12 @@ class ApiChecker {
 
           if (error.response?.data != null) {
             try {
+              final data = error.response!.data;
+              if (data is! Map<String, dynamic>) {
+                throw Exception('Response data is not a Map');
+              }
               final responseModel = ResponseModel.fromJson(
-                error.response!.data,
+                data,
                 statusCode: error.response!.statusCode,
               );
 
@@ -169,12 +177,14 @@ class ApiChecker {
                       : responseModel.message,
                 );
               } else {
-                if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-                  CustomSnackbar.showError(
-                    responseModel.errors!.first.message ?? 'Something went wrong',
-                  );
-                } else {
-                  CustomSnackbar.showError(responseModel.message);
+                if (error.response?.statusCode != 422) {
+                  if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
+                    CustomSnackbar.showError(
+                      responseModel.errors!.first.message ?? 'Something went wrong',
+                    );
+                  } else {
+                    CustomSnackbar.showError(responseModel.message);
+                  }
                 }
               }
 
@@ -314,7 +324,7 @@ class ApiChecker {
     }
 
     if (statusCode != 200) {
-      if (response.data != null) {
+      if (response.data != null && response.data is Map<String, dynamic>) {
         try {
           final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
 
@@ -369,16 +379,28 @@ class ApiChecker {
       }
     }
 
-    return ResponseModel.fromJson(response.data, statusCode: statusCode);
+    if (response.data is Map) {
+      return ResponseModel.fromJson(response.data, statusCode: statusCode);
+    } else {
+      return ResponseModel(
+        isSuccess: statusCode == 200 || statusCode == 201,
+        message: statusCode == 200 || statusCode == 201 ? 'Success' : 'Something went wrong',
+        statusCode: statusCode,
+        body: response.data,
+      );
+    }
   }
 
   static void _showErrorMessage(Response response, [String? defaultMessage]) {
-    final message = response.data['msg'] ?? response.data['message'] ?? defaultMessage ?? 'Something went wrong';
-    CustomSnackbar.showError(message);
+    String? message;
+    if (response.data is Map) {
+      message = response.data['msg'] ?? response.data['message'];
+    }
+    CustomSnackbar.showError(message ?? defaultMessage ?? 'Something went wrong');
   }
 
   static void _showValidationErrors(Response response) {
-    if (response.data != null) {
+    if (response.data != null && response.data is Map<String, dynamic>) {
       try {
         final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
         if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {

@@ -20,6 +20,7 @@ import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/language/screens/language_selection_screen.dart';
 import '../features/home/screens/home_screen.dart';
 import '../features/wallet/screens/wallet_screen.dart';
+import '../features/wallet/screens/payment_success_screen.dart';
 import '../features/matrimony/screens/matrimony_screen.dart';
 import '../features/remedy/screens/remedy_detail_screen.dart';
 import '../features/call/screens/call_list_screen.dart';
@@ -34,6 +35,8 @@ import '../features/support/presentation/bindings/support_binding.dart';
 import '../features/profile/screens/faq_screen.dart';
 import '../features/profile/screens/privacy_policy_screen.dart';
 import '../features/profile/screens/terms_and_conditions_screen.dart';
+import '../features/notification/screens/notification_screen.dart';
+import '../features/notification/bindings/notification_binding.dart';
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -56,8 +59,16 @@ class RouteHelper {
   static String getCallListRoute() => AppRoutes.callList;
   static String getChatListRoute() => AppRoutes.chatList;
   static String getEditProfileRoute() => AppRoutes.editProfile;
+  static String getPaymentSuccessRoute() => AppRoutes.paymentSuccess;
+  static String getNotificationRoute() => AppRoutes.notification;
 
   static List<GetPage> routes = [
+    GetPage(
+      name: AppRoutes.notification,
+      page: () => const NotificationScreen(),
+      binding: NotificationBinding(),
+      transition: Transition.rightToLeft,
+    ),
     GetPage(
       name: AppRoutes.splash,
       page: () => const SplashScreen(),
@@ -200,6 +211,11 @@ class RouteHelper {
       page: () => const TermsAndConditionsScreen(),
       transition: Transition.rightToLeft,
       binding: SupportBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.paymentSuccess,
+      page: () => const PaymentSuccessScreen(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

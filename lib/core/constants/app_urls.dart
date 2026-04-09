@@ -1,5 +1,4 @@
 
-
 class AppUrls {
   static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
   static const String baseImageUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com/storage/app/public/";
@@ -36,4 +35,16 @@ class AppUrls {
   static const String privacyPolicy = '/api/v1/privacy-policy';
   static const String paymentPolicy = '/api/v1/payment-policy';
   static const String termsAndConditions = '/api/v1/terms-and-conditions';
+  static const String paymentSuccess = '/payment-success';
+
+  // Notifications
+  static String getNotificationCount(int userId) => '/api/v1/user/notifications/count?user_id=$userId';
+  static String getNotifications(int userId) => '/api/v1/user/notifications?user_id=$userId';
+  static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id?user_id=$userId';
+  static String markNotificationRead(int id, int userId) => '/api/v1/user/notifications/$id/mark-read?user_id=$userId';
+
+  // Gifts
+  static const String gifts = '/api/v1/gifts';
+  static const String sendGift = '/api/v1/gifts/send';
+  static String getGiftHistory(int id) => '/api/v1/astrologers/$id/gifts';
 }

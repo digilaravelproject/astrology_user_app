@@ -95,6 +95,7 @@ class AppStrings {
   static String get skills => "Skills".tr;
   static String get languages => "Languages".tr;
   static String get experience => "Experience".tr;
+  static String get sortBy => "Sort By".tr;
   // Home Filters (reusing common strings)
   static String get homeFilter => filter;
   static String get homeAll => all;

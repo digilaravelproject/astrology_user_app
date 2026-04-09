@@ -374,13 +374,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
         CustomSnackbar.showSuccess(result.message);
         
         // Show success message
-        Get.snackbar(
-          'Success',
-          data['message'] ?? 'Razorpay order created successfully',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.primaryColor,
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showSuccess(data['message'] ?? 'Razorpay order created successfully');
         
         // Handle Razorpay order if present
         if (data.containsKey('razorpay_order')) {
@@ -402,22 +396,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
           }
         }
       } else {
-        Get.snackbar(
-          'Error',
-          result.message ?? 'Failed to create order',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showError(result.message ?? 'Failed to create order');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackbar.showError(e.toString());
     } finally {
       controller.isLoading.value = false;
     }
@@ -435,7 +417,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
     // Get user email and contact from auth controller
     final authController = Get.find<AuthController>();
     final user = authController.currentUser.value;
-    final email = "awi@gmail.com" '';
+    final email = "" '';
     final contact = user?.mobile ?? '';
 
     _razorpayService.init(
@@ -450,20 +432,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
         );
       },
       onFailure: (failure) {
-        Get.snackbar(
-          'Error',
-          failure.message ?? 'Payment failed',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showError(failure.message ?? 'Payment failed');
       },
       onExternalWallet: (wallet) {
-        Get.snackbar(
-          'Wallet',
-          'Paid via ${wallet.walletName}',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        CustomSnackbar.showInfo('Paid via ${wallet.walletName}');
       },
     );
 
@@ -494,7 +466,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
       );
 
       if (result.isSuccess) {
-        // Refresh profile to update plan_id and is_matrimony status
+        // Refresh profile to update plan_id and isMatrimony status
         await controller.refreshProfile();
         
         // Show success dialog
@@ -511,22 +483,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
           ),
         );
       } else {
-        Get.snackbar(
-          'Error',
-          result.message ?? 'Payment verification failed',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        CustomSnackbar.showError(result.message ?? 'Payment verification failed');
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      CustomSnackbar.showError(e.toString());
     } finally {
       controller.isLoading.value = false;
     }

@@ -41,7 +41,7 @@ class WalletRepository implements WalletRepositoryInterface {
     try {
       final response = await apiClient.post(AppUrls.walletTopup, data: {
         'amount': amount,
-      });
+      }, handleError: false, showToaster: false);
       print('[PCB_APP] [DEBUG] | topUpWallet Status: ${response.statusCode}');
       print('[PCB_APP] [DEBUG] | topUpWallet isSuccess: ${response.isSuccess}');
 

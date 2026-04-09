@@ -28,6 +28,9 @@ class ApiClient {
       connectTimeout: const Duration(milliseconds: 30000),
       receiveTimeout: const Duration(milliseconds: 30000),
       contentType: 'application/json',
+      headers: {
+        'Accept': 'application/json',
+      },
       validateStatus: (status) => status! < 500,
     );
 
@@ -35,7 +38,7 @@ class ApiClient {
       onRequest: (options, handler) async {
         String token = await TokenManager.getToken() ?? "";
         options.headers["Authorization"] = "Bearer $token";
-        options.headers["Content-Type"] = "application/json";
+        options.headers["Accept"] = "application/json";
 
         // Detailed request logging
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -255,7 +258,16 @@ class ApiClient {
 
       if (handleError) {
         final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        if (result.data is Map<String, dynamic>) {
+          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        } else {
+          return ResponseModel(
+            isSuccess: result.statusCode == 200 || result.statusCode == 201,
+            message: 'Multipart upload completed with status ${result.statusCode}',
+            statusCode: result.statusCode,
+            body: result.data,
+          );
+        }
       } else {
         return ApiChecker.checkApi(response, showToaster: showToaster);
       }

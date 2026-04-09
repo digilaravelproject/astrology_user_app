@@ -27,4 +27,15 @@ class AppConstants {
     
     // Default Settings
     static const String defaultLanguage = 'en';
+
+    // Expertise Skills
+    static const List<String> skillList = [
+        'Vedic',
+        'Tarot',
+        'Numerology',
+        'Life Coach',
+        'Palmistry',
+        'Vastu',
+        'Face Reading'
+    ];
 }

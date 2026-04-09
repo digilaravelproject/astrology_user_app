@@ -22,7 +22,16 @@ class ResponseModel {
     final success = res == 'success' || status == 'success' || (json['success'] == true);
 
     List<ErrorDetail>? errors;
-    if (json['errors'] is List) {
+    if (json['errors'] is Map) {
+      errors = [];
+      (json['errors'] as Map<String, dynamic>).forEach((key, value) {
+        if (value is List && value.isNotEmpty) {
+          errors!.add(ErrorDetail(code: key, message: value.first.toString()));
+        } else {
+          errors!.add(ErrorDetail(code: key, message: value.toString()));
+        }
+      });
+    } else if (json['errors'] is List) {
       errors = (json['errors'] as List)
           .map((e) => ErrorDetail.fromJson(e))
           .toList();
@@ -32,8 +41,9 @@ class ResponseModel {
       isSuccess: success && (statusCode == 200 || statusCode == 201 || statusCode == null),
       message: json['msg']?.toString() ??
           json['message']?.toString() ??
+          json['Message']?.toString() ??
           (success ? 'Success' : 'Something went wrong'),
-      body: json['data'],
+      body: json['data'] ?? json['body'] ?? json, // Fallback to full json if no data key
       statusCode: statusCode,
       errors: errors,
       token: json['token']?.toString(),

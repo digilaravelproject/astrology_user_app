@@ -7,8 +7,8 @@ class GetAstrologersUseCase {
 
   GetAstrologersUseCase({required this.service});
 
-  Future<List<AstrologerModel>> execute() async {
-    final response = await service.getAstrologers();
+  Future<List<AstrologerModel>> execute({Map<String, dynamic>? params}) async {
+    final response = await service.getAstrologers(queryParameters: params);
     if (response.isSuccess && response.body != null) {
       final List<dynamic> data = response.body['astrologers'] ?? [];
       return data.map((json) => AstrologerModel.fromJson(json)).toList();

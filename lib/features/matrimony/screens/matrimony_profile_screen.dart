@@ -8,6 +8,7 @@ import '../domain/models/matrimony_profile_model.dart';
 import '../../../core/constants/app_urls.dart';
 import '../controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 
 
 
@@ -272,42 +273,34 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
-                  child: _getImages(profile).length > 1
-                      ? PageView.builder(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentImageIndex = index;
-                            });
-                          },
-                          itemCount: _getImages(profile).length,
-                          itemBuilder: (context, index) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.only(
-                                  bottomLeft: Radius.circular(30),
-                                  bottomRight: Radius.circular(30),
-                                ),
-                                image: DecorationImage(
-                                  image: NetworkImage(_getImages(profile)[index]),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
+                child: _getImages(profile).length > 1
+                    ? PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentImageIndex = index;
+                          });
+                        },
+                        itemCount: _getImages(profile).length,
+                        itemBuilder: (context, index) {
+                          return CustomImageWidget(
+                            imagePath: _getImages(profile)[index],
+                            fit: BoxFit.cover,
+                            radius: const BorderRadius.only(
                               bottomLeft: Radius.circular(30),
                               bottomRight: Radius.circular(30),
                             ),
-                            image: DecorationImage(
-                              image: NetworkImage(_getImages(profile)[0]),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          );
+                        },
+                      )
+                    : CustomImageWidget(
+                        imagePath: _getImages(profile)[0],
+                        fit: BoxFit.cover,
+                        radius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
+                      ),
                 ),
               ),
               // Page indicators (Only show for multiple images)

@@ -1,3 +1,5 @@
+import 'package:astro_user/core/constants/app_urls.dart';
+
 class AstrologerModel {
   final int id;
   final int userId;
@@ -14,6 +16,11 @@ class AstrologerModel {
   final String? email;
   final bool isChatEnabled;
   final bool isCallEnabled;
+  final double rating;
+  final bool isOnline;
+  final bool isFollowed;
+  final bool isBlocked;
+  final int totalOrders;
 
   AstrologerModel({
     required this.id,
@@ -31,6 +38,11 @@ class AstrologerModel {
     this.email,
     this.isChatEnabled = false,
     this.isCallEnabled = false,
+    this.isOnline = false,
+    this.rating = 0.0,
+    this.totalOrders = 0,
+    this.isFollowed = false,
+    this.isBlocked = false,
   });
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
@@ -47,11 +59,18 @@ class AstrologerModel {
       chatRate: json['chat_rate'],
       callRate: json['call_rate'],
       videoCallRate: json['video_call_rate'],
-      name: userData['name'] ?? 'Unknown',
+      name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
       phone: userData['phone'],
       email: userData['email'],
       isChatEnabled: json['is_chat_enabled'] == 1,
       isCallEnabled: json['is_call_enabled'] == 1,
+      isOnline: json['is_online'] == 1 || json['is_online'] == true,
+      rating: double.tryParse(json['reviews_avg_rating']?.toString() ?? json['avg_rating']?.toString() ?? '0') ?? 0.0,
+      totalOrders: json['total_orders'] ?? 0,
+      isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
+      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
     );
   }
+
+  String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 }

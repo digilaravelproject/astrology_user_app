@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class BlogModel {
   final int id;
   final String title;
@@ -7,6 +9,8 @@ class BlogModel {
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? blogImage;
+  final String? type;
 
   BlogModel({
     required this.id,
@@ -17,6 +21,8 @@ class BlogModel {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    this.blogImage,
+    this.type,
   });
 
   factory BlogModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +33,8 @@ class BlogModel {
       content: json['content']?.toString() ?? '',
       author: json['author']?.toString() ?? '',
       isActive: json['is_active'] == true || json['is_active'] == 1,
+      blogImage: json['blog_image']?.toString(),
+      type: json['type']?.toString(),
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now() : DateTime.now(),
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) ?? DateTime.now() : DateTime.now(),
     );
@@ -40,6 +48,8 @@ class BlogModel {
       'content': content,
       'author': author,
       'is_active': isActive,
+      'blog_image': blogImage,
+      'type': type,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

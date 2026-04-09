@@ -8,23 +8,29 @@ import '../domain/usecases/save_matrimony_profile_usecase.dart';
 import '../domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../../auth/controllers/auth_controller.dart';
+import '../../auth/domain/services/auth_service.dart';
+import '../../profile/domain/usecases/get_profile_usecase.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../auth/domain/models/user_model.dart';
 
 class MatrimonyController extends GetxController {
   final SaveMatrimonyProfileUseCase _saveMatrimonyProfileUseCase;
   final GetMatrimonyProfileUseCase _getMatrimonyProfileUseCase;
   final GetMatrimonyProfileDetailsUseCase _getMatrimonyProfileDetailsUseCase;
   final SearchMatrimonyProfilesUseCase _searchMatrimonyProfilesUseCase;
+  final GetProfileUseCase _getProfileUseCase;
 
   MatrimonyController({
     SaveMatrimonyProfileUseCase? saveMatrimonyProfileUseCase,
     GetMatrimonyProfileUseCase? getMatrimonyProfileUseCase,
     GetMatrimonyProfileDetailsUseCase? getMatrimonyProfileDetailsUseCase,
     SearchMatrimonyProfilesUseCase? searchMatrimonyProfilesUseCase,
+    GetProfileUseCase? getProfileUseCase,
   })  : _saveMatrimonyProfileUseCase = saveMatrimonyProfileUseCase ?? Get.find<SaveMatrimonyProfileUseCase>(),
         _getMatrimonyProfileUseCase = getMatrimonyProfileUseCase ?? Get.find<GetMatrimonyProfileUseCase>(),
         _getMatrimonyProfileDetailsUseCase = getMatrimonyProfileDetailsUseCase ?? Get.find<GetMatrimonyProfileDetailsUseCase>(),
-        _searchMatrimonyProfilesUseCase = searchMatrimonyProfilesUseCase ?? Get.find<SearchMatrimonyProfilesUseCase>();
+        _searchMatrimonyProfilesUseCase = searchMatrimonyProfilesUseCase ?? Get.find<SearchMatrimonyProfilesUseCase>(),
+        _getProfileUseCase = getProfileUseCase ?? Get.find<GetProfileUseCase>();
 
 
 
@@ -101,40 +107,48 @@ class MatrimonyController extends GetxController {
     }
   }
 
+  Future<void> refreshRegistrationStatusFromServer() async {
+    try {
+      final authController = Get.find<AuthController>();
+      final userId = authController.currentUser.value?.id;
+      print('refreshRegistrationStatusFromServer: [START] Syncing status for userId=$userId');
+
+      if (Get.isRegistered<ProfileController>()) {
+        final profileController = Get.find<ProfileController>();
+        await profileController.refreshProfile();
+        print('refreshRegistrationStatusFromServer: [SUCCESS] Profile refreshed via ProfileController');
+      } else {
+        print('refreshRegistrationStatusFromServer: [WARNING] ProfileController not found, using existing Auth state');
+      }
+      
+      checkRegistrationStatus();
+    } catch (e) {
+      print('refreshRegistrationStatusFromServer: [ERROR] $e');
+      checkRegistrationStatus();
+    }
+  }
+
   void checkRegistrationStatus() {
     final authController = Get.find<AuthController>();
     final user = authController.currentUser.value;
     
     if (user == null) {
-      print('checkRegistrationStatus: user is null');
+      print('checkRegistrationStatus: [FAILURE] No user found in AuthController');
       isRegistered.value = false;
       return;
     }
     
-    final hasPlan = user.planId != null;
     final isMatrimonyRegistered = user.isMatrimony;
+    print('checkRegistrationStatus: [DASHBOARD] userId=${user.id}, isMatrimony=$isMatrimonyRegistered');
+    print('checkRegistrationStatus: [RAW_USER] ${user.toJsonString()}');
     
-    // Store user data in SharedPreferences
-    SharedPrefs.setInt('user_id', user.id);
-    SharedPrefs.setString('user_name', user.name);
-    SharedPrefs.setString('user_mobile', user.mobile);
-    SharedPrefs.setBool('profile_completed', user.profileCompleted);
-    SharedPrefs.setBool('is_matrimony', user.isMatrimony);
-    if (user.planId != null) {
-      SharedPrefs.setInt('plan_id', user.planId!);
-    }
-    if (user.planStartedAt != null) {
-      SharedPrefs.setString('plan_started_at', user.planStartedAt!);
-    }
-    if (user.planExpiresAt != null) {
-      SharedPrefs.setString('plan_expires_at', user.planExpiresAt!);
-    }
+    // Set isRegistered based on isMatrimony flag from user profile
+    isRegistered.value = isMatrimonyRegistered;
+    isRegistered.refresh();
     
-    print("checkRegistrationStatus: planId=${user.planId}, isMatrimony=$isMatrimonyRegistered, hasPlan=$hasPlan");
-    print("SharedPrefs is_matrimony: ${SharedPrefs.getBool('is_matrimony')}");
-    
-    // Set isRegistered to true only if both plan is purchased and matrimony is registered
-    isRegistered.value = hasPlan && isMatrimonyRegistered;
+    // Ensure persistence is updated
+    SharedPrefs.setBool('isMatrimony', isMatrimonyRegistered);
+    if (user.planId != null) SharedPrefs.setInt('plan_id', user.planId!);
   }
 
 
@@ -143,11 +157,31 @@ class MatrimonyController extends GetxController {
       isLoading.value = true;
       final response = await _saveMatrimonyProfileUseCase.execute(profile, photo);
       if (response.isSuccess) {
-        // Refresh profile to get updated user data
-        final profileController = Get.find<ProfileController>();
-        await profileController.refreshProfile();
+        final authController = Get.find<AuthController>();
+        final currentUser = authController.currentUser.value;
         
-        // Re-check registration status with updated data
+        if (currentUser != null) {
+          // 1. Fetch latest profile from server
+          final updatedUserFromServer = await _getProfileUseCase.execute(currentUser.id);
+          
+          if (updatedUserFromServer != null) {
+            // 2. Update local state and persistence
+            authController.currentUser.value = updatedUserFromServer;
+            await Get.find<AuthService>().saveUserInfo(updatedUserFromServer);
+            
+            // 3. Double check and sync with ProfileController if registered
+            if (Get.isRegistered<ProfileController>()) {
+              await Get.find<ProfileController>().refreshProfile();
+            }
+          } else {
+            // Fallback if profile fetch fails
+            final localUpdate = currentUser.copyWith(isMatrimony: true);
+            authController.currentUser.value = localUpdate;
+            await Get.find<AuthService>().saveUserInfo(localUpdate);
+          }
+        }
+        
+        // Final sync of the registration flag
         checkRegistrationStatus();
         
         CustomSnackbar.showSuccess(response.message ?? 'Profile saved successfully');
@@ -256,21 +290,8 @@ class MatrimonyController extends GetxController {
 
 
   void setRegistered(bool value) {
-    final authController = Get.find<AuthController>();
-    final user = authController.currentUser.value;
-    
-    if (user == null) {
-      print('setRegistered: user is null');
-      isRegistered.value = false;
-      return;
-    }
-    
-    final hasPlan = user.planId != null;
-    final isMatrimonyRegistered = user.isMatrimony ?? false;
-    
-    print('setRegistered: planId=${user.planId}, isMatrimony=$isMatrimonyRegistered, hasPlan=$hasPlan');
-    
-    // Only set to true if both plan is purchased and matrimony is registered
-    isRegistered.value = hasPlan && isMatrimonyRegistered;
+    print('setRegistered: setting isRegistered to $value');
+    isRegistered.value = value;
+    isRegistered.refresh();
   }
 }

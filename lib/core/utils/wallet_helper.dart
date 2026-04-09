@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_text.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../features/wallet/screens/wallet_screen.dart';
+import '../../features/wallet/widgets/recharge_bottom_sheet.dart';
 
 class WalletHelper {
   static void checkBalanceAndProceed({
@@ -20,6 +21,19 @@ class WalletHelper {
     final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
     final double requiredAmount = double.tryParse(price) ?? 0.0;
     final bool hasSufficientBalance = walletBalance >= requiredAmount;
+
+    if (!hasSufficientBalance) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => RechargeBottomSheet(
+          neededAmount: requiredAmount,
+          serviceType: type,
+        ),
+      );
+      return;
+    }
 
     showModalBottomSheet(
       context: context,
@@ -41,8 +55,6 @@ class WalletHelper {
                 ),
               ),
               const SizedBox(height: 20),
-
-
               
               // Balance Info
               Container(
@@ -86,70 +98,39 @@ class WalletHelper {
               
               const SizedBox(height: 24),
               
-              if (!hasSufficientBalance) ...[
-                const Icon(Icons.info_outline_rounded, color: Colors.orange, size: 32),
-                const SizedBox(height: 8),
-                AppText(
-                  "Insufficient Balance",
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+              const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 32),
+              const SizedBox(height: 8),
+              AppText(
+                "Ready to Connect",
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
+              const SizedBox(height: 8),
+              AppText(
+                "You have sufficient balance to start the $type.",
+                fontSize: 14,
+                color: Colors.grey.shade600,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: CustomButton(
+                  text: "Start ${type.capitalizeFirst}",
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                  onTap: () {
+                    Get.back();
+                    if (type == 'chat') {
+                      Get.to(() => ChatScreen(astrologerName: name, astrologerImage: imageUrl));
+                    } else {
+                      Get.to(() => CallScreen(astrologerName: name, astrologerImage: imageUrl));
+                    }
+                  },
                 ),
-                const SizedBox(height: 8),
-                 AppText(
-                  "You need at least ₹$price to start a $type with $name.",
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: CustomButton(
-                    text: "Add Amount",
-                    backgroundColor: AppColors.deepPink,
-                    textColor: Colors.white,
-                    onTap: () {
-                      Get.back();
-                      Get.to(() => const WalletScreen());
-                    },
-                  ),
-                ),
-              ] else ...[
-                 const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 32),
-                const SizedBox(height: 8),
-                AppText(
-                  "Ready to Connect",
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                ),
-                 const SizedBox(height: 8),
-                 AppText(
-                  "You have sufficient balance to start the $type.",
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  textAlign: TextAlign.center,
-                ),
-                 const SizedBox(height: 24),
-                 SizedBox(
-                  width: double.infinity,
-                  child: CustomButton(
-                    text: "Start ${type.capitalizeFirst}",
-                    backgroundColor: Colors.green,
-                    textColor: Colors.white,
-                    onTap: () {
-                      Get.back();
-                      if (type == 'chat') {
-                         Get.to(() => ChatScreen(astrologerName: name, astrologerImage: imageUrl));
-                      } else {
-                         Get.to(() => CallScreen(astrologerName: name, astrologerImage: imageUrl));
-                      }
-                    },
-                  ),
-                ),
-              ],
-               const SizedBox(height: 16),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         );

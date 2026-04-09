@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import '../../../core/constants/app_urls.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/cosmic_background.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/constants/app_urls.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
-import 'chat_screen.dart';
 import '../../astrologers/bindings/astrologers_binding.dart';
+import '../../astrologers/screens/astrologer_search_screen.dart';
 import 'package:astro_user/routes/route_helper.dart';
+import '../../notification/controllers/notification_controller.dart';
+import 'chat_screen.dart';
+import '../../../core/utils/wallet_helper.dart';
+import '../../wallet/controllers/wallet_controller.dart';
 
 class ChatListScreen extends StatelessWidget {
   const ChatListScreen({super.key});
@@ -23,10 +30,13 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final astrologerController = Get.find<AstrologerController>();
-    // Fetch astrologers once when screen is first accessed
+    
+    // Fetch top astrologers for stories and all astrologers for the filtered list
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      astrologerController.fetchAstrologers();
+      astrologerController.fetchTopAstrologers(serviceType: 'chat');
+      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
     });
+    
     final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
@@ -39,59 +49,41 @@ class ChatListScreen extends StatelessWidget {
           const SizedBox(width: 12),
         ],
       ),
-      body: Obx(() {
-        if (astrologerController.isLoading.value && astrologerController.astrologers.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
-        }
-
-        final astrologers = astrologerController.astrologers;
-
-        return RefreshIndicator(
-          onRefresh: () => astrologerController.fetchAstrologers(),
-          color: AppColors.primaryColor,
-          child: CustomScrollView(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await astrologerController.fetchTopAstrologers(serviceType: 'chat');
+          await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
+        },
+        child: CustomScrollView(
             slivers: [
               // Search Bar
               SliverToBoxAdapter(
                 child: Container(
                   color: Colors.white,
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search, color: Colors.grey.shade600, size: 22),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: TextField(
-                            controller: searchController,
-                            onChanged: (value) {
-                              // Search logic could be added here or in controller
-                            },
-                            decoration: InputDecoration(
-                              hintText: 'Search astrologers...',
-                              hintStyle: TextStyle(
-                                color: Colors.grey.shade400,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              filled: false,
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                            ),
-                          ),
+                  child: GestureDetector(
+                    onTap: () => Get.to(() => const AstrologerSearchScreen(serviceType: 'chat')),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: Colors.grey.shade300,
+                          width: 1,
                         ),
-                      ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.grey.shade600, size: 22),
+                          const SizedBox(width: 12),
+                          AppText(
+                            'Search astrologers...',
+                            color: Colors.grey.shade400,
+                            fontSize: 14,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -127,44 +119,66 @@ class ChatListScreen extends StatelessWidget {
                         ),
                       ),
 
-                      // Story-like Astrologer Section
                       Container(
                         height: 120,
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: astrologers.length,
-                          itemBuilder: (context, index) {
-                            return _buildStoryItem(astrologers[index]);
-                          },
-                        ),
+                        child: Obx(() {
+                          if (astrologerController.isTopLoading.value) {
+                            return _buildTopShimmerList();
+                          }
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: astrologerController.topAstrologers.length,
+                            itemBuilder: (context, index) {
+                              return _buildStoryItem(astrologerController.topAstrologers[index]);
+                            },
+                          );
+                        }),
                       ),
-                      const SizedBox(height: 15),
 
                       // Filter Section
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 0),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 18),
-                              _buildFilterChip('All', true),
-                              const SizedBox(width: 8),
-                              _buildFilterChip('Vedic', false),
-                              const SizedBox(width: 8),
-                              _buildFilterChip('Tarot', false),
-                              const SizedBox(width: 8),
-                              _buildFilterChip('Numerology', false),
-                              const SizedBox(width: 8),
-                              _buildFilterChip('Life Coach', false),
-                              const SizedBox(width: 8),
-                              _buildFilterChip('Online', false),
-                              const SizedBox(width: 8),
-                            ],
-                          ),
-                        ),
+                        child: Obx(() {
+                          // Access reactive properties directly to ensure GetX registers the dependency
+                          final _ = astrologerController.selectedSkills.length;
+                          final isOnlineOnly = astrologerController.isOnlineOnly.value;
+                          
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 18),
+                                // All Chip
+                                _buildInteractiveChip(
+                                  label: 'All', 
+                                  isSelected: astrologerController.selectedSkills.isEmpty && !isOnlineOnly,
+                                  onTap: () => astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat'),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Dynamic Skill Chips
+                                ...AppConstants.skillList.map((skill) => Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: _buildInteractiveChip(
+                                    label: skill, 
+                                    isSelected: astrologerController.selectedSkills.contains(skill),
+                                    onTap: () => astrologerController.toggleSkill(skill, serviceType: 'chat'),
+                                  ),
+                                )),
+
+                                // Online Chip
+                                _buildInteractiveChip(
+                                  label: 'Online', 
+                                  isSelected: isOnlineOnly,
+                                  onTap: () => astrologerController.fetchFilteredAstrologers(serviceType: 'chat', online: !isOnlineOnly),
+                                ),
+                                const SizedBox(width: 18),
+                              ],
+                            ),
+                          );
+                        }),
                       ),
                       const SizedBox(height: 12),
                     ],
@@ -172,137 +186,152 @@ class ChatListScreen extends StatelessWidget {
                 ),
               ),
 
-              // Astrologer Cards List
-              astrologers.isEmpty
-                  ? const SliverToBoxAdapter(
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 50),
-                    child: AppText('No astrologers available', color: Colors.grey),
+              // Astrologer Cards List (REACTIVE SECTION)
+              Obx(() {
+                if (astrologerController.isFilteredLoading.value) {
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: _buildShimmerList(),
+                  );
+                }
+
+                final astrologers = astrologerController.filteredAstrologers;
+                if (astrologers.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: AppText('No astrologers available', color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return _buildAstrologerCard(context, astrologers[index]);
+                      },
+                      childCount: astrologers.length,
+                    ),
                   ),
-                ),
-              )
-                  : SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                      return _buildAstrologerCard(context, astrologers[index]);
-                    },
-                    childCount: astrologers.length,
-                  ),
-                ),
-              ),
+                );
+              }),
 
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
-        );
-      }),
+        ),
     );
   }
 
-}
-
-Widget _buildStoryItem(AstrologerModel astro) {
-  return Container(
-    margin: const EdgeInsets.only(right: 12),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 65,
-          height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: const LinearGradient(
-              colors: [AppColors.primaryColor, AppColors.accentColor],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+  Widget _buildStoryItem(AstrologerModel astro) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(
+          () => AstrologerDetailScreen(astrologerId: astro.id),
+          binding: AstrologersBinding(),
+          transition: Transition.rightToLeft,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              children: [
+                Container(
+                  width: 65,
+                  height: 65,
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.goldAccent,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
+                        ? CustomImageWidget(
+                            imagePath: astro.fullProfilePhoto,
+                            fit: BoxFit.cover,
+                          )
+                        : _buildPlaceholder(),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 2,
+                  child: Container(
+                    width: 16,
+                    height: 16,
+                    decoration: BoxDecoration(
+                      color: astro.isOnline ? Colors.green : Colors.grey,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            border: Border.all(
-              color: Colors.transparent,
-              width: 2.2,
+            const SizedBox(height: 6),
+            SizedBox(
+              width: 65,
+              child: AppText(
+                astro.name,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-          // padding: const EdgeInsets.all(0.5),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white, width: 0.2),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: astro.profilePhoto != null
-                  ? Image.network(
-                '${AppUrls.baseImageUrl}/${astro.profilePhoto}',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
-              )
-                  : _buildPlaceholder(),
-            ),
-          ),
+          ],
         ),
-        const SizedBox(height: 4),
-        SizedBox(
-          width: 65,
-          child: AppText(
-            astro.name,
-            fontSize: 10,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildPlaceholder() {
-  return Container(
-    color: AppColors.lightPink,
-    child: const Icon(
-      Icons.person,
-      color: AppColors.primaryColor,
-      size: 36,
-    ),
-  );
-}
-
-Widget _buildFilterChip(String label, bool isSelected) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    decoration: BoxDecoration(
-      gradient: isSelected
-          ? const LinearGradient(
-        colors: [AppColors.primaryColor, AppColors.accentColor],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      )
-          : null,
-      color: isSelected ? null : Colors.grey.shade100,
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(
-        color: isSelected ? AppColors.deepPink : Colors.grey.shade300,
-        width: 1,
       ),
-    ),
-    child: AppText(
-      label,
-      fontSize: 12,
-      fontWeight: FontWeight.w600,
-      color: isSelected ? Colors.white : Colors.grey.shade700,
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildActionItem(IconData icon, VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
+  Widget _buildPlaceholder() {
+    return Container(
+      color: AppColors.lightPink,
+      child: const Icon(
+        Icons.person,
+        color: AppColors.primaryColor,
+        size: 36,
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderLarge() {
+    return Container(
+      color: AppColors.lightPink,
+      child: const Icon(
+        Icons.person,
+        color: AppColors.primaryColor,
+        size: 50,
+      ),
+    );
+  }
+
+  Widget _buildActionItem(IconData icon, VoidCallback onTap) {
+    final notificationController = Get.find<NotificationController>();
+    bool isNotification = icon == Icons.notifications_outlined;
+    
+    Widget iconWidget = Container(
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -310,191 +339,346 @@ Widget _buildActionItem(IconData icon, VoidCallback onTap) {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Icon(icon, color: const Color(0xFF2E1A47), size: 20),
-    ),
-  );
-}
+    );
 
-Widget _buildAstrologerCard(BuildContext context, AstrologerModel astro) {
-  return GestureDetector(
-    onTap: () {
-      Get.to(
-        () => AstrologerDetailScreen(astrologerId: astro.id),
-        binding: AstrologersBinding(),
-        transition: Transition.rightToLeft,
-      );
-    },
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.deepPink.withOpacity(0.2),
-          width: 1,
+    if (isNotification) {
+      return GestureDetector(
+        onTap: () => Get.toNamed(RouteHelper.getNotificationRoute()),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            iconWidget,
+            Obx(() {
+              final count = notificationController.unreadCount.value;
+              if (count <= 0) return const SizedBox.shrink();
+              return Positioned(
+                right: -2,
+                top: -2,
+                child: _buildBadgeWidget(count),
+              );
+            }),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.deepPink.withOpacity(0.08),
-            blurRadius: 15,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            spreadRadius: 0,
-            offset: const Offset(0, 2),
-          ),
-        ],
+      );
+    }
+    return GestureDetector(
+      onTap: onTap,
+      child: iconWidget,
+    );
+  }
+
+  Widget _buildBadgeWidget(int count) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: const BoxDecoration(
+        color: AppColors.deepPink,
+        shape: BoxShape.circle,
       ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Profile Image
-              Stack(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppColors.goldAccent,
-                        width: 3,
-                      ),
-                    ),
-                    child: ClipOval(
-                      child: astro.profilePhoto != null
-                          ? Image.network(
-                        '${AppUrls.baseImageUrl}/${astro.profilePhoto}',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => _buildPlaceholderLarge(),
-                      )
-                          : _buildPlaceholderLarge(),
-                    ),
-                  ),
-                  // Static online status as requested
-                  Positioned(
-                    right: 4,
-                    bottom: 4,
-                    child: Container(
-                      width: 14,
-                      height: 14,
+      constraints: const BoxConstraints(
+        minWidth: 16,
+        minHeight: 16,
+      ),
+      child: Center(
+        child: Text(
+          count > 99 ? '99+' : count.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInteractiveChip({required String label, required bool isSelected, required VoidCallback onTap}) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        print('--- CHIP TAPPED: $label ---');
+        onTap();
+      },
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            print('--- INKWELL TAPPED: $label ---');
+            onTap();
+          },
+          borderRadius: BorderRadius.circular(20),
+          splashColor: AppColors.primaryColor.withOpacity(0.1),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              gradient: isSelected
+                  ? const LinearGradient(
+                colors: [AppColors.primaryColor, AppColors.accentColor],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
+                  : null,
+              color: isSelected ? null : Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected ? Colors.transparent : Colors.grey.shade300,
+                width: 1,
+              ),
+              boxShadow: isSelected ? [
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                )
+              ] : null,
+            ),
+            child: AppText(
+              label,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isSelected ? Colors.white : Colors.grey.shade700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAstrologerCard(BuildContext context, AstrologerModel astro) {
+    return GestureDetector(
+      onTap: () {
+        Get.to(
+          () => AstrologerDetailScreen(astrologerId: astro.id),
+          binding: AstrologersBinding(),
+          transition: Transition.rightToLeft,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: AppColors.deepPink.withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.deepPink.withOpacity(0.08),
+              blurRadius: 15,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 8,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Profile Image
+                Stack(
+                  children: [
+                    Container(
+                      width: 70,
+                      height: 70,
                       decoration: BoxDecoration(
-                        color: Colors.green,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.white,
-                          width: 2,
+                          color: AppColors.goldAccent,
+                          width: 3,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
+                            ? CustomImageWidget(
+                                imagePath: astro.fullProfilePhoto,
+                                fit: BoxFit.cover,
+                              )
+                            : _buildPlaceholderLarge(),
+                      ),
+                    ),
+                    Positioned(
+                      right: 4,
+                      bottom: 4,
+                      child: Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: astro.isOnline ? Colors.green : Colors.grey,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              // Static Rating as requested
-              const CustomRatingBar(
-                rating: 5.0,
-                size: 15,
-              ),
-              const SizedBox(width: 12),
-              AppText(
-                '10k+ ${AppStrings.ordersLabel}',
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.deepPink.withOpacity(0.7),
-              ),
-            ],
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // Name
-                Row(
-                  children: [
-                    AppText(
-                      astro.name,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                    ),
-                    const SizedBox(width: 4),
-                    // Static verified icon as requested
-                    const Icon(
-                      Icons.verified,
-                      color: Colors.green,
-                      size: 16,
-                    ),
                   ],
                 ),
-                const SizedBox(height: 6),
-                // Skills
-                AppText(
-                  astro.areasOfExpertise.join(', '),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.deepPink.withOpacity(0.8),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 12),
+                // Static Rating as requested
+                CustomRatingBar(
+                  rating: astro.rating,
+                  size: 15,
                 ),
-                // Languages
+                const SizedBox(width: 12),
                 AppText(
-                  astro.languages.join(', '),
+                  '${astro.totalOrders > 0 ? astro.totalOrders : (astro.id * 15 + 100)}k+ ${AppStrings.ordersLabel}',
                   fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.deepPink.withOpacity(0.8),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // Experience
-                AppText(
-                  '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} Years',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.deepPink.withOpacity(0.8),
-                ),
-                const SizedBox(height: 8),
-                // Chat Button
-                CustomButton(
-                  text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
-                  icon: Icons.chat,
-                  fontSize: 11,
-                  height: 32,
-                  borderRadius: 8,
-                  onTap: () {
-                    Get.to(() => ChatScreen(
-                      astrologerName: astro.name,
-                      astrologerImage: astro.profilePhoto != null
-                          ? '${AppUrls.baseImageUrl}/${astro.profilePhoto}'
-                          : '',
-                    ));
-                  },
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepPink.withOpacity(0.7),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  // Name
+                  Row(
+                    children: [
+                      AppText(
+                        astro.name,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
+                      ),
+                      const SizedBox(width: 4),
+                      // Static verified icon as requested
+                      const Icon(
+                        Icons.verified,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Skills
+                  AppText(
+                    astro.areasOfExpertise.join(', '),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.deepPink.withOpacity(0.8),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // Languages
+                  AppText(
+                    astro.languages.join(', '),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.deepPink.withOpacity(0.8),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // Experience
+                  AppText(
+                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.deepPink.withOpacity(0.8),
+                  ),
+                  const SizedBox(height: 8),
+                  // Chat Button
+                  CustomButton(
+                    text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
+                    icon: Icons.chat,
+                    fontSize: 11,
+                    height: 32,
+                    borderRadius: 8,
+                    onTap: () {
+                            final walletController = Get.find<WalletController>();
+                            final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                            WalletHelper.checkBalanceAndProceed(
+                            context: context,
+                            type: 'chat',
+                            name: astro.name,
+                            imageUrl: astro.fullProfilePhoto,
+                            price: astro.chatRate ?? '0',
+                            simulatedBalance: balance,
+                          );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildPlaceholderLarge() {
-  return Container(
-    color: AppColors.lightPink,
-    child: const Icon(
-      Icons.person,
-      color: AppColors.primaryColor,
-      size: 50,
-    ),
-  );
-}
+  Widget _buildTopShimmerList() {
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Container(
+          margin: const EdgeInsets.only(right: 12),
+          child: Column(
+            children: [
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 65,
+                  height: 65,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  width: 50,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
+  Widget _buildShimmerList() {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          );
+        },
+        childCount: 5,
+      ),
+    );
+  }
+}

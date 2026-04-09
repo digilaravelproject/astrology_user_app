@@ -7,8 +7,8 @@ class AstrologerRepository {
 
   AstrologerRepository({required this.apiClient});
 
-  Future<ResponseModel> getAstrologers() async {
-    return await apiClient.get(AppUrls.astrologers);
+  Future<ResponseModel> getAstrologers({Map<String, dynamic>? queryParameters}) async {
+    return await apiClient.get(AppUrls.astrologers, queryParameters: queryParameters);
   }
 
   Future<ResponseModel> getAstrologerById(int id) async {

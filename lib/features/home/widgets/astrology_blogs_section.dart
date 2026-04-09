@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
+import '../../../../core/widgets/custom_image_widget.dart';
+import '../../../../core/constants/app_urls.dart';
 import '../screens/blog_detail_screen.dart';
 import '../controllers/blog_controller.dart';
 import '../domain/models/blog_model.dart';
@@ -50,8 +53,8 @@ class AstrologyBlogsSection extends StatelessWidget {
         // Blog Grid - Horizontal Scroll with 2 Rows
         Obx(() {
           if (blogController.isLoading.value) {
-            return const SizedBox(
-              height: 300,
+            return SizedBox(
+              height: 360,
               child: Center(
                 child: CircularProgressIndicator(
                   color: AppColors.deepPink,
@@ -63,7 +66,7 @@ class AstrologyBlogsSection extends StatelessWidget {
 
           if (blogController.blogs.isEmpty) {
             return const SizedBox(
-              height: 300,
+              height: 360,
               child: Center(
                 child: AppText(
                   'No blogs available',
@@ -75,7 +78,7 @@ class AstrologyBlogsSection extends StatelessWidget {
           }
 
           final bool isSingleItem = blogController.blogs.length == 1;
-          final double dynamicHeight = isSingleItem ? 160 : 300;
+          final double dynamicHeight = isSingleItem ? 180 : 360;
 
           return SizedBox(
             height: dynamicHeight,
@@ -86,23 +89,25 @@ class AstrologyBlogsSection extends StatelessWidget {
                 crossAxisCount: isSingleItem ? 1 : 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: isSingleItem ? 0.65 : 0.75,
+                childAspectRatio: isSingleItem ? 0.6 : 0.58,
               ),
               itemCount: blogController.blogs.length,
               itemBuilder: (context, index) {
                 final blog = blogController.blogs[index];
                 final color = _blogColors[index % _blogColors.length];
-                final icon = blogController.getBlogImage(index);
+                final imageUrl = blog.blogImage != null && blog.blogImage!.isNotEmpty
+                    ? "${AppUrls.baseImageUrl}${blog.blogImage}"
+                    : "";
                 
                 return GestureDetector(
                   onTap: () {
                     Get.to(() => BlogDetailScreen(
                       blogId: blog.id,
                       blogColor: color,
-                      icon: icon,
+                      imageUrl: imageUrl,
                     ));
                   },
-                  child: _buildBlogCard(blog, color, icon),
+                  child: _buildBlogCard(blog, color, imageUrl),
                 );
               },
             ),
@@ -112,7 +117,9 @@ class AstrologyBlogsSection extends StatelessWidget {
     );
   }
 
-  Widget _buildBlogCard(BlogModel blog, Color color, String icon) {
+  Widget _buildBlogCard(BlogModel blog, Color color, String imageUrl) {
+    String formattedDate = DateFormat('MMM dd, yyyy').format(blog.createdAt);
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -137,68 +144,96 @@ class AstrologyBlogsSection extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
                   child: Hero(
-                    tag: 'blog_icon_${blog.id}',
-                    child: Image.network(
-                      icon,
-                      width: 24,
-                      height: 24,
-                      color: color,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.article_rounded,
-                          color: color,
-                          size: 22,
-                        );
-                      },
+                    tag: 'blog_image_${blog.id}',
+                    child: CustomImageWidget(
+                      imagePath: imageUrl,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 
-                const SizedBox(width: 10),
+                const SizedBox(width: 15),
                 
                 Expanded(
-                  child: AppText(
-                    blog.title,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF2E1A47),
-                    height: 1.2,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (blog.type != null && blog.type!.isNotEmpty)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: AppText(
+                            blog.type!.toUpperCase(),
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      AppText(
+                        blog.title,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF2E1A47),
+                        height: 1.2,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            Expanded(
-              child: AppText(
+            if (blog.subtitle.isNotEmpty)
+              AppText(
                 blog.subtitle,
                 fontSize: 10,
-                fontWeight: FontWeight.w400,
-                color: Colors.black54,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
                 height: 1.4,
-                maxLines: 3,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-              ),
-            ),
+              )
+            else
+              const Spacer(),
             
-            const SizedBox(height: 4),
+            const Spacer(),
+            
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 16,
-                  color: color.withOpacity(0.6),
+                Row(
+                  children: [
+                    Icon(Icons.person_outline_rounded, size: 12, color: Colors.grey.shade500),
+                    const SizedBox(width: 4),
+                    SizedBox(
+                      width: 60,
+                      child: AppText(
+                        blog.author,
+                        fontSize: 9,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                AppText(
+                  formattedDate,
+                  fontSize: 9,
+                  color: Colors.grey.shade400,
                 ),
               ],
             ),

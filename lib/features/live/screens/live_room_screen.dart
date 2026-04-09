@@ -1,17 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../astrologers/controllers/astrologer_controller.dart';
+import '../../astrologers/domain/models/gift_model.dart' as model;
 
 class LiveRoomScreen extends StatefulWidget {
+  final int astrologerId;
   final String astrologerName;
   final String astrologerImage;
 
   const LiveRoomScreen({
     super.key,
+    this.astrologerId = 1,
     this.astrologerName = "Lord Busuz",
     this.astrologerImage = "https://randomuser.me/api/portraits/men/32.jpg",
   });
@@ -21,6 +26,7 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
+  final AstrologerController _controller = Get.find<AstrologerController>();
   final List<ChatMessage> _messages = [
     ChatMessage(name: "Andrew Phipps", message: "Hi, best games ⭐", avatar: "https://randomuser.me/api/portraits/men/1.jpg"),
     ChatMessage(name: "Joshua Chen", message: "Well played, Lord! You're Master 🫡", avatar: "https://randomuser.me/api/portraits/men/2.jpg"),
@@ -31,18 +37,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   final List<Widget> _reactions = [];
   final TextEditingController _commentController = TextEditingController();
 
-  final List<GiftModel> _gifts = [
-    GiftModel(name: AppStrings.giftRose, icon: "🌹", price: 10),
-    GiftModel(name: AppStrings.giftChocolate, icon: "🍫", price: 50),
-    GiftModel(name: AppStrings.giftDiamond, icon: "💎", price: 100),
-    GiftModel(name: AppStrings.giftStar, icon: "⭐", price: 200),
-    GiftModel(name: AppStrings.giftHeart, icon: "❤️", price: 30),
-    GiftModel(name: AppStrings.giftCrown, icon: "👑", price: 500),
-    GiftModel(name: AppStrings.giftClap, icon: "👏", price: 5),
-    GiftModel(name: AppStrings.giftCandy, icon: "🍬", price: 15),
-  ];
-
-  GiftModel? _selectedGift;
+  model.GiftModel? _selectedGift;
 
   void _showGiftSheet() {
     showModalBottomSheet(
@@ -102,60 +97,76 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
                   Expanded(
-                    child: GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: _gifts.length,
-                      itemBuilder: (context, index) {
-                        final gift = _gifts[index];
-                        final isSelected = _selectedGift == gift;
-                        return GestureDetector(
-                          onTap: () {
-                            setSheetState(() {
-                              _selectedGift = gift;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isSelected ? Colors.orange : Colors.transparent,
-                                width: 1.5,
+                    child: Obx(() {
+                      if (_controller.isGiftsLoading.value) {
+                         return const Center(child: CircularProgressIndicator());
+                      }
+                      if (_controller.gifts.isEmpty) {
+                         return const Center(child: Text("No gifts available", style: TextStyle(color: Colors.white70)));
+                      }
+                      return GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemCount: _controller.gifts.length,
+                        itemBuilder: (context, index) {
+                          final gift = _controller.gifts[index];
+                          final isSelected = _selectedGift == gift;
+                          return GestureDetector(
+                            onTap: () {
+                              setSheetState(() {
+                                _selectedGift = gift;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isSelected ? Colors.white.withOpacity(0.1) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? Colors.orange : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CustomImageWidget(
+                                    imagePath: gift.iconUrl,
+                                    height: 35,
+                                    width: 35,
+                                    fit: BoxFit.contain,
+                                    fallbackWidget: const Icon(Icons.card_giftcard, color: Colors.orange, size: 28),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    gift.title,
+                                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(Icons.monetization_on, color: Colors.orange, size: 10),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        gift.price,
+                                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(gift.icon, style: const TextStyle(fontSize: 28)),
-                                const SizedBox(height: 4),
-                                Text(
-                                  gift.name,
-                                  style: const TextStyle(color: Colors.white70, fontSize: 10),
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.monetization_on, color: Colors.orange, size: 10),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      gift.price.toString(),
-                                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      );
+                    }),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -163,15 +174,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: _selectedGift == null ? null : () {
+                        onPressed: _selectedGift == null ? null : () async {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("${AppStrings.youSentAGift} ${_selectedGift!.name}!"),
-                              backgroundColor: Colors.orange,
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
+                          await _controller.sendGift(_selectedGift!, widget.astrologerId);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
@@ -180,9 +185,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        child: Text(
-                          _selectedGift == null ? AppStrings.selectAGift : "${AppStrings.sendGiftAction} ${_selectedGift!.name}",
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        child: Obx(() => (_controller.sendingGiftId.value != null && _selectedGift != null && _controller.sendingGiftId.value == _selectedGift!.id)
+                          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : Text(
+                              _selectedGift == null ? AppStrings.selectAGift : "${AppStrings.sendGiftAction} ${_selectedGift!.title}",
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
                         ),
                       ),
                     ),
@@ -525,14 +533,6 @@ class ChatMessage {
   final String avatar;
 
   ChatMessage({required this.name, required this.message, required this.avatar});
-}
-
-class GiftModel {
-  final String name;
-  final String icon;
-  final int price;
-
-  GiftModel({required this.name, required this.icon, required this.price});
 }
 
 class FloatingReaction extends StatefulWidget {

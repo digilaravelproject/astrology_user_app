@@ -3,17 +3,13 @@ import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../home/controllers/remedy_controller.dart';
 import '../../home/domain/models/remedy_model.dart';
 
 class RemedyDetailScreen extends StatefulWidget {
-  /// The remedy id to fetch detail for
   final int remedyId;
-
-  /// The accent color cycled from the list screen
   final Color accentColor;
-
-  /// The exact image url shown on the list card
   final String imageUrl;
 
   const RemedyDetailScreen({
@@ -50,22 +46,20 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.accentColor;
-    final imageUrl = widget.imageUrl;  // ← use exactly the same image from the list
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: _remedy?.title ?? 'Remedy Detail',
-        backgroundColor: color.withOpacity(0.05),
+        title: "Remedy Details",
+        backgroundColor: Colors.white,
+        iconColor: Colors.black,
+        elevation: 0.5,
       ),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: color,
-                strokeWidth: 2,
-              ),
-            )
+              color: widget.accentColor,
+              strokeWidth: 2,
+            ))
           : _remedy == null
               ? const Center(
                   child: AppText(
@@ -78,81 +72,35 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── Hero image banner ──────────────────────────────
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 48),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              color.withOpacity(0.08),
-                              Colors.white,
-                            ],
-                          ),
-                        ),
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(28),
-                            decoration: BoxDecoration(
-                              color: color.withOpacity(0.12),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: color.withOpacity(0.15),
-                                  blurRadius: 40,
-                                  offset: const Offset(0, 12),
-                                ),
-                              ],
-                            ),
-                            child: Image.network(
-                              imageUrl,
-                              width: 120,
-                              height: 120,
-                              color: color,
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.auto_fix_high_rounded,
-                                size: 120,
-                                color: color,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 10),
 
-                      // ── Content ──────────────────────────────────────
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
+                        padding: const EdgeInsets.all(24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Title
+                            // Remedy Title
                             AppText(
                               _remedy!.title,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
-                              color: color,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF2E1A47),
+                              height: 1.3,
                             ),
-                            const SizedBox(height: 16),
 
-                            // Description
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: color.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: color.withOpacity(0.15),
-                                ),
-                              ),
-                              child: AppText(
-                                _remedy!.description,
-                                fontSize: 15,
-                                color: Colors.black87,
-                                height: 1.6,
-                              ),
+                            const SizedBox(height: 16),
+                            
+                            const Divider(height: 1),
+                            
+                            const SizedBox(height: 20),
+
+                            // Remedy Description
+                            AppText(
+                              _remedy!.description,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black87,
+                              height: 1.6,
                             ),
 
                             const SizedBox(height: 40),
@@ -161,14 +109,14 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF9F9F9),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Colors.black12),
+                                color: const Color(0xFFF9FAFB),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.black.withOpacity(0.05)),
                               ),
                               child: const Row(
                                 children: [
                                   Icon(Icons.info_outline, color: Colors.blueGrey, size: 20),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: AppText(
                                       'Consult with an expert astrologer for personalized remedies based on your birth chart.',
