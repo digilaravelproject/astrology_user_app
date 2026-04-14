@@ -17,7 +17,15 @@ import '../../profile/controllers/profile_controller.dart';
 
 class MatrimonyRegistrationScreen extends StatefulWidget {
   final VoidCallback onComplete;
-  const MatrimonyRegistrationScreen({super.key, required this.onComplete});
+  final MatrimonyProfileModel? existingProfile; // For edit mode
+  final bool isEditMode;
+  
+  const MatrimonyRegistrationScreen({
+    super.key, 
+    required this.onComplete,
+    this.existingProfile,
+    this.isEditMode = false,
+  });
 
   @override
   State<MatrimonyRegistrationScreen> createState() => _MatrimonyRegistrationScreenState();
@@ -60,6 +68,60 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   bool _isDrivingLicenceSelected = false;
   bool _isAadhaarSelected = false;
   Map<String, String> _errors = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // If editing, populate fields with existing data
+    if (widget.isEditMode && widget.existingProfile != null) {
+      _populateFieldsForEdit(widget.existingProfile!);
+    }
+  }
+
+  void _populateFieldsForEdit(MatrimonyProfileModel profile) {
+    _selectedProfileFor = profile.createdFor;
+    _firstNameController.text = profile.firstName;
+    _lastNameController.text = profile.lastName;
+    _emailController.text = profile.email;
+    _mobileController.text = profile.phone;
+    
+    // Parse date of birth
+    if (profile.dateOfBirth.isNotEmpty) {
+      try {
+        final dob = DateTime.parse(profile.dateOfBirth);
+        _dayController.text = dob.day.toString().padLeft(2, '0');
+        _monthController.text = dob.month.toString().padLeft(2, '0');
+        _yearController.text = dob.year.toString();
+      } catch (e) {
+        print('Error parsing date: $e');
+      }
+    }
+    
+    _selectedGender = profile.gender;
+    _heightController.text = profile.height;
+    _selectedMaritalStatus = profile.maritalStatus;
+    _locationController.text = profile.location;
+    _educationController.text = profile.education;
+    _jobTitleController.text = profile.jobTitle;
+    _incomeController.text = profile.annualIncome;
+    _aboutController.text = profile.about;
+    
+    // Document details
+    if (profile.panCardNumber != null && profile.panCardNumber!.isNotEmpty) {
+      _panController.text = profile.panCardNumber!;
+      _isPanSelected = true;
+    }
+    if (profile.drivingLicenceNumber != null && profile.drivingLicenceNumber!.isNotEmpty) {
+      _drivingLicenceController.text = profile.drivingLicenceNumber!;
+      _isDrivingLicenceSelected = true;
+    }
+    if (profile.aadhaarCardNumber != null && profile.aadhaarCardNumber!.isNotEmpty) {
+      _aadhaarController.text = profile.aadhaarCardNumber!;
+      _isAadhaarSelected = true;
+    }
+    
+    setState(() {});
+  }
 
   final List<String> _profileForOptions = [
     AppStrings.myself, AppStrings.mySon, AppStrings.myDaughter, 
@@ -183,7 +245,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         curve: Curves.easeInOut,
       );
     } else {
-      // Final Submit
+      // Final Submit or Update
       final dob = "${_yearController.text}-${_monthController.text.padLeft(2, '0')}-${_dayController.text.padLeft(2, '0')}";
       
       final profile = MatrimonyProfileModel(
@@ -206,17 +268,26 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         aadhaarCardNumber: _isAadhaarSelected ? _aadhaarController.text : null,
       );
 
-      final success = await _controller.saveProfile(profile, _matrimonyPhoto);
-      if (success) {
-        // Refresh profile if controller exists
-        if (Get.isRegistered<ProfileController>()) {
-          final profileController = Get.find<ProfileController>();
-          await profileController.refreshProfile();
+      bool success;
+      if (widget.isEditMode) {
+        // Update existing profile
+        success = await _controller.updateProfile(profile, _matrimonyPhoto);
+      } else {
+        // Create new profile
+        success = await _controller.saveProfile(profile, _matrimonyPhoto);
+        if (success) {
+          // Refresh profile if controller exists
+          if (Get.isRegistered<ProfileController>()) {
+            final profileController = Get.find<ProfileController>();
+            await profileController.refreshProfile();
+          }
+          
+          // Set isRegistered to true after successful registration
+          _controller.setRegistered(true);
         }
-        
-        // Set isRegistered to true after successful registration
-        _controller.setRegistered(true);
-        
+      }
+      
+      if (success) {
         widget.onComplete();
       }
     }
@@ -668,7 +739,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           Center(child: AppText(AppStrings.photoPrivacyMsg, color: Colors.white54, fontSize: 12)),
           const SizedBox(height: 32),
           CustomButton(
-            text: AppStrings.uploadPhotos,
+            text: widget.isEditMode ? 'Update Profile' : AppStrings.uploadPhotos,
             onTap: _nextStep,
             backgroundColor: const Color(0xFFB01D53),
             textColor: Colors.white,

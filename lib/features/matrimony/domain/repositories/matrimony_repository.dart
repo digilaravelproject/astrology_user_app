@@ -7,8 +7,10 @@ import '../models/matrimony_profile_model.dart';
 
 abstract class MatrimonyRepositoryInterface {
   Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo);
+  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile, XFile? photo);
   Future<ResponseModel> getMatrimonyProfile();
   Future<ResponseModel> getMatrimonyProfileDetails(int id);
+  Future<ResponseModel> getMyMatrimonyProfileDetails(int userId);
   Future<ResponseModel> searchMatrimonyProfiles(String query);
   Future<ResponseModel> blockProfile(int id);
   Future<ResponseModel> reportProfile(int id, String reason);
@@ -33,6 +35,17 @@ class MatrimonyRepository implements MatrimonyRepositoryInterface {
   }
 
   @override
+  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile,
+      XFile? photo) async {
+    return await apiClient.putMultipartData(
+      AppUrls.updateMatrimonyProfile,
+      profile.toFormFields(),
+      [MultipartBody('profile_photo', photo)],
+      [],
+    );
+  }
+
+  @override
   Future<ResponseModel> getMatrimonyProfile() async {
     return await apiClient.get(
       AppUrls.getMatrimonyProfile,
@@ -43,6 +56,13 @@ class MatrimonyRepository implements MatrimonyRepositoryInterface {
   Future<ResponseModel> getMatrimonyProfileDetails(int id) async {
     return await apiClient.get(
       AppUrls.getMatrimonyProfileDetails(id),
+    );
+  }
+
+  @override
+  Future<ResponseModel> getMyMatrimonyProfileDetails(int userId) async {
+    return await apiClient.get(
+      AppUrls.getMyMatrimonyProfileDetails(userId),
     );
   }
 

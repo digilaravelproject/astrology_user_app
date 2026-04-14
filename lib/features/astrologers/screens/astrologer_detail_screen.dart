@@ -159,7 +159,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       Obx(() => _buildReviewsSection()),
                       const SizedBox(height: 16),
                       // Chat with Assistant
-                      _buildChatAssistantSection(),
+                      //_buildChatAssistantSection(),
                       const SizedBox(height: 16),
                       // Send Gift
                       _buildGiftSection(),

@@ -80,9 +80,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  child: Image.network(
-                    'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
-                    fit: BoxFit.cover,
+                  child: Image.asset(
+                    "assets/images/astro.jpg",
+                   // 'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
+                    fit: BoxFit.fill,
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: const Color(0xFF2E1A47),
                     ),

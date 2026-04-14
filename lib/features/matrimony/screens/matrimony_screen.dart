@@ -471,7 +471,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 18),
+                      child: InkWell(
+                        onTap: () {
+                          Get.toNamed(AppRoutes.myMatrimonyProfile);
+                        },
+                        child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 18),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

@@ -23,6 +23,7 @@ import '../features/home/screens/home_screen.dart';
 import '../features/wallet/screens/wallet_screen.dart';
 import '../features/wallet/screens/payment_success_screen.dart';
 import '../features/matrimony/screens/matrimony_screen.dart';
+import '../features/matrimony/screens/my_matrimony_profile_screen.dart';
 import '../features/remedy/screens/remedy_detail_screen.dart';
 import '../features/call/screens/call_list_screen.dart';
 import '../features/chat/screens/chat_list_screen.dart';
@@ -56,6 +57,7 @@ class RouteHelper {
   static String getDashboardRoute() => AppRoutes.dashboard;
   static String getWalletRoute() => AppRoutes.wallet;
   static String getMatrimonyRoute() => AppRoutes.matrimony;
+  static String getMyMatrimonyProfileRoute() => AppRoutes.myMatrimonyProfile;
   static String getRemedyDetailRoute(int id) => '${AppRoutes.remedyDetail}/$id';
   static String getCallListRoute() => AppRoutes.callList;
   static String getChatListRoute() => AppRoutes.chatList;
@@ -151,6 +153,12 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.matrimony,
       page: () => const MatrimonyScreen(),
+      transition: Transition.rightToLeft,
+      binding: MatrimonyBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.myMatrimonyProfile,
+      page: () => const MyMatrimonyProfileScreen(),
       transition: Transition.rightToLeft,
       binding: MatrimonyBinding(),
     ),

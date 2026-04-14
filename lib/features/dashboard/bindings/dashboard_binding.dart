@@ -4,8 +4,10 @@ import '../../matrimony/controllers/matrimony_controller.dart';
 import '../../matrimony/domain/repositories/matrimony_repository.dart';
 import '../../matrimony/domain/services/matrimony_service.dart';
 import '../../matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
+import '../../matrimony/domain/usecases/update_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_details_usecase.dart';
+import '../../matrimony/domain/usecases/get_my_matrimony_profile_details_usecase.dart';
 import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../../matrimony/domain/usecases/block_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/report_matrimony_profile_usecase.dart';
@@ -68,16 +70,20 @@ class DashboardBinding extends Bindings {
     Get.put<MatrimonyRepositoryInterface>(MatrimonyRepository(apiClient: Get.find()));
     Get.put<MatrimonyServiceInterface>(MatrimonyService(repository: Get.find()));
     Get.put(SaveMatrimonyProfileUseCase(service: Get.find()));
+    Get.put(UpdateMatrimonyProfileUseCase(service: Get.find()));
     Get.put(GetMatrimonyProfileUseCase(service: Get.find()));
     Get.put<GetMatrimonyProfileDetailsUseCase>(GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.put<GetMyMatrimonyProfileDetailsUseCase>(GetMyMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
     Get.put<SearchMatrimonyProfilesUseCase>(SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
     Get.put<BlockMatrimonyProfileUseCase>(BlockMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
     Get.put<ReportMatrimonyProfileUseCase>(ReportMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
     Get.put<MatrimonyController>(
       MatrimonyController(
         saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
+        updateMatrimonyProfileUseCase: Get.find<UpdateMatrimonyProfileUseCase>(),
         getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
         getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        getMyMatrimonyProfileDetailsUseCase: Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
         searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
         blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
         reportMatrimonyProfileUseCase: Get.find<ReportMatrimonyProfileUseCase>(),

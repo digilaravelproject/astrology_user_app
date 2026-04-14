@@ -19,8 +19,10 @@ class AppUrls {
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
+  static const String updateMatrimonyProfile = '/api/v1/user/matrimony/profile';
   static const String getMatrimonyProfile = '/api/v1/user/matrimony/profiles';
   static String getMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles/$id';
+  static String getMyMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles_user_id/$id';
   static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
   static String blockMatrimonyProfile(int id) => '$astrologers/$id/block';
   static String reportMatrimonyProfile(int id) => '$astrologers/$id/report';
