@@ -28,5 +28,6 @@ class AppRoutes {
   static const String paymentPolicy = '/payment-policy';
   static const String termsAndConditions = '/terms-and-conditions';
   static const String paymentSuccess = '/payment-success';
+  static const String subscriptionSuccess = '/subscription-success';
   static const String notification = '/notification';
 }

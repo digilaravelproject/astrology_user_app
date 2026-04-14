@@ -11,8 +11,11 @@ import '../domain/usecases/get_following_usecase.dart';
 import '../domain/usecases/get_plans_usecase.dart';
 import '../domain/usecases/upgrade_plan_usecase.dart';
 import '../domain/usecases/verify_upgrade_usecase.dart';
-import '../domain/repositories/plan_repository.dart';
+import '../domain/usecases/submit_feedback_usecase.dart';
+import '../domain/usecases/get_about_us_usecase.dart';
+import '../domain/usecases/get_customer_support_usecase.dart';
 import '../domain/services/plan_service.dart';
+import '../domain/repositories/plan_repository.dart';
 
 class ProfileBinding extends Bindings {
   @override
@@ -29,6 +32,10 @@ class ProfileBinding extends Bindings {
     Get.lazyPut(() => GetPlanByIdUseCase(Get.find<PlanService>()));
     Get.lazyPut(() => UpgradePlanUseCase(Get.find<PlanService>()));
     Get.lazyPut(() => VerifyUpgradeUseCase(Get.find<PlanService>()));
+    Get.lazyPut(() => SubmitFeedbackUseCase(Get.find<ProfileService>()));
+    Get.lazyPut(() => GetAboutUsUseCase(Get.find<ProfileService>()));
+    Get.lazyPut(() => GetCustomerSupportUseCase(Get.find<ProfileService>()));
+    
     Get.lazyPut(() =>
         ProfileController(
           updateProfilePhotoUseCase: Get.find<UpdateProfilePhotoUseCase>(),
@@ -39,7 +46,10 @@ class ProfileBinding extends Bindings {
           getPlanByIdUseCase: Get.find<GetPlanByIdUseCase>(),
           upgradePlanUseCase: Get.find<UpgradePlanUseCase>(),
           verifyUpgradeUseCase: Get.find<VerifyUpgradeUseCase>(),
-        ));
+          submitFeedbackUseCase: Get.find<SubmitFeedbackUseCase>(),
+          getAboutUsUseCase: Get.find<GetAboutUsUseCase>(),
+          getCustomerSupportUseCase: Get.find<GetCustomerSupportUseCase>(),
+        ),
+    );
   }
 }
-

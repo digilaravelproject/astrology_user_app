@@ -10,6 +10,10 @@ import '../domain/services/blog_service.dart';
 import '../domain/usecases/get_blogs_usecase.dart';
 import '../domain/usecases/get_blog_by_id_usecase.dart';
 import '../controllers/blog_controller.dart';
+import '../domain/repositories/founder_repository.dart';
+import '../domain/services/founder_service.dart';
+import '../domain/usecases/get_founder_words_usecase.dart';
+import '../controllers/founder_controller.dart';
 
 class HomeBinding extends Bindings {
   @override
@@ -30,6 +34,14 @@ class HomeBinding extends Bindings {
     Get.lazyPut(() => BlogController(
       getBlogsUseCase: Get.find<GetBlogsUseCase>(),
       getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
+    ));
+
+    // Founder words
+    Get.lazyPut(() => FounderRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => FounderService(Get.find<FounderRepository>()));
+    Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
+    Get.lazyPut(() => FounderController(
+      getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
     ));
   }
 }

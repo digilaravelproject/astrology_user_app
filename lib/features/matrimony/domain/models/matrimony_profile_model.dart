@@ -21,6 +21,7 @@ class MatrimonyProfileModel {
   final String? aadhaarCardNumber;
   final String? updatedAt;
   final String? createdAt;
+  final bool isBlocked;
 
   MatrimonyProfileModel({
     this.id,
@@ -45,6 +46,7 @@ class MatrimonyProfileModel {
     this.aadhaarCardNumber,
     this.updatedAt,
     this.createdAt,
+    this.isBlocked = false,
   });
 
   factory MatrimonyProfileModel.fromJson(Map<String, dynamic> json) {
@@ -71,6 +73,7 @@ class MatrimonyProfileModel {
       aadhaarCardNumber: json['aadhar_card_number'],
       updatedAt: json['updated_at'],
       createdAt: json['created_at'],
+      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
     );
   }
 

@@ -10,6 +10,8 @@ abstract class MatrimonyRepositoryInterface {
   Future<ResponseModel> getMatrimonyProfile();
   Future<ResponseModel> getMatrimonyProfileDetails(int id);
   Future<ResponseModel> searchMatrimonyProfiles(String query);
+  Future<ResponseModel> blockProfile(int id);
+  Future<ResponseModel> reportProfile(int id, String reason);
 }
 
 
@@ -48,6 +50,21 @@ class MatrimonyRepository implements MatrimonyRepositoryInterface {
   Future<ResponseModel> searchMatrimonyProfiles(String query) async {
     return await apiClient.get(
       AppUrls.matrimonySearch(query),
+    );
+  }
+
+  @override
+  Future<ResponseModel> blockProfile(int id) async {
+    return await apiClient.post(
+      AppUrls.blockMatrimonyProfile(id),
+    );
+  }
+
+  @override
+  Future<ResponseModel> reportProfile(int id, String reason) async {
+    return await apiClient.post(
+      AppUrls.reportMatrimonyProfile(id),
+      data: {'reason': reason},
     );
   }
 }

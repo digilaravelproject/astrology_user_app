@@ -320,7 +320,19 @@ class AstrologerController extends GetxController {
   }
 
   Future<ResponseModel> blockAstrologer(int id) async {
-    return await _blockAstrologerUseCase.execute(id);
+    final result = await _blockAstrologerUseCase.execute(id);
+    if (result.isSuccess) {
+      fetchAstrologerById(id);
+    }
+    return result;
+  }
+
+  Future<ResponseModel> unblockAstrologer(int id) async {
+    final result = await _blockAstrologerUseCase.execute(id);
+    if (result.isSuccess) {
+      fetchAstrologerById(id);
+    }
+    return result;
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {

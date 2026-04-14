@@ -8,6 +8,8 @@ abstract class MatrimonyServiceInterface {
   Future<ResponseModel> getMatrimonyProfile();
   Future<ResponseModel> getMatrimonyProfileDetails(int id);
   Future<ResponseModel> searchMatrimonyProfiles(String query);
+  Future<ResponseModel> blockProfile(int id);
+  Future<ResponseModel> reportProfile(int id, String reason);
 }
 
 
@@ -35,6 +37,16 @@ class MatrimonyService implements MatrimonyServiceInterface {
   @override
   Future<ResponseModel> searchMatrimonyProfiles(String query) async {
     return await repository.searchMatrimonyProfiles(query);
+  }
+
+  @override
+  Future<ResponseModel> blockProfile(int id) {
+    return repository.blockProfile(id);
+  }
+
+  @override
+  Future<ResponseModel> reportProfile(int id, String reason) {
+    return repository.reportProfile(id, reason);
   }
 }
 

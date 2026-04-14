@@ -5,6 +5,7 @@ import 'package:astro_user/features/profile/screens/following_screen.dart';
 import 'package:astro_user/features/profile/screens/payment_policy_screen.dart';
 import 'package:astro_user/features/profile/screens/subscription_details_screen.dart';
 import 'package:astro_user/features/profile/screens/subscription_screen.dart';
+import 'package:astro_user/features/profile/screens/subscription_success_screen.dart';
 import 'package:get/get.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/otp_screen.dart';
@@ -187,6 +188,7 @@ class RouteHelper {
         name: AppRoutes.subscriptionDetailScreen,
         page: () => SubscriptionDetailScreen(planId: 0),
         transition: Transition.rightToLeft,
+        binding: ProfileBinding(),
     ),
     GetPage(
       name: AppRoutes.faq,
@@ -215,6 +217,11 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.paymentSuccess,
       page: () => const PaymentSuccessScreen(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.subscriptionSuccess,
+      page: () => const SubscriptionSuccessScreen(),
       transition: Transition.fadeIn,
     ),
   ];

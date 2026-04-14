@@ -74,6 +74,21 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
                     children: [
                       const SizedBox(height: 10),
 
+                      // Image Header
+                      if (widget.imageUrl.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: CustomImageWidget(
+                              imagePath: widget.imageUrl,
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+
                       Padding(
                         padding: const EdgeInsets.all(24),
                         child: Column(

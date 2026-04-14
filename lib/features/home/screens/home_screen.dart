@@ -29,6 +29,7 @@ import '../../wallet/controllers/wallet_controller.dart';
 import '../../notification/controllers/notification_controller.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../profile/bindings/profile_binding.dart';
 import '../widgets/astrologer_filter_bottom_sheet.dart';
 
 
@@ -246,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () => Get.to(() => const ProfileScreen()),
+          onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
             child: Obx(() {
               final user = authController.currentUser.value;
               return Container(

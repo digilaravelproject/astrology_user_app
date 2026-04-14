@@ -7,6 +7,12 @@ import '../../matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
+import '../../matrimony/domain/usecases/block_matrimony_profile_usecase.dart';
+import '../../matrimony/domain/usecases/report_matrimony_profile_usecase.dart';
+import '../../home/controllers/founder_controller.dart';
+import '../../home/domain/repositories/founder_repository.dart';
+import '../../home/domain/services/founder_service.dart';
+import '../../home/domain/usecases/get_founder_words_usecase.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../wallet/domain/repositories/wallet_repository.dart';
 import '../../wallet/domain/services/wallet_service.dart';
@@ -65,12 +71,16 @@ class DashboardBinding extends Bindings {
     Get.put(GetMatrimonyProfileUseCase(service: Get.find()));
     Get.put<GetMatrimonyProfileDetailsUseCase>(GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
     Get.put<SearchMatrimonyProfilesUseCase>(SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.put<BlockMatrimonyProfileUseCase>(BlockMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
+    Get.put<ReportMatrimonyProfileUseCase>(ReportMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
     Get.put<MatrimonyController>(
       MatrimonyController(
         saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
         getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
         getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
         searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
+        blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
+        reportMatrimonyProfileUseCase: Get.find<ReportMatrimonyProfileUseCase>(),
         getProfileUseCase: Get.find<GetProfileUseCase>(),
       ),
     );
@@ -142,6 +152,14 @@ class DashboardBinding extends Bindings {
     // Notifications
     Get.lazyPut(() => NotificationRepository(apiClient: Get.find()));
     Get.put(NotificationController(repository: Get.find()));
+
+    // Founder words
+    Get.lazyPut(() => FounderRepository(Get.find<ApiClient>()));
+    Get.lazyPut(() => FounderService(Get.find<FounderRepository>()));
+    Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
+    Get.lazyPut(() => FounderController(
+      getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
+    ));
   }
 }
 

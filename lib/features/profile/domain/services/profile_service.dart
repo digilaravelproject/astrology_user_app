@@ -22,4 +22,16 @@ class ProfileService {
   Future<ResponseModel> getFollowing() async {
     return await repository.getFollowing();
   }
+
+  Future<ResponseModel> submitFeedback(int rating, String comment) async {
+    return await repository.submitFeedback(rating, comment);
+  }
+
+  Future<ResponseModel> getAboutUs() async {
+    return await repository.getAboutUs();
+  }
+
+  Future<ResponseModel> getCustomerSupport() async {
+    return await repository.getCustomerSupport();
+  }
 }

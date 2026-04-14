@@ -13,6 +13,9 @@ import '../domain/usecases/get_following_usecase.dart';
 import '../domain/usecases/get_plans_usecase.dart';
 import '../domain/usecases/upgrade_plan_usecase.dart';
 import '../domain/usecases/verify_upgrade_usecase.dart';
+import '../domain/usecases/submit_feedback_usecase.dart';
+import '../domain/usecases/get_about_us_usecase.dart';
+import '../domain/usecases/get_customer_support_usecase.dart';
 import '../domain/models/plan_model.dart';
 import '../../../../features/auth/domain/models/user_model.dart';
 
@@ -25,6 +28,9 @@ class ProfileController extends GetxController {
   final GetPlanByIdUseCase _getPlanByIdUseCase;
   final UpgradePlanUseCase _upgradePlanUseCase;
   final VerifyUpgradeUseCase _verifyUpgradeUseCase;
+  final SubmitFeedbackUseCase _submitFeedbackUseCase;
+  final GetAboutUsUseCase _getAboutUsUseCase;
+  final GetCustomerSupportUseCase _getCustomerSupportUseCase;
 
   ProfileController({
     required UpdateProfilePhotoUseCase updateProfilePhotoUseCase,
@@ -35,6 +41,9 @@ class ProfileController extends GetxController {
     required GetPlanByIdUseCase getPlanByIdUseCase,
     required UpgradePlanUseCase upgradePlanUseCase,
     required VerifyUpgradeUseCase verifyUpgradeUseCase,
+    required SubmitFeedbackUseCase submitFeedbackUseCase,
+    required GetAboutUsUseCase getAboutUsUseCase,
+    required GetCustomerSupportUseCase getCustomerSupportUseCase,
   })
       : _updateProfilePhotoUseCase = updateProfilePhotoUseCase,
         _getProfileUseCase = getProfileUseCase,
@@ -43,7 +52,10 @@ class ProfileController extends GetxController {
         _getPlansUseCase = getPlansUseCase,
         _getPlanByIdUseCase = getPlanByIdUseCase,
         _upgradePlanUseCase = upgradePlanUseCase,
-        _verifyUpgradeUseCase = verifyUpgradeUseCase;
+        _verifyUpgradeUseCase = verifyUpgradeUseCase,
+        _submitFeedbackUseCase = submitFeedbackUseCase,
+        _getAboutUsUseCase = getAboutUsUseCase,
+        _getCustomerSupportUseCase = getCustomerSupportUseCase;
 
   final isLoading = false.obs;
   final RxList<dynamic> followingList = <dynamic>[].obs;
@@ -133,7 +145,7 @@ class ProfileController extends GetxController {
       final result = await _getFollowingUseCase.execute();
       if (result.isSuccess && result.body != null) {
         final data = result.body as Map<String, dynamic>;
-        final following = data['following'] ?? [];
+        final following = data['following'] as List? ?? [];
         followingList.assignAll(following);
       }
     } catch (e) {
@@ -238,6 +250,104 @@ class ProfileController extends GetxController {
       print('Error verifying upgrade: $e');
       return ResponseModel(
           isSuccess: false, message: e.toString(), statusCode: 500);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> submitFeedback(int rating, String comment) async {
+    try {
+      isLoading.value = true;
+      final result = await _submitFeedbackUseCase.execute(rating, comment);
+      if (result.isSuccess) {
+        Get.back();
+        CustomSnackbar.showSuccess('Thank you! Your feedback has been submitted.');
+      } else {
+        CustomSnackbar.showError(result.message ?? 'Failed to submit feedback');
+      }
+    } catch (e) {
+      CustomSnackbar.showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<String?> fetchAboutUs() async {
+    try {
+      isLoading.value = true;
+      final result = await _getAboutUsUseCase.execute();
+      if (result.isSuccess && result.body != null) {
+        final body = result.body;
+        print('AboutUs Body: $body');
+        
+        dynamic findContent(dynamic obj) {
+          if (obj is Map) {
+            if (obj.containsKey('content') && obj['content'] != null) {
+              return obj['content'];
+            }
+            for (var value in obj.values) {
+              final found = findContent(value);
+              if (found != null) return found;
+            }
+          } else if (obj is List) {
+            for (var item in obj) {
+              final found = findContent(item);
+              if (found != null) return found;
+            }
+          }
+          return null;
+        }
+
+        final content = findContent(body);
+        if (content != null) return content.toString();
+        
+        // Final fallback
+        if (body is Map && body.containsKey('data')) {
+           return body['data'].toString();
+        }
+        return body.toString();
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching about us: $e');
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<String?> fetchCustomerSupport() async {
+    try {
+      isLoading.value = true;
+      final result = await _getCustomerSupportUseCase.execute();
+      if (result.isSuccess && result.body != null) {
+        final body = result.body;
+        
+        dynamic findContent(dynamic obj) {
+          if (obj is Map) {
+            if (obj.containsKey('content') && obj['content'] != null) {
+              return obj['content'];
+            }
+            for (var value in obj.values) {
+              final found = findContent(value);
+              if (found != null) return found;
+            }
+          } else if (obj is List) {
+            for (var item in obj) {
+              final found = findContent(item);
+              if (found != null) return found;
+            }
+          }
+          return null;
+        }
+
+        final content = findContent(body);
+        return content?.toString();
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching customer support: $e');
+      return null;
     } finally {
       isLoading.value = false;
     }

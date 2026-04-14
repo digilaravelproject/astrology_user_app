@@ -116,11 +116,15 @@ class SubscriptionScreen extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.white, size: 16),
-               // const SizedBox(width: 8),
-                AppText(
-                  activePlan.description,
-                  fontSize: 12,
-                  color: Colors.white,
+                const SizedBox(width: 8),
+                Expanded(
+                  child: AppText(
+                    activePlan.description,
+                    fontSize: 12,
+                    color: Colors.white,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
@@ -129,10 +133,12 @@ class SubscriptionScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.check_circle, color: Colors.white, size: 16),
                 const SizedBox(width: 8),
-                AppText(
-                  "Basic Daily Horoscope",
-                  fontSize: 14,
-                  color: Colors.white,
+                Expanded(
+                  child: AppText(
+                    "Basic Daily Horoscope",
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),

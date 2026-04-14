@@ -104,8 +104,12 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D)),
                       onSelected: (value) {
                         // Handle menu selection
-                        if (value == 'Block') {
-                          _showBlockBottomSheet(context, _astrologer!.name);
+                        if (value == 'Block' || value == 'Unblock') {
+                          if (_astrologer!.isBlocked) {
+                            _showUnblockBottomSheet(context, _astrologer!.name);
+                          } else {
+                            _showBlockBottomSheet(context, _astrologer!.name);
+                          }
                         } else if (value == 'Report') {
                           _showReportBottomSheet(context, _astrologer!.name);
                         }
@@ -114,7 +118,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         }
                       },
                       itemBuilder: (BuildContext context) {
-                        return {'Block', 'Report','Review'}.map((String choice) {
+                        return { 
+                          _astrologer?.isBlocked == true ? 'Unblock' : 'Block', 
+                          'Report', 
+                          'Review' 
+                        }.map((String choice) {
                           return PopupMenuItem<String>(
                             value: choice,
                             child: AppText(
@@ -162,6 +170,84 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               ],
             ),
       bottomNavigationBar: _buildBottomActions(context),
+    );
+  }
+
+  void _showUnblockBottomSheet(BuildContext context, String name) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Icon(Icons.check_circle_outline_rounded, size: 48, color: Colors.green),
+              const SizedBox(height: 16),
+              AppText(
+                "Unblock $name?",
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
+              const SizedBox(height: 8),
+              AppText(
+                "You will be able to message and call this astrologer again.",
+                fontSize: 14,
+                color: Colors.grey.shade600,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      text: "Cancel",
+                      backgroundColor: Colors.grey.shade100,
+                      textColor: Colors.black87,
+                      onTap: () => Get.back(),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: CustomButton(
+                      text: "Unblock",
+                      backgroundColor: Colors.green,
+                      onTap: () async {
+                        Get.back(); // Close bottom sheet
+                        try {
+                          final result = await _controller.unblockAstrologer(widget.astrologerId);
+                          if (result.isSuccess) {
+                            CustomSnackbar.showSuccess(result.message);
+                            _fetchAstrologer(); // Refresh local state
+                          } else {
+                            CustomSnackbar.showError(result.message);
+                          }
+                        } catch (e) {
+                          CustomSnackbar.showError("Failed to unblock astrologer: $e");
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
     );
   }
 

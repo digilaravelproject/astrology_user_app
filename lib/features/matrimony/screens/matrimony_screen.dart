@@ -379,6 +379,10 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
         return _buildLandingUI();
       }
 
+      if (!_controller.hasPlan.value) {
+        return _buildPurchaseUI();
+      }
+
 
 
       // If both plan and matrimony registration are complete, show data screen
@@ -616,7 +620,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           onTap: () {
                             Get.to(() => MatrimonyRegistrationScreen(
                               onComplete: () {
-                                _controller.setRegistered(true);
+                                _controller.checkRegistrationStatus(); // Refresh status properly
                                 Get.back();
                               },
                             ));
@@ -661,6 +665,115 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPurchaseUI() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFFF0F5), Colors.white],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFE91E63).withOpacity(0.15),
+                      blurRadius: 30,
+                      spreadRadius: 10,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.stars_rounded,
+                  size: 80,
+                  color: Color(0xFFE91E63),
+                ),
+              ),
+              const SizedBox(height: 40),
+              const AppText(
+                'Unlock Premium Access',
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: Color(0xFF2D3142),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              AppText(
+                'Unlock the power of Matrimony! Purchase a membership plan to view detailed profiles and find your perfect life partner today.',
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 48),
+              GestureDetector(
+                onTap: () {
+                  Get.toNamed(AppRoutes.subscriptionScreen);
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFE91E63).withOpacity(0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 20),
+                        SizedBox(width: 10),
+                        AppText(
+                          'Buy Membership Now',
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () {
+                  _controller.refreshRegistrationStatusFromServer();
+                },
+                child: AppText(
+                  'Already purchased? Refresh',
+                  color: const Color(0xFFE91E63).withOpacity(0.8),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

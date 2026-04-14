@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
+import '../../../../core/widgets/custom_image_widget.dart';
 import '../../remedy/screens/remedy_detail_screen.dart';
 import '../../home/controllers/remedy_controller.dart';
 import '../../home/domain/models/remedy_model.dart';
@@ -59,7 +60,7 @@ class RemedyGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             final remedy = remedyController.remedies[index];
             final color = _cardColors[index % _cardColors.length];
-            final imageUrl = remedyController.getRemedyImage(index);
+            final imageUrl = remedy.image ?? remedyController.getRemedyImage(index);
             return GestureDetector(
               onTap: () {
                 Get.to(() => RemedyDetailScreen(
@@ -109,12 +110,20 @@ class RemedyGrid extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.auto_fix_high_rounded, color: color, size: 18),
+                  child: CustomImageWidget(
+                    imagePath: remedy.image,
+                    width: 32,
+                    height: 32,
+                    radius: BorderRadius.circular(16),
+                    fit: BoxFit.cover,
+                    fallbackWidget: Icon(Icons.auto_fix_high_rounded, color: color, size: 18),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(

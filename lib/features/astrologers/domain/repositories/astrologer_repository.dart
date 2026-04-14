@@ -16,7 +16,7 @@ class AstrologerRepository {
   }
 
   Future<ResponseModel> blockAstrologer(int id) async {
-    return await apiClient.post('${AppUrls.astrologers}/$id/block');
+    return await apiClient.post(AppUrls.blockAstrologer(id));
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {

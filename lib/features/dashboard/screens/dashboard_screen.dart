@@ -50,6 +50,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Check for initial index from arguments
+    final argIndex = Get.arguments?['index'];
+    if (argIndex != null && argIndex is int) {
+      _selectedIndex = argIndex;
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showPromotionalSheet();
     });

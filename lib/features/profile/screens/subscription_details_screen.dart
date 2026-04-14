@@ -11,6 +11,7 @@ import '../controllers/profile_controller.dart';
 import '../domain/models/plan_model.dart';
 import '../../../core/services/payment/razorpay/razorpay_service.dart';
 import '../../../core/services/payment/razorpay/razorpay_config.dart';
+import '../../../routes/app_routes.dart';
 
 class SubscriptionDetailScreen extends StatelessWidget {
   final int planId;
@@ -469,18 +470,14 @@ class SubscriptionDetailScreen extends StatelessWidget {
         // Refresh profile to update plan_id and isMatrimony status
         await controller.refreshProfile();
         
-        // Show success dialog
-        Get.dialog(
-          PaymentSuccessDialog(
-            title: 'Subscription Successful',
-            message: 'Your plan has been upgraded successfully',
-            orderId: providerOrderId,
-            amount: plan?.price.toString(),
-            onOk: () {
-              Get.back();
-              Get.back();
-            },
-          ),
+        // Navigate to success screen instead of dialog
+        Get.toNamed(
+          AppRoutes.subscriptionSuccess,
+          arguments: {
+            'amount': plan?.price.toString(),
+            'orderId': providerOrderId,
+            'planName': plan?.name,
+          },
         );
       } else {
         CustomSnackbar.showError(result.message ?? 'Payment verification failed');

@@ -13,6 +13,7 @@ class AppUrls {
   static const String blogs = '/api/v1/user/blogs';
   static const String astrologers = '/api/v1/user/astrologers';
   static String getAstrologerDetails(int id) => '/api/v1/user/astrologers/$id';
+  static String blockAstrologer(int id) => '/api/v1/user/astrologers/$id/block';
   static const String wallet = '/api/v1/user/wallet';
   static const String walletTopup = '/api/v1/user/wallet/topup';
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
@@ -21,6 +22,8 @@ class AppUrls {
   static const String getMatrimonyProfile = '/api/v1/user/matrimony/profiles';
   static String getMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles/$id';
   static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
+  static String blockMatrimonyProfile(int id) => '$astrologers/$id/block';
+  static String reportMatrimonyProfile(int id) => '$astrologers/$id/report';
 
 
   static const String deleteAccount = '/api/v1/user/delete-account';
@@ -47,4 +50,10 @@ class AppUrls {
   static const String gifts = '/api/v1/gifts';
   static const String sendGift = '/api/v1/gifts/send';
   static String getGiftHistory(int id) => '/api/v1/astrologers/$id/gifts';
+
+  // Feedback & Static Pages
+  static const String feedback = '/api/v1/feedback';
+  static const String aboutUs = '/api/v1/static-pages/about_us';
+  static const String customerSupport = '/api/v1/static-pages/customer_support';
+  static const String foundersWords = '/api/v1/user/founders-words';
 }

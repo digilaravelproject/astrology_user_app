@@ -31,4 +31,19 @@ class ProfileRepository {
   Future<ResponseModel> getFollowing() async {
     return await apiClient.get(AppUrls.following);
   }
+
+  Future<ResponseModel> submitFeedback(int rating, String comment) async {
+    return await apiClient.post(AppUrls.feedback, data: {
+      'rating': rating,
+      'comment': comment,
+    });
+  }
+
+  Future<ResponseModel> getAboutUs() async {
+    return await apiClient.get(AppUrls.aboutUs);
+  }
+
+  Future<ResponseModel> getCustomerSupport() async {
+    return await apiClient.get(AppUrls.customerSupport);
+  }
 }

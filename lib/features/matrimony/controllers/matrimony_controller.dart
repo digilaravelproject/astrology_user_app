@@ -7,6 +7,8 @@ import '../domain/usecases/get_matrimony_profile_usecase.dart';
 import '../domain/usecases/save_matrimony_profile_usecase.dart';
 import '../domain/usecases/get_matrimony_profile_details_usecase.dart';
 import '../domain/usecases/search_matrimony_profiles_usecase.dart';
+import '../domain/usecases/block_matrimony_profile_usecase.dart';
+import '../domain/usecases/report_matrimony_profile_usecase.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../auth/domain/services/auth_service.dart';
 import '../../profile/domain/usecases/get_profile_usecase.dart';
@@ -18,6 +20,8 @@ class MatrimonyController extends GetxController {
   final GetMatrimonyProfileUseCase _getMatrimonyProfileUseCase;
   final GetMatrimonyProfileDetailsUseCase _getMatrimonyProfileDetailsUseCase;
   final SearchMatrimonyProfilesUseCase _searchMatrimonyProfilesUseCase;
+  final BlockMatrimonyProfileUseCase _blockMatrimonyProfileUseCase;
+  final ReportMatrimonyProfileUseCase _reportMatrimonyProfileUseCase;
   final GetProfileUseCase _getProfileUseCase;
 
   MatrimonyController({
@@ -25,16 +29,21 @@ class MatrimonyController extends GetxController {
     GetMatrimonyProfileUseCase? getMatrimonyProfileUseCase,
     GetMatrimonyProfileDetailsUseCase? getMatrimonyProfileDetailsUseCase,
     SearchMatrimonyProfilesUseCase? searchMatrimonyProfilesUseCase,
+    BlockMatrimonyProfileUseCase? blockMatrimonyProfileUseCase,
+    ReportMatrimonyProfileUseCase? reportMatrimonyProfileUseCase,
     GetProfileUseCase? getProfileUseCase,
   })  : _saveMatrimonyProfileUseCase = saveMatrimonyProfileUseCase ?? Get.find<SaveMatrimonyProfileUseCase>(),
         _getMatrimonyProfileUseCase = getMatrimonyProfileUseCase ?? Get.find<GetMatrimonyProfileUseCase>(),
         _getMatrimonyProfileDetailsUseCase = getMatrimonyProfileDetailsUseCase ?? Get.find<GetMatrimonyProfileDetailsUseCase>(),
         _searchMatrimonyProfilesUseCase = searchMatrimonyProfilesUseCase ?? Get.find<SearchMatrimonyProfilesUseCase>(),
+        _blockMatrimonyProfileUseCase = blockMatrimonyProfileUseCase ?? Get.find<BlockMatrimonyProfileUseCase>(),
+        _reportMatrimonyProfileUseCase = reportMatrimonyProfileUseCase ?? Get.find<ReportMatrimonyProfileUseCase>(),
         _getProfileUseCase = getProfileUseCase ?? Get.find<GetProfileUseCase>();
 
 
 
   final RxBool isRegistered = false.obs;
+  final RxBool hasPlan = false.obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
 
@@ -50,10 +59,19 @@ class MatrimonyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // _loadDummyData();
+    final authController = Get.find<AuthController>();
+    
+    // Listen for user changes to automatically update registration/plan status
+    ever(authController.currentUser, (_) {
+      print('MatrimonyController: Auth state changed, re-checking registration status');
+      checkRegistrationStatus();
+    });
+
     checkRegistrationStatus();
     getMatrimonyProfile();
-
+    
+    // Auto-refresh profile in background to sync any external plan purchases
+    refreshRegistrationStatusFromServer();
   }
 
   Future<void> getMatrimonyProfile() async {
@@ -110,17 +128,35 @@ class MatrimonyController extends GetxController {
   Future<void> refreshRegistrationStatusFromServer() async {
     try {
       final authController = Get.find<AuthController>();
-      final userId = authController.currentUser.value?.id;
-      print('refreshRegistrationStatusFromServer: [START] Syncing status for userId=$userId');
+      final currentUser = authController.currentUser.value;
+      
+      if (currentUser == null) return;
+      
+      print('refreshRegistrationStatusFromServer: [START] Syncing status for userId=${currentUser.id}');
 
-      if (Get.isRegistered<ProfileController>()) {
-        final profileController = Get.find<ProfileController>();
-        await profileController.refreshProfile();
-        print('refreshRegistrationStatusFromServer: [SUCCESS] Profile refreshed via ProfileController');
+      // 1. Fetch latest profile from server directly using UseCase
+      final updatedUserFromServer = await _getProfileUseCase.execute(currentUser.id);
+      
+      if (updatedUserFromServer != null) {
+        print('refreshRegistrationStatusFromServer: [SUCCESS] Fetched latest data. planId=${updatedUserFromServer.planId}');
+        
+        // 2. Update Auth state
+        authController.currentUser.value = updatedUserFromServer;
+        
+        // 3. Save to persistence
+        await Get.find<AuthService>().saveUserInfo(updatedUserFromServer);
+        
+        // 4. Update ProfileController if it exists (to keep everything in sync)
+        if (Get.isRegistered<ProfileController>()) {
+          // ProfileController._syncUser is private, but updating currentUser.value 
+          // might be enough if ProfileController is listening. 
+          // Or we can just let it be since we updated the source of truth (Auth).
+        }
       } else {
-        print('refreshRegistrationStatusFromServer: [WARNING] ProfileController not found, using existing Auth state');
+        print('refreshRegistrationStatusFromServer: [WARNING] Failed to fetch updated profile, using existing state');
       }
       
+      // 5. Final UI refresh
       checkRegistrationStatus();
     } catch (e) {
       print('refreshRegistrationStatusFromServer: [ERROR] $e');
@@ -139,12 +175,17 @@ class MatrimonyController extends GetxController {
     }
     
     final isMatrimonyRegistered = user.isMatrimony;
-    print('checkRegistrationStatus: [DASHBOARD] userId=${user.id}, isMatrimony=$isMatrimonyRegistered');
+    final userHasPlan = user.planId != null;
+
+    print('checkRegistrationStatus: [DASHBOARD] userId=${user.id}, isMatrimony=$isMatrimonyRegistered, hasPlan=$userHasPlan');
     print('checkRegistrationStatus: [RAW_USER] ${user.toJsonString()}');
     
-    // Set isRegistered based on isMatrimony flag from user profile
+    // Set status flags
     isRegistered.value = isMatrimonyRegistered;
+    hasPlan.value = userHasPlan;
+    
     isRegistered.refresh();
+    hasPlan.refresh();
     
     // Ensure persistence is updated
     SharedPrefs.setBool('isMatrimony', isMatrimonyRegistered);
@@ -288,6 +329,63 @@ class MatrimonyController extends GetxController {
     }
   }
 
+  Future<void> blockProfile(int id) async {
+    try {
+      isLoading.value = true;
+      final response = await _blockMatrimonyProfileUseCase.execute(id);
+      if (response != null && response.isSuccess) {
+        CustomSnackbar.showSuccess(response.message);
+        // Refresh details
+        await getMatrimonyProfileDetails(id);
+        // Refresh list
+        getMatrimonyProfile();
+      } else {
+        CustomSnackbar.showError(response?.message ?? 'Failed to block profile');
+      }
+    } catch (e) {
+      CustomSnackbar.showError('Error blocking profile: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> unblockProfile(int id) async {
+    try {
+      isLoading.value = true;
+      final response = await _blockMatrimonyProfileUseCase.execute(id);
+      if (response != null && response.isSuccess) {
+        CustomSnackbar.showSuccess(response.message);
+        // Refresh details
+        await getMatrimonyProfileDetails(id);
+        // Refresh list
+        getMatrimonyProfile();
+      } else {
+        CustomSnackbar.showError(response?.message ?? 'Failed to unblock profile');
+      }
+    } catch (e) {
+      CustomSnackbar.showError('Error unblocking profile: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> reportProfile(int id, String reason) async {
+    try {
+      isLoading.value = true;
+      final response = await _reportMatrimonyProfileUseCase.execute(id, reason);
+      if (response.isSuccess) {
+        CustomSnackbar.showSuccess(response.message ?? 'Profile reported successfully');
+        Get.back(); // Close bottom sheet
+      } else {
+        CustomSnackbar.showError(response.message ?? 'Failed to report profile');
+      }
+    } catch (e) {
+      print('reportProfile error: $e');
+      CustomSnackbar.showError('An error occurred');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   void setRegistered(bool value) {
     print('setRegistered: setting isRegistered to $value');

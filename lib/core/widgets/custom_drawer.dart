@@ -8,6 +8,7 @@ import 'custom_image_widget.dart';
 import '../../features/auth/controllers/auth_controller.dart';
 import '../../features/wallet/screens/wallet_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/profile/bindings/profile_binding.dart';
 import '../../features/history/screens/history_screen.dart';
 import '../../features/notification/screens/notification_screen.dart'; // Assuming chat history might be here or similar
 
@@ -50,7 +51,7 @@ class CustomDrawer extends StatelessWidget {
                   AppStrings.myProfileNav,
                   onTap: () {
                     Get.back();
-                    Get.to(() => const ProfileScreen());
+                    Get.to(() => const ProfileScreen(), binding: ProfileBinding());
                   },
                 ),
                 _buildDrawerItem(

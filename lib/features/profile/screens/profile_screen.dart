@@ -20,10 +20,12 @@ import '../../../core/widgets/simple_content_screen.dart';
 import 'help_support_screen.dart';
 import 'faq_screen.dart';
 import 'subscription_screen.dart';
-import 'astrologer_registration_screen.dart';
-import 'referral_screen.dart';
+import '../controllers/profile_controller.dart';
+import '../bindings/profile_binding.dart';
+import 'about_us_screen.dart';
 import 'following_screen.dart';
 import 'feedback_screen.dart';
+import 'astrologer_registration_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -239,10 +241,10 @@ class ProfileScreen extends StatelessWidget {
           title: AppStrings.following,
           onTap: () => Get.toNamed(AppRoutes.followingScreen),
         ),
-         _buildMenuItem(
+        _buildMenuItem(
           icon: Iconsax.user_add_copy,
           title: AppStrings.astrologerRegistration,
-          onTap: () => Get.to(() => const AstrologerRegistrationScreen()),
+          onTap: () => Get.to(() => AstrologerRegistrationScreen()),
         ),
 
         const SizedBox(height: 10),
@@ -250,7 +252,7 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.headphone_copy,
           title: AppStrings.customerSupport,
-          onTap: () => Get.to(() => const HelpSupportScreen()),
+          onTap: () => Get.to(() => const HelpSupportScreen(), binding: ProfileBinding()),
         ),
         _buildMenuItem(
           icon: Iconsax.message_question_copy,
@@ -279,7 +281,7 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.like_1_copy,
           title: AppStrings.feedback,
-          onTap: () => Get.to(() => const FeedbackScreen()),
+          onTap: () => Get.to(() => const FeedbackScreen(), binding: ProfileBinding()),
         ),
         _buildMenuItem(
           icon: Iconsax.star_1_copy,
@@ -294,7 +296,7 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.info_circle_copy,
           title: AppStrings.aboutUs,
-          onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.aboutUs, content: "About Us Content Placeholder...")),
+          onTap: () => Get.to(() => const AboutUsScreen(), binding: ProfileBinding()),
         ),
       ],
     );

@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/utils/custom_snackbar.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/app_text.dart';
 import '../domain/models/matrimony_profile_model.dart';
@@ -106,7 +108,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFCF8F9), // Soft, warm off-white background
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -175,15 +177,6 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           const SizedBox(height: 20),
                           _buildMenuOption(
                             context,
-                            Icons.share_outlined,
-                            'Share Profile',
-                            () {
-                              Navigator.pop(context);
-                              _shareProfile();
-                            },
-                          ),
-                          _buildMenuOption(
-                            context,
                             Icons.bookmark_border,
                             'Save Profile',
                             () {
@@ -193,8 +186,8 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           ),
                           _buildMenuOption(
                             context,
-                            Icons.block_outlined,
-                            'Block User',
+                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Icons.check_circle_outline : Icons.block_outlined,
+                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
                             () {
                               Navigator.pop(context);
                               _blockUser(context);
@@ -261,8 +254,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
 
   Widget _buildProfileHeader(MatrimonyProfileModel profile) {
     return Container(
-
-      color: Colors.white,
+      color: Colors.transparent, // Background shows the soft warm white
       child: Column(
         children: [
           // Profile Image with rounded bottom corners
@@ -303,90 +295,83 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                       ),
                 ),
               ),
-              // Page indicators (Only show for multiple images)
+              // Story-style segmented progress indicators at the top
               if (_getImages(profile).length > 1)
                 Positioned(
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
+                  top: MediaQuery.of(context).padding.top + 60,
+                  left: 16,
+                  right: 16,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
                       _getImages(profile).length,
-                      (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentImageIndex == index ? 24 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: _currentImageIndex == index
-                              ? Colors.white
-                              : Colors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(4),
+                      (index) => Expanded(
+                        child: Container(
+                          height: 3,
+                          margin: const EdgeInsets.symmetric(horizontal: 2),
+                          decoration: BoxDecoration(
+                            color: _currentImageIndex == index
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(2),
+                            boxShadow: [
+                              if (_currentImageIndex == index)
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              // Image counter (Only show for multiple images)
+
+              // Modern Glassmorphic Image Counter
               if (_getImages(profile).length > 1)
                 Positioned(
-                  bottom: 50,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: AppText(
-                        '${_currentImageIndex + 1}/${_getImages(profile).length}',
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  top: MediaQuery.of(context).padding.top + 80,
+                  right: 16,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                        ),
+                        child: AppText(
+                          '${_currentImageIndex + 1} / ${_getImages(profile).length}',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ),
                 ),
 
-
-              // Action buttons overlay
+              // Action buttons overlay - Redesigned
               Positioned(
-                bottom: 50,
-                right: 16,
+                bottom: 40,
+                right: 20,
                 child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.call, color: Color(0xFFE91E63), size: 22),
+                    _buildActionButton(
+                      icon: Icons.call,
+                      color: const Color(0xFFE91E63),
+                      onTap: () {},
                     ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.chat_bubble, color: Color(0xFF4CAF50), size: 22),
+                    const SizedBox(height: 16),
+                    _buildActionButton(
+                      icon: Icons.chat_bubble_rounded,
+                      color: const Color(0xFF4CAF50),
+                      onTap: () {},
                     ),
                   ],
                 ),
@@ -402,14 +387,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
+                    color: const Color(0xFF880E4F).withOpacity(0.06),
+                    blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
                 ],
+                border: Border.all(color: Colors.white, width: 2),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,10 +412,11 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                         ),
 
                       ),
-                      Image.asset(
+                       Image.asset(
                         'assets/icons/verify.png',
-                        width: 28,
-                        height: 28,
+                        width: 24,
+                        height: 24,
+                        color: const Color(0xFFE91E63), // Tinted verify icon
                       ),
                     ],
                   ),
@@ -438,30 +425,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE91E63).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                         decoration: BoxDecoration(
+                          color: const Color(0xFFE91E63).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: AppText(
                           'ID: MT${profile.id ?? ""}',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
                           color: const Color(0xFFE91E63),
+                          letterSpacing: 0.5,
                         ),
-
-
                       ),
                       const SizedBox(width: 10),
-                      // Icon(Icons.circle, size: 4, color: Colors.grey[400]),
-                      // const SizedBox(width: 10),
-                      // Expanded(
-                      //   child: AppText(
-                      //     'Last seen few hours ago',
-                      //     fontSize: 12,
-                      //     fontWeight: FontWeight.w500,
-                      //     color: Colors.grey[600],
-                      //   ),
-                      // ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -480,15 +456,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   _buildQuickInfo(Icons.location_on_outlined, profile.location),
 
 
-                  const SizedBox(height: 20),
+                   const SizedBox(height: 24),
                   CustomButton(
-                    fontSize: 16,
-                    text: _showDetails ? 'Hide Details' : AppStrings.viewPersonalInformation,
+                    fontSize: 15,
+                    height: 50,
+                    borderRadius: 25,
+                    text: _showDetails ? 'Collapse Details' : 'Show Full Profile',
                     onTap: () {
                       setState(() {
                         _showDetails = !_showDetails;
                       });
                     },
+                    backgroundColor: _showDetails ? Colors.white : AppColors.primaryColor,
+                    textColor: _showDetails ? AppColors.primaryColor : Colors.white,
                   ),
                 ],
               ),
@@ -498,35 +478,57 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       ),
     );
   }
-  
-  Widget _buildQuickInfo(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: const Color(0xFF880E4F)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: AppText(
-            text,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey[800],
-          ),
-        ),
-      ],
-    );
-  }
 
-  void _shareProfile() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Profile shared successfully!'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(20),
-        duration: const Duration(seconds: 2),
+  Widget _buildActionButton({required IconData icon, required Color color, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+          border: Border.all(color: color.withOpacity(0.1), width: 1),
+        ),
+        child: Icon(icon, color: color, size: 24),
       ),
     );
   }
+  
+    Widget _buildQuickInfo(IconData icon, String text) {
+     if (text.isEmpty || text == 'Not specified') return const SizedBox.shrink();
+     
+     return Padding(
+       padding: const EdgeInsets.only(bottom: 12),
+       child: Row(
+         children: [
+           Container(
+             padding: const EdgeInsets.all(8),
+             decoration: BoxDecoration(
+               color: const Color(0xFF880E4F).withOpacity(0.05),
+               shape: BoxShape.circle,
+             ),
+             child: Icon(icon, size: 16, color: const Color(0xFF880E4F)),
+           ),
+           const SizedBox(width: 12),
+           Expanded(
+             child: AppText(
+               text,
+               fontSize: 14,
+               fontWeight: FontWeight.w500,
+               color: const Color(0xFF424242),
+             ),
+           ),
+         ],
+       ),
+     );
+   }
 
   void _saveProfile() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -550,14 +552,16 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const AppText(
-          'Block User',
+        title: AppText(
+          (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF880E4F),
+          color: const Color(0xFF880E4F),
         ),
-        content: const AppText(
-          'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.',
+        content: AppText(
+          (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) 
+              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'
+              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.',
           fontSize: 14,
           color: Colors.black87,
         ),
@@ -573,22 +577,26 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('User blocked successfully'),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                  margin: EdgeInsets.all(20),
-                  duration: Duration(seconds: 2),
-                ),
-              );
+               final profileId = widget.profile.id;
+               final isBlocked = _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked;
+               
+               if (profileId != null) {
+                  if (isBlocked) {
+                    _controller.unblockProfile(profileId);
+                  } else {
+                    _controller.blockProfile(profileId);
+                  }
+                  Navigator.pop(context);
+               } else {
+                  Navigator.pop(context);
+                  CustomSnackbar.showError('Invalid profile ID');
+               }
             },
-            child: const AppText(
-              'Block',
+            child: AppText(
+              ( _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock' : 'Block',
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: Colors.red,
+              color: ( _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Colors.green : Colors.red,
             ),
           ),
         ],
@@ -653,16 +661,12 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   Widget _buildReportOption(BuildContext context, String reason) {
     return InkWell(
       onTap: () {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Profile reported for: $reason'),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(20),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        if (widget.profile.id != null) {
+          _controller.reportProfile(widget.profile.id!, reason);
+        } else {
+          Navigator.pop(context);
+          CustomSnackbar.showError('Invalid profile ID');
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -743,87 +747,50 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildPersonalInformation(MatrimonyProfileModel profile) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE91E63).withOpacity(0.2), Color(0xFFAD1457).withOpacity(0.2)],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person_outline, color: Color(0xFF880E4F), size: 22),
-              ),
-              const SizedBox(width: 12),
-              AppText(
-                AppStrings.personalInformation,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF880E4F),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildDetailRow(AppStrings.age, '${profile.age} Years'),
-          _buildDetailRow(AppStrings.height, '${profile.height} Feet'),
-          _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'),
-          _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor),
-          _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus),
-          _buildDetailRow(AppStrings.livesIn, profile.location),
-          _buildDetailRow(AppStrings.eatingHabits, 'Not specified'),
-          _buildDetailRow(AppStrings.religion, 'Not specified'),
-          _buildDetailRow(AppStrings.subcaste, 'Not specified'),
-          _buildDetailRow(AppStrings.manglik, 'Not specified'),
-          _buildDetailRow(AppStrings.employment, profile.jobTitle, isLink: true),
-
-
-        ],
-      ),
+   Widget _buildPersonalInformation(MatrimonyProfileModel profile) {
+    return _buildSectionCard(
+      icon: Icons.person_outline_rounded,
+      title: AppStrings.personalInformation,
+      children: [
+        _buildDetailRow(AppStrings.age, '${profile.age} Years'),
+        _buildDetailRow(AppStrings.height, '${profile.height} Feet'),
+        _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'),
+        _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor),
+        _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus),
+        _buildDetailRow(AppStrings.livesIn, profile.location),
+        _buildDetailRow(AppStrings.eatingHabits, 'Not specified'),
+        _buildDetailRow(AppStrings.religion, 'Not specified'),
+        _buildDetailRow(AppStrings.subcaste, 'Not specified'),
+        _buildDetailRow(AppStrings.manglik, 'Not specified'),
+        _buildDetailRow(AppStrings.employment, profile.jobTitle, isLink: true),
+      ],
     );
   }
 
   Widget _buildDetailRow(String label, String value, {bool isLink = false}) {
+    if (value.isEmpty || value == 'Not specified') return const SizedBox.shrink();
+    
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 140,
+            width: 120,
             child: AppText(
               label,
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[700],
+              color: Colors.grey[600],
             ),
           ),
-          const AppText(':  '),
           Expanded(
             child: AppText(
               value,
-              fontSize: 14,
-              fontWeight: isLink ? FontWeight.w500 : FontWeight.w600,
-              color: isLink ? const Color(0xFFE91E63) : const Color(0xFF212121),
+              fontSize: 13,
+              fontWeight: isLink ? FontWeight.w600 : FontWeight.w500,
+              color: isLink ? const Color(0xFFE91E63) : const Color(0xFF263238),
+              height: 1.4,
             ),
           ),
         ],
@@ -832,156 +799,101 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   }
 
   Widget _buildContactInformation(MatrimonyProfileModel profile) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE91E63).withOpacity(0.2), Color(0xFFAD1457).withOpacity(0.2)],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.phone_outlined, color: Color(0xFF880E4F), size: 22),
-              ),
-              const SizedBox(width: 12),
-              AppText(
-                AppStrings.contactInformation,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF880E4F),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              AppText(
-                AppStrings.mobileNumber,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-              const SizedBox(width: 24),
-              const AppText(':  '),
-              AppText(
-                profile.phone,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          Center(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.lock_outline, size: 14, color: Color(0xFFE91E63)),
-                const SizedBox(width: 4),
-                AppText(
-                  AppStrings.upgradeToView,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFE91E63),
-                ),
-                const Icon(Icons.chevron_right, size: 16, color: Color(0xFFE91E63)),
-              ],
+    return _buildSectionCard(
+      icon: Icons.phone_iphone_rounded,
+      title: AppStrings.contactInformation,
+      children: [
+        Row(
+          children: [
+            AppText(
+              AppStrings.mobileNumber,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600],
             ),
+            const SizedBox(width: 45),
+            AppText(
+              profile.phone,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: () {}, // Link to upgrade
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.stars_rounded, size: 16, color: Color(0xFFE91E63)),
+              const SizedBox(width: 6),
+              AppText(
+                AppStrings.upgradeToView,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFFE91E63),
+              ),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFFE91E63)),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildAboutMyself(MatrimonyProfileModel profile) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE91E63).withOpacity(0.2), Color(0xFFAD1457).withOpacity(0.2)],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.info_outline, color: Color(0xFF880E4F), size: 22),
-              ),
-              const SizedBox(width: 12),
-              AppText(
-                AppStrings.aboutMyself,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF880E4F),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          AppText(
-            profile.about,
-            fontSize: 11,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-            height: 1.3,
-          ),
-
-
-        ],
-      ),
+    if (profile.about.isEmpty) return const SizedBox.shrink();
+    
+    return _buildSectionCard(
+      icon: Icons.notes_rounded,
+      title: AppStrings.aboutMyself,
+      children: [
+        AppText(
+          profile.about,
+          fontSize: 13,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF455A64),
+          height: 1.5,
+        ),
+      ],
     );
   }
 
   Widget _buildLifestyle(MatrimonyProfileModel profile) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+    return _buildSectionCard(
+      icon: Icons.auto_awesome_rounded,
+      title: AppStrings.lifestyle,
+      children: [
+        _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan"),
+        _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'),
+        _buildDetailRow(AppStrings.music, 'Indian classical'),
+        _buildDetailRow(AppStrings.sports, "I'm not a sportsperson"),
+        _buildDetailRow(AppStrings.smokingHabits, 'Not specified'),
+        _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'),
+      ],
+    );
+  }
 
+  Widget _buildSectionCard({
+    required IconData icon,
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF880E4F).withOpacity(0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
           ),
         ],
+        border: Border.all(color: Colors.white, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -991,29 +903,22 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE91E63).withOpacity(0.2), Color(0xFFAD1457).withOpacity(0.2)],
-                  ),
+                  color: const Color(0xFFE91E63).withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.favorite_outline, color: Color(0xFF880E4F), size: 22),
+                child: Icon(icon, color: const Color(0xFFE91E63), size: 20),
               ),
               const SizedBox(width: 12),
               AppText(
-                AppStrings.lifestyle,
-                fontSize: 18,
+                title,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF880E4F),
+                color: const Color(0xFF263238),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan"),
-          _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'),
-          _buildDetailRow(AppStrings.music, 'Indian classical'),
-          _buildDetailRow(AppStrings.sports, "I'm not a sportsperson"),
-          _buildDetailRow(AppStrings.smokingHabits, 'Not specified'),
-          _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'),
+          const SizedBox(height: 16),
+          ...children,
         ],
       ),
     );

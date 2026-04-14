@@ -14,10 +14,18 @@ class GetProfileUseCase {
         final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
         print('GetProfileUseCase: bodyMap=$bodyMap');
         
-        // API returns {status: success, data: {user: {...}}}
-        // So we need to get data first, then user
-        final Map<String, dynamic> data = bodyMap['data'] as Map<String, dynamic>;
-        final Map<String, dynamic> userJson = data['user'] as Map<String, dynamic>;
+        // Handle nesting: {data: {user: {...}}} OR {user: {...}}
+        Map<String, dynamic> userJson;
+        if (bodyMap.containsKey('data') && bodyMap['data'] is Map) {
+          final Map<String, dynamic> data = bodyMap['data'] as Map<String, dynamic>;
+          userJson = data['user'] as Map<String, dynamic>;
+        } else if (bodyMap.containsKey('user') && bodyMap['user'] is Map) {
+          userJson = bodyMap['user'] as Map<String, dynamic>;
+        } else {
+          // Fallback: the whole body might be user data
+          userJson = bodyMap;
+        }
+
         print('GetProfileUseCase: userJson=$userJson');
         return UserModel.fromJson(userJson);
       } catch (e) {
