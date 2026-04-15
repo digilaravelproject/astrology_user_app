@@ -37,7 +37,7 @@ class MatrimonyRepository implements MatrimonyRepositoryInterface {
   @override
   Future<ResponseModel> updateProfile(MatrimonyProfileModel profile,
       XFile? photo) async {
-    return await apiClient.putMultipartData(
+    return await apiClient.postMultipartData(
       AppUrls.updateMatrimonyProfile,
       profile.toFormFields(),
       [MultipartBody('profile_photo', photo)],

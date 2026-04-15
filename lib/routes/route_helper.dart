@@ -1,4 +1,6 @@
 import 'package:astro_user/features/astrologers/screens/astrologer_detail_screen.dart';
+import 'package:astro_user/features/panchang/panchang_screen.dart';
+import 'package:astro_user/features/panchang/bindings/panchang_binding.dart';
 import 'package:astro_user/features/profile/bindings/profile_binding.dart';
 import 'package:astro_user/features/profile/screens/edit_profile_screen.dart';
 import 'package:astro_user/features/profile/screens/following_screen.dart';
@@ -64,6 +66,9 @@ class RouteHelper {
   static String getEditProfileRoute() => AppRoutes.editProfile;
   static String getPaymentSuccessRoute() => AppRoutes.paymentSuccess;
   static String getNotificationRoute() => AppRoutes.notification;
+
+
+  static String getPanchangRoute() => AppRoutes.panchangScreen;
 
   static List<GetPage> routes = [
     GetPage(
@@ -231,6 +236,13 @@ class RouteHelper {
       name: AppRoutes.subscriptionSuccess,
       page: () => const SubscriptionSuccessScreen(),
       transition: Transition.fadeIn,
+    ),
+
+    GetPage(
+      name: AppRoutes.panchangScreen,
+      page: () => const PanchangScreen(),
+      transition: Transition.fadeIn,
+      binding: PanchangBinding(),
     ),
   ];
 }

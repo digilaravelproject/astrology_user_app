@@ -31,4 +31,7 @@ class AppRoutes {
   static const String paymentSuccess = '/payment-success';
   static const String subscriptionSuccess = '/subscription-success';
   static const String notification = '/notification';
+
+
+  static const String panchangScreen = '/panchangScreen';
 }

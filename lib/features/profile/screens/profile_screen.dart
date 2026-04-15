@@ -211,6 +211,11 @@ class ProfileScreen extends StatelessWidget {
           onTap: () => Get.toNamed(AppRoutes.wallet),
         ),
         _buildMenuItem(
+          icon: Iconsax.sun_1_copy,
+          title: AppStrings.panchang,
+          onTap: () => Get.toNamed(AppRoutes.panchangScreen),
+        ),
+        _buildMenuItem(
           icon: Iconsax.crown_1_copy,
           title: AppStrings.manageSubscription,
           onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
