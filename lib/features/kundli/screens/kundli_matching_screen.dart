@@ -58,6 +58,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
+
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(50),
           child: Container(

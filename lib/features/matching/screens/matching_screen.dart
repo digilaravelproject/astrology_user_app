@@ -4,6 +4,10 @@ import 'package:get/get.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../kundli/screens/kundli_matching_screen.dart';
+import 'create_kundali_screen.dart';
+import 'kundli_screen.dart';
+import 'match_making_screen.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
@@ -84,6 +88,15 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         showLeading: false,
         backgroundColor: Colors.white,
         titleColor: AppColors.textColorPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: AppColors.primaryColor),
+            onPressed: () {
+             Get.to((CreateKundaliScreen()));
+              print("Plus clicked");
+            },
+          ),
+        ],
         iconColor: AppColors.textColorPrimary,
       ),
       body: Column(
@@ -357,6 +370,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                               padding: EdgeInsets.zero,
                               onSelected: (value) {
                                 if (value == 'view') {
+                                  Get.to((KundliScreen()));
                                   // View kundli details
                                 } else if (value == 'edit') {
                                   // Edit kundli
