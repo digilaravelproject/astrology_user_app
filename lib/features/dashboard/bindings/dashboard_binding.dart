@@ -60,6 +60,15 @@ import '../../matching/controllers/matching_controller.dart';
 import '../../matching/data/repositories/matching_repository_impl.dart';
 import '../../matching/domain/repositories/matching_repository.dart';
 import '../../matching/domain/usecases/get_matching_usecase.dart';
+import '../../matching/controllers/kundli_controller.dart';
+import '../../matching/data/repositories/kundli_repository_impl.dart';
+import '../../matching/domain/repositories/kundli_repository.dart';
+import '../../matching/domain/usecases/get_birth_chart_usecase.dart';
+import '../../matching/domain/usecases/create_kundli_usecase.dart';
+import '../../matching/domain/usecases/get_kundli_list_usecase.dart';
+import '../../matching/domain/usecases/get_kundli_by_id_usecase.dart';
+import '../../matching/domain/usecases/update_kundli_usecase.dart';
+import '../../matching/domain/usecases/delete_kundli_usecase.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -176,6 +185,23 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => GetMatchingUseCase(repository: Get.find<MatchingRepository>()));
     Get.lazyPut(() => MatchingController(
       getMatchingUseCase: Get.find<GetMatchingUseCase>(),
+    ));
+
+    // Kundli (Birth Chart)
+    Get.lazyPut<KundliRepository>(() => KundliRepositoryImpl(apiClient: Get.find<ApiClient>()));
+    Get.lazyPut(() => GetBirthChartUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => CreateKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => GetKundliListUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => GetKundliByIdUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => UpdateKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => DeleteKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => KundliController(
+      getBirthChartUseCase: Get.find<GetBirthChartUseCase>(),
+      createKundliUseCase: Get.find<CreateKundliUseCase>(),
+      getKundliListUseCase: Get.find<GetKundliListUseCase>(),
+      getKundliByIdUseCase: Get.find<GetKundliByIdUseCase>(),
+      updateKundliUseCase: Get.find<UpdateKundliUseCase>(),
+      deleteKundliUseCase: Get.find<DeleteKundliUseCase>(),
     ));
   }
 }

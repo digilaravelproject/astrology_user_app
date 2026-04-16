@@ -62,6 +62,10 @@ class AppUrls {
 
 
 
+  static const String createKundali = '/api/v1/kundli/create';
+
+
+
   static String getPanchangByDate(String date) => 'https://api.vedika.io/sandbox/panchang/$date';
 
 }

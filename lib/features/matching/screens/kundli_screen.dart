@@ -53,17 +53,31 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
       controller = Get.find<KundliController>();
     } else {
       // Binding should handle this, but fallback
-      controller = Get.put(KundliController(getBirthChartUseCase: Get.find()));
+      controller = Get.put(KundliController(
+        getBirthChartUseCase: Get.find(),
+        createKundliUseCase: Get.find(),
+        getKundliListUseCase: Get.find(),
+        getKundliByIdUseCase: Get.find(),
+        updateKundliUseCase: Get.find(),
+        deleteKundliUseCase:  Get.find(),
+      ));
     }
     
-    // Fetch data with provided parameters
-    controller.fetchKundliData(
-      birthDate: widget.birthDate,
-      birthTime: widget.birthTime,
-      latitude: widget.latitude,
-      longitude: widget.longitude,
-      datetime: widget.datetime,
-    );
+    // Check if we should skip fetching (data already loaded)
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    final skipFetch = arguments?['skipFetch'] ?? false;
+    
+    // Only fetch if not skipped and we don't have data
+    if (!skipFetch && controller.kundliData.value == null) {
+      // Fetch data with provided parameters
+      controller.fetchKundliData(
+        birthDate: widget.birthDate,
+        birthTime: widget.birthTime,
+        latitude: widget.latitude,
+        longitude: widget.longitude,
+        datetime: widget.datetime,
+      );
+    }
   }
 
   @override
