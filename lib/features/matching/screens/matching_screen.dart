@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart' as sax;
 import '../../../core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../routes/app_routes.dart';
 import '../../kundli/screens/kundli_matching_screen.dart';
 import 'create_kundali_screen.dart';
+import 'kundali_matching_screen.dart';
 import 'kundli_screen.dart';
 import 'match_making_screen.dart';
 
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
+
+
 
   @override
   State<MatchingScreen> createState() => _MatchingScreenState();
@@ -20,6 +25,22 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   late TabController _tabController;
   String? profile1Name;
   String? profile2Name;
+
+
+
+  // Matching Boy Controllers
+  final TextEditingController _boysNameController = TextEditingController();
+  final TextEditingController _boysGenderController = TextEditingController();
+  final TextEditingController _boysDobController = TextEditingController();
+  final TextEditingController _boysTobController = TextEditingController();
+  final TextEditingController _boysPobController = TextEditingController();
+
+  // Matching Girl Controllers
+  final TextEditingController _girlsNameController = TextEditingController();
+  final TextEditingController _girlsGenderController = TextEditingController();
+  final TextEditingController _girlsDobController = TextEditingController();
+  final TextEditingController _girlsTobController = TextEditingController();
+  final TextEditingController _girlsPobController = TextEditingController();
   
   // Controllers for Open Kundli tab
   final TextEditingController _boyNameController = TextEditingController();
@@ -82,7 +103,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFCECF1),
       appBar: CustomAppBar(
         title: 'Match Making',
         showLeading: false,
@@ -106,7 +127,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(30),
             ),
             child: Row(
@@ -177,7 +198,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               controller: _tabController,
               children: [
                 _buildOpenKundliTab(),
-                _buildNewMatchingTab(),
+               // _buildNewMatchingTab(),
+                Padding(
+                  padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 0),
+                  child:  _buildMatchingForm(),
+                )
               ],
             ),
           ),
@@ -370,7 +395,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                               padding: EdgeInsets.zero,
                               onSelected: (value) {
                                 if (value == 'view') {
-                                  Get.to((KundliScreen()));
+                                  //onTap: () => Get.toNamed(AppRoutes.panchangScreen),
+
+                                Get.toNamed((AppRoutes.kundaliScreen));
                                   // View kundli details
                                 } else if (value == 'edit') {
                                   // Edit kundli
@@ -619,7 +646,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         child: Column(
           children: [
             const SizedBox(height: 20),
-            
+
             // Profile Circles with Connection
             Stack(
               alignment: Alignment.center,
@@ -631,7 +658,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     painter: ConnectionLinePainter(),
                   ),
                 ),
-                
+
                 // Decorative Stars
                 Positioned(
                   top: 15,
@@ -669,7 +696,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     size: 28,
                   ),
                 ),
-                
+
                 // Profile Circles
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -693,9 +720,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // Description
             const AppText(
               'The stars reveal compatibility',
@@ -714,13 +741,14 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               height: 1.5,
             ),
             const SizedBox(height: 30),
-            
+
             // Check Compatibility Button
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
+                  Get.to(KundliMatchScreen());
                   if (profile1Name != null && profile2Name != null) {
                     CustomSnackbar.showInfo('Compatibility results coming soon!', title: 'Coming Soon');
                   } else {
@@ -748,6 +776,194 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       ),
     );
   }
+
+
+
+
+  Widget _buildMatchingForm() {
+    return ListView(
+      children: [
+        _buildSectionCard(
+          title: "Boy's Details",
+          titleIcon: sax.Iconsax.man_copy,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            //  _buildField("Name", "Enter name", sax.Iconsax.user_copy, controller: _boysNameController),
+            //  _buildField("Gender", "Select gender", sax.Iconsax.user_tag_copy, controller: _boysGenderController, isPicker: true, onTap: () => _showGenderSelection(_boysGenderController)),
+              _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _boysDobController, isPicker: true, onTap: () => _selectDate(context,_boysDobController)),
+              _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _boysTobController, isPicker: true, onTap: () => _selectTime(context,_boysTobController)),
+              _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _boysPobController),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+        _buildSectionCard(
+          title: "Girl's Details",
+          titleIcon: sax.Iconsax.woman_copy,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            //  _buildField("Name", "Enter name", sax.Iconsax.user_copy, controller: _girlsNameController),
+             // _buildField("Gender", "Select gender", sax.Iconsax.user_tag_copy, controller: _girlsGenderController, isPicker: true, onTap: () => _showGenderSelection(_girlsGenderController)),
+              _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _girlsDobController, isPicker: true, onTap: () => _selectDate(context,_girlsDobController)),
+              _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _girlsTobController, isPicker: true, onTap: () => _selectTime(context,_girlsTobController)),
+              _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _girlsPobController),
+            ],
+          ),
+        ),
+        const SizedBox(height: 30),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 30),
+          child: GestureDetector(
+            onTap: () => Get.to(() => KundliMatchScreen()),
+            child: Container(
+              height: 56,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryColor.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: AppText(
+                      "Generate Horoscope",
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  // Positioned(
+                  //   right: 20,
+                  //   top: 0,
+                  //   bottom: 0,
+                  //   child: Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withOpacity(0.5), size: 14),
+                  // ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildSectionCard({String? title, IconData? titleIcon, required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+        border: Border.all(color: AppColors.primaryColor.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (titleIcon != null) ...[
+                  Icon(titleIcon, size: 20, color: AppColors.primaryColor),
+                  const SizedBox(width: 8),
+                ],
+                Text(title, style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Container(height: 1, color: AppColors.primaryColor.withOpacity(0.05)),
+            const SizedBox(height: 12),
+          ],
+          child,
+        ],
+      ),
+    );
+  }
+
+
+
+  Widget _buildField(String label, String hint, IconData icon, {required TextEditingController controller, bool isPicker = false, VoidCallback? onTap}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4, top: 8),
+          child: AppText(label, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
+        ),
+        GestureDetector(
+          onTap: isPicker ? (onTap ?? () {}) : null,
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.fieldBackground,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.borderColor.withOpacity(0.3)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withOpacity(0.01),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(icon, size: 16, color: AppColors.primaryColor.withOpacity(0.6)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    cursorColor: AppColors.primaryColor,
+                    readOnly: isPicker,
+                    enabled: !isPicker,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
+                    onTap: isPicker ? (onTap ?? () {}) : null,
+                    decoration: InputDecoration(
+                      hintText: hint,
+                      hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
+                      filled: false,
+                      fillColor: Colors.transparent,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+                if (isPicker) Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.primaryColor.withOpacity(0.4)),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+
+
 
   Widget _buildInputField({
     required IconData icon,
@@ -842,6 +1058,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[month - 1];
   }
+
+
 
   Widget _buildProfileCircle(String initial, String? name, VoidCallback onTap) {
     return GestureDetector(

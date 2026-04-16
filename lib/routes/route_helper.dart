@@ -1,4 +1,6 @@
 import 'package:astro_user/features/astrologers/screens/astrologer_detail_screen.dart';
+import 'package:astro_user/features/matching/bindings/kundli_binding.dart';
+import 'package:astro_user/features/matching/screens/kundli_screen.dart';
 import 'package:astro_user/features/panchang/panchang_screen.dart';
 import 'package:astro_user/features/panchang/bindings/panchang_binding.dart';
 import 'package:astro_user/features/profile/bindings/profile_binding.dart';
@@ -69,6 +71,7 @@ class RouteHelper {
 
 
   static String getPanchangRoute() => AppRoutes.panchangScreen;
+  static String getKundaliRoute() => AppRoutes.kundaliScreen;
 
   static List<GetPage> routes = [
     GetPage(
@@ -243,6 +246,13 @@ class RouteHelper {
       page: () => const PanchangScreen(),
       transition: Transition.fadeIn,
       binding: PanchangBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.kundaliScreen,
+      page: () => const KundliScreen(),
+      transition: Transition.fadeIn,
+      binding: KundliBinding(),
     ),
   ];
 }
