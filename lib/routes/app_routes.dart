@@ -35,4 +35,5 @@ class AppRoutes {
 
   static const String panchangScreen = '/panchangScreen';
   static const String kundaliScreen = '/kundaliScreen';
+  static const String kundaliMatchingScreen = '/kundaliMatchingScreen';
 }

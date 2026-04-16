@@ -18,6 +18,7 @@ import '../features/auth/screens/arrival_screen.dart';
 import '../features/auth/screens/name_screen.dart';
 import '../features/auth/screens/gender_screen.dart';
 import '../features/auth/screens/birth_details_screen.dart';
+import '../features/matching/screens/kundali_matching_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/auth/screens/complete_profile_screen.dart';
 import '../features/auth/screens/registration_success_screen.dart';
@@ -72,6 +73,7 @@ class RouteHelper {
 
   static String getPanchangRoute() => AppRoutes.panchangScreen;
   static String getKundaliRoute() => AppRoutes.kundaliScreen;
+  static String getKundaliMatchingRoute() => AppRoutes.kundaliMatchingScreen;
 
   static List<GetPage> routes = [
     GetPage(
@@ -251,6 +253,13 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.kundaliScreen,
       page: () => const KundliScreen(),
+      transition: Transition.fadeIn,
+      binding: KundliBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.kundaliMatchingScreen,
+      page: () => const KundliMatchScreen(),
       transition: Transition.fadeIn,
       binding: KundliBinding(),
     ),

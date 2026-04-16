@@ -1,71 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
-
+import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
+import '../controllers/matching_controller.dart';
 
-
-final Map<String, dynamic> kundliData = {
-  "compatibility_score": 28.5,
-  "max_score": 36,
-  "percentage": 79.2,
-  "verdict": "Highly Compatible",
-  "recommendation": "This match is favorable for marriage. The couple shares good mental and emotional compatibility.",
-  "guna_milan": {
-    "varna": {
-      "score": 1,
-      "max": 1,
-      "description": "Spiritual compatibility - Both belong to compatible varnas"
-    },
-    "vashya": {
-      "score": 2,
-      "max": 2,
-      "description": "Dominance - Mutual respect and understanding"
-    },
-    "tara": {
-      "score": 3,
-      "max": 3,
-      "description": "Birth star compatibility - Favorable nakshatras"
-    },
-    "yoni": {
-      "score": 4,
-      "max": 4,
-      "description": "Physical compatibility - Excellent match"
-    },
-    "graha_maitri": {
-      "score": 4.5,
-      "max": 5,
-      "description": "Planetary friendship - Good mental compatibility"
-    },
-    "gana": {
-      "score": 6,
-      "max": 6,
-      "description": "Temperament - Both are Manushya gana"
-    },
-    "bhakoot": {
-      "score": 5,
-      "max": 7,
-      "description": "Love and affection - Minor doshas present"
-    },
-    "nadi": {
-      "score": 3,
-      "max": 8,
-      "description": "Health and genes - Nadi dosha partially present"
-    }
-  },
-  "doshas": {
-    "manglik": {
-      "male": {"present": false, "intensity": null},
-      "female": {"present": true, "intensity": "Mild", "cancelled_by": "Jupiter aspect"}
-    },
-    "nadi_dosha": {
-      "present": true,
-      "severity": "Low",
-      "remedies": ["Nadi Nivaran Puja", "Gold donation"]
-    }
-  }
-};
-
-class KundliMatchScreen extends StatelessWidget {
+class KundliMatchScreen extends GetView<MatchingController> {
   const KundliMatchScreen({Key? key}) : super(key: key);
 
   @override
@@ -87,9 +25,8 @@ class KundliMatchScreen extends StatelessWidget {
           centerTitle: true,
           backgroundColor: AppColors.white,
           elevation: 0,
-          // Removed the bottom line by not using bottom property
-          // and setting elevation to 0
           bottom: const TabBar(
+            dividerColor: Colors.transparent, // 👈 ye line add karo
             indicatorColor: AppColors.primaryColor,
             indicatorWeight: 2.5,
             labelColor: AppColors.primaryColor,
@@ -109,29 +46,47 @@ class KundliMatchScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [
-            OverviewTab(),
-            GunaMilanTab(),
-            DoshasTab(),
-          ],
-        ),
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.matchingData.value == null) {
+            return Center(
+              child: Text(
+                controller.errorMessage.value.isEmpty
+                    ? 'No matching data available'
+                    : controller.errorMessage.value,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            );
+          }
+
+          return const TabBarView(
+            children: [
+              OverviewTab(),
+              GunaMilanTab(),
+              DoshasTab(),
+            ],
+          );
+        }),
       ),
     );
   }
 }
 
 // ===================== TAB 1: OVERVIEW =====================
-class OverviewTab extends StatelessWidget {
+class OverviewTab extends GetView<MatchingController> {
   const OverviewTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final score = kundliData['compatibility_score'] as double;
-    final maxScore = kundliData['max_score'] as int;
-    final percentage = kundliData['percentage'] as double;
-    final verdict = kundliData['verdict'] as String;
-    final recommendation = kundliData['recommendation'] as String;
+    final data = controller.matchingData.value!.data;
+    final score = data.compatibilityScore;
+    final maxScore = data.maxScore;
+    final percentage = data.percentage;
+    final verdict = data.verdict;
+    final recommendation = data.recommendation;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -286,12 +241,12 @@ class OverviewTab extends StatelessWidget {
 }
 
 // ===================== TAB 2: GUNA MILAN (4 Columns) =====================
-class GunaMilanTab extends StatelessWidget {
+class GunaMilanTab extends GetView<MatchingController> {
   const GunaMilanTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final gunaData = kundliData['guna_milan'] as Map<String, dynamic>;
+    final gunaData = controller.matchingData.value!.data.gunaMilan.toMap();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -361,13 +316,11 @@ class GunaMilanTab extends StatelessWidget {
           // Guna Rows
           ...gunaData.entries.map((entry) {
             final key = entry.key;
-            final value = entry.value as Map<String, dynamic>;
-            final score = value['score'] is double
-                ? (value['score'] as double).toString()
-                : value['score'].toString();
-            final maxScore = value['max'].toString();
-            final description = value['description'].split('-').first.trim();
-           // final gunaName = key[0].toUpperCase() + key.substring(1);
+            final value = entry.value;
+            final score = value.score.toString();
+            final maxScore = value.max.toString();
+            final description = value.description.split('-').first.trim();
+            
             final gunaName = key.contains('_')
                 ? key.split('_').last
                 : key;
@@ -444,14 +397,14 @@ class GunaMilanTab extends StatelessWidget {
 }
 
 // ===================== TAB 3: DOSHAS =====================
-class DoshasTab extends StatelessWidget {
+class DoshasTab extends GetView<MatchingController> {
   const DoshasTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final doshasData = kundliData['doshas'] as Map<String, dynamic>;
-    final manglikData = doshasData['manglik'] as Map<String, dynamic>;
-    final nadiData = doshasData['nadi_dosha'] as Map<String, dynamic>;
+    final doshasData = controller.matchingData.value!.data.doshas;
+    final manglikData = doshasData.manglik;
+    final nadiData = doshasData.nadiDosha;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -492,17 +445,17 @@ class DoshasTab extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: (manglikData['female']['present'] as bool)
+                          color: manglikData.female.present
                               ? AppColors.errorColor.withOpacity(0.1)
                               : AppColors.successColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          (manglikData['female']['present'] as bool) ? 'Active' : 'Clear',
+                          manglikData.female.present ? 'Active' : 'Clear',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: (manglikData['female']['present'] as bool)
+                            color: manglikData.female.present
                                 ? AppColors.errorColor
                                 : AppColors.successColor,
                           ),
@@ -518,16 +471,16 @@ class DoshasTab extends StatelessWidget {
                     children: [
                       _buildDoshaStatusRow(
                         'Male',
-                        (manglikData['male']['present'] as bool) ? 'Present' : 'Not Present',
-                        (manglikData['male']['present'] as bool),
+                        manglikData.male.present ? 'Present' : 'Not Present',
+                        manglikData.male.present,
                       ),
                       const SizedBox(height: 12),
                       _buildDoshaStatusRow(
                         'Female',
-                        (manglikData['female']['present'] as bool) ? 'Present' : 'Not Present',
-                        (manglikData['female']['present'] as bool),
+                        manglikData.female.present ? 'Present' : 'Not Present',
+                        manglikData.female.present,
                       ),
-                      if (manglikData['female']['present'] as bool) ...[
+                      if (manglikData.female.present) ...[
                         const SizedBox(height: 16),
                         Container(
                           padding: const EdgeInsets.all(12),
@@ -547,7 +500,7 @@ class DoshasTab extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    manglikData['female']['intensity'] as String,
+                                    manglikData.female.intensity ?? 'N/A',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
@@ -566,7 +519,7 @@ class DoshasTab extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    manglikData['female']['cancelled_by'] as String,
+                                    manglikData.female.cancelledBy ?? 'N/A',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 13,
@@ -620,17 +573,17 @@ class DoshasTab extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: (nadiData['present'] as bool)
+                          color: nadiData.present
                               ? AppColors.warningColor.withOpacity(0.1)
                               : AppColors.successColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          (nadiData['present'] as bool) ? 'Partial' : 'Clear',
+                          nadiData.present ? 'Partial' : 'Clear',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: (nadiData['present'] as bool)
+                            color: nadiData.present
                                 ? AppColors.warningColor
                                 : AppColors.successColor,
                           ),
@@ -646,14 +599,14 @@ class DoshasTab extends StatelessWidget {
                     children: [
                       _buildDoshaStatusRow(
                         'Status',
-                        (nadiData['present'] as bool) ? 'Present' : 'Not Present',
-                        (nadiData['present'] as bool),
+                        nadiData.present ? 'Present' : 'Not Present',
+                        nadiData.present,
                       ),
-                      if (nadiData['present'] as bool) ...[
+                      if (nadiData.present) ...[
                         const SizedBox(height: 12),
                         _buildDoshaStatusRow(
                           'Severity',
-                          nadiData['severity'] as String,
+                          nadiData.severity,
                           true,
                           isWarning: true,
                         ),
@@ -675,7 +628,7 @@ class DoshasTab extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              ...(nadiData['remedies'] as List).map((remedy) => Padding(
+                              ...nadiData.remedies.map((remedy) => Padding(
                                 padding: const EdgeInsets.only(left: 8, bottom: 6),
                                 child: Row(
                                   children: [

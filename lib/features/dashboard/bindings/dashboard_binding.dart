@@ -56,6 +56,10 @@ import '../../astrologers/domain/services/gift_service.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../notification/domain/repositories/notification_repository.dart';
 import '../../notification/controllers/notification_controller.dart';
+import '../../matching/controllers/matching_controller.dart';
+import '../../matching/data/repositories/matching_repository_impl.dart';
+import '../../matching/domain/repositories/matching_repository.dart';
+import '../../matching/domain/usecases/get_matching_usecase.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -165,6 +169,13 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
     Get.lazyPut(() => FounderController(
       getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
+    ));
+
+    // Matching (Kundli Matching)
+    Get.lazyPut<MatchingRepository>(() => MatchingRepositoryImpl());
+    Get.lazyPut(() => GetMatchingUseCase(repository: Get.find<MatchingRepository>()));
+    Get.lazyPut(() => MatchingController(
+      getMatchingUseCase: Get.find<GetMatchingUseCase>(),
     ));
   }
 }
