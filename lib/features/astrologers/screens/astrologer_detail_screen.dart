@@ -1043,7 +1043,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText('Vera', fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF4A148C)),
+                  AppText("", fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF4A148C)),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,

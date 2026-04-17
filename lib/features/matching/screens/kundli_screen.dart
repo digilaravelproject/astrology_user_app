@@ -69,14 +69,22 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
     
     // Only fetch if not skipped and we don't have data
     if (!skipFetch && controller.kundliData.value == null) {
-      // Fetch data with provided parameters
-      controller.fetchKundliData(
-        birthDate: widget.birthDate,
-        birthTime: widget.birthTime,
-        latitude: widget.latitude,
-        longitude: widget.longitude,
-        datetime: widget.datetime,
-      );
+      // Fetch data with provided parameters - all required
+      if (widget.birthDate != null && 
+          widget.birthTime != null && 
+          widget.latitude != null && 
+          widget.longitude != null && 
+          widget.datetime != null) {
+        controller.fetchKundliData(
+          birthDate: widget.birthDate!,
+          birthTime: widget.birthTime!,
+          latitude: widget.latitude!,
+          longitude: widget.longitude!,
+          datetime: widget.datetime!,
+        );
+      } else {
+        print('[KUNDLI_APP] [ERROR] Missing required parameters for birth chart API');
+      }
     }
   }
 

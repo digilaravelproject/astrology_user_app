@@ -18,8 +18,6 @@ import 'match_making_screen.dart';
 class MatchingScreen extends StatefulWidget {
   const MatchingScreen({super.key});
 
-
-
   @override
   State<MatchingScreen> createState() => _MatchingScreenState();
 }
@@ -591,63 +589,156 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   Widget _buildMatchingForm() {
     return GetX<MatchingController>(
       init: Get.find<MatchingController>(),
-      builder: (matchingController) => ListView(
-      children: [
-        _buildSectionCard(
-          title: "Boy's Details",
-          titleIcon: sax.Iconsax.man_copy,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _boysDobController, isPicker: true, onTap: () => _selectDate(context,_boysDobController)),
-              _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _boysTobController, isPicker: true, onTap: () => _selectTime(context,_boysTobController)),
-              _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _boysPobController),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        _buildSectionCard(
-          title: "Girl's Details",
-          titleIcon: sax.Iconsax.woman_copy,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _girlsDobController, isPicker: true, onTap: () => _selectDate(context,_girlsDobController)),
-              _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _girlsTobController, isPicker: true, onTap: () => _selectTime(context,_girlsTobController)),
-              _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _girlsPobController),
-            ],
-          ),
-        ),
-        const SizedBox(height: 30),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 30),
-          child: GestureDetector(
-            onTap: matchingController.isLoading.value ? null : () async {
-              // Validate all fields
-              if (_boysDobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please select boy\'s date of birth');
-                return;
-              }
-              if (_boysTobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please select boy\'s time of birth');
-                return;
-              }
-              if (_boysPobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please enter boy\'s place of birth');
-                return;
-              }
-              if (_girlsDobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please select girl\'s date of birth');
-                return;
-              }
-              if (_girlsTobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please select girl\'s time of birth');
-                return;
-              }
-              if (_girlsPobController.text.trim().isEmpty) {
-                CustomSnackbar.showError('Please enter girl\'s place of birth');
-                return;
-              }
+      builder: (matchingController) {
+        // Validation error states - local to this widget
+        final boyDobError = ''.obs;
+        final boyTobError = ''.obs;
+        final boyPobError = ''.obs;
+        final girlDobError = ''.obs;
+        final girlTobError = ''.obs;
+        final girlPobError = ''.obs;
+
+        return ListView(
+          children: [
+            _buildSectionCard(
+              title: "Boy's Details",
+              titleIcon: sax.Iconsax.man_copy,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _boysDobController, isPicker: true, onTap: () {
+                    boyDobError.value = '';
+                    _selectDate(context, _boysDobController);
+                  }),
+                  Obx(() => boyDobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            boyDobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                  _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _boysTobController, isPicker: true, onTap: () {
+                    boyTobError.value = '';
+                    _selectTime(context, _boysTobController);
+                  }),
+                  Obx(() => boyTobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            boyTobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                  _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _boysPobController),
+                  Obx(() => boyPobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            boyPobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildSectionCard(
+              title: "Girl's Details",
+              titleIcon: sax.Iconsax.woman_copy,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _girlsDobController, isPicker: true, onTap: () {
+                    girlDobError.value = '';
+                    _selectDate(context, _girlsDobController);
+                  }),
+                  Obx(() => girlDobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            girlDobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                  _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _girlsTobController, isPicker: true, onTap: () {
+                    girlTobError.value = '';
+                    _selectTime(context, _girlsTobController);
+                  }),
+                  Obx(() => girlTobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            girlTobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                  _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _girlsPobController),
+                  Obx(() => girlPobError.value.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            girlPobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        )
+                      : const SizedBox.shrink()),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 30),
+              child: GestureDetector(
+                onTap: matchingController.isLoading.value ? null : () async {
+                  // Clear previous errors
+                  boyDobError.value = '';
+                  boyTobError.value = '';
+                  boyPobError.value = '';
+                  girlDobError.value = '';
+                  girlTobError.value = '';
+                  girlPobError.value = '';
+
+                  // Validate all fields
+                  bool hasError = false;
+                  
+                  if (_boysDobController.text.trim().isEmpty) {
+                    boyDobError.value = 'Please select boy\'s date of birth';
+                    hasError = true;
+                  }
+                  if (_boysTobController.text.trim().isEmpty) {
+                    boyTobError.value = 'Please select boy\'s time of birth';
+                    hasError = true;
+                  }
+                  if (_boysPobController.text.trim().isEmpty) {
+                    boyPobError.value = 'Please enter boy\'s place of birth';
+                    hasError = true;
+                  }
+                  if (_girlsDobController.text.trim().isEmpty) {
+                    girlDobError.value = 'Please select girl\'s date of birth';
+                    hasError = true;
+                  }
+                  if (_girlsTobController.text.trim().isEmpty) {
+                    girlTobError.value = 'Please select girl\'s time of birth';
+                    hasError = true;
+                  }
+                  if (_girlsPobController.text.trim().isEmpty) {
+                    girlPobError.value = 'Please enter girl\'s place of birth';
+                    hasError = true;
+                  }
+
+                  if (hasError) return;
 
               // Convert date format from "15-Jan-1995" to "1995-01-15"
               String convertDate(String dateStr) {
@@ -735,7 +826,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
           ),
         ),
       ],
-    ));
+    );
+      },
+    );
   }
 
 

@@ -63,6 +63,10 @@ class AppUrls {
 
 
   static const String createKundali = '/api/v1/kundli/create';
+  static const String getKundali = '/api/v1/kundli';
+  static String getKundaliById(int id) => '/api/v1/kundli/$id';
+  static String updateKundali(int id) => '/api/v1/kundli/$id';
+  static String deleteKundali(int id) => '/api/v1/kundli/$id';
 
 
 

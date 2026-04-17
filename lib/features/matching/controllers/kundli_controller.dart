@@ -253,29 +253,36 @@ class KundliController extends GetxController {
   }
 
   Future<void> fetchKundliData({
-    String? birthDate,
-    String? birthTime,
-    double? latitude,
-    double? longitude,
-    String? datetime,
+    required String birthDate,
+    required String birthTime,
+    required double latitude,
+    required double longitude,
+    required String datetime,
   }) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
       final request = KundliRequestModel(
-        birthDate: birthDate ?? '1995-08-15',
-        birthTime: birthTime ?? '10:30',
-        latitude: latitude ?? 28.6139,
-        longitude: longitude ?? 77.2090,
-        datetime: datetime ?? '1990-01-15T14:30:00',
+        birthDate: birthDate,
+        birthTime: birthTime,
+        latitude: latitude,
+        longitude: longitude,
+        datetime: datetime,
       );
 
       print('[KUNDLI_APP] [DEBUG] Controller: Fetching kundli data');
+      print('[KUNDLI_APP] [DEBUG] Controller: Request - birthDate: $birthDate, birthTime: $birthTime');
+      print('[KUNDLI_APP] [DEBUG] Controller: Request - latitude: $latitude, longitude: $longitude');
+      print('[KUNDLI_APP] [DEBUG] Controller: Request - datetime: $datetime');
+      
       final result = await getBirthChartUseCase.call(request);
       
       kundliData.value = result;
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli data set successfully');
+      print('[KUNDLI_APP] [DEBUG] Controller: Response - date: ${result.data.birthDetails.date}');
+      print('[KUNDLI_APP] [DEBUG] Controller: Response - time: ${result.data.birthDetails.time}');
+      print('[KUNDLI_APP] [DEBUG] Controller: Response - place: ${result.data.birthDetails.place}');
     } catch (e) {
       print('[KUNDLI_APP] [ERROR] Controller: Failed to load kundli: $e');
       errorMessage.value = 'Failed to load kundli data: $e';

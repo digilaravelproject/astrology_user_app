@@ -85,7 +85,7 @@ class KundliRepositoryImpl implements KundliRepository {
       print('[KUNDLI_APP] [DEBUG] Repository: Fetching kundli list');
       
       final response = await apiClient.get(
-        '/api/v1/kundli?per_page=$perPage',
+        '${AppUrls.getKundali}?per_page=$perPage',
         handleError: false,
         showToaster: false,
       );
@@ -118,7 +118,8 @@ class KundliRepositoryImpl implements KundliRepository {
       print('[KUNDLI_APP] [DEBUG] Repository: Fetching kundli by id: $id');
       
       final response = await apiClient.get(
-        '/api/v1/kundli/$id',
+       // '/api/v1/kundli/$id',
+        AppUrls.getKundaliById(id),
         handleError: false,
         showToaster: false,
       );
@@ -155,7 +156,8 @@ class KundliRepositoryImpl implements KundliRepository {
       print('[KUNDLI_APP] [DEBUG] Repository: Request data: ${request.toJson()}');
       
       final response = await apiClient.put(
-        '/api/v1/kundli/$id',
+        //'/api/v1/kundli/$id',
+        AppUrls.updateKundali(id),
         data: request.toJson(),
         handleError: false,
         showToaster: false,
@@ -182,7 +184,8 @@ class KundliRepositoryImpl implements KundliRepository {
       print('[KUNDLI_APP] [DEBUG] Repository: Deleting kundli id: $id');
       
       final response = await apiClient.delete(
-        '/api/v1/kundli/$id',
+        AppUrls.deleteKundali(id),
+       // '/api/v1/kundli/$id',
         handleError: false,
         showToaster: false,
       );
