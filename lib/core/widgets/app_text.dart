@@ -15,6 +15,7 @@ class AppText extends StatelessWidget {
   final Color? color;
   final double? letterSpacing;
   final double? height;
+  final TextDecoration? decoration;
 
   const AppText(
     this.text, {
@@ -30,6 +31,7 @@ class AppText extends StatelessWidget {
     this.color,
     this.letterSpacing,
     this.height,
+        this.decoration,
   }) : super(key: key);
 
   @override
@@ -43,6 +45,7 @@ class AppText extends StatelessWidget {
       color: color,
       letterSpacing: letterSpacing,
       height: height,
+      decoration: decoration,
     );
 
     return Text(

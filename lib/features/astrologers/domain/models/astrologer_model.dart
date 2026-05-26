@@ -16,6 +16,7 @@ class AstrologerModel {
   final String? email;
   final bool isChatEnabled;
   final bool isCallEnabled;
+  final bool isVideoCallEnabled;
   final double rating;
   final bool isOnline;
   final bool isFollowed;
@@ -38,6 +39,7 @@ class AstrologerModel {
     this.email,
     this.isChatEnabled = false,
     this.isCallEnabled = false,
+    this.isVideoCallEnabled = false,
     this.isOnline = false,
     this.rating = 0.0,
     this.totalOrders = 0,
@@ -56,14 +58,15 @@ class AstrologerModel {
       languages: List<String>.from(json['languages'] ?? []),
       profilePhoto: json['profile_photo'],
       bio: json['bio'] ?? '',
-      chatRate: json['chat_rate'],
-      callRate: json['call_rate'],
+      chatRate: json['chat_rate_per_minute'],
+      callRate: json['call_rate_per_minute'],
       videoCallRate: json['video_call_rate'],
       name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
       phone: userData['phone'],
       email: userData['email'],
-      isChatEnabled: json['is_chat_enabled'] == 1,
-      isCallEnabled: json['is_call_enabled'] == 1,
+      isChatEnabled: json['is_chat_enabled'] == true,
+      isCallEnabled: json['is_call_enabled'] == true,
+      isVideoCallEnabled: json['is_video_call_enabled'] == true,
       isOnline: json['is_online'] == 1 || json['is_online'] == true,
       rating: double.tryParse(json['reviews_avg_rating']?.toString() ?? json['avg_rating']?.toString() ?? '0') ?? 0.0,
       totalOrders: json['total_orders'] ?? 0,

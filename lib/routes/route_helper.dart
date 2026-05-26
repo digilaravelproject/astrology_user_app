@@ -1,4 +1,8 @@
 import 'package:astro_user/features/astrologers/screens/astrologer_detail_screen.dart';
+import 'package:astro_user/features/matching/bindings/kundli_binding.dart';
+import 'package:astro_user/features/matching/screens/kundli_screen.dart';
+import 'package:astro_user/features/panchang/panchang_screen.dart';
+import 'package:astro_user/features/panchang/bindings/panchang_binding.dart';
 import 'package:astro_user/features/profile/bindings/profile_binding.dart';
 import 'package:astro_user/features/profile/screens/edit_profile_screen.dart';
 import 'package:astro_user/features/profile/screens/following_screen.dart';
@@ -14,6 +18,7 @@ import '../features/auth/screens/arrival_screen.dart';
 import '../features/auth/screens/name_screen.dart';
 import '../features/auth/screens/gender_screen.dart';
 import '../features/auth/screens/birth_details_screen.dart';
+import '../features/matching/screens/kundali_matching_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
 import '../features/auth/screens/complete_profile_screen.dart';
 import '../features/auth/screens/registration_success_screen.dart';
@@ -23,6 +28,7 @@ import '../features/home/screens/home_screen.dart';
 import '../features/wallet/screens/wallet_screen.dart';
 import '../features/wallet/screens/payment_success_screen.dart';
 import '../features/matrimony/screens/matrimony_screen.dart';
+import '../features/matrimony/screens/my_matrimony_profile_screen.dart';
 import '../features/remedy/screens/remedy_detail_screen.dart';
 import '../features/call/screens/call_list_screen.dart';
 import '../features/chat/screens/chat_list_screen.dart';
@@ -56,12 +62,18 @@ class RouteHelper {
   static String getDashboardRoute() => AppRoutes.dashboard;
   static String getWalletRoute() => AppRoutes.wallet;
   static String getMatrimonyRoute() => AppRoutes.matrimony;
+  static String getMyMatrimonyProfileRoute() => AppRoutes.myMatrimonyProfile;
   static String getRemedyDetailRoute(int id) => '${AppRoutes.remedyDetail}/$id';
   static String getCallListRoute() => AppRoutes.callList;
   static String getChatListRoute() => AppRoutes.chatList;
   static String getEditProfileRoute() => AppRoutes.editProfile;
   static String getPaymentSuccessRoute() => AppRoutes.paymentSuccess;
   static String getNotificationRoute() => AppRoutes.notification;
+
+
+  static String getPanchangRoute() => AppRoutes.panchangScreen;
+  static String getKundaliRoute() => AppRoutes.kundaliScreen;
+  static String getKundaliMatchingRoute() => AppRoutes.kundaliMatchingScreen;
 
   static List<GetPage> routes = [
     GetPage(
@@ -155,6 +167,12 @@ class RouteHelper {
       binding: MatrimonyBinding(),
     ),
     GetPage(
+      name: AppRoutes.myMatrimonyProfile,
+      page: () => const MyMatrimonyProfileScreen(),
+      transition: Transition.rightToLeft,
+      binding: MatrimonyBinding(),
+    ),
+    GetPage(
       name: AppRoutes.remedyDetail,
       page: () => RemedyDetailScreen(remedyId: 0, imageUrl: ''),
       transition: Transition.rightToLeft,
@@ -223,6 +241,27 @@ class RouteHelper {
       name: AppRoutes.subscriptionSuccess,
       page: () => const SubscriptionSuccessScreen(),
       transition: Transition.fadeIn,
+    ),
+
+    GetPage(
+      name: AppRoutes.panchangScreen,
+      page: () => const PanchangScreen(),
+      transition: Transition.fadeIn,
+      binding: PanchangBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.kundaliScreen,
+      page: () => const KundliScreen(),
+      transition: Transition.fadeIn,
+      binding: KundliBinding(),
+    ),
+
+    GetPage(
+      name: AppRoutes.kundaliMatchingScreen,
+      page: () => const KundliMatchScreen(),
+      transition: Transition.fadeIn,
+      binding: KundliBinding(),
     ),
   ];
 }

@@ -5,8 +5,10 @@ import '../models/matrimony_profile_model.dart';
 
 abstract class MatrimonyServiceInterface {
   Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo);
+  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile, XFile? photo);
   Future<ResponseModel> getMatrimonyProfile();
   Future<ResponseModel> getMatrimonyProfileDetails(int id);
+  Future<ResponseModel> getMyMatrimonyProfileDetails(int userId);
   Future<ResponseModel> searchMatrimonyProfiles(String query);
   Future<ResponseModel> blockProfile(int id);
   Future<ResponseModel> reportProfile(int id, String reason);
@@ -25,6 +27,11 @@ class MatrimonyService implements MatrimonyServiceInterface {
   }
 
   @override
+  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile, XFile? photo) {
+    return repository.updateProfile(profile, photo);
+  }
+
+  @override
   Future<ResponseModel> getMatrimonyProfile() {
     return repository.getMatrimonyProfile();
   }
@@ -32,6 +39,11 @@ class MatrimonyService implements MatrimonyServiceInterface {
   @override
   Future<ResponseModel> getMatrimonyProfileDetails(int id) async {
     return await repository.getMatrimonyProfileDetails(id);
+  }
+
+  @override
+  Future<ResponseModel> getMyMatrimonyProfileDetails(int userId) async {
+    return await repository.getMyMatrimonyProfileDetails(userId);
   }
 
   @override

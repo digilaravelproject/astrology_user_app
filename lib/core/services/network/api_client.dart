@@ -277,6 +277,138 @@ class ApiClient {
     }
   }
 
+
+
+
+  Future<ResponseModel> putMultipartData(
+      String path,
+      Map<String, String> body,
+      List<MultipartBody> multipartBody,
+      List<MultipartDocument> otherFile, {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress,
+        bool fromChat = false,
+        bool handleError = AppConstants.handleError,
+        bool showToaster = AppConstants.showToaster,
+        bool showErrorScreen = AppConstants.isHandleErrorScreen,
+        bool showInternetScreen = AppConstants.isHandleInternetScreen,
+      }) async {
+
+    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    }
+
+    try {
+      Logger.d('ApiClient() => PUT Multipart request: $path');
+
+      dio.FormData formData = dio.FormData();
+
+      // 🔹 Add body fields
+      body.forEach((key, value) {
+        formData.fields.add(MapEntry(key, value));
+      });
+
+      // 🔹 Add images/files
+      for (MultipartBody multipart in multipartBody) {
+        if (multipart.file != null) {
+          if (kIsWeb) {
+            List<int> bytes = await multipart.file!.readAsBytes();
+            formData.files.add(MapEntry(
+              multipart.key,
+              dio.MultipartFile.fromBytes(
+                bytes,
+                filename: basename(multipart.file!.path),
+                contentType: MediaType('image', 'jpg'),
+              ),
+            ));
+          } else {
+            File file = File(multipart.file!.path);
+            formData.files.add(MapEntry(
+              multipart.key,
+              await dio.MultipartFile.fromFile(
+                file.path,
+                filename: basename(file.path),
+              ),
+            ));
+          }
+        }
+      }
+
+      // 🔹 Other files
+      if (otherFile.isNotEmpty) {
+        for (MultipartDocument file in otherFile) {
+          if (kIsWeb) {
+            if (fromChat) {
+              PlatformFile platformFile = file.file!.files.first;
+              formData.files.add(MapEntry(
+                'image[]',
+                dio.MultipartFile.fromBytes(
+                  platformFile.bytes!,
+                  filename: platformFile.name,
+                ),
+              ));
+            } else {
+              var fileBytes = file.file!.files.first.bytes!;
+              formData.files.add(MapEntry(
+                file.key,
+                dio.MultipartFile.fromBytes(
+                  fileBytes,
+                  filename: file.file!.files.first.name,
+                ),
+              ));
+            }
+          } else {
+            File other = File(file.file!.files.single.path!);
+            formData.files.add(MapEntry(
+              file.key,
+              await dio.MultipartFile.fromFile(
+                other.path,
+                filename: basename(other.path),
+              ),
+            ));
+          }
+        }
+      }
+
+      // 🔥 MAIN CHANGE: POST → PUT
+      final response = await _dio.put(
+        path,
+        data: formData,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress,
+      );
+
+      Logger.d('ApiClient() => PUT Multipart response: ${response.data}');
+
+      if (handleError) {
+        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
+
+        if (result.data is Map<String, dynamic>) {
+          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        } else {
+          return ResponseModel(
+            isSuccess: result.statusCode == 200 || result.statusCode == 201,
+            message: 'Multipart upload completed with status ${result.statusCode}',
+            statusCode: result.statusCode,
+            body: result.data,
+          );
+        }
+      } else {
+        return ApiChecker.checkApi(response, showToaster: showToaster);
+      }
+
+    } catch (e) {
+      Logger.e('ApiClient() => PUT Multipart error: $e');
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+    }
+  }
+
   Future<ResponseModel> put(
       String path, {
         dynamic data,

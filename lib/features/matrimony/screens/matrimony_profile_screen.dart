@@ -50,8 +50,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   void initState() {
     super.initState();
     _startAutoSlide();
-    if (widget.profile.id != null) {
-      _controller.getMatrimonyProfileDetails(widget.profile.id!);
+    
+    // Clear previous profile data to avoid showing stale data
+    _controller.selectedProfile.value = null;
+    
+    if (widget.profile.userId != null) {
+      print('MatrimonyProfileScreen: Loading profile for userId: ${widget.profile.userId}');
+      _controller.getMyMatrimonyProfileDetails(widget.profile.userId!);
+    } else {
+      print('MatrimonyProfileScreen: userId is null!');
     }
   }
 
@@ -223,9 +230,9 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
 
         final profile = _controller.selectedProfile.value ?? widget.profile;
         
-        return _showDetails
-            ? SingleChildScrollView(
-                child: Column(
+        return SingleChildScrollView(
+          child: _showDetails
+              ? Column(
                   children: [
                     _buildProfileHeader(profile),
                     const SizedBox(height: 16),
@@ -242,12 +249,9 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     _buildIgnoredSection(),
                     const SizedBox(height: 32),
                   ],
-                ),
-              )
-            : SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: _buildProfileHeader(profile),
-              );
+                )
+              : _buildProfileHeader(profile),
+        );
       }),
     );
   }

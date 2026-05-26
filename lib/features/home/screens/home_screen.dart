@@ -201,9 +201,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const SizedBox(height: 35),
                     const LiveSessionSection(),
-                    const SizedBox(height: 35),
-                    const RemedyServicesSection(),
-                    const SizedBox(height: 150),
+                    //const SizedBox(height: 35),
+                    // const RemedyServicesSection(),
+                     const SizedBox(height: 130),
                   ],
                 )
             ),

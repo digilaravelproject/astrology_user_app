@@ -14,6 +14,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String wallet = '/wallet';
   static const String matrimony = '/matrimony';
+  static const String myMatrimonyProfile = '/my-matrimony-profile';
   static const String astrologerDetail = '/astrologer-detail';
   static const String callList = '/call-list';
   static const String chatList = '/chat-list';
@@ -30,4 +31,9 @@ class AppRoutes {
   static const String paymentSuccess = '/payment-success';
   static const String subscriptionSuccess = '/subscription-success';
   static const String notification = '/notification';
+
+
+  static const String panchangScreen = '/panchangScreen';
+  static const String kundaliScreen = '/kundaliScreen';
+  static const String kundaliMatchingScreen = '/kundaliMatchingScreen';
 }

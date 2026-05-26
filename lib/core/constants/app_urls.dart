@@ -1,6 +1,7 @@
 
 class AppUrls {
   static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
+  //static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
   static const String baseImageUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com/storage/app/public/";
   static String sendOtp = "/api/v1/user/send-otp";
   static String verifyOtp = "/api/v1/user/verify-otp";
@@ -19,8 +20,10 @@ class AppUrls {
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
+  static const String updateMatrimonyProfile = '/api/v1/user/matrimony/update_profile';
   static const String getMatrimonyProfile = '/api/v1/user/matrimony/profiles';
   static String getMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles/$id';
+  static String getMyMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles_user_id/$id';
   static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
   static String blockMatrimonyProfile(int id) => '$astrologers/$id/block';
   static String reportMatrimonyProfile(int id) => '$astrologers/$id/report';
@@ -56,4 +59,17 @@ class AppUrls {
   static const String aboutUs = '/api/v1/static-pages/about_us';
   static const String customerSupport = '/api/v1/static-pages/customer_support';
   static const String foundersWords = '/api/v1/user/founders-words';
+
+
+
+  static const String createKundali = '/api/v1/kundli/create';
+  static const String getKundali = '/api/v1/kundli';
+  static String getKundaliById(int id) => '/api/v1/kundli/$id';
+  static String updateKundali(int id) => '/api/v1/kundli/$id';
+  static String deleteKundali(int id) => '/api/v1/kundli/$id';
+
+
+
+  static String getPanchangByDate(String date) => 'https://api.vedika.io/sandbox/panchang/$date';
+
 }

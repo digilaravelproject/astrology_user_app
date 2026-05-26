@@ -35,10 +35,17 @@ class AstrologersPreviewSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 40),
             child: Column(
               children: [
-                Icon(Icons.person_search_rounded,
-                    size: 64, color: Colors.grey[300]),
+                Icon(
+                  Icons.person_search_rounded,
+                  size: 64,
+                  color: Colors.grey[300],
+                ),
                 const SizedBox(height: 16),
-                AppText('No Astrologers Found', color: Colors.grey, fontSize: 16),
+                AppText(
+                  'No Astrologers Found',
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
               ],
             ),
           ),
@@ -55,7 +62,6 @@ class AstrologersPreviewSection extends StatelessWidget {
       );
     });
   }
-
 
   Widget _buildAstrologerCard(BuildContext context, AstrologerModel astro) {
     return GestureDetector(
@@ -103,7 +109,9 @@ class AstrologersPreviewSection extends StatelessWidget {
                     Container(
                       width: 72,
                       height: 72,
-                      padding: const EdgeInsets.all(4), // Space between gold and image
+                      padding: const EdgeInsets.all(
+                        4,
+                      ), // Space between gold and image
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -117,12 +125,14 @@ class AstrologersPreviewSection extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
-                            ? CustomImageWidget(
-                                imagePath: astro.fullProfilePhoto,
-                                fit: BoxFit.cover,
-                              )
-                            : _buildPlaceholderLarge(),
+                        child:
+                            astro.profilePhoto != null &&
+                                    astro.profilePhoto!.isNotEmpty
+                                ? CustomImageWidget(
+                                  imagePath: astro.fullProfilePhoto,
+                                  fit: BoxFit.cover,
+                                )
+                                : _buildPlaceholderLarge(),
                       ),
                     ),
                     Positioned(
@@ -132,12 +142,9 @@ class AstrologersPreviewSection extends StatelessWidget {
                         width: 18,
                         height: 18,
                         decoration: BoxDecoration(
-                          color: astro.isOnline ? Colors.green : Colors.grey,
+                          color: astro.isOnline ? Colors.green : Colors.red,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2.5,
-                          ),
+                          border: Border.all(color: Colors.white, width: 2.5),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -151,10 +158,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 // Rating and Orders Placeholder
-                CustomRatingBar(
-                  rating: astro.rating,
-                  size: 15,
-                ),
+                CustomRatingBar(rating: astro.rating, size: 15),
                 const SizedBox(width: 12),
                 AppText(
                   '${astro.totalOrders > 0 ? astro.totalOrders : (astro.id * 15 + 100)}k+ ${AppStrings.ordersLabel}',
@@ -184,11 +188,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
-                        Icons.verified,
-                        color: Colors.green,
-                        size: 16,
-                      ),
+                      const Icon(Icons.verified, color: Colors.green, size: 16),
                     ],
                   ),
 
@@ -222,65 +222,95 @@ class AstrologersPreviewSection extends StatelessWidget {
                     color: AppColors.deepPink.withOpacity(0.8),
                   ),
                   const SizedBox(height: 12),
+
                   // Buttons Row
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (astro.chatRate != null)
-                          CustomButton(
-                            text: '${AppStrings.chat}',
-                            icon: Icons.chat_bubble_outline_rounded,
-                            fontSize: 10,
-                            height: 32,
-                            width: 85,
-                            borderRadius: 8,
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            onTap: () {
-                              final walletController = Get.find<WalletController>();
-                              final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                              WalletHelper.checkBalanceAndProceed(
-                                context: context,
-                                type: 'chat',
-                                name: astro.name,
-                                imageUrl: astro.fullProfilePhoto,
-                                price: astro.chatRate ?? '0',
-                                simulatedBalance: balance,
-                              );
-                            },
-                          ),
-                        if (astro.chatRate != null && astro.callRate != null)
-                          const SizedBox(width: 10),
-                        if (astro.callRate != null)
-                          CustomButton(
-                            text: '${AppStrings.call}',
-                            icon: Icons.call_outlined,
-                            fontSize: 10,
-                            height: 32,
-                            width: 85,
-                            borderRadius: 8,
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
+
+                    child:
+                        (astro.isOnline)
+                            ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (astro.isChatEnabled)
+                                  CustomButton(
+                                    text: '${AppStrings.chat}',
+                                    icon: Icons.chat_bubble_outline_rounded,
+                                    fontSize: 10,
+                                    height: 32,
+                                    width: 85,
+                                    borderRadius: 8,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    onTap: () {
+                                      final walletController =
+                                          Get.find<WalletController>();
+                                      final double balance =
+                                          double.tryParse(
+                                            walletController.balance,
+                                          ) ??
+                                          0.0;
+                                      WalletHelper.checkBalanceAndProceed(
+                                        context: context,
+                                        type: 'chat',
+                                        name: astro.name,
+                                        imageUrl: astro.fullProfilePhoto,
+                                        price: astro.chatRate ?? '0',
+                                        simulatedBalance: balance,
+                                      );
+                                    },
+                                  ),
+                                //  if (astro.chatRate != null && astro.callRate != null)
+                                const SizedBox(width: 10),
+                                if (astro.isCallEnabled ||
+                                    astro.isVideoCallEnabled)
+                                  CustomButton(
+                                    text: '${AppStrings.call}',
+                                    icon: Icons.call_outlined,
+                                    fontSize: 10,
+                                    height: 32,
+                                    width: 85,
+                                    borderRadius: 8,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF4CAF50),
+                                        Color(0xFF388E3C),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    onTap: () {
+                                      final walletController =
+                                          Get.find<WalletController>();
+                                      final double balance =
+                                          double.tryParse(
+                                            walletController.balance,
+                                          ) ??
+                                          0.0;
+                                      WalletHelper.checkBalanceAndProceed(
+                                        context: context,
+                                        type: 'call',
+                                        name: astro.name,
+                                        imageUrl: astro.fullProfilePhoto,
+                                        price: astro.callRate ?? '0',
+                                        simulatedBalance: balance,
+                                      );
+                                    },
+                                  ),
+                              ],
+                            )
+                            : Text(
+                              "Astrologer is offline.",
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            onTap: () {
-                              final walletController = Get.find<WalletController>();
-                              final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                              WalletHelper.checkBalanceAndProceed(
-                                context: context,
-                                type: 'call',
-                                name: astro.name,
-                                imageUrl: astro.fullProfilePhoto,
-                                price: astro.callRate ?? '0',
-                                simulatedBalance: balance,
-                              );
-                            },
-                          ),
-                      ],
-                    ),
                   ),
                 ],
               ),
@@ -294,29 +324,22 @@ class AstrologersPreviewSection extends StatelessWidget {
   Widget _buildPlaceholder() {
     return Container(
       color: AppColors.lightPink,
-      child: const Icon(
-        Icons.person,
-        color: AppColors.primaryColor,
-        size: 36,
-      ),
+      child: const Icon(Icons.person, color: AppColors.primaryColor, size: 36),
     );
   }
 
   Widget _buildPlaceholderLarge() {
     return Container(
       color: AppColors.lightPink,
-      child: const Icon(
-        Icons.person,
-        color: AppColors.primaryColor,
-        size: 50,
-      ),
+      child: const Icon(Icons.person, color: AppColors.primaryColor, size: 50),
     );
   }
 
   Widget _buildShimmerList() {
     return Column(
-      children: List.generate(3, (index) => 
-        Shimmer.fromColors(
+      children: List.generate(
+        3,
+        (index) => Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
           child: Container(

@@ -4,8 +4,10 @@ import '../../matrimony/controllers/matrimony_controller.dart';
 import '../../matrimony/domain/repositories/matrimony_repository.dart';
 import '../../matrimony/domain/services/matrimony_service.dart';
 import '../../matrimony/domain/usecases/save_matrimony_profile_usecase.dart';
+import '../../matrimony/domain/usecases/update_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/get_matrimony_profile_details_usecase.dart';
+import '../../matrimony/domain/usecases/get_my_matrimony_profile_details_usecase.dart';
 import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../../matrimony/domain/usecases/block_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/report_matrimony_profile_usecase.dart';
@@ -54,6 +56,19 @@ import '../../astrologers/domain/services/gift_service.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../notification/domain/repositories/notification_repository.dart';
 import '../../notification/controllers/notification_controller.dart';
+import '../../matching/controllers/matching_controller.dart';
+import '../../matching/data/repositories/matching_repository_impl.dart';
+import '../../matching/domain/repositories/matching_repository.dart';
+import '../../matching/domain/usecases/get_matching_usecase.dart';
+import '../../matching/controllers/kundli_controller.dart';
+import '../../matching/data/repositories/kundli_repository_impl.dart';
+import '../../matching/domain/repositories/kundli_repository.dart';
+import '../../matching/domain/usecases/get_birth_chart_usecase.dart';
+import '../../matching/domain/usecases/create_kundli_usecase.dart';
+import '../../matching/domain/usecases/get_kundli_list_usecase.dart';
+import '../../matching/domain/usecases/get_kundli_by_id_usecase.dart';
+import '../../matching/domain/usecases/update_kundli_usecase.dart';
+import '../../matching/domain/usecases/delete_kundli_usecase.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -68,16 +83,20 @@ class DashboardBinding extends Bindings {
     Get.put<MatrimonyRepositoryInterface>(MatrimonyRepository(apiClient: Get.find()));
     Get.put<MatrimonyServiceInterface>(MatrimonyService(repository: Get.find()));
     Get.put(SaveMatrimonyProfileUseCase(service: Get.find()));
+    Get.put(UpdateMatrimonyProfileUseCase(service: Get.find()));
     Get.put(GetMatrimonyProfileUseCase(service: Get.find()));
     Get.put<GetMatrimonyProfileDetailsUseCase>(GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
+    Get.put<GetMyMatrimonyProfileDetailsUseCase>(GetMyMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
     Get.put<SearchMatrimonyProfilesUseCase>(SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
     Get.put<BlockMatrimonyProfileUseCase>(BlockMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
     Get.put<ReportMatrimonyProfileUseCase>(ReportMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
     Get.put<MatrimonyController>(
       MatrimonyController(
         saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
+        updateMatrimonyProfileUseCase: Get.find<UpdateMatrimonyProfileUseCase>(),
         getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
         getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        getMyMatrimonyProfileDetailsUseCase: Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
         searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
         blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
         reportMatrimonyProfileUseCase: Get.find<ReportMatrimonyProfileUseCase>(),
@@ -159,6 +178,30 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
     Get.lazyPut(() => FounderController(
       getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
+    ));
+
+    // Matching (Kundli Matching)
+    Get.lazyPut<MatchingRepository>(() => MatchingRepositoryImpl());
+    Get.lazyPut(() => GetMatchingUseCase(repository: Get.find<MatchingRepository>()));
+    Get.lazyPut(() => MatchingController(
+      getMatchingUseCase: Get.find<GetMatchingUseCase>(),
+    ));
+
+    // Kundli (Birth Chart)
+    Get.lazyPut<KundliRepository>(() => KundliRepositoryImpl(apiClient: Get.find<ApiClient>()));
+    Get.lazyPut(() => GetBirthChartUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => CreateKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => GetKundliListUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => GetKundliByIdUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => UpdateKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => DeleteKundliUseCase(repository: Get.find<KundliRepository>()));
+    Get.lazyPut(() => KundliController(
+      getBirthChartUseCase: Get.find<GetBirthChartUseCase>(),
+      createKundliUseCase: Get.find<CreateKundliUseCase>(),
+      getKundliListUseCase: Get.find<GetKundliListUseCase>(),
+      getKundliByIdUseCase: Get.find<GetKundliByIdUseCase>(),
+      updateKundliUseCase: Get.find<UpdateKundliUseCase>(),
+      deleteKundliUseCase: Get.find<DeleteKundliUseCase>(),
     ));
   }
 }

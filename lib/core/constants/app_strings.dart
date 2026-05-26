@@ -427,4 +427,9 @@ class AppStrings {
   static String get joinedLiveSession => "Joined Live Session".tr;
   static String get durationPrefix => "Duration: ".tr;
   static String get chatSessionEnded => "This chat session has ended.".tr;
+
+
+
+  static String get panchang => 'Panchang'.tr;
+
 }

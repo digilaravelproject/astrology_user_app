@@ -10,6 +10,7 @@ class AssetsRes {
   static const String PROJECT_VERSION = '1.0.0+1';
   static const String BUBBLE_IMG = 'assets/icons/bubble_img.png';
   static const String VERIFY = 'assets/icons/verify.png';
+  static const String ASTRO = 'assets/images/astro.jpg';
   static const String BG_JOIN_SESSION_HOME = 'assets/images/bg_join_session_home.jpeg';
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
   static const String BUBBLE_IMG = 'assets/images/bubble_img.png';

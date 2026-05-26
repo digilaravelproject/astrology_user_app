@@ -5,7 +5,9 @@ import '../../../core/services/storage/shared_prefs.dart';
 import '../domain/models/matrimony_profile_model.dart';
 import '../domain/usecases/get_matrimony_profile_usecase.dart';
 import '../domain/usecases/save_matrimony_profile_usecase.dart';
+import '../domain/usecases/update_matrimony_profile_usecase.dart';
 import '../domain/usecases/get_matrimony_profile_details_usecase.dart';
+import '../domain/usecases/get_my_matrimony_profile_details_usecase.dart';
 import '../domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../domain/usecases/block_matrimony_profile_usecase.dart';
 import '../domain/usecases/report_matrimony_profile_usecase.dart';
@@ -17,8 +19,10 @@ import '../../auth/domain/models/user_model.dart';
 
 class MatrimonyController extends GetxController {
   final SaveMatrimonyProfileUseCase _saveMatrimonyProfileUseCase;
+  final UpdateMatrimonyProfileUseCase _updateMatrimonyProfileUseCase;
   final GetMatrimonyProfileUseCase _getMatrimonyProfileUseCase;
   final GetMatrimonyProfileDetailsUseCase _getMatrimonyProfileDetailsUseCase;
+  final GetMyMatrimonyProfileDetailsUseCase _getMyMatrimonyProfileDetailsUseCase;
   final SearchMatrimonyProfilesUseCase _searchMatrimonyProfilesUseCase;
   final BlockMatrimonyProfileUseCase _blockMatrimonyProfileUseCase;
   final ReportMatrimonyProfileUseCase _reportMatrimonyProfileUseCase;
@@ -26,15 +30,19 @@ class MatrimonyController extends GetxController {
 
   MatrimonyController({
     SaveMatrimonyProfileUseCase? saveMatrimonyProfileUseCase,
+    UpdateMatrimonyProfileUseCase? updateMatrimonyProfileUseCase,
     GetMatrimonyProfileUseCase? getMatrimonyProfileUseCase,
     GetMatrimonyProfileDetailsUseCase? getMatrimonyProfileDetailsUseCase,
+    GetMyMatrimonyProfileDetailsUseCase? getMyMatrimonyProfileDetailsUseCase,
     SearchMatrimonyProfilesUseCase? searchMatrimonyProfilesUseCase,
     BlockMatrimonyProfileUseCase? blockMatrimonyProfileUseCase,
     ReportMatrimonyProfileUseCase? reportMatrimonyProfileUseCase,
     GetProfileUseCase? getProfileUseCase,
   })  : _saveMatrimonyProfileUseCase = saveMatrimonyProfileUseCase ?? Get.find<SaveMatrimonyProfileUseCase>(),
+        _updateMatrimonyProfileUseCase = updateMatrimonyProfileUseCase ?? Get.find<UpdateMatrimonyProfileUseCase>(),
         _getMatrimonyProfileUseCase = getMatrimonyProfileUseCase ?? Get.find<GetMatrimonyProfileUseCase>(),
         _getMatrimonyProfileDetailsUseCase = getMatrimonyProfileDetailsUseCase ?? Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        _getMyMatrimonyProfileDetailsUseCase = getMyMatrimonyProfileDetailsUseCase ?? Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
         _searchMatrimonyProfilesUseCase = searchMatrimonyProfilesUseCase ?? Get.find<SearchMatrimonyProfilesUseCase>(),
         _blockMatrimonyProfileUseCase = blockMatrimonyProfileUseCase ?? Get.find<BlockMatrimonyProfileUseCase>(),
         _reportMatrimonyProfileUseCase = reportMatrimonyProfileUseCase ?? Get.find<ReportMatrimonyProfileUseCase>(),
@@ -120,6 +128,42 @@ class MatrimonyController extends GetxController {
 
     } catch (e) {
       print('Error fetching matrimony profile details: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> getMyMatrimonyProfileDetails(int userId) async {
+    try {
+      print('[getMyMatrimonyProfileDetails] Starting API call for userId: $userId');
+      isLoading.value = true;
+      selectedProfile.value = null; // Clear previous data
+      
+      final response = await _getMyMatrimonyProfileDetailsUseCase.execute(userId);
+      print('[getMyMatrimonyProfileDetails] Response received: ${response?.isSuccess}');
+      
+      if (response != null && response.isSuccess) {
+        final body = response.body;
+        print('[getMyMatrimonyProfileDetails] Response body: $body');
+        
+        // ResponseModel.body is already json['data']
+        final profileJson = body['profile'];
+        print('[getMyMatrimonyProfileDetails] Profile JSON: $profileJson');
+        
+        if (profileJson != null) {
+          selectedProfile.value = MatrimonyProfileModel.fromJson(profileJson);
+          print('[getMyMatrimonyProfileDetails] Successfully fetched my profile: ${selectedProfile.value?.firstName}');
+        } else {
+          print('[getMyMatrimonyProfileDetails] Profile JSON is null');
+        }
+      } else {
+        print('[getMyMatrimonyProfileDetails] API call failed: ${response?.message}');
+        CustomSnackbar.showError(response?.message ?? 'Failed to load your profile');
+      }
+
+    } catch (e, stackTrace) {
+      print('[getMyMatrimonyProfileDetails] Error: $e');
+      print('[getMyMatrimonyProfileDetails] StackTrace: $stackTrace');
     } finally {
       isLoading.value = false;
     }
@@ -234,6 +278,48 @@ class MatrimonyController extends GetxController {
     } catch (e) {
       CustomSnackbar.showError('An unexpected error occurred');
       print('Error saving matrimony profile: $e');
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> updateProfile(MatrimonyProfileModel profile, XFile? photo) async {
+    try {
+      isLoading.value = true;
+      print('[updateProfile] Starting update with profile: ${profile.firstName}');
+      
+      final response = await _updateMatrimonyProfileUseCase.execute(profile, photo);
+      print('[updateProfile] Response: ${response.isSuccess}, Message: ${response.message}');
+      
+      if (response.isSuccess) {
+        final authController = Get.find<AuthController>();
+        final currentUser = authController.currentUser.value;
+        
+        if (currentUser != null) {
+          // Fetch latest profile from server
+          final updatedUserFromServer = await _getProfileUseCase.execute(currentUser.id);
+          
+          if (updatedUserFromServer != null) {
+            authController.currentUser.value = updatedUserFromServer;
+            await Get.find<AuthService>().saveUserInfo(updatedUserFromServer);
+            
+            if (Get.isRegistered<ProfileController>()) {
+              await Get.find<ProfileController>().refreshProfile();
+            }
+          }
+        }
+        
+        checkRegistrationStatus();
+        CustomSnackbar.showSuccess(response.message ?? 'Profile updated successfully');
+        return true;
+      } else {
+        CustomSnackbar.showError(response.message ?? 'Failed to update profile');
+        return false;
+      }
+    } catch (e) {
+      CustomSnackbar.showError('An unexpected error occurred');
+      print('[updateProfile] Error: $e');
       return false;
     } finally {
       isLoading.value = false;

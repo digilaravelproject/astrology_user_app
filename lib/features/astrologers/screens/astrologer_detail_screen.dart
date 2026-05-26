@@ -159,7 +159,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       Obx(() => _buildReviewsSection()),
                       const SizedBox(height: 16),
                       // Chat with Assistant
-                      _buildChatAssistantSection(),
+                      //_buildChatAssistantSection(),
                       const SizedBox(height: 16),
                       // Send Gift
                       _buildGiftSection(),
@@ -169,7 +169,12 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar: _buildBottomActions(context),
+      bottomNavigationBar: (_astrologer?.isOnline ?? false)
+          ? _buildBottomActions(context)
+          : null,
+
+     // bottomNavigationBar: _buildBottomActions(context),
+
     );
   }
 
@@ -1043,7 +1048,12 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText('Vera', fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF4A148C)),
+                  AppText(
+                    _astrologer?.name ?? "Astrologer",
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF4A148C),
+                  ),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,
@@ -1183,6 +1193,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       ),
       child: Row(
         children: [
+          if (_astrologer?.isChatEnabled == true)
           Expanded(
             child: GestureDetector(
               onTap: _astrologer?.isBlocked == true 
@@ -1236,6 +1247,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             ),
           ),
           const SizedBox(width: 10),
+          if(_astrologer?.isCallEnabled == true|| _astrologer?.isVideoCallEnabled == true)
           Expanded(
             child: GestureDetector(
               onTap: _astrologer?.isBlocked == true 

@@ -63,7 +63,7 @@ class SubscriptionScreen extends StatelessWidget {
   }
 
   Widget _buildCurrentPlan(PlanModel? activePlan) {
-    final planName = activePlan?.name ?? 'Free Tier';
+    final planName = activePlan?.name ?? 'You haven’t purchased any plan.';
     final planPrice = activePlan != null ? '₹${activePlan.price}/mo' : 'Free';
 
     return Container(
@@ -85,7 +85,7 @@ class SubscriptionScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    "Current Plan",
+                    "Subscribed Plan",
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.8),
                     fontWeight: FontWeight.w500,
@@ -93,7 +93,7 @@ class SubscriptionScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   AppText(
                     planName,
-                    fontSize: 24,
+                    fontSize: 16,
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),

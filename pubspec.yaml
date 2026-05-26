@@ -45,7 +45,6 @@ dependencies:
   lottie: ^3.3.1
   flutter_screenutil: ^5.9.3
   carousel_slider: ^5.0.0
-  flutter_widget_from_html: ^0.15.2
 
   # Network
   dio: ^5.8.0+1
@@ -116,6 +115,7 @@ flutter:
     - assets/icons/bubble_img.png
     - assets/icons/verify.png
     - assets/images/
+    - assets/images/astro.jpg
     - assets/images/bg_join_session_home.jpeg
     - assets/images/bg_login.jpeg
     - assets/images/bubble_img.png
