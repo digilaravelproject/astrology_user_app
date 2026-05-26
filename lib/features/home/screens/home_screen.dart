@@ -251,21 +251,14 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Obx(() {
               final user = authController.currentUser.value;
               return Container(
-                width: 40,
-                height: 40,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: AppColors.primaryColor,
-                    width: 2,
+                    width: 2.5,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: CustomImageWidget(
                   imagePath: (() {
@@ -275,9 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
                     return '${AppUrls.baseImageUrl}$cleanPhoto';
                   })(),
-                  height: 40,
-                  width: 40,
-                  radius: BorderRadius.circular(20),
+                  height: 48,
+                  width: 48,
+                  radius: BorderRadius.circular(24),
                   fallbackWidget: Container(
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
@@ -289,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? user!.name[0].toUpperCase()
                             : 'U',
                         style: GoogleFonts.poppins(
-                          fontSize: 18,
+                          fontSize: 22,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
