@@ -7,6 +7,9 @@ import '../../core/widgets/app_text.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../features/wallet/screens/wallet_screen.dart';
 import '../../features/wallet/widgets/recharge_bottom_sheet.dart';
+import '../services/network/api_client.dart';
+import '../../core/constants/app_urls.dart';
+import '../../core/utils/custom_snackbar.dart';
 
 class WalletHelper {
   static void checkBalanceAndProceed({
@@ -15,6 +18,7 @@ class WalletHelper {
     required String name,
     required String imageUrl,
     required String price,
+    required int providerId,
     double? simulatedBalance,
   }) {
     // Simulated wallet balance
@@ -120,11 +124,29 @@ class WalletHelper {
                   text: "Start ${type.capitalizeFirst}",
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
-                  onTap: () {
-                    Get.back();
+                  onTap: () async {
                     if (type == 'chat') {
-                      Get.to(() => ChatScreen(astrologerName: name, astrologerImage: imageUrl));
+                      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+                      try {
+                        final apiClient = Get.find<ApiClient>();
+                        final response = await apiClient.post(
+                          AppUrls.initiateChat,
+                          data: {'provider_id': providerId},
+                        );
+                        Get.back(); // close loader
+                        if (response.isSuccess) {
+                          Get.back(); // close bottom sheet
+                          CustomSnackbar.showSuccess(response.message);
+                          Get.to(() => ChatScreen(astrologerName: name, astrologerImage: imageUrl));
+                        } else {
+                          CustomSnackbar.showError(response.message);
+                        }
+                      } catch (e) {
+                        Get.back(); // close loader
+                        CustomSnackbar.showError(e.toString());
+                      }
                     } else {
+                      Get.back();
                       Get.to(() => CallScreen(astrologerName: name, astrologerImage: imageUrl));
                     }
                   },

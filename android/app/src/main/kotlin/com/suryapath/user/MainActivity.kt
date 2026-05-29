@@ -1,4 +1,4 @@
-package com.astro.user
+package com.suryapath.user
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -55,10 +55,11 @@ class PaymentSuccessScreen extends StatelessWidget {
               const SizedBox(height: 16),
               
               AppText(
-                'Amount of ₹$amount has been added to your wallet successfully.',
-                fontSize: 16,
+                '₹$amount has been successfully added to your wallet.',
+                fontSize: 15,
                 color: Colors.grey.shade600,
                 textAlign: TextAlign.center,
+                height: 1.4,
               ),
               
               const SizedBox(height: 50),
@@ -111,14 +112,18 @@ class PaymentSuccessScreen extends StatelessWidget {
           color: Colors.grey.shade500,
           fontWeight: FontWeight.w500,
         ),
-        const SizedBox(width: 20),
+        const SizedBox(width: 16),
         Expanded(
-          child: AppText(
-            value,
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF2E1A47),
-            textAlign: TextAlign.end,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerRight,
+            child: AppText(
+              value,
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF2E1A47),
+              textAlign: TextAlign.end,
+            ),
           ),
         ),
       ],

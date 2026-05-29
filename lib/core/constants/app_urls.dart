@@ -1,8 +1,11 @@
 
 class AppUrls {
-  static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
+  static String baseUrl = "https://suryapathkundli.com";
   //static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
-  static const String baseImageUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com/storage/app/public/";
+  static const String baseImageUrl = "https://suryapathkundli.com/storage/app/public/";
+  //static const String baseImageUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com/storage/app/public/";
+  static const String webSocketUrl = "wss://suryapathkundli.com/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
+  static const String broadcastingAuth = "/api/v1/broadcasting/auth";
   static String sendOtp = "/api/v1/user/send-otp";
   static String verifyOtp = "/api/v1/user/verify-otp";
   static String resendOtp = "/api/v1/user/resend-otp";
@@ -53,6 +56,9 @@ class AppUrls {
   static const String gifts = '/api/v1/gifts';
   static const String sendGift = '/api/v1/gifts/send';
   static String getGiftHistory(int id) => '/api/v1/astrologers/$id/gifts';
+
+  // Chat
+  static const String initiateChat = '/api/v1/chat/initiate';
 
   // Feedback & Static Pages
   static const String feedback = '/api/v1/feedback';

@@ -1207,6 +1207,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       name: _astrologer?.name ?? 'Astrologer',
                       imageUrl: _astrologer?.fullProfilePhoto ?? '',
                       price: _astrologer?.chatRate ?? '0',
+                      providerId: widget.astrologerId,
                       simulatedBalance: balance,
                     );
                   },
@@ -1261,6 +1262,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       name: _astrologer?.name ?? 'Astrologer',
                       imageUrl: _astrologer?.fullProfilePhoto ?? '',
                       price: _astrologer?.callRate ?? '0',
+                      providerId: widget.astrologerId,
                       simulatedBalance: balance,
                     );
                   },

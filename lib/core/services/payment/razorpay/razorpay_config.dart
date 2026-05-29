@@ -3,8 +3,6 @@ import '../../../theme/app_colors.dart';
 import '../../../constants/app_constants.dart';
 
 class RazorpayConfig {
-  static const String razorpayKey = 'rzp_test_S9yXFuXcf0S6Ll'; // Replace with actual Razorpay key
-  
   static const String currency = 'INR';
   static const int timeout = 300; // in seconds
   
@@ -26,7 +24,7 @@ class RazorpayConfig {
       'timeout': timeout,
       'currency': currency,
       'theme': {
-        'color': '#E91E63' // AppColors.primaryColor hex
+        'color': '#${AppColors.primaryColor.value.toRadixString(16).substring(2).toUpperCase()}' // Dynamically using AppColors.primaryColor hex
       },
       'prefill': {
         'contact': contact,

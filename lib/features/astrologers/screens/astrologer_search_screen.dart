@@ -294,6 +294,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                       name: astro.name,
                       imageUrl: astro.fullProfilePhoto,
                       price: (isCall ? astro.callRate : astro.chatRate) ?? '0',
+                      providerId: astro.id,
                       simulatedBalance: 10.0,
                     ),
                   ),

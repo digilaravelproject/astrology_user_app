@@ -6,7 +6,17 @@ class GetPanchangUseCase {
 
   GetPanchangUseCase({required this.repository});
 
-  Future<PanchangModel> call(String date) async {
-    return await repository.getPanchangByDate(date);
+  Future<PanchangModel> call(
+    String date, {
+    double? latitude,
+    double? longitude,
+    double? timezone,
+  }) async {
+    return await repository.getPanchangByDate(
+      date,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
+    );
   }
 }

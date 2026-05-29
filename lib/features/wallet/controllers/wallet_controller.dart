@@ -94,6 +94,13 @@ class WalletController extends GetxController {
         fetchTransactions();
 
         final user = await authService.getUserInfo();
+        final rzpKey = result.data.razorpayKey;
+        if (rzpKey == null || rzpKey.isEmpty) {
+          print('[PCB_APP] [DEBUG] | Failed to start checkout: Razorpay Key missing from backend');
+          CustomSnackbar.showError('Payment configuration missing from server');
+          return;
+        }
+
         print('[PCB_APP] [DEBUG] | Opening Razorpay Checkout...');
         razorpayService.openCheckout(
           amount: amount,
@@ -102,6 +109,7 @@ class WalletController extends GetxController {
           description: 'Wallet Top-up',
           email: 'user@example.com', // UserModel doesn't have email, using placeholder or name
           contact: user?.mobile ?? '',
+          razorpayKey: rzpKey,
         );
       } else {
         print('[PCB_APP] [DEBUG] | Failed to create top-up order: result is null');

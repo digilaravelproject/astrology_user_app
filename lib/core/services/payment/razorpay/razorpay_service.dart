@@ -44,6 +44,7 @@ class RazorpayService {
     required String description,
     required String email,
     required String contact,
+    required String razorpayKey,
   }) {
     // Strip redundant prefix if present (Razorpay SDK expects 'order_...')
     String finalOrderId = orderId;
@@ -55,7 +56,7 @@ class RazorpayService {
 
     print('[PCB_APP] [DEBUG] | Generating Razorpay options...');
     final options = RazorpayConfig.getDefaultOptions(
-      key: RazorpayConfig.razorpayKey,
+      key: razorpayKey,
       amount: amount,
       orderId: finalOrderId,
       name: name,
@@ -70,7 +71,12 @@ class RazorpayService {
       print('[PCB_APP] [DEBUG] | Calling _razorpay.open(options) with delay...');
       // Small delay ensures the UI is ready and doesn't block the main thread transition
       Future.delayed(const Duration(milliseconds: 500), () {
-        _razorpay.open(options);
+        try {
+          _razorpay.open(options);
+        } catch (e) {
+          print('[PCB_APP] [DEBUG] | Error in _razorpay.open delayed callback: $e');
+          CustomSnackbar.showError('Could not open Razorpay checkout: $e');
+        }
       });
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error in _razorpay.open: $e');

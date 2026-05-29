@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 class AppStrings {
   // Common
-  static String get appName => 'AstroUser'.tr;
+  static String get appName => 'Surya Path';
   static String get changeLanguage => 'Change Language'.tr;
   static String get selectLanguage => 'Select Language'.tr;
   static String get next => 'NEXT'.tr;

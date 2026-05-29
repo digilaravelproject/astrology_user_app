@@ -473,7 +473,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _rateUs() async {
-    final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.astro.user');
+    final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.suryapath.user');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch Play Store');
     }
@@ -481,7 +481,7 @@ class ProfileScreen extends StatelessWidget {
 
   void _shareApp() {
     Share.share(
-      'Download ${AppConstants.appName} app for accurate astrology predictions and consultations: https://play.google.com/store/apps/details?id=com.astro.user',
+      'Download ${AppConstants.appName} app for accurate astrology predictions and consultations: https://play.google.com/store/apps/details?id=com.suryapath.user',
     );
   }
 }

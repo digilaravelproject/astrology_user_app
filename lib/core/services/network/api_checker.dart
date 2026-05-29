@@ -16,6 +16,7 @@ class ApiChecker {
     switch (response.statusCode) {
       case 200:
         if (response.data is Map) {
+          if (response.data.containsKey('auth')) return response;
           final res = response.data['res']?.toString().toLowerCase();
           final status = response.data['status']?.toString().toLowerCase();
           if (res == 'success' || status == 'success' || response.data['success'] == true) {
@@ -364,7 +365,7 @@ class ApiChecker {
     if (response.data is Map) {
       final res = response.data['res']?.toString().toLowerCase();
       final status = response.data['status']?.toString().toLowerCase();
-      final isSuccess = res == 'success' || status == 'success' || response.data['success'] == true;
+      final isSuccess = res == 'success' || status == 'success' || response.data['success'] == true || response.data.containsKey('auth');
       
       if (!isSuccess) {
         final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';

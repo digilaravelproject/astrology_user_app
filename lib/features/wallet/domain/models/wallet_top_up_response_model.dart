@@ -29,16 +29,21 @@ class WalletTopUpResponseModel {
 class WalletTopUpData {
   final WalletModel wallet;
   final TransactionModel transaction;
+  final String? razorpayKey;
 
   WalletTopUpData({
     required this.wallet,
     required this.transaction,
+    this.razorpayKey,
   });
 
   factory WalletTopUpData.fromJson(Map<String, dynamic> json) {
+    // If the response is flat (e.g. {"order_id": "...", "amount": 10000}), fallback to root json
+    final transactionJson = json['transaction'] ?? json;
     return WalletTopUpData(
       wallet: WalletModel.fromJson(json['wallet'] ?? {}),
-      transaction: TransactionModel.fromJson(json['transaction'] ?? {}),
+      transaction: TransactionModel.fromJson(transactionJson),
+      razorpayKey: json['razorpay_order']?['key_id'],
     );
   }
 }
@@ -76,7 +81,7 @@ class TransactionModel {
       amount: json['amount']?.toString() ?? '0.00',
       status: json['status'] ?? '',
       paymentProvider: json['payment_provider'] ?? '',
-      providerOrderId: json['provider_order_id'] ?? '',
+      providerOrderId: json['provider_order_id'] ?? json['razorpay_order_id'] ?? json['order_id'] ?? '',
       description: json['description'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       createdAt: json['createdAt'] ?? json['created_at'] ?? '',

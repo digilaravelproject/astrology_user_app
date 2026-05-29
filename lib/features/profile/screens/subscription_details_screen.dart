@@ -447,6 +447,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
       description: 'Plan Upgrade',
       email: email,
       contact: contact,
+      razorpayKey: keyId,
     );
   }
 

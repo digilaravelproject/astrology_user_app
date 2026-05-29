@@ -14,6 +14,9 @@ class PanchangController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool showFullCalendar = false.obs;
   final RxString errorMessage = ''.obs;
+  final RxDouble latitude = 28.6139.obs;
+  final RxDouble longitude = 77.209.obs;
+  final RxDouble timezone = 5.5.obs;
 
   late ScrollController scrollController;
 
@@ -36,9 +39,14 @@ class PanchangController extends GetxController {
       errorMessage.value = '';
 
       final dateString = DateFormat('yyyy-MM-dd').format(selectedDate.value);
-      print('[PCB_APP] [DEBUG] Fetching panchang for date: $dateString');
+      print('[PCB_APP] [DEBUG] Fetching panchang for date: $dateString with lat: ${latitude.value}, lon: ${longitude.value}, tz: ${timezone.value}');
       
-      final result = await getPanchangUseCase.call(dateString);
+      final result = await getPanchangUseCase.call(
+        dateString,
+        latitude: latitude.value,
+        longitude: longitude.value,
+        timezone: timezone.value,
+      );
       
       print('[PCB_APP] [DEBUG] Panchang data received: ${result.success}');
       print('[PCB_APP] [DEBUG] Panchang location: ${result.data.location}');

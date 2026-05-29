@@ -7,6 +7,7 @@ import '../../../routes/route_helper.dart';
 import '../../language/controllers/localization_controller.dart';
 import '../domain/services/auth_service.dart';
 import '../../../core/services/network/response_model.dart';
+import '../../../core/services/network/websocket_service.dart';
 
 
 class AuthController extends GetxController {
@@ -173,8 +174,11 @@ class AuthController extends GetxController {
         //Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
         
         if (user.profileCompleted == true) {
+          Get.find<WebSocketService>().connect();
           Get.offAllNamed(RouteHelper.getDashboardRoute());
         } else {
+          // Still connect if they successfully logged in, even if profile is pending
+          Get.find<WebSocketService>().connect();
           Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
         }
       } else {
@@ -246,6 +250,9 @@ class AuthController extends GetxController {
         mobileController.clear();
         otpController.clear();
         nameController.clear();
+        
+        Get.find<WebSocketService>().disconnect();
+        
         Get.offAllNamed(RouteHelper.getLoginRoute());
         
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -328,6 +335,9 @@ class AuthController extends GetxController {
                             mobileController.clear();
                             otpController.clear();
                             nameController.clear();
+                            
+                            Get.find<WebSocketService>().disconnect();
+                            
                             Get.offAllNamed(RouteHelper.getLoginRoute());
                             
                             Future.delayed(const Duration(milliseconds: 300), () {

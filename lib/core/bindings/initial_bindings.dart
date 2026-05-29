@@ -11,6 +11,7 @@ import '../../features/splash/controllers/splash_controller.dart';
 import '../../features/splash/domain/repositories/splash_repository.dart';
 import '../../features/splash/domain/services/splash_service.dart';
 import '../services/payment/razorpay/razorpay_service.dart';
+import '../services/network/websocket_service.dart';
 
 class InitialBindings extends Bindings {
   @override
@@ -21,6 +22,13 @@ class InitialBindings extends Bindings {
     Get.put(Connectivity(), permanent: true);
     Get.put(NetworkInfo(Get.find<Connectivity>()), permanent: true);
     Get.put(RazorpayService(), permanent: true);
+    
+    // WebSockets
+    final wsService = Get.put(WebSocketService(), permanent: true);
+    wsService.init().then((_) {
+      // Connect will automatically attempt connecting if token exists
+      wsService.connect();
+    });
 
     // Splash
     Get.put(SplashRepository(Get.find<ApiClient>()), permanent: true);
