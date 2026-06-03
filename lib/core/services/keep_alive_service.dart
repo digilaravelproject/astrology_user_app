@@ -9,7 +9,7 @@ Future<void> initializeKeepAliveService() async {
     androidConfiguration: AndroidConfiguration(
       onStart: onStart,
       autoStart: false,
-      isForegroundMode: true,
+      isForegroundMode: false,
       initialNotificationTitle: 'Suryapath Kundli',
       initialNotificationContent: 'Keeping your session active',
       foregroundServiceNotificationId: 888,
