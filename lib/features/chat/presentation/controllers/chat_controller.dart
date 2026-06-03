@@ -282,6 +282,16 @@ class ChatController extends GetxController {
     }
   }
 
+  String _getLatestStatus(int messageId, String defaultStatus) {
+    String currentStatus = defaultStatus;
+    for (var event in WebSocketService.messageStatusUpdates) {
+      if (event['session_id'] == _sessionId && event['message_id'] == messageId) {
+        currentStatus = event['status'];
+      }
+    }
+    return currentStatus;
+  }
+
   Future<void> sendTextMessage() async {
     final text = messageController.text.trim();
     if (text.isEmpty || _sessionId == null) return;
