@@ -22,6 +22,7 @@ import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialo
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/features/auth/controllers/auth_controller.dart';
 
 class ChatController extends GetxController {
   final LoadChatHistoryUseCase _loadChatHistoryUseCase;
@@ -56,9 +57,9 @@ class ChatController extends GetxController {
   Timer? _timer;
   String? _startedAt;
   StreamSubscription? _msgSub;
-  StreamSubscription? _endSub;
   StreamSubscription? _statusSub;
   StreamSubscription? _dismissSub;
+  StreamSubscription? _statusUpdateSub;
 
   int? get sessionId => _sessionId;
 
@@ -151,6 +152,32 @@ class ChatController extends GetxController {
           }
         }
       }
+    // Listen to WebSocket Message Status Updates (delivered/seen)
+    _statusUpdateSub?.cancel();
+    _statusUpdateSub = WebSocketService.messageStatusUpdates.listen((list) {
+      if (list.isNotEmpty) {
+        final lastUpdate = list.last;
+        final updateSessionId = int.tryParse(lastUpdate['session_id']?.toString() ?? '') ?? 0;
+        if (updateSessionId == _sessionId) {
+          final newStatus = lastUpdate['status']?.toString();
+          final messageIdsList = lastUpdate['message_ids'] as List<dynamic>?;
+          if (newStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
+            final messageIds = messageIdsList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+            bool changed = false;
+            for (int i = 0; i < messages.length; i++) {
+              if (messageIds.contains(messages[i].id)) {
+                if (messages[i].status != 'seen') {
+                   messages[i] = messages[i].copyWith(status: newStatus);
+                   changed = true;
+                }
+              }
+            }
+            if (changed) {
+              messages.refresh();
+            }
+          }
+        }
+      }
     });
 
     // Listen to WebSocket Chat Ended Event
@@ -162,6 +189,9 @@ class ChatController extends GetxController {
         FlutterBackgroundService().invoke('stopService');
         if (_sessionId != null) {
           LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+        }
+        if (Get.isRegistered<AuthController>()) {
+          Get.find<AuthController>().checkLoginStatus();
         }
       }
     });
