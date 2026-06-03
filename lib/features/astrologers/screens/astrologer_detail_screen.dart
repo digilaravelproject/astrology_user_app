@@ -12,7 +12,7 @@ import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../astrologers/domain/models/review_model.dart';
 import '../../astrologers/screens/all_reviews_screen.dart';
-import '../../chat/screens/chat_screen.dart';
+import '../../chat/presentation/pages/chat_screen.dart';
 import '../../call/screens/call_screen.dart';
 import '../../../core/utils/wallet_helper.dart';
 import '../../../core/constants/app_urls.dart';

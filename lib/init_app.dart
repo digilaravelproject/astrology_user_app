@@ -7,6 +7,8 @@ import 'core/theme/theme_controller.dart';
 import 'core/services/storage/shared_prefs.dart';
 import 'translations/translations.dart';
 
+import 'core/services/local_notification_service.dart';
+
 Future<void> initApp() async {
   // Set environment configuration
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,5 +39,6 @@ Future<void> initApp() async {
   AppTranslations translations = await AppTranslations.load();
   Get.put<Translations>(translations);
 
-
+  // Initialize local notifications service
+  await LocalNotificationService.initialize();
 }

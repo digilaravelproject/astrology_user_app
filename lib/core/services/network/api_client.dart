@@ -73,6 +73,7 @@ class ApiClient {
         Logger.e('|🔧 Method: ${error.requestOptions.method}');
         Logger.e('|⚠️ Error Type: ${error.type}');
         Logger.e('|💬 Error Message: ${error.message}');
+        Logger.e('|🔌 Underlying Error: ${error.error}');
         if (error.response != null) {
           Logger.e('|📊 Status Code: ${error.response?.statusCode}');
           Logger.e('|📨 Response: ${error.response?.data}');

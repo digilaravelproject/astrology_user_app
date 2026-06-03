@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../features/chat/screens/chat_screen.dart';
+import '../../features/chat/presentation/pages/chat_screen.dart';
+import '../../features/chat/presentation/bindings/chat_binding.dart';
 import '../../features/call/screens/call_screen.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_text.dart';
 import '../../core/widgets/custom_button.dart';
-import '../../features/wallet/screens/wallet_screen.dart';
 import '../../features/wallet/widgets/recharge_bottom_sheet.dart';
 import '../services/network/api_client.dart';
 import '../../core/constants/app_urls.dart';
@@ -137,7 +137,21 @@ class WalletHelper {
                         if (response.isSuccess) {
                           Get.back(); // close bottom sheet
                           CustomSnackbar.showSuccess(response.message);
-                          Get.to(() => ChatScreen(astrologerName: name, astrologerImage: imageUrl));
+                          
+                          int sessionId = 0;
+                          if (response.body != null && response.body is Map) {
+                            final sessionData = response.body['session'];
+                            if (sessionData != null && sessionData is Map) {
+                              sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+                            }
+                          }
+                          
+                          Get.to(() => ChatScreen(
+                            astrologerName: name,
+                            astrologerImage: imageUrl,
+                            sessionId: sessionId,
+                            initialStatus: 'initiated',
+                          ), binding: ChatBinding());
                         } else {
                           CustomSnackbar.showError(response.message);
                         }
