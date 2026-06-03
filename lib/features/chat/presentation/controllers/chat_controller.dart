@@ -21,6 +21,7 @@ import 'package:astro_user/features/auth/domain/models/user_model.dart';
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 class ChatController extends GetxController {
   final LoadChatHistoryUseCase _loadChatHistoryUseCase;
@@ -176,7 +177,7 @@ class ChatController extends GetxController {
           LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
         }
         Get.back();
-        Get.snackbar("Chat Cancelled", "The chat request was cancelled or timed out.");
+        CustomSnackbar.showInfo("The chat request was cancelled or timed out.", title: "Chat Cancelled");
       }
     });
 
