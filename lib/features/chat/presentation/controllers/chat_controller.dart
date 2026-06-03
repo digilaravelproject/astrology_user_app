@@ -152,6 +152,7 @@ class ChatController extends GetxController {
           }
         }
       }
+    });
     // Listen to WebSocket Message Status Updates (delivered/seen)
     _statusUpdateSub?.cancel();
     _statusUpdateSub = WebSocketService.messageStatusUpdates.listen((list) {
