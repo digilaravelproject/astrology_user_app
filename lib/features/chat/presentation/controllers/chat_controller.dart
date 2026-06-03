@@ -57,6 +57,7 @@ class ChatController extends GetxController {
   Timer? _timer;
   String? _startedAt;
   StreamSubscription? _msgSub;
+  StreamSubscription? _endSub;
   StreamSubscription? _statusSub;
   StreamSubscription? _dismissSub;
   StreamSubscription? _statusUpdateSub;
