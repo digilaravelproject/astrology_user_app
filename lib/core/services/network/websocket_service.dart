@@ -132,13 +132,13 @@ class WebSocketService extends GetxService {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|✅ WEBSOCKET SUBSCRIPTION SUCCESS');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        } else if (event == AppUrls.eventChatAccepted) {
+        } else if (event == AppUrls.eventChatAccepted || event == 'App\\Events\\ChatAccepted') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatAccepted(data['data']);
-        } else if (event == AppUrls.eventChatEnded) {
+        } else if (event == AppUrls.eventChatEnded || event == 'App\\Events\\ChatEnded') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
@@ -150,30 +150,30 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatDismissed(data['data']);
-        } else if (event == AppUrls.eventMessageSent) {
+        } else if (event == AppUrls.eventMessageSent || event == 'App\\Events\\MessageSent') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleMessageSent(data['data']);
-        } else if (event == AppUrls.eventChatInitiated) {
+        } else if (event == AppUrls.eventChatInitiated || event == 'App\\Events\\ChatInitiated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        } else if (event == AppUrls.eventMessageStatusUpdated) {
+        } else if (event == AppUrls.eventMessageStatusUpdated || event == 'App\\Events\\MessageStatusUpdated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleMessageStatusUpdated(data['data']);
-        } else if (event == AppUrls.eventPresenceUpdated) {
+        } else if (event == AppUrls.eventPresenceUpdated || event == 'App\\Events\\PresenceUpdated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handlePresenceUpdated(data['data']);
-        } else if (event == AppUrls.eventChatDismissed) {
+        } else if (event == AppUrls.eventChatDismissed || event == 'App\\Events\\ChatDismissed') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
@@ -218,9 +218,11 @@ class WebSocketService extends GetxService {
           showErrorScreen: false,
         );
 
-        if (response.isSuccess && response.body != null && response.body['auth'] != null) {
-          final authString = response.body['auth'];
-          
+        // broadcasting/auth returns {"auth": "..."} not standard format
+        // so check body['auth'] directly, not response.isSuccess
+        final authString = response.body?['auth']?.toString();
+        
+        if (authString != null && authString.isNotEmpty) {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|✅ WEBSOCKET AUTH SUCCESS');
           Logger.d('|🔑 Channel: $channelName');
@@ -233,6 +235,8 @@ class WebSocketService extends GetxService {
               "auth": authString
             }
           }));
+        } else {
+          Logger.e('|❌ WEBSOCKET AUTH FAILED for $channelName, body=${response.body}');
         }
       } catch (e) {
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
