@@ -287,17 +287,17 @@ class ChatController extends GetxController {
     try {
       final result = await _sendAttachmentUseCase.executeImage(
         sessionId: _sessionId!,
-        xFile: xFile,
+        file: xFile,
       );
 
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (result != null) {
           messages[index] = messages[index].copyWith(
-            id: result.id,
+            id: result!.id,
             status: 'sent',
-            attachmentUrl: result.url,
-            image: result.url,
+            attachmentUrl: result!.url,
+            image: result!.url,
           );
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
@@ -331,16 +331,16 @@ class ChatController extends GetxController {
       final result = await _sendAttachmentUseCase.executeDocument(
         sessionId: _sessionId!,
         fileName: platformFile.name,
-        pickerResult: pickerResult,
+        result: pickerResult,
       );
 
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (result != null) {
           messages[index] = messages[index].copyWith(
-            id: result.id,
+            id: result!.id,
             status: 'sent',
-            attachmentUrl: result.url,
+            attachmentUrl: result!.url,
           );
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');

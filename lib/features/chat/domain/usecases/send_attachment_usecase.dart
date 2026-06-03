@@ -1,7 +1,7 @@
-import 'package:astro_user/features/chat/domain/repositories/chat_repository_interface.dart';
+import 'package:astro_user/features/chat/domain/repositories/i_chat_repository.dart';
 
 class SendAttachmentUseCase {
-  final ChatRepositoryInterface _repository;
+  final IChatRepository _repository;
   const SendAttachmentUseCase(this._repository);
 
   /// Send an image (pass image_picker XFile as [file])

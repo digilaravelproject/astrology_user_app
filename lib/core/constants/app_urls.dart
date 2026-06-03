@@ -78,4 +78,32 @@ class AppUrls {
 
   static String getPanchangByDate(String date) => 'https://api.vedika.io/sandbox/panchang/$date';
 
+  // WebSocket / Pusher Events
+  static const String pusherConnectionEstablished = 'pusher:connection_established';
+  static const String pusherSubscriptionSucceeded = 'pusher_internal:subscription_succeeded';
+  static const String pusherSubscribe = 'pusher:subscribe';
+  static const String pusherPing = 'pusher:ping';
+  static const String pusherPong = '{"event":"pusher:pong"}';
+
+  // Chat System Events
+  static const String eventChatInitiated = 'ChatInitiated';
+  static const String eventChatAccepted = 'ChatAccepted';
+  static const String eventChatEnded = 'ChatEnded';
+  static const String eventMessageSent = 'MessageSent';
+  static const String eventMessageStatusUpdated = 'MessageStatusUpdated';
+  static const String eventPresenceUpdated = 'PresenceUpdated';
+  static const String eventChatDismissed = 'ChatDismissed';
+
+  // Channel Names
+  static String privateUserChannel(int userId) => 'private-user.$userId';
+  static const String presenceRoomChannel = 'presence-room';
+
+  // Chat API Endpoints
+  static String getChatMessages(int sessionId) => '/api/v1/chat/$sessionId/messages';
+  static String sendChatMessage(int sessionId) => '/api/v1/chat/$sessionId/message';
+  static String markChatRead(int sessionId) => '/api/v1/chat/$sessionId/read';
+  static String endChatSession(int sessionId) => '/api/v1/chat/$sessionId/end';
+  static const String uploadAttachment = '/api/v1/chat/upload-attachment';
+  static const String getCurrentSession = '/api/v1/chat/current-session';
+
 }

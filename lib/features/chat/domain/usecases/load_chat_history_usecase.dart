@@ -1,11 +1,11 @@
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
-import 'package:astro_user/features/chat/domain/repositories/chat_repository_interface.dart';
+import 'package:astro_user/features/chat/domain/repositories/i_chat_repository.dart';
 
 class LoadChatHistoryUseCase {
-  final ChatRepositoryInterface _repository;
+  final IChatRepository _repository;
   const LoadChatHistoryUseCase(this._repository);
 
-  Future<({List<ChatMessageEntity> messages, String? startedAt})> execute({
+  Future<({List<ChatMessage> messages, String? startedAt})> execute({
     required int sessionId,
     required int currentUserId,
   }) {
