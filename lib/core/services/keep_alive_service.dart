@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 Future<void> initializeKeepAliveService() async {
@@ -28,6 +29,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
   // Keep the isolate alive
   Timer.periodic(const Duration(minutes: 1), (timer) {
     // Dummy timer to keep the background isolate active
