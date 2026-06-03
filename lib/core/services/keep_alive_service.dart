@@ -11,8 +11,9 @@ Future<void> initializeKeepAliveService() async {
       autoStart: false,
       isForegroundMode: true,
       initialNotificationTitle: 'Suryapath Kundli',
-      initialNotificationContent: 'Connected for real-time updates',
-      foregroundServiceNotificationId: 889,
+      initialNotificationContent: 'Keeping your session active',
+      foregroundServiceNotificationId: 888,
+      foregroundServiceTypes: ['dataSync'],
     ),
     iosConfiguration: IosConfiguration(
       autoStart: false,
