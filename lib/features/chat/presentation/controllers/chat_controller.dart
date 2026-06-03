@@ -307,10 +307,12 @@ class ChatController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (serverId != null) {
-          messages[index] = messages[index].copyWith(id: serverId, status: 'sent');
+          final newStatus = _getLatestStatus(serverId, 'sent');
+          messages[index] = messages[index].copyWith(id: serverId, status: newStatus);
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
         }
+        messages.refresh();
       }
     } catch (_) {
       final index = messages.indexWhere((m) => m.id == tempId);
@@ -345,15 +347,17 @@ class ChatController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (result != null) {
+          final newStatus = _getLatestStatus(result!.id, 'sent');
           messages[index] = messages[index].copyWith(
             id: result!.id,
-            status: 'sent',
+            status: newStatus,
             attachmentUrl: result!.url,
             image: result!.url,
           );
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
         }
+        messages.refresh();
       }
     } catch (_) {
       final index = messages.indexWhere((m) => m.id == tempId);
@@ -389,14 +393,16 @@ class ChatController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (result != null) {
+          final newStatus = _getLatestStatus(result!.id, 'sent');
           messages[index] = messages[index].copyWith(
             id: result!.id,
-            status: 'sent',
+            status: newStatus,
             attachmentUrl: result!.url,
           );
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
         }
+        messages.refresh();
       }
     } catch (_) {
       final index = messages.indexWhere((m) => m.id == tempId);
