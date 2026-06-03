@@ -153,7 +153,11 @@ class WalletHelper {
                             initialStatus: 'initiated',
                           ), binding: ChatBinding());
                         } else {
-                          CustomSnackbar.showError(response.message);
+                          if (response.statusCode == 400 && response.message.toLowerCase().contains("pending or waiting request")) {
+                            _handlePendingSession(context, apiClient);
+                          } else {
+                            CustomSnackbar.showError(response.message);
+                          }
                         }
                       } catch (e) {
                         Get.back(); // close loader
@@ -170,6 +174,57 @@ class WalletHelper {
             ],
           ),
         );
+      },
+    );
+  }
+  static Future<void> _handlePendingSession(BuildContext context, ApiClient apiClient) async {
+    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    try {
+      final sessionRes = await apiClient.get(AppUrls.currentSession);
+      Get.back(); // close loader
+
+      if (sessionRes.isSuccess && sessionRes.body != null) {
+        final sessionData = sessionRes.body['session'];
+        if (sessionData != null && sessionData is Map) {
+          final int pendingSessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+          if (pendingSessionId > 0) {
+            // Show popup to cancel
+            _showCancelSessionDialog(context, pendingSessionId, apiClient);
+            return;
+          }
+        }
+      }
+      CustomSnackbar.showError("You already have a pending request.");
+    } catch (e) {
+      Get.back();
+      CustomSnackbar.showError("Failed to check pending session.");
+    }
+  }
+
+  static void _showCancelSessionDialog(BuildContext context, int sessionId, ApiClient apiClient) {
+    Get.defaultDialog(
+      title: "Pending Request",
+      middleText: "You already have a pending chat request. Would you like to cancel it to start a new one?",
+      textCancel: "No",
+      textConfirm: "Yes, Cancel It",
+      confirmTextColor: Colors.white,
+      buttonColor: AppColors.deepPink,
+      cancelTextColor: AppColors.deepPink,
+      onConfirm: () async {
+        Get.back(); // close dialog
+        Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+        try {
+          final cancelRes = await apiClient.post(AppUrls.cancelSession(sessionId));
+          Get.back(); // close loader
+          if (cancelRes.isSuccess) {
+            CustomSnackbar.showSuccess("Pending request cancelled. You can now start a new chat.");
+          } else {
+            CustomSnackbar.showError(cancelRes.message);
+          }
+        } catch (e) {
+          Get.back();
+          CustomSnackbar.showError("Failed to cancel request.");
+        }
       },
     );
   }

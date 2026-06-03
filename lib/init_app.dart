@@ -8,6 +8,7 @@ import 'core/services/storage/shared_prefs.dart';
 import 'translations/translations.dart';
 
 import 'core/services/local_notification_service.dart';
+import 'core/services/keep_alive_service.dart';
 
 Future<void> initApp() async {
   // Set environment configuration
@@ -22,6 +23,9 @@ Future<void> initApp() async {
 
   // Initialize shared preferences
   await SharedPrefs.init();
+
+  // Initialize keep-alive foreground service
+  await initializeKeepAliveService();
 
   // Register controllers
   // Get.lazyPut(() => ThemeController());

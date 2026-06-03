@@ -8,6 +8,7 @@ import '../../language/controllers/localization_controller.dart';
 import '../domain/services/auth_service.dart';
 import '../../../core/services/network/response_model.dart';
 import '../../../core/services/network/websocket_service.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 
 
 class AuthController extends GetxController {
@@ -252,6 +253,7 @@ class AuthController extends GetxController {
         nameController.clear();
         
         Get.find<WebSocketService>().disconnect();
+        FlutterBackgroundService().invoke('stopService');
         
         Get.offAllNamed(RouteHelper.getLoginRoute());
         
@@ -337,6 +339,7 @@ class AuthController extends GetxController {
                             nameController.clear();
                             
                             Get.find<WebSocketService>().disconnect();
+                            FlutterBackgroundService().invoke('stopService');
                             
                             Get.offAllNamed(RouteHelper.getLoginRoute());
                             

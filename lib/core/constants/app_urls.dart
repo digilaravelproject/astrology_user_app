@@ -59,6 +59,8 @@ class AppUrls {
 
   // Chat
   static const String initiateChat = '/api/v1/chat/initiate';
+  static const String currentSession = '/api/v1/chat/current-session';
+  static String cancelSession(int sessionId) => '/api/v1/chat/$sessionId/cancel';
 
   // Feedback & Static Pages
   static const String feedback = '/api/v1/feedback';

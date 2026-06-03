@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/io.dart';
 import '../storage/token_manger.dart';
 import '../storage/shared_prefs.dart';
 import '../../../core/constants/app_constants.dart';
@@ -33,6 +34,8 @@ class WebSocketService extends GetxService {
   static final RxMap<int, String> sessionStartTimes = <int, String>{}.obs;
   // Signal: when set to a sessionId, that chat session has been ended remotely
   static final RxInt chatEndedSessionId = (-1).obs;
+  static final RxInt chatDismissedSessionId = (-1).obs;
+  static final RxMap<String, dynamic> chatEndedBilling = <String, dynamic>{}.obs;
 
   final String _wsUrl = AppUrls.webSocketUrl;
   
@@ -70,7 +73,10 @@ class WebSocketService extends GetxService {
       Logger.d('|📍 URL: $_wsUrl');
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
-      _channel = WebSocketChannel.connect(Uri.parse(_wsUrl));
+      _channel = IOWebSocketChannel.connect(
+        Uri.parse(_wsUrl),
+        headers: {'Origin': 'https://suryapathkundli.com'},
+      );
       
       _channel?.stream.listen(
         (message) {
@@ -138,6 +144,12 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatEnded(data['data']);
+        } else if (event == AppUrls.eventChatDismissed) {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleChatDismissed(data['data']);
         } else if (event == AppUrls.eventMessageSent) {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
@@ -181,7 +193,6 @@ class WebSocketService extends GetxService {
 
     final List<String> channelsToSubscribe = [
       AppUrls.privateUserChannel(_userId!),
-      'private-user.private-user.${_userId!}',
       AppUrls.presenceRoomChannel,
     ];
 
@@ -399,7 +410,7 @@ class WebSocketService extends GetxService {
       // If active screen is open, signal it to close
       if (activeSessionId == sessionId) {
         activeSessionId = null;
-        chatEndedSessionId.value = sessionId;
+        chatDismissedSessionId.value = sessionId;
       }
     } catch (e) {
       Logger.e('WebSocketService: error handling ChatDismissed -> $e');

@@ -4,6 +4,7 @@ import '../../../core/services/storage/shared_prefs.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../routes/route_helper.dart';
 import '../domain/services/splash_service.dart';
+import '../../../core/services/network/websocket_service.dart';
 
 class SplashController extends GetxController {
   final SplashService _splashService;
@@ -33,6 +34,7 @@ class SplashController extends GetxController {
         final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
 
         if (isLoggedIn) {
+          Get.find<WebSocketService>().connect();
           Get.offAllNamed(RouteHelper.getDashboardRoute());
         } else {
           Get.offAllNamed(RouteHelper.getLoginRoute());
