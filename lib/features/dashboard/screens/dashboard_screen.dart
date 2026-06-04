@@ -130,8 +130,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                FloatingChatBubble.dismiss();
                Get.to(
                  () => ChatScreen(
-                   userName: name,
-                   userImage: '',
+                   astrologerName: name,
+                   astrologerImage: '',
                    sessionId: sessionId,
                    initialStatus: currentStatus,
                    startedAtString: startedAt,
