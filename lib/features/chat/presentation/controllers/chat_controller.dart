@@ -79,7 +79,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if (status.value == 'ongoing' && _sessionId != null && _astrologerName != null) {
+      if ((status.value == 'ongoing' || status.value == 'initiated') && _sessionId != null && _astrologerName != null) {
         minimizeToBubble(Get.context!, _astrologerName!, "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
@@ -514,7 +514,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   }
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
-    if (_sessionId == null || status.value != 'ongoing') return;
+    if (_sessionId == null || (status.value != 'ongoing' && status.value != 'initiated')) return;
     WebSocketService.activeSessionId = null;
     FloatingChatBubble.show(
       context: context,
