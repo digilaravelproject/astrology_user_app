@@ -226,17 +226,15 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
     // Listen to WebSocket Chat Dismissed Event
     _dismissSub?.cancel();
+    
+    // Check if already dismissed before we started listening
+    if (WebSocketService.chatDismissedSessionId.value == _sessionId) {
+      _handleDismissed();
+    }
+
     _dismissSub = WebSocketService.chatDismissedSessionId.listen((dismissedSessionId) {
       if (dismissedSessionId == _sessionId) {
-        status.value = 'ended'; // or 'dismissed'
-        _timer?.cancel();
-        FlutterBackgroundService().invoke('stopService');
-        if (_sessionId != null) {
-          LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
-        }
-        FloatingChatBubble.dismiss();
-        Get.back();
-        CustomSnackbar.showInfo("The chat request was cancelled or timed out.", title: "Chat Cancelled");
+        _handleDismissed();
       }
     });
 
@@ -269,6 +267,18 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         }
       }
     });
+  }
+
+  void _handleDismissed() {
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    if (_sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    }
+    FloatingChatBubble.dismiss();
+    Get.back();
+    CustomSnackbar.showInfo("The chat request was cancelled or timed out.", title: "Chat Cancelled");
   }
 
   void _setupTimer(String? startedAtString) {
