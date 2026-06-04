@@ -19,8 +19,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
     try {
       final response = await _apiClient.get('${AppUrls.userChatSessions}?page=$page');
       if (response.isSuccess && response.body != null) {
-        final data = response.body['data'] ?? response.body;
-        return ChatSessionListResponse.fromJson(data);
+        return ChatSessionListResponse.fromJson(response.body);
       } else {
         throw Exception(response.message ?? 'Failed to fetch chat sessions');
       }

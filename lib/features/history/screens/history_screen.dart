@@ -9,6 +9,8 @@ import '../controllers/history_controller.dart';
 import '../domain/usecases/get_chat_sessions_usecase.dart';
 import '../data/repositories/history_repository.dart';
 import 'package:intl/intl.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({Key? key}) : super(key: key);
@@ -165,10 +167,16 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
               
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => ChatHistoryDetailScreen(
-                    astrologerName: astrologerName,
-                    date: dateStr,
-                  ));
+                  Get.to(
+                    () => ChatScreen(
+                      astrologerName: astrologerName,
+                      astrologerImage: session.provider?.profilePhoto ?? '',
+                      sessionId: session.id,
+                      initialStatus: session.status, // "completed" or whatever
+                      startedAtString: session.startedAt,
+                    ),
+                    binding: ChatBinding(),
+                  );
                 },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),

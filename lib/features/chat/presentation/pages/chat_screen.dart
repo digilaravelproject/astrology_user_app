@@ -105,25 +105,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_controller.status.value != 'ended') {
+        if (_controller.status.value != 'ended' && _controller.status.value != 'completed') {
           _controller.minimizeToBubble(
             context,
             widget.astrologerName,
             widget.astrologerImage,
             shouldPop: false,
           );
-          return true;
+          // Return false because minimizeToBubble handles the pop
+          return false;
         }
         return true;
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF5F5F5),
+        backgroundColor: Colors.white,
         appBar: CustomAppBar(
           title: widget.astrologerName,
           centerTitle: false,
           showLeading: true,
           onLeadingPressed: () {
-            if (_controller.status.value != 'ended') {
+            if (_controller.status.value != 'ended' && _controller.status.value != 'completed') {
               _controller.minimizeToBubble(
                 context,
                 widget.astrologerName,
@@ -156,7 +157,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             Obx(() {
               final seconds = _controller.elapsedSeconds.value;
               final status = _controller.status.value;
-              final isEnded = status == 'ended';
+              final isEnded = status == 'ended' || status == 'completed';
               final isInitiated = status == 'initiated';
 
               if (isInitiated) return const SizedBox.shrink();
@@ -324,7 +325,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
             // Input Area
             Obx(() {
-              final isEnded = _controller.status.value == 'ended';
+              final isEnded = _controller.status.value == 'ended' || status.value == 'completed';
               final isInitiated = _controller.status.value == 'initiated';
               if (isEnded || isInitiated) return const SizedBox.shrink();
 

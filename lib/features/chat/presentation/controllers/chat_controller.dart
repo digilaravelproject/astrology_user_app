@@ -75,7 +75,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if (status.value != 'ended' && _sessionId != null && _astrologerName != null) {
+      if (status.value != 'ended' && status.value != 'completed' && _sessionId != null && _astrologerName != null) {
         minimizeToBubble(Get.context!, _astrologerName!, "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
@@ -268,6 +268,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   void _setupTimer(String? startedAtString) {
     _timer?.cancel();
+    if (status.value == 'ended' || status.value == 'completed') return;
+    
     final startedAtStr = startedAtString ?? WebSocketService.sessionStartTimes[_sessionId];
     if (startedAtStr != null) {
       final startedAt = DateTime.tryParse(startedAtStr);
