@@ -184,13 +184,16 @@ class WalletHelper {
       Get.back(); // close loader
 
       if (sessionRes.isSuccess && sessionRes.body != null) {
-        final sessionData = sessionRes.body['session'];
-        if (sessionData != null && sessionData is Map) {
-          final int pendingSessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
-          if (pendingSessionId > 0) {
-            // Show popup to cancel
-            _showCancelSessionDialog(context, pendingSessionId, apiClient);
-            return;
+        final data = sessionRes.body['data'];
+        if (data != null && data is Map) {
+          final sessionData = data['session'];
+          if (sessionData != null && sessionData is Map) {
+            final int pendingSessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+            if (pendingSessionId > 0) {
+              // Show popup to cancel
+              _showCancelSessionDialog(context, pendingSessionId, apiClient);
+              return;
+            }
           }
         }
       }
