@@ -9,7 +9,7 @@ class ChatSessionListResponse {
 
   factory ChatSessionListResponse.fromJson(Map<String, dynamic> json) {
     return ChatSessionListResponse(
-      currentPage: json['current_page'] ?? 1,
+      currentPage: int.tryParse(json['current_page']?.toString() ?? '') ?? 1,
       data: (json['data'] as List<dynamic>?)
               ?.map((e) => ChatSessionModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -54,16 +54,16 @@ class ChatSessionModel {
 
   factory ChatSessionModel.fromJson(Map<String, dynamic> json) {
     return ChatSessionModel(
-      id: json['id'] ?? 0,
-      consumerId: json['consumer_id'] ?? 0,
-      providerId: json['provider_id'] ?? 0,
-      status: json['status'] ?? '',
-      ratePerMinute: json['rate_per_minute'] ?? 0,
-      durationSeconds: json['duration_seconds'] ?? 0,
-      totalCost: json['total_cost'] ?? 0.0,
-      createdAt: json['created_at'] ?? '',
-      startedAt: json['started_at'] ?? '',
-      unreadCount: json['unread_count'] ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      consumerId: int.tryParse(json['consumer_id']?.toString() ?? '') ?? 0,
+      providerId: int.tryParse(json['provider_id']?.toString() ?? '') ?? 0,
+      status: json['status']?.toString() ?? '',
+      ratePerMinute: int.tryParse(json['rate_per_minute']?.toString() ?? '') ?? 0,
+      durationSeconds: int.tryParse(json['duration_seconds']?.toString() ?? '') ?? 0,
+      totalCost: num.tryParse(json['total_cost']?.toString() ?? '') ?? 0.0,
+      createdAt: json['created_at']?.toString() ?? '',
+      startedAt: json['started_at']?.toString() ?? '',
+      unreadCount: int.tryParse(json['unread_count']?.toString() ?? '') ?? 0,
       provider: json['provider'] != null ? ChatSessionUserModel.fromJson(json['provider']) : null,
       consumer: json['consumer'] != null ? ChatSessionUserModel.fromJson(json['consumer']) : null,
       latestMessage: json['latest_message'] != null ? ChatSessionLatestMessage.fromJson(json['latest_message']) : null,
@@ -87,12 +87,12 @@ class ChatSessionUserModel {
   factory ChatSessionUserModel.fromJson(Map<String, dynamic> json) {
     int chatRate = 0;
     if (json['astrologer'] != null && json['astrologer']['chat_rate_per_minute'] != null) {
-      chatRate = json['astrologer']['chat_rate_per_minute'];
+      chatRate = int.tryParse(json['astrologer']['chat_rate_per_minute'].toString()) ?? 0;
     }
     return ChatSessionUserModel(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      profilePhoto: json['astrologer']?['profile_photo'] ?? json['profile_photo'],
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      name: json['name']?.toString() ?? '',
+      profilePhoto: json['astrologer']?['profile_photo']?.toString() ?? json['profile_photo']?.toString(),
       chatRatePerMinute: chatRate,
     );
   }
@@ -119,13 +119,13 @@ class ChatSessionLatestMessage {
 
   factory ChatSessionLatestMessage.fromJson(Map<String, dynamic> json) {
     return ChatSessionLatestMessage(
-      id: json['id'] ?? 0,
-      chatSessionId: json['chat_session_id'] ?? 0,
-      senderId: json['sender_id'] ?? 0,
-      receiverId: json['receiver_id'] ?? 0,
-      message: json['message'] ?? '',
-      type: json['type'] ?? '',
-      createdAt: json['created_at'] ?? '',
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      chatSessionId: int.tryParse(json['chat_session_id']?.toString() ?? '') ?? 0,
+      senderId: int.tryParse(json['sender_id']?.toString() ?? '') ?? 0,
+      receiverId: int.tryParse(json['receiver_id']?.toString() ?? '') ?? 0,
+      message: json['message']?.toString() ?? '',
+      type: json['type']?.toString() ?? '',
+      createdAt: json['created_at']?.toString() ?? '',
     );
   }
 }
