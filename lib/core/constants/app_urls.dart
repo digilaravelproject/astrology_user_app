@@ -106,7 +106,7 @@ class AppUrls {
   static String markChatRead(int sessionId) => '/api/v1/chat/$sessionId/read';
   static String endChatSession(int sessionId) => '/api/v1/chat/$sessionId/end';
   static const String uploadAttachment = '/api/v1/chat/upload-attachment';
-  static const String getCurrentSession = '/api/v1/chat/current-session';
+  static const String getCurrentSession = '/api/v1/chat/sessions/current';
   static const String markMessagesRead = '/api/v1/chat/messages/read';
   static const String userChatSessions = '/api/v1/chat/sessions/user';
 
