@@ -17,7 +17,7 @@ import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
-import 'package:astro_user/features/chat/bindings/chat_binding.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 
 class DashboardScreen extends StatefulWidget {
