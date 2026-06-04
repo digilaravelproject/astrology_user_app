@@ -113,7 +113,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final session = response.body['data'];
         final sessionId = session['id'];
         final status = session['status'];
-        final startedAt = session['accepted_at'] ?? session['created_at'];
+        final startedAt = session['started_at'] ?? session['accepted_at'] ?? session['created_at'];
         // For user app, other person is provider (astrologer)
         final name = session['provider']?['name'] ?? 'Astrologer';
         
