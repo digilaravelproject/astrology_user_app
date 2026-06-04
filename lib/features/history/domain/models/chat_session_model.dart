@@ -27,6 +27,7 @@ class ChatSessionModel {
   final int durationSeconds;
   final num totalCost;
   final String createdAt;
+  final String startedAt;
   final int unreadCount;
   
   // Either consumer or provider will be populated depending on the API side
@@ -44,6 +45,7 @@ class ChatSessionModel {
     required this.durationSeconds,
     required this.totalCost,
     required this.createdAt,
+    required this.startedAt,
     required this.unreadCount,
     this.provider,
     this.consumer,
@@ -60,6 +62,7 @@ class ChatSessionModel {
       durationSeconds: json['duration_seconds'] ?? 0,
       totalCost: json['total_cost'] ?? 0.0,
       createdAt: json['created_at'] ?? '',
+      startedAt: json['started_at'] ?? '',
       unreadCount: json['unread_count'] ?? 0,
       provider: json['provider'] != null ? ChatSessionUserModel.fromJson(json['provider']) : null,
       consumer: json['consumer'] != null ? ChatSessionUserModel.fromJson(json['consumer']) : null,
@@ -71,11 +74,13 @@ class ChatSessionModel {
 class ChatSessionUserModel {
   final int id;
   final String name;
+  final String? profilePhoto;
   final int chatRatePerMinute;
 
   ChatSessionUserModel({
     required this.id,
     required this.name,
+    this.profilePhoto,
     required this.chatRatePerMinute,
   });
 
@@ -87,6 +92,7 @@ class ChatSessionUserModel {
     return ChatSessionUserModel(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
+      profilePhoto: json['astrologer']?['profile_photo'] ?? json['profile_photo'],
       chatRatePerMinute: chatRate,
     );
   }

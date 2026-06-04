@@ -325,7 +325,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
             // Input Area
             Obx(() {
-              final isEnded = _controller.status.value == 'ended' || status.value == 'completed';
+              final isEnded = _controller.status.value == 'ended' || _controller.status.value == 'completed';
               final isInitiated = _controller.status.value == 'initiated';
               if (isEnded || isInitiated) return const SizedBox.shrink();
 
