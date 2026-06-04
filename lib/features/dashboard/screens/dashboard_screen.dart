@@ -11,6 +11,9 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/custom_bottom_nav_bar.dart';
 import '../../matrimony/controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -59,7 +62,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showPromotionalSheet();
+      _checkOverlayPermission();
     });
+  }
+
+  Future<void> _checkOverlayPermission() async {
+    if (Platform.isAndroid) {
+      try {
+        final bool isGranted = await FlutterOverlayWindow.isPermissionGranted();
+        if (!isGranted) {
+          Get.dialog(
+            CupertinoAlertDialog(
+              title: const Text('Overlay Permission'),
+              content: const Text('To show the floating chat bubble when the app is in the background, please allow "Display over other apps" permission.'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('Cancel'),
+                  onPressed: () => Get.back(),
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: const Text('Allow'),
+                  onPressed: () {
+                    Get.back();
+                    FlutterOverlayWindow.requestPermission();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+      } catch (e) {
+        debugPrint('Error checking overlay permission: $e');
+      }
+    }
   }
 
   void _showPromotionalSheet() {
