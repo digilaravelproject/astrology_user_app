@@ -33,6 +33,9 @@
             android:name="id.flutter.flutter_background_service.BackgroundService"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Flutter Overlay Window Service -->
+        <service android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" android:exported="false" />
+
         <!-- Activity aliases for alternate icons -->
         <activity-alias android:label="Surya Path" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:name=".icon_1" android:exported="true" android:enabled="false" android:targetActivity=".MainActivity"/>
         <activity-alias android:label="Surya Path" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:name=".icon_2" android:exported="true" android:enabled="false" android:targetActivity=".MainActivity"/>

@@ -23,8 +23,9 @@ import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/auth/controllers/auth_controller.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class ChatController extends GetxController {
+class ChatController extends GetxController with WidgetsBindingObserver {
   final LoadChatHistoryUseCase _loadChatHistoryUseCase;
   final SendTextMessageUseCase _sendTextMessageUseCase;
   final SendAttachmentUseCase _sendAttachmentUseCase;
@@ -63,6 +64,24 @@ class ChatController extends GetxController {
   StreamSubscription? _statusUpdateSub;
 
   int? get sessionId => _sessionId;
+
+  @override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+    scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+      if (status.value != 'ended' && _sessionId != null && _astrologerName != null) {
+        minimizeToBubble(Get.context!, _astrologerName!, "", shouldPop: false);
+      }
+    } else if (state == AppLifecycleState.resumed) {
+      FloatingChatBubble.dismiss();
+    }
+  }
 
   void initSession({
     required int sessionId,
@@ -502,8 +521,13 @@ class ChatController extends GetxController {
     });
   }
 
+  void _scrollListener() {
+    // Implement scroll listener logic if needed
+  }
+
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _msgSub?.cancel();
     _endSub?.cancel();
