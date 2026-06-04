@@ -278,7 +278,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     }
     FloatingChatBubble.dismiss();
     Get.back();
-    CustomSnackbar.showInfo("The chat request was cancelled or timed out.", title: "Chat Cancelled");
   }
 
   void _setupTimer(String? startedAtString) {
