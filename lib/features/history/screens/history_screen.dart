@@ -133,14 +133,32 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
         }
         
         if (_historyController.error.value.isNotEmpty && _historyController.chatSessions.isEmpty) {
-          return Center(child: Text("Error: ${_historyController.error.value}"));
+          return RefreshIndicator(
+            onRefresh: () => _historyController.fetchChatSessions(isRefresh: true),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: Text("Error: ${_historyController.error.value}"),
+              ),
+            ),
+          );
         }
 
         if (_historyController.chatSessions.isEmpty) {
-          return Center(
-            child: AppText(
-              "No chat history available.",
-              color: Colors.grey.shade500,
+          return RefreshIndicator(
+            onRefresh: () => _historyController.fetchChatSessions(isRefresh: true),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: AppText(
+                  "No chat history available.",
+                  color: Colors.grey.shade500,
+                ),
+              ),
             ),
           );
         }
