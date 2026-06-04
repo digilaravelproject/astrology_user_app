@@ -234,6 +234,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         if (_sessionId != null) {
           LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
         }
+        FloatingChatBubble.dismiss();
         Get.back();
         CustomSnackbar.showInfo("The chat request was cancelled or timed out.", title: "Chat Cancelled");
       }
