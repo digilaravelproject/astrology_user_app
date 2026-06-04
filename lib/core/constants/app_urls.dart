@@ -104,6 +104,7 @@ class AppUrls {
   static String getChatMessages(int sessionId) => '/api/v1/chat/$sessionId/messages';
   static String sendChatMessage(int sessionId) => '/api/v1/chat/$sessionId/message';
   static String markChatRead(int sessionId) => '/api/v1/chat/$sessionId/read';
+  static String syncChatStatus(int sessionId) => '/api/v1/chat/$sessionId/sync-status';
   static String endChatSession(int sessionId) => '/api/v1/chat/$sessionId/end';
   static const String uploadAttachment = '/api/v1/chat/upload-attachment';
   static const String getCurrentSession = '/api/v1/chat/sessions/current';

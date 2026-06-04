@@ -12,6 +12,11 @@ import '../../features/splash/domain/repositories/splash_repository.dart';
 import '../../features/splash/domain/services/splash_service.dart';
 import '../services/payment/razorpay/razorpay_service.dart';
 import '../services/network/websocket_service.dart';
+import '../../features/chat/data/datasources/chat_remote_data_source.dart';
+import '../../features/chat/data/datasources/chat_local_data_source.dart';
+import '../../features/chat/data/repositories/chat_repository_impl.dart';
+import '../../features/chat/domain/repositories/i_chat_repository.dart';
+import '../../features/chat/domain/usecases/sync_message_status_usecase.dart';
 
 class InitialBindings extends Bindings {
   @override
@@ -29,6 +34,12 @@ class InitialBindings extends Bindings {
       // Connect will automatically attempt connecting if token exists
       wsService.connect();
     });
+
+    // Chat global dependencies (needed by WebSocketService)
+    Get.put<IChatRemoteDataSource>(ChatRemoteDataSourceImpl(apiClient: Get.find<ApiClient>()), permanent: true);
+    Get.put<IChatLocalDataSource>(ChatLocalDataSourceImpl(), permanent: true);
+    Get.put<IChatRepository>(ChatRepositoryImpl(remoteDataSource: Get.find<IChatRemoteDataSource>(), localDataSource: Get.find<IChatLocalDataSource>()), permanent: true);
+    Get.put(SyncMessageStatusUseCase(Get.find<IChatRepository>()), permanent: true);
 
     // Splash
     Get.put(SplashRepository(Get.find<ApiClient>()), permanent: true);

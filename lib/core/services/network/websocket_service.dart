@@ -18,6 +18,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
 
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
@@ -446,6 +447,17 @@ class WebSocketService extends GetxService {
             FloatingChatBubble.incrementUnreadCount();
           }
           _showInAppNotification(map);
+          
+          final int messageId = int.tryParse(map['id']?.toString() ?? '') ?? 0;
+          if (messageId > 0 && Get.isRegistered<SyncMessageStatusUseCase>()) {
+            Get.find<SyncMessageStatusUseCase>().execute(
+              sessionId: sessionId,
+              messageIds: [messageId],
+              status: 'delivered',
+            ).catchError((e) {
+              debugPrint('Error syncing message status: $e');
+            });
+          }
         }
       }
     } catch (e) {
