@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
+import 'package:astro_user/features/chat/domain/usecases/reject_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/load_chat_history_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/mark_messages_read_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/send_attachment_usecase.dart';
@@ -31,6 +32,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   final SendAttachmentUseCase _sendAttachmentUseCase;
   final MarkMessagesReadUseCase _markMessagesReadUseCase;
   final EndChatSessionUseCase _endChatSessionUseCase;
+  final RejectChatSessionUseCase _rejectChatSessionUseCase;
 
   ChatController({
     required LoadChatHistoryUseCase loadChatHistoryUseCase,
@@ -38,11 +40,13 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     required SendAttachmentUseCase sendAttachmentUseCase,
     required MarkMessagesReadUseCase markMessagesReadUseCase,
     required EndChatSessionUseCase endChatSessionUseCase,
+    required RejectChatSessionUseCase rejectChatSessionUseCase,
   })  : _loadChatHistoryUseCase = loadChatHistoryUseCase,
         _sendTextMessageUseCase = sendTextMessageUseCase,
         _sendAttachmentUseCase = sendAttachmentUseCase,
         _markMessagesReadUseCase = markMessagesReadUseCase,
-        _endChatSessionUseCase = endChatSessionUseCase;
+        _endChatSessionUseCase = endChatSessionUseCase,
+        _rejectChatSessionUseCase = rejectChatSessionUseCase;
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
   final RxBool isLoading = false.obs;
@@ -474,7 +478,26 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         );
       }
     } catch (e) {
-      debugPrint("Error ending chat session: $e");
+      CustomSnackbar.showError(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> rejectChatSession() async {
+    if (_sessionId == null) return;
+    isLoading.value = true;
+    try {
+      await _rejectChatSessionUseCase.execute(_sessionId!);
+      status.value = 'ended';
+      _timer?.cancel();
+      FlutterBackgroundService().invoke('stopService');
+      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      FloatingChatBubble.dismiss();
+      Get.back(); // close chat screen
+    } catch (e) {
+      debugPrint("Error rejecting chat session: $e");
+      CustomSnackbar.showError(e.toString());
     } finally {
       isLoading.value = false;
     }

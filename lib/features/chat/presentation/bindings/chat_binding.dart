@@ -5,6 +5,7 @@ import '../../data/datasources/chat_remote_data_source.dart';
 import '../../data/repositories/chat_repository_impl.dart';
 import '../../domain/repositories/i_chat_repository.dart';
 import '../../domain/usecases/end_chat_session_usecase.dart';
+import '../../domain/usecases/reject_chat_session_usecase.dart';
 import '../../domain/usecases/load_chat_history_usecase.dart';
 import '../../domain/usecases/mark_messages_read_usecase.dart';
 import '../../domain/usecases/send_attachment_usecase.dart';
@@ -39,6 +40,7 @@ class ChatBinding extends Bindings {
     Get.lazyPut(() => SendAttachmentUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => MarkMessagesReadUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => EndChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
+    Get.lazyPut(() => RejectChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
 
     // 4. Controller
     Get.lazyPut(
@@ -48,6 +50,7 @@ class ChatBinding extends Bindings {
         sendAttachmentUseCase: Get.find<SendAttachmentUseCase>(),
         markMessagesReadUseCase: Get.find<MarkMessagesReadUseCase>(),
         endChatSessionUseCase: Get.find<EndChatSessionUseCase>(),
+        rejectChatSessionUseCase: Get.find<RejectChatSessionUseCase>(),
       ),
     );
   }

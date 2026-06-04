@@ -21,4 +21,5 @@ abstract class IChatRepository {
   });
   Future<void> markMessagesRead(int sessionId);
   Future<ChatSession?> endChatSession(int sessionId);
+  Future<void> rejectChatSession(int sessionId);
 }

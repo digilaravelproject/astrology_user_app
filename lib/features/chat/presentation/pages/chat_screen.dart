@@ -492,7 +492,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
             // End Call button
             GestureDetector(
-              onTap: () => _showEndChatConfirmation(context),
+              onTap: () => _controller.rejectChatSession(),
               child: const Icon(Icons.call_end_rounded, color: Colors.red, size: 48),
             ),
           ],
