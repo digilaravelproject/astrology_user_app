@@ -109,6 +109,21 @@ class AppUrls {
   static const String uploadAttachment = '/api/v1/chat/upload-attachment';
   static const String getCurrentSession = '/api/v1/chat/sessions/current';
   static const String markMessagesRead = '/api/v1/chat/messages/read';
-  static const String userChatSessions = '/api/v1/chat/sessions/user';
+  // Call System Endpoints
+  static const String initiateCall = '/api/v1/call/initiate';
+  static String acceptCall(int sessionId) => '/api/v1/call/$sessionId/accept';
+  static String rejectCall(int sessionId) => '/api/v1/call/$sessionId/reject';
+  static String cancelCall(int sessionId) => '/api/v1/call/$sessionId/cancel';
+  static String endCallSession(int sessionId) => '/api/v1/call/$sessionId/end';
+  static String sendIceCandidate(int sessionId) => '/api/v1/call/$sessionId/ice-candidate';
+  static const String currentCallSession = '/api/v1/call/current-session';
+  static const String userCallSessions = '/api/v1/call/sessions/user';
+  static const String astrologerCallSessions = '/api/v1/call/sessions/astrologer';
 
+  // Call System Events
+  static const String eventCallInitiated = 'CallInitiated';
+  static const String eventCallAccepted = 'CallAccepted';
+  static const String eventCallDismissed = 'CallDismissed';
+  static const String eventCallEnded = 'CallEnded';
+  static const String eventIceCandidateSent = 'IceCandidateSent';
 }

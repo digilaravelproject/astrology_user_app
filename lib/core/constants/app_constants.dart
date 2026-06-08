@@ -38,4 +38,8 @@ class AppConstants {
         'Vastu',
         'Face Reading'
     ];
+    // Call-related constants
+    static const String outgoingRingPath = 'audio/outgoing_ring.mp3';
+    static const String incomingRingPath = 'audio/incoming_ring.mp3';
+    static const String webrtcStunServer = 'stun:stun.l.google.com:19302';
 }

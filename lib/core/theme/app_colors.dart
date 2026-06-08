@@ -1,42 +1,42 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Light theme colors - Updated to Pink Theme
-  static const Color primaryColor = Color(0xFFE91E63); // Pink Primary
-  static const Color secondaryColor = Color(0xFFEC407A); // Pink Secondary
-  static const Color accentColor = Color(0xFFF06292); // Pink Accent
-  static const Color lightPink = Color(0xFFFCE4EC); // Very Light Pink
-  static const Color softPink = Color(0xFFF8BBD0); // Soft Pink
-  static const Color deepPink = Color(0xFFC2185B); // Deep Pink
+  // Light theme colors - Updated to Peach/Coral/Burgundy Theme from image
+  static const Color primaryColor = Color(0xFFB51F49); // Deep Burgundy/Magenta
+  static const Color secondaryColor = Color(0xFFEF6A55); // Coral/Peach
+  static const Color accentColor = Color(0xFFF78B75); // Lighter Coral/Peach
+  static const Color lightPink = Color(0xFFFFEAE6); // Very Light Peach/Pink
+  static const Color softPink = Color(0xFFFCD2C8); // Soft Peach/Pink
+  static const Color deepPink = Color(0xFFB51F49); // Deep Burgundy/Magenta
   static const Color goldAccent = Color(0xFFFFD700); // Gold for premium feel
-  static const Color fieldBackground = Color(0xFFF9F9F9); // Light off-white for inputs
+  static const Color fieldBackground = Color(0xFFFFF9F9); // Warm light input background
 
   static const Color backgroundColor = Colors.white;
   static const Color cardColor = Colors.white;
-  static const Color scaffoldBackgroundColor = Colors.white;
+  static const Color scaffoldBackgroundColor = Color(0xFFFFF5F4); // Very soft peach-white page background
 
-  static const Color textColorPrimary = Color(0xFF212121);
-  static const Color textColorSecondary = Color(0xFF757575);
-  static const Color textColorHint = Color(0xFFBDBDBD);
+  static const Color textColorPrimary = Color(0xFF2C1E1B); // Dark warm brown/charcoal
+  static const Color textColorSecondary = Color(0xFF7D6763); // Muted warm grey
+  static const Color textColorHint = Color(0xFFBCAAA4); // Light warm hint text
 
-  static const Color borderColor = Color(0xFFE0E0E0);
-  static const Color dividerColor = Color(0xFFE0E0E0);
+  static const Color borderColor = Color(0xFFFFDFD9); // Peach border
+  static const Color dividerColor = Color(0xFFFFDFD9); // Peach divider
 
-  // Dark theme colors
-  static const Color darkPrimaryColor = Color(0xFFEC407A); // Pink for dark mode
-  static const Color darkSecondaryColor = Color(0xFFF06292); // Lighter pink
-  static const Color darkAccentColor = Color(0xFFFFD54F); // Amber-light for contrast
+  // Dark theme colors - Matching Warm/Burgundy palette
+  static const Color darkPrimaryColor = Color(0xFFEF6A55); // Coral/Peach for dark mode contrast
+  static const Color darkSecondaryColor = Color(0xFFF78B75); // Lighter Coral/Peach
+  static const Color darkAccentColor = Color(0xFFB51F49); // Deep Burgundy/Magenta
 
-  static const Color darkBackgroundColor = Color(0xFF121212);
-  static const Color darkCardColor = Color(0xFF1E1E1E);
-  static const Color darkScaffoldBackgroundColor = Color(0xFF121212);
+  static const Color darkBackgroundColor = Color(0xFF221614); // Dark warm charcoal
+  static const Color darkCardColor = Color(0xFF2F201E); // Slightly lighter warm dark color for cards
+  static const Color darkScaffoldBackgroundColor = Color(0xFF1E1210); // Dark background
 
-  static const Color darkTextColorPrimary = Color(0xFFFFFFFF);
-  static const Color darkTextColorSecondary = Color(0xFFB3B3B3);
-  static const Color darkTextColorHint = Color(0xFF888888);
+  static const Color darkTextColorPrimary = Color(0xFFFFEAE6); // Light peach text
+  static const Color darkTextColorSecondary = Color(0xFFD2BCAE); // Muted warm text
+  static const Color darkTextColorHint = Color(0xFF9E8B83);
 
-  static const Color darkBorderColor = Color(0xFF333333);
-  static const Color darkDividerColor = Color(0xFF333333);
+  static const Color darkBorderColor = Color(0xFF4C302B);
+  static const Color darkDividerColor = Color(0xFF4C302B);
 
   // Common colors
   static const Color errorColor = Color(0xFFD32F2F); // Red

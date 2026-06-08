@@ -39,6 +39,15 @@ class WebSocketService extends GetxService {
   static final RxInt chatDismissedSessionId = (-1).obs;
   static final RxMap<String, dynamic> chatEndedBilling = <String, dynamic>{}.obs;
 
+  // Call System State
+  static final RxMap<int, String> callSessionStatusUpdates = <int, String>{}.obs;
+  static final RxInt callEndedSessionId = (-1).obs;
+  static final RxInt callDismissedSessionId = (-1).obs;
+  static final RxMap<String, dynamic> callDismissedData = <String, dynamic>{}.obs;
+  static final RxMap<String, dynamic> callAcceptedData = <String, dynamic>{}.obs;
+  static final RxMap<String, dynamic> callEndedData = <String, dynamic>{}.obs;
+  static final RxMap<String, dynamic> iceCandidateData = <String, dynamic>{}.obs;
+
   final String _wsUrl = AppUrls.webSocketUrl;
   
   bool get isConnected => _isConnected;
@@ -181,6 +190,30 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatDismissed(data['data']);
+        } else if (event == AppUrls.eventCallAccepted || event == 'App\\Events\\CallAccepted') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📞 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleCallAccepted(data['data']);
+        } else if (event == AppUrls.eventCallDismissed || event == 'App\\Events\\CallDismissed') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📞 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleCallDismissed(data['data']);
+        } else if (event == AppUrls.eventCallEnded || event == 'App\\Events\\CallEnded') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📞 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleCallEnded(data['data']);
+        } else if (event == AppUrls.eventIceCandidateSent || event == 'App\\Events\\IceCandidateSent') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📞 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleIceCandidateSent(data['data']);
         } else if (event == AppUrls.pusherPing) {
            _send(AppUrls.pusherPong);
         }
@@ -524,6 +557,93 @@ class WebSocketService extends GetxService {
       presenceUpdates.add(eventData);
     } catch (e) {
       Logger.e('WebSocketService: error handling PresenceUpdated -> $e');
+    }
+  }
+
+  void _handleCallAccepted(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      final session = eventData['session'];
+      if (session != null) {
+        final int sessionId = session['id'] is int 
+            ? session['id'] 
+            : (int.tryParse(session['id']?.toString() ?? '') ?? 0);
+        callSessionStatusUpdates[sessionId] = 'ongoing';
+        callSessionStatusUpdates.refresh();
+      }
+      callAcceptedData.value = eventData;
+      callAcceptedData.refresh();
+    } catch (e) {
+      Logger.e('WebSocketService: error handling CallAccepted -> $e');
+    }
+  }
+
+  void _handleCallDismissed(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      final session = eventData['session'];
+      if (session != null) {
+        final int sessionId = session['id'] is int 
+            ? session['id'] 
+            : (int.tryParse(session['id']?.toString() ?? '') ?? 0);
+        final String? reason = eventData['reason']?.toString();
+        callSessionStatusUpdates[sessionId] = reason ?? 'dismissed';
+        callSessionStatusUpdates.refresh();
+        callDismissedSessionId.value = sessionId;
+      }
+      callDismissedData.value = eventData;
+      callDismissedData.refresh();
+    } catch (e) {
+      Logger.e('WebSocketService: error handling CallDismissed -> $e');
+    }
+  }
+
+  void _handleCallEnded(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      final session = eventData['session'];
+      if (session != null) {
+        final int sessionId = session['id'] is int 
+            ? session['id'] 
+            : (int.tryParse(session['id']?.toString() ?? '') ?? 0);
+        callSessionStatusUpdates[sessionId] = 'completed';
+        callSessionStatusUpdates.refresh();
+        callEndedSessionId.value = sessionId;
+      }
+      callEndedData.value = eventData;
+      callEndedData.refresh();
+    } catch (e) {
+      Logger.e('WebSocketService: error handling CallEnded -> $e');
+    }
+  }
+
+  void _handleIceCandidateSent(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      iceCandidateData.value = eventData;
+      iceCandidateData.refresh();
+    } catch (e) {
+      Logger.e('WebSocketService: error handling IceCandidateSent -> $e');
     }
   }
 }

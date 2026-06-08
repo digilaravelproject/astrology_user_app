@@ -1,0 +1,278 @@
+import 'dart:async';
+import 'package:get/get.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:vibration/vibration.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/webrtc/webrtc_service.dart';
+import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/utils/logger.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+
+class CallController extends GetxController {
+  final ApiClient _apiClient = Get.find<ApiClient>();
+  final WebRTCService webrtcService = WebRTCService();
+
+  final RxString status = 'idle'.obs; // idle, dialing, waiting, ongoing, completed, rejected, cancelled, missed
+  final RxInt durationSeconds = 0.obs;
+  final RxBool isMuted = false.obs;
+  final RxBool isSpeakerOn = false.obs;
+
+  int? sessionId;
+  int? providerId;
+  String? providerName;
+  String? providerImage;
+
+  AudioPlayer? _audioPlayer;
+  Timer? _callTimer;
+  Timer? _ringingTimer;
+  StreamSubscription? _acceptedSubscription;
+  StreamSubscription? _dismissedSubscription;
+  StreamSubscription? _iceSubscription;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _setupWebSocketListeners();
+  }
+
+  void _setupWebSocketListeners() {
+    _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) {
+      if (data.isNotEmpty && status.value == 'dialing') {
+        final session = data['session'];
+        if (session != null && session['id'] == sessionId) {
+          final answer = session['answer']?.toString();
+          if (answer != null) {
+            _handleCallAccepted(answer);
+          }
+        }
+      }
+    });
+
+    _dismissedSubscription = WebSocketService.callDismissedData.listen((data) {
+      if (data.isNotEmpty) {
+        final session = data['session'];
+        if (session != null && session['id'] == sessionId) {
+          final reason = data['reason']?.toString() ?? 'dismissed';
+          _handleCallDismissed(reason);
+        }
+      }
+    });
+
+    _iceSubscription = WebSocketService.iceCandidateData.listen((data) {
+      if (data.isNotEmpty) {
+        final session = data['session'];
+        if (session != null && session['id'] == sessionId) {
+          final candidate = data['candidate']?.toString();
+          final receiverId = data['receiverId'];
+          // Only add candidate if it is meant for us (receiverId matches current user ID)
+          if (candidate != null && receiverId == WebSocketService.currentUserId) {
+            webrtcService.addRemoteCandidate(candidate);
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> initiateCall({
+    required int providerId,
+    required String providerName,
+    required String providerImage,
+  }) async {
+    try {
+      this.providerId = providerId;
+      this.providerName = providerName;
+      this.providerImage = providerImage;
+
+      status.value = 'dialing';
+      Logger.d('CallController: Dialing astrologer $providerName (ID: $providerId)...');
+
+      // 1. Create SDP Offer
+      // We pass a temporary sessionId (0) first since we don't have the real ID yet
+      final offerDescription = await webrtcService.createOffer(0);
+
+      // 2. Post to Initiate API
+      final response = await _apiClient.post(
+        AppUrls.initiateCall,
+        data: {
+          'provider_id': providerId,
+          'offer': offerDescription.sdp,
+        },
+        handleError: true,
+        showErrorScreen: false,
+      );
+
+      if (response.isSuccess && response.body?['success'] == true) {
+        final sessionData = response.body?['data']?['session'];
+        if (sessionData != null) {
+          sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+          final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
+
+          if (sessionStatus == 'waiting') {
+            status.value = 'waiting';
+            CustomSnackBar.show('Astrologer busy. You are in queue.', isError: false);
+          } else {
+            status.value = 'ringing';
+            _startRingtone(isIncoming: false);
+          }
+
+          _startRingingTimeout();
+        }
+      } else {
+        status.value = 'idle';
+        CustomSnackBar.show(response.body?['message']?.toString() ?? 'Failed to initiate call.', isError: true);
+        cleanUp();
+      }
+    } catch (e) {
+      status.value = 'idle';
+      Logger.e('CallController: Exception initiating call -> $e');
+      cleanUp();
+    }
+  }
+
+  Future<void> cancelCall() async {
+    if (sessionId == null) return;
+    try {
+      final response = await _apiClient.post(
+        AppUrls.cancelCall(sessionId!),
+        handleError: true,
+        showErrorScreen: false,
+      );
+      if (response.isSuccess) {
+        status.value = 'cancelled';
+        CustomSnackBar.show('Call cancelled.', isError: false);
+      }
+    } catch (e) {
+      Logger.e('CallController: Error cancelling call -> $e');
+    } finally {
+      cleanUp();
+    }
+  }
+
+  Future<void> endCall() async {
+    if (sessionId == null) return;
+    try {
+      final response = await _apiClient.post(
+        AppUrls.endCallSession(sessionId!),
+        handleError: true,
+        showErrorScreen: false,
+      );
+      if (response.isSuccess) {
+        status.value = 'completed';
+        CustomSnackBar.show('Call ended successfully.', isError: false);
+      }
+    } catch (e) {
+      Logger.e('CallController: Error ending call -> $e');
+    } finally {
+      cleanUp();
+    }
+  }
+
+  void toggleMute() {
+    isMuted.value = !isMuted.value;
+    webrtcService.toggleMute(isMuted.value);
+  }
+
+  void toggleSpeaker() {
+    isSpeakerOn.value = !isSpeakerOn.value;
+    webrtcService.toggleSpeaker(isSpeakerOn.value);
+  }
+
+  Future<void> _handleCallAccepted(String answerSdp) async {
+    _stopRingtone();
+    _ringingTimer?.cancel();
+    status.value = 'ongoing';
+    durationSeconds.value = 0;
+
+    await webrtcService.setRemoteAnswer(answerSdp);
+    _startCallTimer();
+    _showOngoingNotification();
+  }
+
+  void _handleCallDismissed(String reason) {
+    status.value = reason; // rejected, cancelled, timeout
+    CustomSnackBar.show('Call dismissed: $reason', isError: reason != 'cancelled');
+    cleanUp();
+  }
+
+  void _handleCallEnded(Map<String, dynamic> data) {
+    status.value = 'completed';
+    CustomSnackBar.show('Call ended by astrologer.', isError: false);
+    cleanUp();
+  }
+
+  void _startRingingTimeout() {
+    _ringingTimer?.cancel();
+    _ringingTimer = Timer(const Duration(seconds: 60), () {
+      if (status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') {
+        status.value = 'missed';
+        CustomSnackBar.show('Call unanswered.', isError: true);
+        cleanUp();
+      }
+    });
+  }
+
+  void _startCallTimer() {
+    _callTimer?.cancel();
+    _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      durationSeconds.value++;
+      _showOngoingNotification();
+    });
+  }
+
+  void _showOngoingNotification() {
+    if (sessionId != null) {
+      final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
+      final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
+      LocalNotificationService.showOngoingCallNotification(
+        sessionId: sessionId!,
+        title: 'Active Call in Progress',
+        body: 'Talking with $providerName - $minutes:$seconds',
+      );
+    }
+  }
+
+  Future<void> _startRingtone({required bool isIncoming}) async {
+    try {
+      _audioPlayer = AudioPlayer();
+      final path = isIncoming ? AppConstants.incomingRingPath : AppConstants.outgoingRingPath;
+      await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer?.play(AssetSource(path));
+
+      if (isIncoming && (await Vibration.hasVibrator() ?? false)) {
+        Vibration.vibrate(pattern: [500, 1000, 500, 1000], repeat: 0);
+      }
+    } catch (e) {
+      Logger.e('CallController: Error playing ringtone -> $e');
+    }
+  }
+
+  void _stopRingtone() {
+    _audioPlayer?.stop();
+    _audioPlayer?.dispose();
+    _audioPlayer = null;
+    Vibration.cancel();
+  }
+
+  void cleanUp() {
+    _stopRingtone();
+    _callTimer?.cancel();
+    _ringingTimer?.cancel();
+    if (sessionId != null) {
+      LocalNotificationService.cancelOngoingCallNotification(sessionId!);
+    }
+    webrtcService.dispose();
+    status.value = 'idle';
+  }
+
+  @override
+  void onClose() {
+    _acceptedSubscription?.cancel();
+    _dismissedSubscription?.cancel();
+    _iceSubscription?.cancel();
+    cleanUp();
+    super.onClose();
+  }
+}
