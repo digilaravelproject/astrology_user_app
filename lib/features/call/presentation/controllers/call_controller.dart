@@ -112,7 +112,7 @@ class CallController extends GetxController {
 
           if (sessionStatus == 'waiting') {
             status.value = 'waiting';
-            CustomSnackBar.show('Astrologer busy. You are in queue.', isError: false);
+            CustomSnackbar.showInfo('Astrologer busy. You are in queue.');
           } else {
             status.value = 'ringing';
             _startRingtone(isIncoming: false);
@@ -122,7 +122,7 @@ class CallController extends GetxController {
         }
       } else {
         status.value = 'idle';
-        CustomSnackBar.show(response.body?['message']?.toString() ?? 'Failed to initiate call.', isError: true);
+        CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate call.');
         cleanUp();
       }
     } catch (e) {
@@ -142,7 +142,7 @@ class CallController extends GetxController {
       );
       if (response.isSuccess) {
         status.value = 'cancelled';
-        CustomSnackBar.show('Call cancelled.', isError: false);
+        CustomSnackbar.showSuccess('Call cancelled.');
       }
     } catch (e) {
       Logger.e('CallController: Error cancelling call -> $e');
@@ -161,7 +161,7 @@ class CallController extends GetxController {
       );
       if (response.isSuccess) {
         status.value = 'completed';
-        CustomSnackBar.show('Call ended successfully.', isError: false);
+        CustomSnackbar.showSuccess('Call ended successfully.');
       }
     } catch (e) {
       Logger.e('CallController: Error ending call -> $e');
@@ -193,13 +193,17 @@ class CallController extends GetxController {
 
   void _handleCallDismissed(String reason) {
     status.value = reason; // rejected, cancelled, timeout
-    CustomSnackBar.show('Call dismissed: $reason', isError: reason != 'cancelled');
+    if (reason == 'cancelled') {
+      CustomSnackbar.showInfo('Call cancelled.');
+    } else {
+      CustomSnackbar.showError('Call dismissed: $reason');
+    }
     cleanUp();
   }
 
   void _handleCallEnded(Map<String, dynamic> data) {
     status.value = 'completed';
-    CustomSnackBar.show('Call ended by astrologer.', isError: false);
+    CustomSnackbar.showInfo('Call ended by astrologer.');
     cleanUp();
   }
 
@@ -208,7 +212,7 @@ class CallController extends GetxController {
     _ringingTimer = Timer(const Duration(seconds: 60), () {
       if (status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') {
         status.value = 'missed';
-        CustomSnackBar.show('Call unanswered.', isError: true);
+        CustomSnackbar.showError('Call unanswered.');
         cleanUp();
       }
     });
