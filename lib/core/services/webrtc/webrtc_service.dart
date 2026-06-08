@@ -42,14 +42,18 @@ class WebRTCService {
     }
   }
 
+  int? activeSessionId;
+
   Future<RTCSessionDescription> createOffer(int sessionId) async {
     try {
+      activeSessionId = sessionId;
       await initLocalStream();
       peerConnection = await createPeerConnection(_iceConfig, _constraints);
 
-      // Listeners
       peerConnection!.onIceCandidate = (candidate) {
-        _sendIceCandidate(sessionId, candidate);
+        if (activeSessionId != null && activeSessionId! > 0) {
+          _sendIceCandidate(activeSessionId!, candidate);
+        }
       };
 
       peerConnection!.onIceConnectionState = (state) {
