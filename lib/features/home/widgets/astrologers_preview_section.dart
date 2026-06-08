@@ -234,11 +234,11 @@ class AstrologersPreviewSection extends StatelessWidget {
                               children: [
                                 if (astro.isChatEnabled) ...[
                                   CustomButton(
-                                    text: '${AppStrings.chat}',
+                                    text: '${AppStrings.chat} ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
                                     icon: Icons.chat_bubble_outline_rounded,
                                     fontSize: 10,
                                     height: 32,
-                                    width: 85,
+                                    width: 95,
                                     borderRadius: 8,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 4,
@@ -262,15 +262,15 @@ class AstrologersPreviewSection extends StatelessWidget {
                                       );
                                     },
                                   ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 8),
                                 ],
                                 if (astro.isCallEnabled)
                                   CustomButton(
-                                    text: '${AppStrings.call}',
+                                    text: '${AppStrings.call} ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
                                     icon: Icons.call_outlined,
                                     fontSize: 10,
                                     height: 32,
-                                    width: 85,
+                                    width: 95,
                                     borderRadius: 8,
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 4,
