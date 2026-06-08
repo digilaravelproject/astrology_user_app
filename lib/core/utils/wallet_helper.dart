@@ -167,7 +167,16 @@ class WalletHelper {
                       }
                     } else {
                       // Request Microphone Permission
-                      final permissionStatus = await Permission.microphone.request();
+                      var permissionStatus = await Permission.microphone.status;
+                      if (!permissionStatus.isGranted) {
+                        permissionStatus = await Permission.microphone.request();
+                      }
+                      
+                      if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+                        await openAppSettings();
+                        return;
+                      }
+
                       if (permissionStatus.isGranted) {
                         Get.back(); // close bottom sheet
                         
@@ -185,8 +194,6 @@ class WalletHelper {
                           providerName: name,
                           providerImage: imageUrl,
                         );
-                      } else {
-                        CustomSnackbar.showError("Microphone permission is required to make calls.");
                       }
                     }
                   },
