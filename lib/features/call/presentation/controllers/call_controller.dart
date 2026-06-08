@@ -104,8 +104,10 @@ class CallController extends GetxController {
         showErrorScreen: false,
       );
 
-      if (response.isSuccess && response.body?['success'] == true) {
-        final sessionData = response.body?['data']?['session'];
+      if (response.isSuccess) {
+        final bodyMap = response.body;
+        // Since response.body already points to the 'data' map from ResponseModel.fromJson (json['data'] ?? json)
+        final sessionData = bodyMap is Map ? (bodyMap['session'] ?? bodyMap['data']?['session']) : null;
         if (sessionData != null) {
           sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
           final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
