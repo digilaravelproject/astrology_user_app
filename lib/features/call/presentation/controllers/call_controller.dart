@@ -40,7 +40,7 @@ class CallController extends GetxController {
 
   void _setupWebSocketListeners() {
     _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) {
-      if (data.isNotEmpty && status.value == 'dialing') {
+      if (data.isNotEmpty && (status.value == 'dialing' || status.value == 'ringing')) {
         final session = data['session'];
         if (session != null && session['id'] == sessionId) {
           final answer = session['answer']?.toString();
