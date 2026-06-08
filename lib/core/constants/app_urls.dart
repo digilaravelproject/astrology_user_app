@@ -2,8 +2,7 @@
 class AppUrls {
   static String baseUrl = "https://suryapathkundli.com";
   //static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
-  static const String baseImageUrl = "https://suryapathkundli.com/storage/app/public/";
-  //static const String baseImageUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com/storage/app/public/";
+  static const String baseImageUrl = "https://suryapathkundli.com/";
   static const String webSocketUrl = "wss://suryapathkundli.com/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
   static const String broadcastingAuth = "/api/v1/broadcasting/auth";
   static String sendOtp = "/api/v1/user/send-otp";
