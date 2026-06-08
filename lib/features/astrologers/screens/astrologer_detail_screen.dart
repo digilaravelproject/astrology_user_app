@@ -169,7 +169,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 ),
               ],
             ),
-      bottomNavigationBar: (_astrologer?.isOnline ?? false)
+      bottomNavigationBar: (_astrologer?.isAvailableOnline ?? false)
           ? _buildBottomActions(context)
           : null,
 
@@ -674,7 +674,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           width: 16,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: astro.isOnline ? Colors.green : Colors.grey,
+                            color: astro.isAvailableOnline ? Colors.green : Colors.grey,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -686,15 +686,15 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: (astro.isOnline ? Colors.green : Colors.grey).withOpacity(0.1),
+                      color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: (astro.isOnline ? Colors.green : Colors.grey).withOpacity(0.5), width: 0.5),
+                      border: Border.all(color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.5), width: 0.5),
                     ),
                     child: AppText(
-                      astro.isOnline ? 'Online' : 'Offline',
+                      astro.isAvailableOnline ? 'Online' : 'Offline',
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: astro.isOnline ? Colors.green : Colors.grey,
+                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
                     ),
                   ),
                   if (astro.isBlocked)
@@ -1193,115 +1193,116 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       ),
       child: Row(
         children: [
-          if (_astrologer?.isChatEnabled == true)
-          Expanded(
-            child: GestureDetector(
-              onTap: _astrologer?.isBlocked == true 
-                ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                : () {
-                    final walletController = Get.find<WalletController>();
-                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                    WalletHelper.checkBalanceAndProceed(
-                      context: context,
-                      type: 'chat',
-                      name: _astrologer?.name ?? 'Astrologer',
-                      imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                      price: _astrologer?.chatRate ?? '0',
-                      providerId: widget.astrologerId,
-                      simulatedBalance: balance,
-                    );
-                  },
-              child: Opacity(
-                opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: _astrologer?.isBlocked == true 
-                        ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                        : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.message_rounded, color: Colors.white, size: 18),
-                      const SizedBox(width: 8),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                          Text('₹${_astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          if(_astrologer?.isCallEnabled == true|| _astrologer?.isVideoCallEnabled == true)
-          Expanded(
-            child: GestureDetector(
-              onTap: _astrologer?.isBlocked == true 
-                ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                : () {
-                    final walletController = Get.find<WalletController>();
-                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                    WalletHelper.checkBalanceAndProceed(
-                      context: context,
-                      type: 'call',
-                      name: _astrologer?.name ?? 'Astrologer',
-                      imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                      price: _astrologer?.callRate ?? '0',
-                      providerId: widget.astrologerId,
-                      simulatedBalance: balance,
-                    );
-                  },
-              child: Opacity(
-                opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: _astrologer?.isBlocked == true 
-                        ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                        : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.call, color: Colors.white, size: 18),
-                      const SizedBox(width: 8),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                          Text('₹${_astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
-                        ],
-                      ),
-                    ],
+          if (_astrologer?.isChatEnabled == true) ...[
+            Expanded(
+              child: GestureDetector(
+                onTap: _astrologer?.isBlocked == true 
+                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
+                  : () {
+                      final walletController = Get.find<WalletController>();
+                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                      WalletHelper.checkBalanceAndProceed(
+                        context: context,
+                        type: 'chat',
+                        name: _astrologer?.name ?? 'Astrologer',
+                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                        price: _astrologer?.chatRate ?? '0',
+                        providerId: widget.astrologerId,
+                        simulatedBalance: balance,
+                      );
+                    },
+                child: Opacity(
+                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: _astrologer?.isBlocked == true 
+                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
+                          : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.message_rounded, color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                            Text('₹${_astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+            if (_astrologer?.isCallEnabled == true) const SizedBox(width: 10),
+          ],
+          if (_astrologer?.isCallEnabled == true)
+            Expanded(
+              child: GestureDetector(
+                onTap: _astrologer?.isBlocked == true 
+                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
+                  : () {
+                      final walletController = Get.find<WalletController>();
+                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                      WalletHelper.checkBalanceAndProceed(
+                        context: context,
+                        type: 'call',
+                        name: _astrologer?.name ?? 'Astrologer',
+                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                        price: _astrologer?.callRate ?? '0',
+                        providerId: widget.astrologerId,
+                        simulatedBalance: balance,
+                      );
+                    },
+                child: Opacity(
+                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: _astrologer?.isBlocked == true 
+                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
+                          : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.call, color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                            Text('₹${_astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

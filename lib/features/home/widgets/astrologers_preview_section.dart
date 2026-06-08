@@ -142,7 +142,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                         width: 18,
                         height: 18,
                         decoration: BoxDecoration(
-                          color: astro.isOnline ? Colors.green : Colors.red,
+                          color: astro.isAvailableOnline ? Colors.green : Colors.red,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2.5),
                           boxShadow: [
@@ -228,11 +228,11 @@ class AstrologersPreviewSection extends StatelessWidget {
                     alignment: Alignment.centerRight,
 
                     child:
-                        (astro.isOnline)
+                        (astro.isAvailableOnline)
                             ? Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (astro.isChatEnabled)
+                                if (astro.isChatEnabled) ...[
                                   CustomButton(
                                     text: '${AppStrings.chat}',
                                     icon: Icons.chat_bubble_outline_rounded,
@@ -262,10 +262,9 @@ class AstrologersPreviewSection extends StatelessWidget {
                                       );
                                     },
                                   ),
-                                //  if (astro.chatRate != null && astro.callRate != null)
-                                const SizedBox(width: 10),
-                                if (astro.isCallEnabled ||
-                                    astro.isVideoCallEnabled)
+                                  const SizedBox(width: 10),
+                                ],
+                                if (astro.isCallEnabled)
                                   CustomButton(
                                     text: '${AppStrings.call}',
                                     icon: Icons.call_outlined,

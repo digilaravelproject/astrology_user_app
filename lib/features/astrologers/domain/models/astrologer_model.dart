@@ -76,4 +76,6 @@ class AstrologerModel {
   }
 
   String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
+
+  bool get isAvailableOnline => isChatEnabled || isCallEnabled || isVideoCallEnabled;
 }

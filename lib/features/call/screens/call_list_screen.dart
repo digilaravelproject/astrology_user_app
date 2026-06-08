@@ -275,7 +275,7 @@ class CallListScreen extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: astro.isOnline ? Colors.green : Colors.red,
+                      color: astro.isAvailableOnline ? Colors.green : Colors.red,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Colors.white,
@@ -512,7 +512,7 @@ class CallListScreen extends StatelessWidget {
                         width: 14,
                         height: 14,
                         decoration: BoxDecoration(
-                          color: astro.isOnline ? Colors.green : Colors.red,
+                          color: astro.isAvailableOnline ? Colors.green : Colors.red,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white,
@@ -590,7 +590,7 @@ class CallListScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   // Call Button
-                  !astro.isOnline
+                  !astro.isAvailableOnline
                       ? Align(
                     alignment: Alignment.centerRight,
                     child: Text(
@@ -602,27 +602,28 @@ class CallListScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                      :
-                  CustomButton(
-                    text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
-                    icon: Icons.call,
-                    fontSize: 11,
-                    height: 32,
-                    borderRadius: 8,
-                    onTap: () {
-                            final walletController = Get.find<WalletController>();
-                            final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                            WalletHelper.checkBalanceAndProceed(
-                            context: context,
-                            type: 'call',
-                            name: astro.name,
-                            imageUrl: astro.fullProfilePhoto,
-                            price: astro.callRate ?? '0',
-                            providerId: astro.id,
-                            simulatedBalance: balance,
-                          );
-                    },
-                  ),
+                      : astro.isCallEnabled
+                          ? CustomButton(
+                              text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
+                              icon: Icons.call,
+                              fontSize: 11,
+                              height: 32,
+                              borderRadius: 8,
+                              onTap: () {
+                                      final walletController = Get.find<WalletController>();
+                                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                      WalletHelper.checkBalanceAndProceed(
+                                      context: context,
+                                      type: 'call',
+                                      name: astro.name,
+                                      imageUrl: astro.fullProfilePhoto,
+                                      price: astro.callRate ?? '0',
+                                      providerId: astro.id,
+                                      simulatedBalance: balance,
+                                    );
+                              },
+                            )
+                          : const SizedBox.shrink(),
                 ],
               ),
             ),

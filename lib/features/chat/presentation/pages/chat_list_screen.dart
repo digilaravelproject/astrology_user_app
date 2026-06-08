@@ -275,7 +275,7 @@ class ChatListScreen extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: astro.isOnline ? Colors.green : Colors.grey,
+                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Colors.white,
@@ -512,7 +512,7 @@ class ChatListScreen extends StatelessWidget {
                         width: 14,
                         height: 14,
                         decoration: BoxDecoration(
-                          color: astro.isOnline ? Colors.green : Colors.grey,
+                          color: astro.isAvailableOnline ? Colors.green : Colors.grey,
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white,
@@ -590,26 +590,40 @@ class ChatListScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   // Chat Button
-                  CustomButton(
-                    text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
-                    icon: Icons.chat,
-                    fontSize: 11,
-                    height: 32,
-                    borderRadius: 8,
-                    onTap: () {
-                            final walletController = Get.find<WalletController>();
-                            final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                            WalletHelper.checkBalanceAndProceed(
-                            context: context,
-                            type: 'chat',
-                            name: astro.name,
-                            imageUrl: astro.fullProfilePhoto,
-                            price: astro.chatRate ?? '0',
-                            providerId: astro.id,
-                            simulatedBalance: balance,
-                          );
-                    },
-                  ),
+                  !astro.isAvailableOnline
+                      ? Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      "Astrologer is offline.",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+                      : astro.isChatEnabled
+                          ? CustomButton(
+                              text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
+                              icon: Icons.chat,
+                              fontSize: 11,
+                              height: 32,
+                              borderRadius: 8,
+                              onTap: () {
+                                      final walletController = Get.find<WalletController>();
+                                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                      WalletHelper.checkBalanceAndProceed(
+                                      context: context,
+                                      type: 'chat',
+                                      name: astro.name,
+                                      imageUrl: astro.fullProfilePhoto,
+                                      price: astro.chatRate ?? '0',
+                                      providerId: astro.id,
+                                      simulatedBalance: balance,
+                                    );
+                              },
+                            )
+                          : const SizedBox.shrink(),
                 ],
               ),
             ),
