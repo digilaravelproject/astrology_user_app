@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({super.key});
@@ -77,10 +78,7 @@ class ReferralScreen extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Clipboard.setData(const ClipboardData(text: "ASTRO2024"));
-                      Get.snackbar("Copied", "Referral code copied to clipboard", 
-                        snackPosition: SnackPosition.BOTTOM, margin: const EdgeInsets.all(20),
-                        backgroundColor: Colors.black87, colorText: Colors.white,
-                      );
+                      CustomSnackbar.showInfo("Referral code copied to clipboard");
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),

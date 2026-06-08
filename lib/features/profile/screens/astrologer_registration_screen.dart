@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class AstrologerRegistrationScreen extends StatelessWidget {
   const AstrologerRegistrationScreen({super.key});
@@ -65,12 +66,7 @@ class AstrologerRegistrationScreen extends StatelessWidget {
               text: "Submit Application",
               onTap: () {
                  Get.back();
-                 Get.snackbar("Success", "Application Submitted Successfully", 
-                  backgroundColor: Colors.green.withOpacity(0.1),
-                  colorText: Colors.green,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(20),
-                );
+                 CustomSnackbar.showSuccess("Application Submitted Successfully");
               },
             ),
           ],

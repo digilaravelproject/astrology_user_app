@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/utils/custom_snackbar.dart';
 import '../../language/controllers/localization_controller.dart';
 import '../../language/domain/models/language_model.dart';
 
@@ -113,15 +114,7 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
                 _localizationController.setLanguage(languages[_selectedIndex]);
                 
                 // Show success message
-                Get.snackbar(
-                  AppStrings.success, 
-                  "Language changed to ${languages[_selectedIndex].languageName}", 
-                  backgroundColor: Colors.green.withOpacity(0.1),
-                  colorText: Colors.green,
-                  snackPosition: SnackPosition.BOTTOM,
-                  margin: const EdgeInsets.all(20),
-                  duration: const Duration(seconds: 2),
-                );
+                CustomSnackbar.showSuccess("Language changed to ${languages[_selectedIndex].languageName}");
                 
                 // Go back to profile screen
                 Get.back();
