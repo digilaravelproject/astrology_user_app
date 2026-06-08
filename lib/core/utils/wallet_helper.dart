@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../features/chat/presentation/pages/chat_screen.dart';
 import '../../features/chat/presentation/bindings/chat_binding.dart';
-import '../../features/call/screens/call_screen.dart';
+import '../../features/call/presentation/pages/call_screen.dart';
+import '../../features/call/presentation/controllers/call_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_text.dart';
 import '../../core/widgets/custom_button.dart';
@@ -164,8 +165,22 @@ class WalletHelper {
                         CustomSnackbar.showError(e.toString());
                       }
                     } else {
-                      Get.back();
-                      Get.to(() => CallScreen(astrologerName: name, astrologerImage: imageUrl));
+                      Get.back(); // close bottom sheet
+                      
+                      // Find or put CallController
+                      final callController = Get.isRegistered<CallController>()
+                          ? Get.find<CallController>()
+                          : Get.put(CallController());
+                          
+                      // Navigate to webrtc CallScreen
+                      Get.to(() => const CallScreen());
+                      
+                      // Start the call
+                      callController.initiateCall(
+                        providerId: providerId,
+                        providerName: name,
+                        providerImage: imageUrl,
+                      );
                     }
                   },
                 ),
