@@ -618,7 +618,7 @@ class ChatListScreen extends StatelessWidget {
                                       name: astro.name,
                                       imageUrl: astro.fullProfilePhoto,
                                       price: astro.chatRate ?? '0',
-                                      providerId: astro.id,
+                                      providerId: astro.userId,
                                       simulatedBalance: balance,
                                     );
                               },

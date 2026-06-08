@@ -257,7 +257,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                                         name: astro.name,
                                         imageUrl: astro.fullProfilePhoto,
                                         price: astro.chatRate ?? '0',
-                                        providerId: astro.id,
+                                        providerId: astro.userId,
                                         simulatedBalance: balance,
                                       );
                                     },
@@ -297,7 +297,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                                         name: astro.name,
                                         imageUrl: astro.fullProfilePhoto,
                                         price: astro.callRate ?? '0',
-                                        providerId: astro.id,
+                                        providerId: astro.userId,
                                         simulatedBalance: balance,
                                       );
                                     },
