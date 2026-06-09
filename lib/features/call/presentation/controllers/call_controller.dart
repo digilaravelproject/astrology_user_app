@@ -10,6 +10,7 @@ import 'package:astro_user/core/services/webrtc/webrtc_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/features/call/presentation/widgets/call_summary_dialog.dart';
 
 class CallController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
@@ -203,10 +204,29 @@ class CallController extends GetxController {
       if (response.isSuccess) {
         status.value = 'completed';
         CustomSnackbar.showSuccess('Call ended successfully.');
+        
+        final bodyMap = response.body;
+        final sessionData = bodyMap is Map ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']) : null;
+        int duration = 0;
+        double cost = 0.0;
+        if (sessionData != null && sessionData is Map) {
+          duration = int.tryParse(sessionData['duration_seconds']?.toString() ?? '') ?? 0;
+          cost = double.tryParse(sessionData['total_cost']?.toString() ?? '') ?? 0.0;
+        }
+        
+        final sId = sessionId ?? 0;
+        cleanUp();
+        
+        Future.delayed(const Duration(milliseconds: 300), () {
+          CallSummaryDialog.show(
+            sessionId: sId,
+            durationSeconds: duration,
+            totalCost: cost,
+          );
+        });
       }
     } catch (e) {
       Logger.e('CallController: Error ending call -> $e');
-    } finally {
       cleanUp();
     }
   }
@@ -245,9 +265,29 @@ class CallController extends GetxController {
 
   void _handleCallEnded(Map<String, dynamic> data) {
     status.value = 'completed';
-    CustomSnackbar.showInfo('Call ended by astrologer.');
+    CustomSnackbar.showInfo('Call ended.');
+    
+    final session = data['session'];
+    int sId = sessionId ?? 0;
+    int duration = 0;
+    double cost = 0.0;
+    
+    if (session != null) {
+      sId = int.tryParse(session['id']?.toString() ?? '') ?? sId;
+      duration = int.tryParse(session['duration_seconds']?.toString() ?? '') ?? 0;
+      cost = double.tryParse(session['total_cost']?.toString() ?? '') ?? 0.0;
+    }
+    
     cleanUp();
     Get.back(); // Close CallScreen
+    
+    Future.delayed(const Duration(milliseconds: 300), () {
+      CallSummaryDialog.show(
+        sessionId: sId,
+        durationSeconds: duration,
+        totalCost: cost,
+      );
+    });
   }
 
   void _startRingingTimeout() {
