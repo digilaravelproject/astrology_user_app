@@ -39,7 +39,7 @@ class CallController extends GetxController {
   }
 
   void _setupWebSocketListeners() {
-    _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) {
+    _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) async {
       Logger.d('CallController: WebSocket callAcceptedData received: $data');
       Logger.d('CallController: Current status: ${status.value}, sessionId: $sessionId');
       if (data.isNotEmpty && (status.value == 'dialing' || status.value == 'ringing')) {
@@ -48,10 +48,29 @@ class CallController extends GetxController {
           final incomingSessionId = int.tryParse(session['id']?.toString() ?? '');
           Logger.d('CallController: Matching session: incomingSessionId = $incomingSessionId, expected = $sessionId');
           if (incomingSessionId == sessionId) {
-            final answer = session['answer']?.toString();
-            Logger.d('CallController: Found answer: ${answer != null ? "length: ${answer.length}" : "NULL"}');
-            if (answer != null) {
+            String? answer = session['answer']?.toString();
+            Logger.d('CallController: Found answer in WS: ${answer != null ? "length: ${answer.length}" : "NULL"}');
+            
+            if (answer == null || answer.isEmpty) {
+              Logger.d('CallController: Answer is null/empty in WS. Fetching from currentCallSession API...');
+              try {
+                final response = await _apiClient.get(AppUrls.currentCallSession, handleError: false, showErrorScreen: false);
+                Logger.d('CallController: currentCallSession API response body: ${response.body}');
+                if (response.isSuccess && response.body != null) {
+                  final dataMap = response.body['data'] ?? response.body;
+                  final activeSession = dataMap['session'] ?? dataMap;
+                  answer = activeSession['answer']?.toString();
+                  Logger.d('CallController: Answer from API: ${answer != null ? "length: ${answer.length}" : "NULL"}');
+                }
+              } catch (e) {
+                Logger.e('CallController: Error fetching current call session -> $e');
+              }
+            }
+
+            if (answer != null && answer.isNotEmpty) {
               _handleCallAccepted(answer);
+            } else {
+              Logger.e('CallController: Answer SDP is still NULL. Cannot establish WebRTC connection.');
             }
           }
         }
