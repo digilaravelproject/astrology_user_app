@@ -48,8 +48,8 @@ class CallController extends GetxController {
           final incomingSessionId = int.tryParse(session['id']?.toString() ?? '');
           Logger.d('CallController: Matching session: incomingSessionId = $incomingSessionId, expected = $sessionId');
           if (incomingSessionId == sessionId) {
-            String? answer = session['answer']?.toString();
-            Logger.d('CallController: Found answer in WS: ${answer != null ? "length: ${answer.length}" : "NULL"}');
+            String? answer = data['answer']?.toString() ?? session['answer']?.toString();
+            Logger.d('CallController: Found answer in WS (checking root and session): ${answer != null ? "length: ${answer.length}" : "NULL"}');
             
             if (answer == null || answer.isEmpty) {
               Logger.d('CallController: Answer is null/empty in WS. Fetching from currentCallSession API...');
@@ -59,7 +59,7 @@ class CallController extends GetxController {
                 if (response.isSuccess && response.body != null) {
                   final dataMap = response.body['data'] ?? response.body;
                   final activeSession = dataMap['session'] ?? dataMap;
-                  answer = activeSession['answer']?.toString();
+                  answer = activeSession['answer']?.toString() ?? activeSession['answer_sdp']?.toString();
                   Logger.d('CallController: Answer from API: ${answer != null ? "length: ${answer.length}" : "NULL"}');
                 }
               } catch (e) {
