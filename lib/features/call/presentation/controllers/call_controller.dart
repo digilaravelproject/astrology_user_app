@@ -31,6 +31,7 @@ class CallController extends GetxController {
   StreamSubscription? _acceptedSubscription;
   StreamSubscription? _dismissedSubscription;
   StreamSubscription? _iceSubscription;
+  StreamSubscription? _endedSubscription;
 
   @override
   void onInit() {
@@ -98,6 +99,16 @@ class CallController extends GetxController {
           if (candidate != null && receiverId == WebSocketService.currentUserId) {
             webrtcService.addRemoteCandidate(candidate);
           }
+        }
+      }
+    });
+
+    _endedSubscription = WebSocketService.callEndedData.listen((data) {
+      Logger.d('CallController: WebSocket callEndedData received: $data');
+      if (data.isNotEmpty) {
+        final session = data['session'];
+        if (session != null && session['id'] == sessionId) {
+          _handleCallEnded(data);
         }
       }
     });
@@ -306,6 +317,7 @@ class CallController extends GetxController {
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();
     _iceSubscription?.cancel();
+    _endedSubscription?.cancel();
     cleanUp();
     super.onClose();
   }
