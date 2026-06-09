@@ -29,6 +29,7 @@ class CallController extends GetxController {
   AudioPlayer? _audioPlayer;
   Timer? _callTimer;
   Timer? _ringingTimer;
+  bool _isSummaryShown = false;
   StreamSubscription? _acceptedSubscription;
   StreamSubscription? _dismissedSubscription;
   StreamSubscription? _iceSubscription;
@@ -121,6 +122,7 @@ class CallController extends GetxController {
     required String providerImage,
   }) async {
     try {
+      _isSummaryShown = false;
       this.providerId = providerId;
       this.providerName = providerName;
       this.providerImage = providerImage;
@@ -202,6 +204,9 @@ class CallController extends GetxController {
         showErrorScreen: false,
       );
       if (response.isSuccess) {
+        if (_isSummaryShown) return;
+        _isSummaryShown = true;
+        
         status.value = 'completed';
         CustomSnackbar.showSuccess('Call ended successfully.');
         
@@ -264,6 +269,9 @@ class CallController extends GetxController {
   }
 
   void _handleCallEnded(Map<String, dynamic> data) {
+    if (_isSummaryShown) return;
+    _isSummaryShown = true;
+    
     status.value = 'completed';
     CustomSnackbar.showInfo('Call ended.');
     
