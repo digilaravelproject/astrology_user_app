@@ -352,6 +352,8 @@ class CallController extends GetxController {
     }
     webrtcService.dispose();
     status.value = 'idle';
+    isMuted.value = false;
+    isSpeakerOn.value = false;
   }
 
   @override
