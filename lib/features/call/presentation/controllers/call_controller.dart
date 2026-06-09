@@ -110,6 +110,7 @@ class CallController extends GetxController {
         final sessionData = bodyMap is Map ? (bodyMap['session'] ?? bodyMap['data']?['session']) : null;
         if (sessionData != null) {
           sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+          webrtcService.activeSessionId = sessionId;
           final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
 
           if (sessionStatus == 'waiting') {

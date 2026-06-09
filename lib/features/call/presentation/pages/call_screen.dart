@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 
@@ -24,7 +25,9 @@ class CallScreen extends StatelessWidget {
             // Blurred profile background
             if (controller.providerImage != null && controller.providerImage!.isNotEmpty)
               CachedNetworkImage(
-                imageUrl: controller.providerImage!,
+                imageUrl: controller.providerImage!.startsWith('http')
+                    ? controller.providerImage!
+                    : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
                 fit: BoxFit.cover,
                 errorWidget: (context, url, error) => Container(color: AppColors.primaryColor.withValues(alpha: 0.8)),
               )
@@ -86,7 +89,11 @@ class CallScreen extends StatelessWidget {
                             child: CircleAvatar(
                               radius: 66,
                               backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
-                                  ? CachedNetworkImageProvider(controller.providerImage!)
+                                  ? CachedNetworkImageProvider(
+                                      controller.providerImage!.startsWith('http')
+                                          ? controller.providerImage!
+                                          : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
+                                    )
                                   : null,
                               child: controller.providerImage == null || controller.providerImage!.isEmpty
                                   ? const Icon(Icons.person, size: 60, color: Colors.white)

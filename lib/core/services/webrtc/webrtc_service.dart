@@ -42,7 +42,40 @@ class WebRTCService {
     }
   }
 
-  int? activeSessionId;
+  int? _activeSessionId;
+  final List<RTCIceCandidate> _queuedIceCandidates = [];
+
+  int? get activeSessionId => _activeSessionId;
+  set activeSessionId(int? id) {
+    _activeSessionId = id;
+    if (id != null && id > 0 && _queuedIceCandidates.isNotEmpty) {
+      Logger.d('WebRTCService: Flushing ${_queuedIceCandidates.length} queued ICE candidates for session $id.');
+      for (var candidate in _queuedIceCandidates) {
+        _sendIceCandidate(id, candidate);
+      }
+      _queuedIceCandidates.clear();
+    }
+  }
+
+  String _normalizeSdp(String sdp) {
+    String cleanSdp = sdp.trim();
+    if (cleanSdp.startsWith('"') && cleanSdp.endsWith('"')) {
+      cleanSdp = cleanSdp.substring(1, cleanSdp.length - 1);
+    }
+    
+    // Convert all escaped newlines to standard LF
+    cleanSdp = cleanSdp
+        .replaceAll('\\r\\n', '\n')
+        .replaceAll('\\n', '\n')
+        .replaceAll('\\r', '\n')
+        .replaceAll(r'\r\n', '\n')
+        .replaceAll(r'\n', '\n')
+        .replaceAll(r'\r', '\n');
+
+    // Split by LF and join using CRLF to ensure every line ends with \r\n
+    List<String> lines = cleanSdp.split('\n');
+    return lines.map((line) => line.trim()).where((line) => line.isNotEmpty).join('\r\n') + '\r\n';
+  }
 
   Future<RTCSessionDescription> createOffer(int sessionId) async {
     try {
@@ -51,8 +84,12 @@ class WebRTCService {
       peerConnection = await createPeerConnection(_iceConfig, _constraints);
 
       peerConnection!.onIceCandidate = (candidate) {
-        if (activeSessionId != null && activeSessionId! > 0) {
-          _sendIceCandidate(activeSessionId!, candidate);
+        final currentId = activeSessionId;
+        if (currentId != null && currentId > 0) {
+          _sendIceCandidate(currentId, candidate);
+        } else {
+          _queuedIceCandidates.add(candidate);
+          Logger.d('WebRTCService: Queued ICE candidate because activeSessionId is not set yet.');
         }
       };
 
@@ -92,7 +129,8 @@ class WebRTCService {
         Logger.e('WebRTCService: peerConnection is null. Cannot set remote answer.');
         return;
       }
-      RTCSessionDescription answer = RTCSessionDescription(answerSdp, 'answer');
+      final normalized = _normalizeSdp(answerSdp);
+      RTCSessionDescription answer = RTCSessionDescription(normalized, 'answer');
       await peerConnection!.setRemoteDescription(answer);
       Logger.d('WebRTCService: Remote Answer SDP set successfully.');
     } catch (e) {
@@ -131,7 +169,8 @@ class WebRTCService {
         peerConnection!.addTrack(track, localStream!);
       });
 
-      RTCSessionDescription offer = RTCSessionDescription(offerSdp, 'offer');
+      final normalized = _normalizeSdp(offerSdp);
+      RTCSessionDescription offer = RTCSessionDescription(normalized, 'offer');
       await peerConnection!.setRemoteDescription(offer);
 
       RTCSessionDescription answer = await peerConnection!.createAnswer(_constraints);
