@@ -40,18 +40,26 @@ class CallController extends GetxController {
 
   void _setupWebSocketListeners() {
     _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) {
+      Logger.d('CallController: WebSocket callAcceptedData received: $data');
+      Logger.d('CallController: Current status: ${status.value}, sessionId: $sessionId');
       if (data.isNotEmpty && (status.value == 'dialing' || status.value == 'ringing')) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final answer = session['answer']?.toString();
-          if (answer != null) {
-            _handleCallAccepted(answer);
+        if (session != null) {
+          final incomingSessionId = int.tryParse(session['id']?.toString() ?? '');
+          Logger.d('CallController: Matching session: incomingSessionId = $incomingSessionId, expected = $sessionId');
+          if (incomingSessionId == sessionId) {
+            final answer = session['answer']?.toString();
+            Logger.d('CallController: Found answer: ${answer != null ? "length: ${answer.length}" : "NULL"}');
+            if (answer != null) {
+              _handleCallAccepted(answer);
+            }
           }
         }
       }
     });
 
     _dismissedSubscription = WebSocketService.callDismissedData.listen((data) {
+      Logger.d('CallController: WebSocket callDismissedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
         if (session != null && session['id'] == sessionId) {
