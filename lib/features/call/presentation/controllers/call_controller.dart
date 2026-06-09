@@ -240,12 +240,14 @@ class CallController extends GetxController {
       CustomSnackbar.showError('Call dismissed: $reason');
     }
     cleanUp();
+    Get.back(); // Close CallScreen
   }
 
   void _handleCallEnded(Map<String, dynamic> data) {
     status.value = 'completed';
     CustomSnackbar.showInfo('Call ended by astrologer.');
     cleanUp();
+    Get.back(); // Close CallScreen
   }
 
   void _startRingingTimeout() {
