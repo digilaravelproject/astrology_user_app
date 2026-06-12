@@ -13,8 +13,10 @@ import '../services/network/api_client.dart';
 import '../../core/constants/app_urls.dart';
 import '../../core/utils/custom_snackbar.dart';
 
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+
 class WalletHelper {
-  static void checkBalanceAndProceed({
+  static Future<void> checkBalanceAndProceed({
     required BuildContext context,
     required String type,
     required String name,
@@ -22,7 +24,18 @@ class WalletHelper {
     required String price,
     required int providerId,
     double? simulatedBalance,
-  }) {
+  }) async {
+    try {
+      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
+      if (!isOverlayGranted) {
+        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
+        await FlutterOverlayWindow.requestPermission();
+        return;
+      }
+    } catch (e) {
+      debugPrint('Error checking overlay permission: $e');
+    }
+
     // Simulated wallet balance
     final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
     final double requiredAmount = double.tryParse(price) ?? 0.0;
@@ -127,6 +140,17 @@ class WalletHelper {
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
                   onTap: () async {
+                    try {
+                      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
+                      if (!isOverlayGranted) {
+                        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
+                        await FlutterOverlayWindow.requestPermission();
+                        return;
+                      }
+                    } catch (e) {
+                      debugPrint('Error checking overlay permission: $e');
+                    }
+
                     if (type == 'chat') {
                       Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
                       try {
