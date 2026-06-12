@@ -112,8 +112,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             widget.astrologerImage,
             shouldPop: false,
           );
-          // Return false because minimizeToBubble handles the pop if we wanted it, or we just minimized
-          return false;
+          // Return true to allow system back to pop the screen
+          return true;
         }
         return true;
       },
