@@ -369,6 +369,10 @@ class CallController extends GetxController with WidgetsBindingObserver {
     status.value = 'idle';
     isMuted.value = false;
     isSpeakerOn.value = false;
+    sessionId = null;
+    providerId = null;
+    providerName = null;
+    providerImage = null;
   }
 
   @override
