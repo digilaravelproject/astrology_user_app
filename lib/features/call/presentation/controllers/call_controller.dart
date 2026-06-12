@@ -439,7 +439,32 @@ class CallController extends GetxController with WidgetsBindingObserver {
               _startRingingTimeout();
             }
             
-            Get.to(() => const CallScreen());
+            // Show Notification
+            final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
+            final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
+            LocalNotificationService.showOngoingCallNotification(
+              sessionId: sessionId!,
+              title: 'Active Call in Progress',
+              body: 'Talking with $providerName - $minutes:$seconds',
+              startedAtMillis: sessionStatus == 'ongoing' && session['started_at'] != null 
+                  ? DateTime.tryParse(session['started_at'].toString())?.millisecondsSinceEpoch
+                  : null,
+            );
+
+            // Show Floating Bubble
+            FloatingCallBubble.show(
+              context: Get.context!,
+              sessionId: sessionId!,
+              name: providerName!,
+              imageUrl: providerImage ?? "",
+              startedAt: session['started_at']?.toString(),
+              status: status.value,
+              onTap: () {
+                final currentStatus = FloatingCallBubble.callStatus.value;
+                FloatingCallBubble.dismiss();
+                Get.to(() => const CallScreen());
+              },
+            );
           }
         }
       }
