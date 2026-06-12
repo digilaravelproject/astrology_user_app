@@ -19,6 +19,7 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -69,6 +70,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _showPromotionalSheet();
       _checkOverlayPermission();
       _checkCurrentActiveSession();
+      Get.find<CallController>().checkCurrentActiveCallSession();
     });
   }
 
