@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import 'chat_history_detail_screen.dart';
 import '../controllers/history_controller.dart';
 import '../domain/usecases/get_chat_sessions_usecase.dart';
+import '../domain/usecases/get_call_sessions_usecase.dart';
 import '../data/repositories/history_repository.dart';
 import 'package:intl/intl.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
@@ -35,10 +36,17 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
       if (!Get.isRegistered<GetChatSessionsUseCase>()) {
         Get.put(GetChatSessionsUseCase(Get.find<HistoryRepository>()));
       }
-      Get.put(HistoryController(getChatSessionsUseCase: Get.find()));
+      if (!Get.isRegistered<GetCallSessionsUseCase>()) {
+        Get.put(GetCallSessionsUseCase(Get.find<HistoryRepository>()));
+      }
+      Get.put(HistoryController(
+        getChatSessionsUseCase: Get.find(),
+        getCallSessionsUseCase: Get.find(),
+      ));
     }
     _historyController = Get.find<HistoryController>();
   }
+
 
   @override
   void dispose() {
@@ -288,6 +296,164 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                       ),
                     ],
                   ),
+                ),
+              );
+            },
+          ),
+        );
+      });
+    }
+
+    if (type == "Call") {
+      return Obx(() {
+        if (_historyController.isCallLoading.value && _historyController.callSessions.isEmpty) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+        }
+        
+        if (_historyController.callError.value.isNotEmpty && _historyController.callSessions.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: Text("Error: ${_historyController.callError.value}"),
+              ),
+            ),
+          );
+        }
+
+        if (_historyController.callSessions.isEmpty) {
+          return RefreshIndicator(
+            onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.6,
+                alignment: Alignment.center,
+                child: AppText(
+                  "No call history available.",
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: _historyController.callSessions.length,
+            itemBuilder: (context, index) {
+              final session = _historyController.callSessions[index];
+              final isCompleted = session.status == "completed";
+              final astrologerName = session.provider?.name ?? "Astrologer";
+              
+              DateTime? date;
+              if (session.createdAt != null) {
+                try {
+                  date = DateTime.parse(session.createdAt!);
+                } catch (_) {}
+              }
+              
+              final dateStr = date != null ? DateFormat('dd MMM, yyyy').format(date) : "N/A";
+              final timeStr = date != null ? DateFormat('hh:mm a').format(date) : "N/A";
+              
+              final durationMins = (session.durationSeconds / 60).ceil();
+              
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Avatar Placeholder
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: AppColors.lightPink.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: AppText(
+                          astrologerName.isNotEmpty ? astrologerName[0].toUpperCase() : 'A',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepPink,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    
+                    // Details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            astrologerName,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          const SizedBox(height: 4),
+                          AppText(
+                            "$dateStr • $timeStr",
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(height: 2),
+                          AppText(
+                            "Call Duration: $durationMins mins",
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Status & Price
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        AppText(
+                          "₹${session.totalCost}",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: AppText(
+                            session.status.capitalizeFirst ?? session.status,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: isCompleted ? Colors.green : Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             },

@@ -377,7 +377,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
         minimizeToBubble(Get.context!, providerName!, providerImage ?? "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
-      FloatingCallBubble.dismiss();
+      // Keep floating bubble visible in foreground
+      // FloatingCallBubble.dismiss();
     }
   }
 
@@ -404,8 +405,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
   Future<void> checkCurrentActiveCallSession() async {
     try {
       final response = await _apiClient.get(AppUrls.currentCallSession, handleError: false, showErrorScreen: false);
-      if (response.isSuccess && response.body != null && response.body['data'] != null) {
-        final session = response.body['data']['session'];
+      if (response.isSuccess && response.body != null) {
+        final bodyMap = response.body;
+        final session = bodyMap is Map 
+            ? (bodyMap['session'] ?? bodyMap['data']?['session'])
+            : null;
         if (session != null) {
           final sessionStatus = session['status']?.toString();
           if (sessionStatus == 'ongoing' || sessionStatus == 'ringing' || sessionStatus == 'dialing' || sessionStatus == 'waiting') {
