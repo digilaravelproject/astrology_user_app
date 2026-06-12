@@ -136,13 +136,8 @@ class CallScreen extends StatelessWidget {
                           onPressed: () => controller.toggleMute(),
                         ),
 
-                        // End Call (Red Button)
                         _buildEndCallButton(onPressed: () {
-                          if (status == 'ongoing') {
-                            controller.endCall();
-                          } else {
-                            controller.cancelCall();
-                          }
+                          controller.endCall();
                           Get.back();
                         }),
 
