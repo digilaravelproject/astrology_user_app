@@ -471,8 +471,14 @@ class CallController extends GetxController with WidgetsBindingObserver {
                 },
               );
             }
+          } else {
+            cleanUp();
           }
+        } else {
+          cleanUp();
         }
+      } else {
+        cleanUp();
       }
     } catch (e) {
       Logger.e('CallController: Error checking current active call session -> $e');
