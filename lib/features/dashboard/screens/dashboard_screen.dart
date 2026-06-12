@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../home/screens/home_screen.dart';
@@ -331,17 +332,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
         navGradientColor = isRegistered ? Colors.white : const Color(0xFF1A0A2E);
       }
 
-      return Scaffold(
-        extendBody: true,
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: _screens,
-        ),
-        bottomNavigationBar: CustomBottomNavBar(
-          selectedIndex: _selectedIndex,
-          items: _navItems,
-          onItemSelected: _onItemTapped,
-          gradientColor: navGradientColor,
+      return PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          final callController = Get.find<CallController>();
+          if (callController.sessionId != null) {
+            try {
+              const channel = MethodChannel('com.suryapath.user/app_retain');
+              await channel.invokeMethod('sendToBackground');
+            } catch (e) {
+              debugPrint("Error sending to background: $e");
+            }
+          } else {
+            SystemNavigator.pop();
+          }
+        },
+        child: Scaffold(
+          extendBody: true,
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: _screens,
+          ),
+          bottomNavigationBar: CustomBottomNavBar(
+            selectedIndex: _selectedIndex,
+            items: _navItems,
+            onItemSelected: _onItemTapped,
+            gradientColor: navGradientColor,
+          ),
         ),
       );
     });
