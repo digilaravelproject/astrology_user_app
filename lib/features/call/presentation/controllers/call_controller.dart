@@ -23,7 +23,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final RxString status = 'idle'.obs; // idle, dialing, waiting, ongoing, completed, rejected, cancelled, missed
   final RxInt durationSeconds = 0.obs;
   final RxBool isMuted = false.obs;
-  final RxBool isSpeakerOn = false.obs;
+
+  bool isCallScreenVisible = false;
 
   int? sessionId;
   int? providerId;
@@ -456,19 +457,21 @@ class CallController extends GetxController with WidgetsBindingObserver {
             );
 
             // Show Floating Bubble
-            FloatingCallBubble.show(
-              context: Get.context!,
-              sessionId: sessionId!,
-              name: providerName!,
-              imageUrl: providerImage ?? "",
-              startedAt: session['started_at']?.toString(),
-              status: status.value,
-              onTap: () {
-                final currentStatus = FloatingCallBubble.callStatus.value;
-                FloatingCallBubble.dismiss();
-                Get.to(() => const CallScreen());
-              },
-            );
+            if (!isCallScreenVisible) {
+              FloatingCallBubble.show(
+                context: Get.context!,
+                sessionId: sessionId!,
+                name: providerName!,
+                imageUrl: providerImage ?? "",
+                startedAt: session['started_at']?.toString(),
+                status: status.value,
+                onTap: () {
+                  final currentStatus = FloatingCallBubble.callStatus.value;
+                  FloatingCallBubble.dismiss();
+                  Get.to(() => const CallScreen());
+                },
+              );
+            }
           }
         }
       }
