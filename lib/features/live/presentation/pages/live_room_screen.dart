@@ -44,7 +44,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     _liveController.joinSession(widget.sessionId);
     
     // Fetch gifts listing
-    _giftController.getGifts();
+    _giftController.fetchGifts();
   }
 
   @override
