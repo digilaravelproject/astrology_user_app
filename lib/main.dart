@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   // final ThemeController themeController = Get.find();
+    final ThemeController themeController = Get.find();
     final LocalizationController localizationController = Get.find();
 
     return Obx(() => GetMaterialApp(
@@ -71,9 +71,9 @@ class MyApp extends StatelessWidget {
       navigatorKey: Get.key,
       scaffoldMessengerKey: CustomSnackbar.messengerKey,
       initialBinding: InitialBindings(),
-     // theme: lightTheme,
-     // darkTheme: lightTheme,
-     // themeMode: ThemeMode.light,
+      // theme: lightTheme,
+      // darkTheme: lightTheme,
+      // themeMode: ThemeMode.light,
       initialRoute: '${RouteHelper.getSplashRoute()}',
       getPages: RouteHelper.routes,
       defaultTransition: Transition.fadeIn,
