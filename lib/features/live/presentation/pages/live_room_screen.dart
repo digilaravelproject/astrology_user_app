@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
@@ -35,6 +37,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   final TextEditingController _commentController = TextEditingController();
   model.GiftModel? _selectedGift;
 
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
+  bool _isPlayerInitialized = false;
+  Worker? _sessionWorker;
+
   @override
   void initState() {
     super.initState();
@@ -45,12 +52,42 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     
     // Fetch gifts listing
     _giftController.fetchGifts();
+
+    // Listen to session changes to get stream_url
+    _sessionWorker = ever(_liveController.currentSession, (session) {
+      if (session != null && session.streamUrl != null && !_isPlayerInitialized) {
+        _initializeVideoPlayer(session.streamUrl!);
+      }
+    });
+  }
+
+  Future<void> _initializeVideoPlayer(String url) async {
+    if (_isPlayerInitialized) return;
+    try {
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+      await _videoPlayerController!.initialize();
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController!,
+        autoPlay: true,
+        looping: true,
+        showControls: false,
+        aspectRatio: _videoPlayerController!.value.aspectRatio,
+      );
+      setState(() {
+        _isPlayerInitialized = true;
+      });
+    } catch (e) {
+      debugPrint('Error initializing live stream video player: $e');
+    }
   }
 
   @override
   void dispose() {
+    _sessionWorker?.dispose();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
+    _chewieController?.dispose();
+    _videoPlayerController?.dispose();
     super.dispose();
   }
 
@@ -224,16 +261,26 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Live camera stream backdrop / mock image
+          // 1. Live camera stream backdrop / video player
           Positioned.fill(
-            child: Obx(() {
-              final currentSession = _liveController.currentSession.value;
-              final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
-              return CustomImageWidget(
-                imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
-                fit: BoxFit.cover,
-              );
-            }),
+            child: _isPlayerInitialized && _chewieController != null
+                ? FittedBox(
+                    fit: BoxFit.cover,
+                    clipBehavior: Clip.hardEdge,
+                    child: SizedBox(
+                      width: _videoPlayerController!.value.size.width,
+                      height: _videoPlayerController!.value.size.height,
+                      child: Chewie(controller: _chewieController!),
+                    ),
+                  )
+                : Obx(() {
+                    final currentSession = _liveController.currentSession.value;
+                    final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+                    return CustomImageWidget(
+                      imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
+                      fit: BoxFit.cover,
+                    );
+                  }),
           ),
           
           Positioned.fill(
