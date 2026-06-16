@@ -1,44 +1,34 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/widgets/app_text.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/custom_image_widget.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
-import '../../../core/widgets/custom_app_bar.dart';
+import 'package:get/get.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/widgets/app_text.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/custom_image_widget.dart';
+import '../../../../core/widgets/coming_soon_screen.dart';
+import '../../../../core/widgets/custom_app_bar.dart';
+import '../controllers/live_controller.dart';
+import '../../data/models/live_session_model.dart';
 import 'live_room_screen.dart';
 
-class LiveAstrologerScreen extends StatelessWidget {
+class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> liveSessions = [
-      {
-        "name": "Astro Joy M",
-        "title": "Career & Success",
-        "image": "https://randomuser.me/api/portraits/women/44.jpg",
-        "viewers": "1.2k"
-      },
-      {
-        "name": "Astro Anjali",
-        "title": "Relationship Guide",
-        "image": "https://randomuser.me/api/portraits/women/68.jpg",
-        "viewers": "850"
-      },
-      {
-        "name": "Astro Kavi",
-        "title": "Daily Predictions",
-        "image": "https://randomuser.me/api/portraits/women/33.jpg",
-        "viewers": "2.1k"
-      },
-      {
-        "name": "Astro Meera",
-        "title": "Tarot Reading",
-        "image": "https://randomuser.me/api/portraits/women/90.jpg",
-        "viewers": "540"
-      },
-    ];
+  State<LiveAstrologerScreen> createState() => _LiveAstrologerScreenState();
+}
 
+class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
+  late LiveController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = Get.find<LiveController>();
+    _controller.fetchActiveSessions();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
@@ -50,42 +40,80 @@ class LiveAstrologerScreen extends StatelessWidget {
           const SizedBox(width: 12),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildLiveBanner(),
-            _buildSectionTitle(),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 18,
-                crossAxisSpacing: 18,
-                childAspectRatio: 0.78,
-              ),
-              itemCount: liveSessions.length,
-              itemBuilder: (context, index) {
-                final session = liveSessions[index];
-                return GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => LiveRoomScreen(
-                        astrologerName: session["name"]!,
-                        astrologerImage: session["image"]!,
+      body: RefreshIndicator(
+        onRefresh: () => _controller.fetchActiveSessions(),
+        color: AppColors.primaryColor,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildLiveBanner(),
+              _buildSectionTitle(),
+              
+              Obx(() {
+                if (_controller.isLoadingSessions.value) {
+                  return const SizedBox(
+                    height: 200,
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.primaryColor),
+                    ),
+                  );
+                }
+                
+                if (_controller.activeSessions.isEmpty) {
+                  return SizedBox(
+                    height: 250,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.video_camera_back_outlined, size: 48, color: Colors.grey.shade300),
+                          const SizedBox(height: 12),
+                          AppText(
+                            'No active streams currently.',
+                            fontSize: 14,
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ],
                       ),
                     ),
+                  );
+                }
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 18,
+                    crossAxisSpacing: 18,
+                    childAspectRatio: 0.78,
                   ),
-                  child: _buildLiveCard(session),
+                  itemCount: _controller.activeSessions.length,
+                  itemBuilder: (context, index) {
+                    final session = _controller.activeSessions[index];
+                    return GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => LiveRoomScreen(
+                            sessionId: session.id,
+                            astrologerName: session.astrologer?.name ?? 'Astrologer',
+                            astrologerImage: session.astrologer?.profilePhoto ?? '',
+                          ),
+                        ),
+                      ),
+                      child: _buildLiveCard(session),
+                    );
+                  },
                 );
-              },
-            ),
-            const SizedBox(height: 280),
-          ],
+              }),
+              const SizedBox(height: 280),
+            ],
+          ),
         ),
       ),
     );
@@ -107,24 +135,6 @@ class LiveAstrologerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Icon(icon, color: const Color(0xFF2E1A47), size: 22),
-    );
-  }
-
   Widget _buildLiveBanner() {
     return Container(
       width: double.infinity,
@@ -139,7 +149,7 @@ class LiveAstrologerScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryColor.withValues(alpha: 0.3),
+            color: AppColors.primaryColor.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -154,7 +164,7 @@ class LiveAstrologerScreen extends StatelessWidget {
               opacity: 0.2,
               child: Transform.rotate(
                 angle: -0.2,
-                child: Icon(Icons.live_tv_rounded, size: 140, color: Colors.white),
+                child: const Icon(Icons.live_tv_rounded, size: 140, color: Colors.white),
               ),
             ),
           ),
@@ -167,7 +177,7 @@ class LiveAstrologerScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -224,7 +234,7 @@ class LiveAstrologerScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.red.withValues(alpha: 0.4),
+                      color: Colors.red.withOpacity(0.4),
                       blurRadius: 6,
                       spreadRadius: 2,
                     ),
@@ -252,13 +262,13 @@ class LiveAstrologerScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLiveCard(Map<String, String> session) {
+  Widget _buildLiveCard(LiveSessionModel session) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -269,7 +279,7 @@ class LiveAstrologerScreen extends StatelessWidget {
         child: Stack(
           children: [
             CustomImageWidget(
-              imagePath: session["image"]!,
+              imagePath: session.astrologer?.profilePhoto ?? '',
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -280,9 +290,9 @@ class LiveAstrologerScreen extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withValues(alpha: 0.1),
-                    Colors.black.withValues(alpha: 0.4),
-                    Colors.black.withValues(alpha: 0.85),
+                    Colors.black.withOpacity(0.1),
+                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.85),
                   ],
                   stops: const [0.0, 0.4, 0.9],
                 ),
@@ -294,11 +304,11 @@ class LiveAstrologerScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.9),
+                  color: Colors.red.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 4,
                     )
                   ],
@@ -323,7 +333,7 @@ class LiveAstrologerScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.4),
+                  color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -331,7 +341,7 @@ class LiveAstrologerScreen extends StatelessWidget {
                     const Icon(Icons.visibility_rounded, color: Colors.white, size: 12),
                     const SizedBox(width: 5),
                     AppText(
-                      session["viewers"]!,
+                      '${session.viewerCount}',
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -348,7 +358,7 @@ class LiveAstrologerScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    session["name"]!,
+                    session.astrologer?.name ?? 'Priya Sharma',
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -356,7 +366,7 @@ class LiveAstrologerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   AppText(
-                    session["title"]!,
+                    session.title,
                     fontSize: 11,
                     color: Colors.white.withOpacity(0.8),
                     fontWeight: FontWeight.w500,

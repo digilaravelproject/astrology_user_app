@@ -2,23 +2,25 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_text.dart';
-import '../../../core/widgets/custom_image_widget.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../astrologers/controllers/astrologer_controller.dart';
-import '../../astrologers/domain/models/gift_model.dart' as model;
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/app_text.dart';
+import '../../../../core/widgets/custom_image_widget.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../astrologers/controllers/astrologer_controller.dart';
+import '../../../astrologers/domain/models/gift_model.dart' as model;
+import '../controllers/live_controller.dart';
+import '../../data/models/live_session_model.dart';
 
 class LiveRoomScreen extends StatefulWidget {
-  final int astrologerId;
+  final int sessionId;
   final String astrologerName;
   final String astrologerImage;
 
   const LiveRoomScreen({
     super.key,
-    this.astrologerId = 1,
-    this.astrologerName = "Lord Busuz",
-    this.astrologerImage = "https://randomuser.me/api/portraits/men/32.jpg",
+    required this.sessionId,
+    this.astrologerName = "Priya Sharma",
+    this.astrologerImage = "",
   });
 
   @override
@@ -26,18 +28,31 @@ class LiveRoomScreen extends StatefulWidget {
 }
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
-  final AstrologerController _controller = Get.find<AstrologerController>();
-  final List<ChatMessage> _messages = [
-    ChatMessage(name: "Andrew Phipps", message: "Hi, best games ⭐", avatar: "https://randomuser.me/api/portraits/men/1.jpg"),
-    ChatMessage(name: "Joshua Chen", message: "Well played, Lord! You're Master 🫡", avatar: "https://randomuser.me/api/portraits/men/2.jpg"),
-    ChatMessage(name: "Felícia Barbosa", message: "Give away bang! 🔥🔥", avatar: "https://randomuser.me/api/portraits/women/3.jpg"),
-    ChatMessage(name: "Punica 0.2B", message: "Let's play Anno 1701 Again! 👋", avatar: "https://randomuser.me/api/portraits/women/4.jpg"),
-  ];
-
+  late LiveController _liveController;
+  final AstrologerController _giftController = Get.find<AstrologerController>();
+  
   final List<Widget> _reactions = [];
   final TextEditingController _commentController = TextEditingController();
-
   model.GiftModel? _selectedGift;
+
+  @override
+  void initState() {
+    super.initState();
+    _liveController = Get.find<LiveController>();
+    
+    // Join the session
+    _liveController.joinSession(widget.sessionId);
+    
+    // Fetch gifts listing
+    _giftController.getGifts();
+  }
+
+  @override
+  void dispose() {
+    _liveController.leaveSession(widget.sessionId);
+    _commentController.dispose();
+    super.dispose();
+  }
 
   void _showGiftSheet() {
     showModalBottomSheet(
@@ -76,32 +91,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.wallet, color: Colors.orange, size: 14),
-                              const SizedBox(width: 4),
-                              const Text(
-                                "500",
-                                style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
                   Expanded(
                     child: Obx(() {
-                      if (_controller.isGiftsLoading.value) {
-                         return const Center(child: CircularProgressIndicator());
+                      if (_giftController.isGiftsLoading.value) {
+                         return const Center(child: CircularProgressIndicator(color: Colors.orange));
                       }
-                      if (_controller.gifts.isEmpty) {
+                      if (_giftController.gifts.isEmpty) {
                          return const Center(child: Text("No gifts available", style: TextStyle(color: Colors.white70)));
                       }
                       return GridView.builder(
@@ -112,9 +110,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           crossAxisSpacing: 12,
                           childAspectRatio: 0.8,
                         ),
-                        itemCount: _controller.gifts.length,
+                        itemCount: _giftController.gifts.length,
                         itemBuilder: (context, index) {
-                          final gift = _controller.gifts[index];
+                          final gift = _giftController.gifts[index];
                           final isSelected = _selectedGift == gift;
                           return GestureDetector(
                             onTap: () {
@@ -176,7 +174,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       child: ElevatedButton(
                         onPressed: _selectedGift == null ? null : () async {
                           Navigator.pop(context);
-                          await _controller.sendGift(_selectedGift!, widget.astrologerId);
+                          final int giftId = _selectedGift!.id;
+                          await _liveController.sendSuperChat(widget.sessionId, giftId, "Sent a ${_selectedGift!.title} 🎉");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
@@ -185,7 +184,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             borderRadius: BorderRadius.circular(24),
                           ),
                         ),
-                        child: Obx(() => (_controller.sendingGiftId.value != null && _selectedGift != null && _controller.sendingGiftId.value == _selectedGift!.id)
+                        child: Obx(() => (_liveController.isSendingSuperChat.value)
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                           : Text(
                               _selectedGift == null ? AppStrings.selectAGift : "${AppStrings.sendGiftAction} ${_selectedGift!.title}",
@@ -210,7 +209,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         const FloatingReaction(),
       );
     });
-    // Remove the reaction after animation completes (approx 3s)
     Timer(const Duration(seconds: 3), () {
       if (mounted && _reactions.isNotEmpty) {
         setState(() {
@@ -223,18 +221,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Dark fallback
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Truly Static Background
-          const Positioned.fill(
-            child: CustomImageWidget(
-              imagePath: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
-              fit: BoxFit.cover,
-            ),
+          // 1. Live camera stream backdrop / mock image
+          Positioned.fill(
+            child: Obx(() {
+              final currentSession = _liveController.currentSession.value;
+              final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+              return CustomImageWidget(
+                imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
+                fit: BoxFit.cover,
+              );
+            }),
           ),
           
-          // 2. Static Gradient Overlay
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -245,7 +246,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     Colors.black.withOpacity(0.4),
                     Colors.transparent,
                     Colors.transparent,
-                    Colors.black.withOpacity(0.6),
+                    Colors.black.withOpacity(0.7),
                   ],
                   stops: const [0.0, 0.2, 0.7, 1.0],
                 ),
@@ -253,13 +254,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           ),
 
-          // 3. Transparent, Keyboard-Aware Scaffold for content
           Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: true,
             body: Column(
               children: [
-                // 3.1 Header (Always at top)
+                // Header details
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -286,13 +286,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                       Row(
                                         children: [
                                           Flexible(
-                                            child: AppText(
-                                              widget.astrologerName,
+                                            child: Obx(() => AppText(
+                                              _liveController.currentSession.value?.astrologer?.name ?? widget.astrologerName,
                                               color: Colors.white,
                                               fontSize: 14,
                                               fontWeight: FontWeight.w700,
                                               overflow: TextOverflow.ellipsis,
-                                            ),
+                                            )),
                                           ),
                                           const SizedBox(width: 4),
                                           const Icon(Icons.verified, color: Colors.blue, size: 14),
@@ -301,7 +301,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 8),
                               ],
                             ),
                           ),
@@ -315,14 +314,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
                 const Spacer(),
 
-                // 3.2 Chat & Interaction Area (Always pushed by keyboard)
+                // Comments feed & comment bar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Chat List
+                      // Scrollable real-time comments list
                       ConstrainedBox(
                         constraints: BoxConstraints(
                           maxHeight: MediaQuery.of(context).size.height * 0.25,
@@ -330,7 +329,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         child: _buildChatList(),
                       ),
                       const SizedBox(height: 12),
-                      // Interaction Bar
+                      
+                      // Input controls
                       Row(
                         children: [
                           Expanded(
@@ -356,7 +356,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             ),
           ),
 
-          // 4. Reaction Animations (Separate Layer)
+          // floating reactions
           Positioned(
             right: 20,
             bottom: 80,
@@ -373,6 +373,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       ),
     );
   }
+
   Widget _buildCircleActionIcon(IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -391,10 +392,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        CircleAvatar(
-          radius: 17,
-          backgroundImage: NetworkImage(widget.astrologerImage),
-        ),
+        Obx(() {
+          final currentSession = _liveController.currentSession.value;
+          final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+          return CircleAvatar(
+            radius: 17,
+            backgroundImage: image.isNotEmpty ? NetworkImage(image) : null,
+            child: image.isEmpty ? const Icon(Icons.person, color: Colors.white) : null,
+          );
+        }),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
           decoration: BoxDecoration(
@@ -417,14 +423,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         color: Colors.black.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.visibility_outlined, color: Colors.white, size: 14),
-          SizedBox(width: 6),
-          Text(
-            "1628",
-            style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-          ),
+          const Icon(Icons.visibility_outlined, color: Colors.white, size: 14),
+          const SizedBox(width: 6),
+          Obx(() {
+            final count = _liveController.currentSession.value?.viewerCount ?? 0;
+            return Text(
+              '$count',
+              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+            );
+          }),
         ],
       ),
     );
@@ -433,47 +442,55 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Widget _buildChatList() {
     return ScrollConfiguration(
       behavior: const ScrollBehavior().copyWith(overscroll: false),
-      child: ListView.builder(
-        shrinkWrap: true,
-        reverse: true,
-        padding: EdgeInsets.zero,
-        itemCount: _messages.length,
-        itemBuilder: (context, index) {
-          final msg = _messages[(_messages.length - 1) - index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(msg.avatar),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText(
-                        msg.name,
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      AppText(
-                        msg.message,
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ],
+      child: Obx(() {
+        final reversedComments = _liveController.comments.reversed.toList();
+        return ListView.builder(
+          shrinkWrap: true,
+          reverse: true,
+          padding: EdgeInsets.zero,
+          itemCount: reversedComments.length,
+          itemBuilder: (context, index) {
+            final comment = reversedComments[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 12,
+                    backgroundImage: (comment.userAvatar != null && comment.userAvatar!.isNotEmpty) 
+                        ? NetworkImage(comment.userAvatar!) 
+                        : null,
+                    child: (comment.userAvatar == null || comment.userAvatar!.isEmpty)
+                        ? const Icon(Icons.person, size: 12, color: Colors.white)
+                        : null,
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText(
+                          comment.userName,
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        AppText(
+                          comment.message,
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }),
     );
   }
 
@@ -490,6 +507,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           Expanded(
             child: TextField(
               controller: _commentController,
+              onSubmitted: (val) {
+                _liveController.sendComment(widget.sessionId, val);
+                _commentController.clear();
+              },
               style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: InputDecoration(
                 hintText: AppStrings.typeYourComment,
@@ -503,7 +524,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ),
             ),
           ),
-          Icon(Icons.send_rounded, color: Colors.white.withOpacity(0.5), size: 18),
+          GestureDetector(
+            onTap: () {
+              _liveController.sendComment(widget.sessionId, _commentController.text);
+              _commentController.clear();
+            },
+            child: Icon(Icons.send_rounded, color: Colors.white.withOpacity(0.5), size: 18),
+          ),
         ],
       ),
     );
@@ -525,14 +552,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       ),
     );
   }
-}
-
-class ChatMessage {
-  final String name;
-  final String message;
-  final String avatar;
-
-  ChatMessage({required this.name, required this.message, required this.avatar});
 }
 
 class FloatingReaction extends StatefulWidget {
@@ -562,7 +581,7 @@ class _FloatingReactionState extends State<FloatingReaction> with SingleTickerPr
   @override
   void dispose() {
     _controller.dispose();
-    super.initState();
+    super.dispose();
   }
 
   @override
@@ -572,7 +591,7 @@ class _FloatingReactionState extends State<FloatingReaction> with SingleTickerPr
       builder: (context, child) {
         final double value = _animation.value;
         final double y = -300 * value;
-        final double x = _startX + (20 * (value < 0.5 ? value : 1 - value)); // Subtle sway
+        final double x = _startX + (20 * (value < 0.5 ? value : 1 - value)); // Sway
         final double opacity = 1.0 - value;
         final double scale = 0.5 + (0.5 * value);
 

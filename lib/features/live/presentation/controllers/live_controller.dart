@@ -1,0 +1,187 @@
+import 'dart:async';
+import 'package:get/get.dart';
+import '../../../../core/utils/custom_snackbar.dart';
+import '../../../../core/services/network/api_checker.dart';
+import '../../data/models/live_session_model.dart';
+import '../../domain/usecases/live_usecases.dart';
+
+class LiveController extends GetxController {
+  final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;
+  final GetLiveSessionDetailUseCase _getSessionDetailUseCase;
+  final JoinLiveSessionUseCase _joinSessionUseCase;
+  final LeaveLiveSessionUseCase _leaveSessionUseCase;
+  final SendLiveCommentUseCase _sendCommentUseCase;
+  final SendSuperChatUseCase _sendSuperChatUseCase;
+  final GetLiveCommentsUseCase _getCommentsUseCase;
+
+  LiveController(
+    this._getActiveSessionsUseCase,
+    this._getSessionDetailUseCase,
+    this._joinSessionUseCase,
+    this._leaveSessionUseCase,
+    this._sendCommentUseCase,
+    this._sendSuperChatUseCase,
+    this._getCommentsUseCase,
+  );
+
+  final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
+  final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
+  final RxList<LiveCommentModel> comments = <LiveCommentModel>[].obs;
+  
+  final RxBool isLoadingSessions = false.obs;
+  final RxBool isLoadingDetail = false.obs;
+  final RxBool isSendingComment = false.obs;
+  final RxBool isSendingSuperChat = false.obs;
+  
+  Timer? _commentsPollTimer;
+
+  Future<void> fetchActiveSessions() async {
+    try {
+      isLoadingSessions.value = true;
+      final result = await _getActiveSessionsUseCase.call();
+      if (result.isSuccess && result.body != null) {
+        final List<dynamic> data = result.body['data'] ?? [];
+        activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        print('[LIVE] Loaded ${activeSessions.length} active live sessions');
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching active sessions: $e');
+    } finally {
+      isLoadingSessions.value = false;
+    }
+  }
+
+  Future<void> fetchSessionDetail(int id) async {
+    try {
+      isLoadingDetail.value = true;
+      final result = await _getSessionDetailUseCase.call(id);
+      if (result.isSuccess && result.body != null) {
+        currentSession.value = LiveSessionModel.fromJson(result.body['data']);
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching session detail: $e');
+    } finally {
+      isLoadingDetail.value = false;
+    }
+  }
+
+  Future<void> joinSession(int id) async {
+    try {
+      final result = await _joinSessionUseCase.call(id);
+      if (result.isSuccess) {
+        print('[LIVE] Successfully joined session $id');
+        await fetchSessionDetail(id);
+        await fetchComments(id);
+        
+        // Start polling comments periodically
+        _startCommentsPolling(id);
+      }
+    } catch (e) {
+      print('[LIVE] Error joining session: $e');
+    }
+  }
+
+  Future<void> leaveSession(int id) async {
+    try {
+      _stopCommentsPolling();
+      final result = await _leaveSessionUseCase.call(id);
+      if (result.isSuccess) {
+        print('[LIVE] Successfully left session $id');
+        currentSession.value = null;
+        comments.clear();
+      }
+    } catch (e) {
+      print('[LIVE] Error leaving session: $e');
+    }
+  }
+
+  Future<void> fetchComments(int sessionId) async {
+    try {
+      final result = await _getCommentsUseCase.call(sessionId);
+      if (result.isSuccess && result.body != null) {
+        final List<dynamic> data = result.body['data']?['data'] ?? [];
+        final newComments = data.map((json) => LiveCommentModel.fromJson(json)).toList();
+        
+        // Update comments if count changed or check uniqueness
+        if (newComments.length != comments.length) {
+          comments.value = newComments;
+        }
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching comments: $e');
+    }
+  }
+
+  Future<void> sendComment(int sessionId, String message) async {
+    if (message.trim().isEmpty) return;
+    try {
+      isSendingComment.value = true;
+      
+      // Optimistic Update
+      final tempComment = LiveCommentModel(
+        id: DateTime.now().millisecondsSinceEpoch,
+        userId: 0,
+        userName: 'You',
+        message: message,
+        createdAt: DateTime.now(),
+      );
+      comments.add(tempComment);
+
+      final result = await _sendCommentUseCase.call(sessionId, message);
+      if (result.isSuccess) {
+        print('[LIVE] Comment sent successfully');
+        // Fetch comments to sync ID
+        await fetchComments(sessionId);
+      } else {
+        // Rollback optimistic update
+        comments.removeWhere((c) => c.id == tempComment.id);
+        ApiChecker.handleResponse(result);
+      }
+    } catch (e) {
+      print('[LIVE] Error sending comment: $e');
+    } finally {
+      isSendingComment.value = false;
+    }
+  }
+
+  Future<bool> sendSuperChat(int sessionId, int giftId, String? message) async {
+    try {
+      isSendingSuperChat.value = true;
+      final result = await _sendSuperChatUseCase.call(sessionId, giftId, message);
+      if (result.isSuccess) {
+        CustomSnackBar.showSuccess('Super Chat sent successfully! 🎉');
+        await fetchComments(sessionId);
+        return true;
+      } else {
+        ApiChecker.handleResponse(result);
+        return false;
+      }
+    } catch (e) {
+      print('[LIVE] Error sending Super Chat: $e');
+      CustomSnackBar.showError('Transaction failed: $e');
+      return false;
+    } finally {
+      isSendingSuperChat.value = false;
+    }
+  }
+
+  void _startCommentsPolling(int sessionId) {
+    _stopCommentsPolling();
+    _commentsPollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      fetchComments(sessionId);
+      // Optional: Refresh session details for viewer count
+      fetchSessionDetail(sessionId);
+    });
+  }
+
+  void _stopCommentsPolling() {
+    _commentsPollTimer?.cancel();
+    _commentsPollTimer = null;
+  }
+
+  @override
+  void onClose() {
+    _stopCommentsPolling();
+    super.onClose();
+  }
+}

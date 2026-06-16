@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
-import '../../live/screens/live_room_screen.dart';
+import '../../live/presentation/pages/live_room_screen.dart';
 
 class LiveSessionSection extends StatelessWidget {
   const LiveSessionSection({super.key});
@@ -200,6 +200,7 @@ class LiveSessionSection extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => const LiveRoomScreen(
+                        sessionId: 1,
                         astrologerName: "Acharya Prakash",
                         astrologerImage: "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
                       ),
