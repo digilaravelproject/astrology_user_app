@@ -11,6 +11,7 @@ import '../../../astrologers/controllers/astrologer_controller.dart';
 import '../../../astrologers/domain/models/gift_model.dart' as model;
 import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
+import '../../../../core/services/network/websocket_service.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final int sessionId;
@@ -52,6 +53,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     // Fetch gifts listing
     _giftController.fetchGifts();
 
+    // Subscribe to dynamic websocket channel
+    try {
+      final ws = Get.find<WebSocketService>();
+      ws.subscribeToChannel('live-session.${widget.sessionId}');
+    } catch (e) {
+      debugPrint('[LIVE] Error subscribing to websocket channel: $e');
+    }
+
     // Listen to session changes to connect to LiveKit
     _sessionWorker = ever(_liveController.currentSession, (session) {
       if (session != null) {
@@ -87,6 +96,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       await room.connect(
         wsUrl,
         token,
+        roomOptions: const RoomOptions(
+          adaptiveStream: true,
+          dynacast: true,
+        ),
       );
       
       _room = room;
@@ -155,6 +168,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     _disconnectLiveKit();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
+    try {
+      final ws = Get.find<WebSocketService>();
+      ws.unsubscribeFromChannel('live-session.${widget.sessionId}');
+    } catch (e) {
+      debugPrint('[LIVE] Error unsubscribing from websocket channel: $e');
+    }
     super.dispose();
   }
 

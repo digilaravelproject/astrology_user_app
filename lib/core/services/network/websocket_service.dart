@@ -19,6 +19,8 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
+import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
 
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
@@ -216,10 +218,262 @@ class WebSocketService extends GetxService {
           _handleIceCandidateSent(data['data']);
         } else if (event == AppUrls.pusherPing) {
            _send(AppUrls.pusherPong);
+        } else if (event == 'LiveSessionStarted' || event == 'App\\Events\\LiveSessionStarted' || event == '.LiveSessionStarted') {
+          _handleLiveSessionStarted(data['data']);
+        } else if (event == 'ViewerCountUpdated' || event == 'App\\Events\\ViewerCountUpdated' || event == '.ViewerCountUpdated') {
+          _handleViewerCountUpdated(data['data']);
+        } else if (event == 'NewLiveComment' || event == 'App\\Events\\NewLiveComment' || event == '.NewLiveComment') {
+          _handleNewLiveComment(data['data']);
+        } else if (event == 'SuperChatReceived' || event == 'App\\Events\\SuperChatReceived' || event == '.SuperChatReceived') {
+          _handleSuperChatReceived(data['data']);
+        } else if (event == 'LiveSessionEnded' || event == 'App\\Events\\LiveSessionEnded' || event == '.LiveSessionEnded') {
+          _handleLiveSessionEnded(data['data']);
+        } else if (event == 'AstrologerBroadcastStarted' || event == 'App\\Events\\AstrologerBroadcastStarted' || event == '.AstrologerBroadcastStarted') {
+          _handleAstrologerBroadcastStarted(data['data']);
         }
       } catch (e) {
         debugPrint('WebSocketService: Error parsing message -> $e');
       }
+    }
+  }
+
+  Future<void> subscribeToChannel(String channelName) async {
+    if (!_isConnected || _socketId == null) {
+      Logger.d('Cannot subscribe to channel $channelName, not connected yet.');
+      return;
+    }
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.post(
+        AppUrls.broadcastingAuth,
+        data: {
+          'channel_name': channelName,
+          'socket_id': _socketId,
+        },
+        options: Options(
+          contentType: Headers.formUrlEncodedContentType,
+        ),
+        handleError: false,
+        showErrorScreen: false,
+      );
+
+      final authString = response.body?['auth']?.toString();
+      if (authString != null && authString.isNotEmpty) {
+        Logger.d('Subscribing to dynamic channel: $channelName');
+        _send(jsonEncode({
+          "event": AppUrls.pusherSubscribe,
+          "data": {
+            "channel": channelName,
+            "auth": authString
+          }
+        }));
+      }
+    } catch (e) {
+      Logger.e('Error subscribing to dynamic channel $channelName: $e');
+    }
+  }
+
+  void unsubscribeFromChannel(String channelName) {
+    if (_isConnected) {
+      Logger.d('Unsubscribing from channel: $channelName');
+      _send(jsonEncode({
+        "event": "pusher:unsubscribe",
+        "data": {
+          "channel": channelName
+        }
+      }));
+    }
+  }
+
+  void _handleLiveSessionStarted(dynamic rawData) {
+    try {
+      if (Get.isRegistered<LiveController>()) {
+        Get.find<LiveController>().fetchActiveSessions();
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling LiveSessionStarted -> $e');
+    }
+  }
+
+  void _handleViewerCountUpdated(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      final int sessionId = eventData['live_session_id'] is int 
+          ? eventData['live_session_id'] 
+          : (int.tryParse(eventData['live_session_id']?.toString() ?? '') ?? 0);
+      final int count = eventData['viewer_count'] is int 
+          ? eventData['viewer_count'] 
+          : (int.tryParse(eventData['viewer_count']?.toString() ?? '') ?? 0);
+      
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        if (controller.currentSession.value?.id == sessionId) {
+          controller.currentSession.value = LiveSessionModel(
+            id: controller.currentSession.value!.id,
+            title: controller.currentSession.value!.title,
+            description: controller.currentSession.value!.description,
+            sessionType: controller.currentSession.value!.sessionType,
+            status: controller.currentSession.value!.status,
+            streamUrl: controller.currentSession.value!.streamUrl,
+            viewerCount: count,
+            startedAt: controller.currentSession.value!.startedAt,
+            astrologer: controller.currentSession.value!.astrologer,
+            isBroadcasting: controller.currentSession.value!.isBroadcasting,
+          );
+          controller.currentSession.refresh();
+        }
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling ViewerCountUpdated -> $e');
+    }
+  }
+
+  void _handleNewLiveComment(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
+      final int id = eventData['id'] is int 
+          ? eventData['id'] 
+          : (int.tryParse(eventData['id']?.toString() ?? '') ?? DateTime.now().millisecondsSinceEpoch);
+      final int userId = eventData['user_id'] is int 
+          ? eventData['user_id'] 
+          : (int.tryParse(eventData['user_id']?.toString() ?? '') ?? 0);
+      final String userName = eventData['user_name'] ?? 'User';
+      final String? userAvatar = eventData['user_avatar'] ?? eventData['user_image'];
+      final String message = eventData['message'] ?? '';
+      final DateTime createdAt = eventData['created_at'] != null 
+          ? DateTime.tryParse(eventData['created_at']) ?? DateTime.now() 
+          : DateTime.now();
+
+      final newComment = LiveCommentModel(
+        id: id,
+        userId: userId,
+        userName: userName,
+        userAvatar: userAvatar,
+        message: message,
+        createdAt: createdAt,
+      );
+
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        final exists = controller.comments.any((c) => c.message == message && c.userName == userName);
+        if (!exists) {
+          controller.comments.add(newComment);
+        }
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling NewLiveComment -> $e');
+    }
+  }
+
+  void _handleSuperChatReceived(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      
+      final String userName = eventData['user_name'] ?? 'User';
+      final String message = eventData['message'] ?? '';
+      
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        final newComment = LiveCommentModel(
+          id: DateTime.now().millisecondsSinceEpoch,
+          userId: eventData['user_id'] is int ? eventData['user_id'] : 0,
+          userName: userName,
+          userAvatar: eventData['user_avatar'],
+          message: '🎁 $message',
+          createdAt: DateTime.now(),
+        );
+        controller.comments.add(newComment);
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling SuperChatReceived -> $e');
+    }
+  }
+
+  void _handleAstrologerBroadcastStarted(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      
+      final int sessionId = eventData['live_session_id'] is int 
+          ? eventData['live_session_id'] 
+          : (int.tryParse(eventData['live_session_id']?.toString() ?? '') ?? 0);
+      
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        if (controller.currentSession.value?.id == sessionId) {
+          controller.currentSession.value = LiveSessionModel(
+            id: controller.currentSession.value!.id,
+            title: controller.currentSession.value!.title,
+            description: controller.currentSession.value!.description,
+            sessionType: controller.currentSession.value!.sessionType,
+            status: controller.currentSession.value!.status,
+            streamUrl: controller.currentSession.value!.streamUrl,
+            viewerCount: controller.currentSession.value!.viewerCount,
+            startedAt: controller.currentSession.value!.startedAt,
+            astrologer: controller.currentSession.value!.astrologer,
+            isBroadcasting: true,
+          );
+          controller.currentSession.refresh();
+        }
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling AstrologerBroadcastStarted -> $e');
+    }
+  }
+
+  void _handleLiveSessionEnded(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      
+      final int sessionId = eventData['id'] is int 
+          ? eventData['id'] 
+          : (int.tryParse(eventData['id']?.toString() ?? '') ?? 0);
+      
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        if (controller.currentSession.value?.id == sessionId) {
+          controller.currentSession.value = LiveSessionModel(
+            id: controller.currentSession.value!.id,
+            title: controller.currentSession.value!.title,
+            description: controller.currentSession.value!.description,
+            sessionType: controller.currentSession.value!.sessionType,
+            status: 'completed',
+            streamUrl: controller.currentSession.value!.streamUrl,
+            viewerCount: controller.currentSession.value!.viewerCount,
+            startedAt: controller.currentSession.value!.startedAt,
+            astrologer: controller.currentSession.value!.astrologer,
+            isBroadcasting: false,
+          );
+          controller.currentSession.refresh();
+        }
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling LiveSessionEnded -> $e');
     }
   }
 
