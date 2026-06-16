@@ -163,7 +163,7 @@ class LiveController extends GetxController {
       } else {
         // Rollback optimistic update
         comments.removeWhere((c) => c.id == tempComment.id);
-        CustomSnackBar.showError(result.message);
+        CustomSnackbar.showError(result.message);
       }
     } catch (e) {
       print('[LIVE] Error sending comment: $e');
@@ -181,7 +181,7 @@ class LiveController extends GetxController {
         await fetchComments(sessionId);
         return true;
       } else {
-        CustomSnackBar.showError(result.message);
+        CustomSnackbar.showError(result.message);
         return false;
       }
     } catch (e) {

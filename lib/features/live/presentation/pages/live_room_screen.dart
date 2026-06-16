@@ -55,7 +55,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
     // Listen to session changes to get stream_url
     _sessionWorker = ever(_liveController.currentSession, (session) {
-      if (session != null && session.streamUrl != null && !_isPlayerInitialized) {
+      if (session != null && session.streamUrl != null && session.streamUrl!.isNotEmpty && !_isPlayerInitialized) {
         _initializeVideoPlayer(session.streamUrl!);
       }
     });
