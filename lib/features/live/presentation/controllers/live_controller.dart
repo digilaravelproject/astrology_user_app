@@ -135,7 +135,7 @@ class LiveController extends GetxController {
       } else {
         // Rollback optimistic update
         comments.removeWhere((c) => c.id == tempComment.id);
-        ApiChecker.handleResponse(result);
+        CustomSnackBar.showError(result.message);
       }
     } catch (e) {
       print('[LIVE] Error sending comment: $e');
@@ -153,7 +153,7 @@ class LiveController extends GetxController {
         await fetchComments(sessionId);
         return true;
       } else {
-        ApiChecker.handleResponse(result);
+        CustomSnackBar.showError(result.message);
         return false;
       }
     } catch (e) {
