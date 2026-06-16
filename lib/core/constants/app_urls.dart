@@ -64,6 +64,8 @@ class AppUrls {
   static String sendLiveComment(int id) => "/api/v1/user/live/$id/comment";
   static String sendSuperChat(int id) => "/api/v1/user/live/$id/super-chat";
   static String getLiveComments(int id) => "/api/v1/user/live/$id/comments";
+  static String watchLiveSession(int id) => "/api/v1/user/live/$id/watch";
+
 
   // Chat
   static const String initiateChat = '/api/v1/chat/initiate';

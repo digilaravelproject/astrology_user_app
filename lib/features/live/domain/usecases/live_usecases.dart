@@ -63,3 +63,13 @@ class GetLiveCommentsUseCase {
     return await repository.getLiveComments(id, perPage: perPage);
   }
 }
+
+class WatchLiveSessionUseCase {
+  final LiveRepository repository;
+  WatchLiveSessionUseCase(this.repository);
+
+  Future<ResponseModel> call(int id) async {
+    return await repository.watchLiveSession(id);
+  }
+}
+

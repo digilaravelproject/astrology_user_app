@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
+import 'package:livekit_client/livekit_client.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
@@ -37,9 +36,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   final TextEditingController _commentController = TextEditingController();
   model.GiftModel? _selectedGift;
 
-  VideoPlayerController? _videoPlayerController;
-  ChewieController? _chewieController;
-  bool _isPlayerInitialized = false;
+  Room? _room;
+  VideoTrack? _remoteVideoTrack;
+  bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
 
   @override
@@ -53,41 +52,109 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     // Fetch gifts listing
     _giftController.fetchGifts();
 
-    // Listen to session changes to get stream_url
+    // Listen to session changes to connect to LiveKit
     _sessionWorker = ever(_liveController.currentSession, (session) {
-      if (session != null && session.streamUrl != null && session.streamUrl!.isNotEmpty && !_isPlayerInitialized) {
-        _initializeVideoPlayer(session.streamUrl!);
+      if (session != null) {
+        if (session.isBroadcasting && !_isLiveKitConnected) {
+          _connectLiveKit(session.id);
+        } else if (!session.isBroadcasting && _isLiveKitConnected) {
+          _disconnectLiveKit();
+        }
       }
     });
   }
 
-  Future<void> _initializeVideoPlayer(String url) async {
-    if (_isPlayerInitialized) return;
+  Future<void> _connectLiveKit(int sessionId) async {
+    if (_isLiveKitConnected || _room != null) return;
+    
+    final watchData = await _liveController.watchLiveSession(sessionId);
+    if (watchData == null) {
+      debugPrint('[LIVE] Watch data is null. Astrologer might not be broadcasting yet.');
+      return;
+    }
+    
+    final String wsUrl = watchData['livekit_ws_url'] ?? '';
+    final String token = watchData['token'] ?? '';
+    
+    if (wsUrl.isEmpty || token.isEmpty) {
+      debugPrint('[LIVE] wsUrl or token is empty');
+      return;
+    }
+    
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
-      await _videoPlayerController!.initialize();
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController!,
-        autoPlay: true,
-        looping: true,
-        showControls: false,
-        aspectRatio: _videoPlayerController!.value.aspectRatio,
+      debugPrint('[LIVE] Connecting to LiveKit room: $wsUrl');
+      final room = Room();
+      await room.connect(
+        wsUrl,
+        token,
       );
-      setState(() {
-        _isPlayerInitialized = true;
+      
+      _room = room;
+      if (mounted) {
+        setState(() {
+          _isLiveKitConnected = true;
+        });
+      }
+      
+      // Find already subscribed tracks
+      for (var participant in room.remoteParticipants.values) {
+        for (var trackPublication in participant.videoTrackPublications) {
+          if (trackPublication.subscribed && trackPublication.track != null) {
+            if (mounted) {
+              setState(() {
+                _remoteVideoTrack = trackPublication.track as VideoTrack?;
+              });
+            }
+          }
+        }
+      }
+      
+      // Listen to events
+      final listener = room.createListener();
+      listener.on<TrackSubscribedEvent>((event) {
+        if (event.track is VideoTrack && mounted) {
+          setState(() {
+            _remoteVideoTrack = event.track as VideoTrack?;
+          });
+        }
       });
+      
+      listener.on<TrackUnsubscribedEvent>((event) {
+        if (event.track == _remoteVideoTrack && mounted) {
+          setState(() {
+            _remoteVideoTrack = null;
+          });
+        }
+      });
+      
+      listener.on<RoomDisconnectedEvent>((event) {
+        debugPrint('[LIVE] LiveKit room disconnected');
+        _disconnectLiveKit();
+      });
+      
     } catch (e) {
-      debugPrint('Error initializing live stream video player: $e');
+      debugPrint('[LIVE] LiveKit connection error: $e');
+      _disconnectLiveKit();
+    }
+  }
+
+  void _disconnectLiveKit() {
+    _room?.disconnect();
+    _room = null;
+    if (mounted) {
+      setState(() {
+        _isLiveKitConnected = false;
+        _remoteVideoTrack = null;
+      });
     }
   }
 
   @override
   void dispose() {
     _sessionWorker?.dispose();
+    _disconnectLiveKit();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
-    _chewieController?.dispose();
-    _videoPlayerController?.dispose();
     super.dispose();
   }
 
@@ -263,15 +330,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         children: [
           // 1. Live camera stream backdrop / video player
           Positioned.fill(
-            child: _isPlayerInitialized && _chewieController != null
-                ? FittedBox(
-                    fit: BoxFit.cover,
-                    clipBehavior: Clip.hardEdge,
-                    child: SizedBox(
-                      width: _videoPlayerController!.value.size.width,
-                      height: _videoPlayerController!.value.size.height,
-                      child: Chewie(controller: _chewieController!),
-                    ),
+            child: _remoteVideoTrack != null
+                ? VideoTrackRenderer(
+                    _remoteVideoTrack!,
+                    fit: VideoViewFit.cover,
                   )
                 : Obx(() {
                     final currentSession = _liveController.currentSession.value;

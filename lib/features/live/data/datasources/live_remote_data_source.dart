@@ -52,4 +52,11 @@ class LiveRemoteDataSource {
     final result = await _apiClient.get('${AppUrls.getLiveComments(id)}?per_page=$perPage');
     return result;
   }
+
+  Future<ResponseModel> watchLiveSession(int id) async {
+    print('[LIVE_DS] Watching live session: $id');
+    final result = await _apiClient.post(AppUrls.watchLiveSession(id), data: {});
+    return result;
+  }
 }
+

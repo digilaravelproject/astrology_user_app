@@ -41,4 +41,10 @@ class LiveRepositoryImpl implements LiveRepository {
   Future<ResponseModel> getLiveComments(int id, {int perPage = 50}) async {
     return await dataSource.getLiveComments(id, perPage: perPage);
   }
+
+  @override
+  Future<ResponseModel> watchLiveSession(int id) async {
+    return await dataSource.watchLiveSession(id);
+  }
 }
+
