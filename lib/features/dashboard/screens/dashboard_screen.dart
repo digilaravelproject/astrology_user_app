@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../home/screens/home_screen.dart';
 import '../../chat/presentation/pages/chat_list_screen.dart';
 import '../../call/screens/call_list_screen.dart';
-import '../../live/screens/live_astrologer_screen.dart';
+import '../../live/presentation/pages/live_astrologer_screen.dart';
 import '../../matching/screens/matching_screen.dart';
 import '../../matrimony/screens/matrimony_screen.dart';
 import '../../../core/constants/app_strings.dart';

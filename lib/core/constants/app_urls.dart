@@ -56,6 +56,15 @@ class AppUrls {
   static const String sendGift = '/api/v1/gifts/send';
   static String getGiftHistory(int id) => '/api/v1/astrologers/$id/gifts';
 
+  // Live Streams
+  static const String activeLiveSessions = "/api/v1/user/live/now";
+  static String liveSessionDetail(int id) => "/api/v1/user/live/$id";
+  static String joinLiveSession(int id) => "/api/v1/user/live/$id/join";
+  static String leaveLiveSession(int id) => "/api/v1/user/live/$id/leave";
+  static String sendLiveComment(int id) => "/api/v1/user/live/$id/comment";
+  static String sendSuperChat(int id) => "/api/v1/user/live/$id/super-chat";
+  static String getLiveComments(int id) => "/api/v1/user/live/$id/comments";
+
   // Chat
   static const String initiateChat = '/api/v1/chat/initiate';
   static const String currentSession = '/api/v1/chat/current-session';

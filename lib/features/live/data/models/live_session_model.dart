@@ -1,0 +1,127 @@
+class LiveSessionModel {
+  final int id;
+  final String title;
+  final String? description;
+  final String sessionType;
+  final String? status;
+  final String? streamUrl;
+  final int viewerCount;
+  final DateTime? startedAt;
+  final LiveAstrologerModel? astrologer;
+
+  LiveSessionModel({
+    required this.id,
+    required this.title,
+    this.description,
+    required this.sessionType,
+    this.status,
+    this.streamUrl,
+    required this.viewerCount,
+    this.startedAt,
+    this.astrologer,
+  });
+
+  factory LiveSessionModel.fromJson(Map<String, dynamic> json) {
+    return LiveSessionModel(
+      id: json['id'],
+      title: json['title'] ?? '',
+      description: json['description'],
+      sessionType: json['session_type'] ?? 'public',
+      status: json['status'],
+      streamUrl: json['stream_url'],
+      viewerCount: json['viewer_count'] ?? 0,
+      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : null,
+      astrologer: json['astrologer'] != null ? LiveAstrologerModel.fromJson(json['astrologer']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'session_type': sessionType,
+      'status': status,
+      'stream_url': streamUrl,
+      'viewer_count': viewerCount,
+      'started_at': startedAt?.toIso8601String(),
+      'astrologer': astrologer?.toJson(),
+    };
+  }
+}
+
+class LiveAstrologerModel {
+  final int id;
+  final String name;
+  final String? profilePhoto;
+  final String? gender;
+  final String? dateOfBirth;
+
+  LiveAstrologerModel({
+    required this.id,
+    required this.name,
+    this.profilePhoto,
+    this.gender,
+    this.dateOfBirth,
+  });
+
+  factory LiveAstrologerModel.fromJson(Map<String, dynamic> json) {
+    return LiveAstrologerModel(
+      id: json['id'],
+      name: json['name'] ?? '',
+      profilePhoto: json['profile_photo'],
+      gender: json['gender'],
+      dateOfBirth: json['date_of_birth'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'profile_photo': profilePhoto,
+      'gender': gender,
+      'date_of_birth': dateOfBirth,
+    };
+  }
+}
+
+class LiveCommentModel {
+  final int id;
+  final int userId;
+  final String userName;
+  final String? userAvatar;
+  final String message;
+  final DateTime createdAt;
+
+  LiveCommentModel({
+    required this.id,
+    required this.userId,
+    required this.userName,
+    this.userAvatar,
+    required this.message,
+    required this.createdAt,
+  });
+
+  factory LiveCommentModel.fromJson(Map<String, dynamic> json) {
+    return LiveCommentModel(
+      id: json['id'] ?? 0,
+      userId: json['user_id'] ?? 0,
+      userName: json['user_name'] ?? 'User',
+      userAvatar: json['user_avatar'] ?? json['user_image'],
+      message: json['message'] ?? '',
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'user_name': userName,
+      'user_avatar': userAvatar,
+      'message': message,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
+}

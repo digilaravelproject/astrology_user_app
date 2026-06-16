@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/live/presentation/bindings/live_binding.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import '../services/network/api_client.dart';
 import '../services/network/network_info.dart';
@@ -82,5 +83,8 @@ class InitialBindings extends Bindings {
 
     // Call dependencies
     Get.put(CallController(), permanent: true);
+
+    // Live dependencies
+    LiveBinding().dependencies();
   }
 }
