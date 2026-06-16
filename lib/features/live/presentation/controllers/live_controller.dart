@@ -13,6 +13,7 @@ class LiveController extends GetxController {
   final SendLiveCommentUseCase _sendCommentUseCase;
   final SendSuperChatUseCase _sendSuperChatUseCase;
   final GetLiveCommentsUseCase _getCommentsUseCase;
+  final WatchLiveSessionUseCase _watchSessionUseCase;
 
   LiveController(
     this._getActiveSessionsUseCase,
@@ -22,7 +23,9 @@ class LiveController extends GetxController {
     this._sendCommentUseCase,
     this._sendSuperChatUseCase,
     this._getCommentsUseCase,
+    this._watchSessionUseCase,
   );
+
 
   final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
   final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
@@ -207,9 +210,30 @@ class LiveController extends GetxController {
     _commentsPollTimer = null;
   }
 
+  Future<Map<String, dynamic>?> watchLiveSession(int id) async {
+    try {
+      final result = await _watchSessionUseCase.call(id);
+      if (result.isSuccess && result.body != null) {
+        final dynamic body = result.body;
+        if (body is Map<String, dynamic>) {
+          if (body['data'] is Map<String, dynamic>) {
+            return body['data'];
+          }
+          return body;
+        }
+      } else {
+        print('[LIVE] Watch token generation failed: ${result.message}');
+      }
+    } catch (e) {
+      print('[LIVE] Error getting watch token: $e');
+    }
+    return null;
+  }
+
   @override
   void onClose() {
     _stopCommentsPolling();
     super.onClose();
   }
 }
+

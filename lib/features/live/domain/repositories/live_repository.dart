@@ -8,4 +8,6 @@ abstract class LiveRepository {
   Future<ResponseModel> sendLiveComment(int id, String message);
   Future<ResponseModel> sendSuperChat(int id, int giftId, String? message);
   Future<ResponseModel> getLiveComments(int id, {int perPage = 50});
+  Future<ResponseModel> watchLiveSession(int id);
 }
+
