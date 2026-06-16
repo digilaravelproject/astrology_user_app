@@ -40,7 +40,14 @@ class LiveController extends GetxController {
       isLoadingSessions.value = true;
       final result = await _getActiveSessionsUseCase.call();
       if (result.isSuccess && result.body != null) {
-        final List<dynamic> data = result.body['data'] ?? [];
+        final List<dynamic> data;
+        if (result.body is List) {
+          data = result.body;
+        } else if (result.body is Map) {
+          data = result.body['data'] is List ? result.body['data'] : (result.body['body'] is List ? result.body['body'] : []);
+        } else {
+          data = [];
+        }
         activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
         print('[LIVE] Loaded ${activeSessions.length} active live sessions');
       }
@@ -56,7 +63,14 @@ class LiveController extends GetxController {
       isLoadingDetail.value = true;
       final result = await _getSessionDetailUseCase.call(id);
       if (result.isSuccess && result.body != null) {
-        currentSession.value = LiveSessionModel.fromJson(result.body['data']);
+        final dynamic bodyData = result.body;
+        if (bodyData is Map<String, dynamic>) {
+          if (bodyData.containsKey('id') && bodyData.containsKey('title')) {
+            currentSession.value = LiveSessionModel.fromJson(bodyData);
+          } else if (bodyData['data'] is Map<String, dynamic>) {
+            currentSession.value = LiveSessionModel.fromJson(bodyData['data']);
+          }
+        }
       }
     } catch (e) {
       print('[LIVE] Error fetching session detail: $e');
@@ -99,7 +113,21 @@ class LiveController extends GetxController {
     try {
       final result = await _getCommentsUseCase.call(sessionId);
       if (result.isSuccess && result.body != null) {
-        final List<dynamic> data = result.body['data']?['data'] ?? [];
+        final List<dynamic> data;
+        if (result.body is List) {
+          data = result.body;
+        } else if (result.body is Map) {
+          final dynamic rawData = result.body['data'];
+          if (rawData is List) {
+            data = rawData;
+          } else if (rawData is Map && rawData['data'] is List) {
+            data = rawData['data'];
+          } else {
+            data = [];
+          }
+        } else {
+          data = [];
+        }
         final newComments = data.map((json) => LiveCommentModel.fromJson(json)).toList();
         
         // Update comments if count changed or check uniqueness
