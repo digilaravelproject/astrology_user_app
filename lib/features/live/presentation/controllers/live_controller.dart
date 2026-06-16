@@ -163,7 +163,7 @@ class LiveController extends GetxController {
       } else {
         // Rollback optimistic update
         comments.removeWhere((c) => c.id == tempComment.id);
-        CustomSnackBar.showError(result.message);
+        CustomSnackbar.showError(result.message);
       }
     } catch (e) {
       print('[LIVE] Error sending comment: $e');
@@ -177,16 +177,16 @@ class LiveController extends GetxController {
       isSendingSuperChat.value = true;
       final result = await _sendSuperChatUseCase.call(sessionId, giftId, message);
       if (result.isSuccess) {
-        CustomSnackBar.showSuccess('Super Chat sent successfully! 🎉');
+        CustomSnackbar.showSuccess('Super Chat sent successfully! 🎉');
         await fetchComments(sessionId);
         return true;
       } else {
-        CustomSnackBar.showError(result.message);
+        CustomSnackbar.showError(result.message);
         return false;
       }
     } catch (e) {
       print('[LIVE] Error sending Super Chat: $e');
-      CustomSnackBar.showError('Transaction failed: $e');
+      CustomSnackbar.showError('Transaction failed: $e');
       return false;
     } finally {
       isSendingSuperChat.value = false;

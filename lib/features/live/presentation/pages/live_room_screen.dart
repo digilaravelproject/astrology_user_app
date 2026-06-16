@@ -55,8 +55,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
     // Listen to session changes to get stream_url
     _sessionWorker = ever(_liveController.currentSession, (session) {
-      if (session != null && session.streamUrl != null && !_isPlayerInitialized) {
-        _initializeVideoPlayer(session.streamUrl!);
+      if (session != null && !_isPlayerInitialized) {
+        _initializeVideoPlayer(session.streamUrl ?? '');
       }
     });
   }
@@ -64,7 +64,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Future<void> _initializeVideoPlayer(String url) async {
     if (_isPlayerInitialized) return;
     try {
-      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(url));
+      final String streamUrl = (url.isNotEmpty && url != 'null')
+          ? url
+          : "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8";
+
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(streamUrl));
       await _videoPlayerController!.initialize();
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController!,
