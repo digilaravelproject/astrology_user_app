@@ -9,6 +9,7 @@ import '../../../../core/widgets/custom_app_bar.dart';
 import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import 'live_room_screen.dart';
+import '../../../../core/constants/app_urls.dart';
 
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
@@ -279,7 +280,11 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         child: Stack(
           children: [
             CustomImageWidget(
-              imagePath: session.astrologer?.profilePhoto ?? '',
+              imagePath: (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
+                  ? (session.astrologer!.profilePhoto!.startsWith('http')
+                      ? session.astrologer!.profilePhoto!
+                      : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
+                  : '',
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
