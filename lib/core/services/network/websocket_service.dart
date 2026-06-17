@@ -226,11 +226,11 @@ class WebSocketService extends GetxService {
           _handleNewLiveComment(data['data']);
         } else if (event == 'SuperChatReceived' || event == 'App\\Events\\SuperChatReceived' || event == '.SuperChatReceived') {
           _handleSuperChatReceived(data['data']);
-        } else if (event == 'LiveSessionEnded' || event == 'App\\Events\\LiveSessionEnded' || event == '.LiveSessionEnded') {
+        } else if (event == AppUrls.eventLiveSessionEnded || event == 'LiveSessionEnded' || event == 'App\\Events\\LiveSessionEnded' || event == '.LiveSessionEnded') {
           _handleLiveSessionEnded(data['data']);
         } else if (event == 'AstrologerBroadcastStarted' || event == 'App\\Events\\AstrologerBroadcastStarted' || event == '.AstrologerBroadcastStarted') {
           _handleAstrologerBroadcastStarted(data['data']);
-        } else if (event == 'AstrologerMediaStatusChanged' || event == 'App\\Events\\AstrologerMediaStatusChanged' || event == '.AstrologerMediaStatusChanged') {
+        } else if (event == AppUrls.eventAstrologerMediaStatusChanged || event == 'AstrologerMediaStatusChanged' || event == 'App\\Events\\AstrologerMediaStatusChanged' || event == '.AstrologerMediaStatusChanged') {
           _handleAstrologerMediaStatusChanged(data['data']);
         } else if (event == AppUrls.eventUserJoinedLiveSession || event == 'App\\Events\\UserJoinedLiveSession' || event == '.UserJoinedLiveSession') {
           _handleUserJoinedLiveSession(data['data']);
@@ -550,6 +550,8 @@ class WebSocketService extends GetxService {
       if (Get.isRegistered<LiveController>()) {
         final controller = Get.find<LiveController>();
         if (controller.currentSession.value?.id == sessionId) {
+          controller.isCameraOn.value = false;
+          controller.isAudioOn.value = false;
           controller.currentSession.value = LiveSessionModel(
             id: controller.currentSession.value!.id,
             title: controller.currentSession.value!.title,
