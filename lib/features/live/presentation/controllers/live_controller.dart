@@ -30,6 +30,8 @@ class LiveController extends GetxController {
   final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
   final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
   final RxList<LiveCommentModel> comments = <LiveCommentModel>[].obs;
+  final RxBool isCameraOn = true.obs;
+  final RxBool isAudioOn = true.obs;
   
   final RxBool isLoadingSessions = false.obs;
   final RxBool isLoadingDetail = false.obs;
@@ -83,6 +85,8 @@ class LiveController extends GetxController {
   }
 
   Future<void> joinSession(int id) async {
+    isCameraOn.value = true;
+    isAudioOn.value = true;
     try {
       final result = await _joinSessionUseCase.call(id);
       if (result.isSuccess) {

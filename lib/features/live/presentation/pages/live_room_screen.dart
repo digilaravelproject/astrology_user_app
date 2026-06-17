@@ -349,19 +349,88 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         children: [
           // 1. Live camera stream backdrop / video player
           Positioned.fill(
-            child: _remoteVideoTrack != null
-                ? VideoTrackRenderer(
-                    _remoteVideoTrack!,
-                    fit: VideoViewFit.cover,
-                  )
-                : Obx(() {
-                    final currentSession = _liveController.currentSession.value;
-                    final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
-                    return CustomImageWidget(
-                      imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
-                      fit: BoxFit.cover,
-                    );
-                  }),
+            child: Obx(() {
+              final isCameraOn = _liveController.isCameraOn.value;
+              final isAudioOn = _liveController.isAudioOn.value;
+              return Stack(
+                children: [
+                  Positioned.fill(
+                    child: (isCameraOn && _remoteVideoTrack != null)
+                        ? VideoTrackRenderer(
+                            _remoteVideoTrack!,
+                            fit: VideoViewFit.cover,
+                          )
+                        : Container(
+                            color: Colors.black,
+                            child: Obx(() {
+                              final currentSession = _liveController.currentSession.value;
+                              final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+                              return CustomImageWidget(
+                                imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
+                                fit: BoxFit.cover,
+                              );
+                            }),
+                          ),
+                  ),
+                  
+                  if (!isCameraOn)
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.black87,
+                        child: const Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.videocam_off, color: Colors.white54, size: 64),
+                              SizedBox(height: 12),
+                              Text(
+                                "Astrologer's camera is off",
+                                style: TextStyle(color: Colors.white54, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Media status overlay icons
+                  Positioned(
+                    right: 16,
+                    bottom: 150, // Positioned safely above comments
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            isCameraOn ? Icons.videocam : Icons.videocam_off,
+                            color: isCameraOn ? Colors.green : Colors.red,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            isAudioOn ? Icons.mic : Icons.mic_off,
+                            color: isAudioOn ? Colors.green : Colors.red,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            }),
           ),
           
           Positioned.fill(
