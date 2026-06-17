@@ -76,9 +76,13 @@ class LiveController extends GetxController {
             currentSession.value = LiveSessionModel.fromJson(bodyData['data']);
           }
         }
-        if (currentSession.value != null && !currentSession.value!.isBroadcasting) {
-          isCameraOn.value = false;
-          isAudioOn.value = false;
+        if (currentSession.value != null) {
+          isCameraOn.value = currentSession.value!.isCameraOn;
+          isAudioOn.value = currentSession.value!.isAudioOn;
+          if (!currentSession.value!.isBroadcasting) {
+            isCameraOn.value = false;
+            isAudioOn.value = false;
+          }
         }
       }
     } catch (e) {
@@ -93,10 +97,28 @@ class LiveController extends GetxController {
     isAudioOn.value = true;
     try {
       final result = await _joinSessionUseCase.call(id);
-      if (result.isSuccess) {
+      if (result.isSuccess && result.body != null) {
         print('[LIVE] Successfully joined session $id');
-        await fetchSessionDetail(id);
-        await fetchComments(id);
+        final dynamic body = result.body;
+        if (body is Map<String, dynamic>) {
+          final sessionData = body['session'] ?? body['data']?['session'] ?? body['data'];
+          if (sessionData != null) {
+            currentSession.value = LiveSessionModel.fromJson(sessionData);
+            
+            // Set initial camera/audio state
+            isCameraOn.value = currentSession.value!.isCameraOn;
+            isAudioOn.value = currentSession.value!.isAudioOn;
+            if (!currentSession.value!.isBroadcasting) {
+              isCameraOn.value = false;
+              isAudioOn.value = false;
+            }
+          }
+          
+          final lastComments = body['last_comments'] ?? body['data']?['last_comments'];
+          if (lastComments is List) {
+            comments.value = lastComments.map((json) => LiveCommentModel.fromJson(json)).toList();
+          }
+        }
         
         // Start polling comments periodically
         _startCommentsPolling(id);
