@@ -17,6 +17,8 @@ import 'response_model.dart';
 
 class ApiClient {
   final Dio _dio;
+  static DateTime? _lastWatchTimestamp;
+  static ResponseModel? _lastWatchResponse;
 
   ApiClient() : _dio = Dio() {
     _initializeDio();
@@ -39,6 +41,11 @@ class ApiClient {
         String token = await TokenManager.getToken() ?? "";
         options.headers["Authorization"] = "Bearer $token";
         options.headers["Accept"] = "application/json";
+
+        if (options.path.contains('/user/live/')) {
+          options.receiveTimeout = const Duration(seconds: 60);
+          Logger.d('|⏱️ ReceiveTimeout increased to 60s for live session endpoint: ${options.path}');
+        }
 
         // Detailed request logging
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -109,24 +116,46 @@ class ApiClient {
       return const ResponseModel(isSuccess: false, message: 'No internet connection');
     }
 
-    try {
-      final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
+    int maxRetries = 3;
+    List<int> backoffs = [1, 2, 4];
 
-      if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
-      } else {
-        return ApiChecker.checkApi(response, showToaster: showToaster);
+    for (int attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        final response = await _dio.get(
+          path,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onReceiveProgress: onReceiveProgress,
+        );
+
+        final ResponseModel result;
+        if (handleError) {
+          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
+        } else {
+          result = ApiChecker.checkApi(response, showToaster: showToaster);
+        }
+        return result;
+      } catch (e) {
+        final isLastAttempt = attempt == maxRetries;
+        
+        bool is429 = false;
+        if (e is DioException && e.response?.statusCode == 429) {
+          is429 = true;
+        }
+
+        if (isLastAttempt) {
+          Logger.e('|❌ Max retries reached for GET: $path. Error: $e');
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+        }
+
+        int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
+        Logger.w('|⚠️ GET request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        await Future.delayed(Duration(seconds: sleepSec));
       }
-    } catch (e) {
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
     }
+    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
   }
 
   Future<ResponseModel> post(
@@ -146,26 +175,66 @@ class ApiClient {
       return const ResponseModel(isSuccess: false, message: 'No internet connection');
     }
 
-    try {
-      final response = await _dio.post(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-
-      if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
-      } else {
-        return ApiChecker.checkApi(response, showToaster: showToaster);
+    if (path.contains('/watch')) {
+      final now = DateTime.now();
+      if (_lastWatchTimestamp != null && now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
+        Logger.d('|🛡️ Debounced /watch call to avoid rate limit. Time since last call: ${now.difference(_lastWatchTimestamp!).inSeconds}s. Returning cached response.');
+        if (_lastWatchResponse != null) {
+          return _lastWatchResponse!;
+        } else {
+          return const ResponseModel(isSuccess: false, message: 'Request debounced to avoid rate limit');
+        }
       }
-    } catch (e) {
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      _lastWatchTimestamp = now;
     }
+
+    int maxRetries = 3;
+    List<int> backoffs = [1, 2, 4];
+
+    for (int attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        final response = await _dio.post(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress,
+        );
+
+        final ResponseModel result;
+        if (handleError) {
+          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
+        } else {
+          result = ApiChecker.checkApi(response, showToaster: showToaster);
+        }
+
+        if (path.contains('/watch') && result.isSuccess) {
+          _lastWatchResponse = result;
+        }
+
+        return result;
+      } catch (e) {
+        final isLastAttempt = attempt == maxRetries;
+        
+        bool is429 = false;
+        if (e is DioException && e.response?.statusCode == 429) {
+          is429 = true;
+        }
+
+        if (isLastAttempt) {
+          Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+        }
+
+        int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
+        Logger.w('|⚠️ POST request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        await Future.delayed(Duration(seconds: sleepSec));
+      }
+    }
+    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
   }
 
   Future<ResponseModel> postMultipartData(
