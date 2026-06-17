@@ -75,6 +75,7 @@ class LiveController extends GetxController {
           } else if (bodyData['data'] is Map<String, dynamic>) {
             currentSession.value = LiveSessionModel.fromJson(bodyData['data']);
           }
+        }
         if (currentSession.value != null && !currentSession.value!.isBroadcasting) {
           isCameraOn.value = false;
           isAudioOn.value = false;
