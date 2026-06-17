@@ -398,7 +398,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             color: Colors.black,
                             child: Obx(() {
                               final currentSession = _liveController.currentSession.value;
-                              final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+                              final rawImage = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+                              final image = rawImage.isNotEmpty
+                                  ? (rawImage.startsWith('http')
+                                      ? rawImage
+                                      : '${AppUrls.baseImageUrl}$rawImage')
+                                  : '';
                               return CustomImageWidget(
                                 imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
                                 fit: BoxFit.cover,
@@ -655,7 +660,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       children: [
         Obx(() {
           final currentSession = _liveController.currentSession.value;
-          final image = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+          final rawImage = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+          final image = rawImage.isNotEmpty
+              ? (rawImage.startsWith('http')
+                  ? rawImage
+                  : '${AppUrls.baseImageUrl}$rawImage')
+              : '';
           return CircleAvatar(
             radius: 17,
             backgroundImage: image.isNotEmpty ? NetworkImage(image) : null,
