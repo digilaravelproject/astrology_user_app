@@ -9,6 +9,8 @@ class LiveSessionModel {
   final DateTime? startedAt;
   final LiveAstrologerModel? astrologer;
   final bool isBroadcasting;
+  final bool isCameraOn;
+  final bool isAudioOn;
 
   LiveSessionModel({
     required this.id,
@@ -21,6 +23,8 @@ class LiveSessionModel {
     this.startedAt,
     this.astrologer,
     this.isBroadcasting = false,
+    this.isCameraOn = true,
+    this.isAudioOn = true,
   });
 
   factory LiveSessionModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,8 @@ class LiveSessionModel {
       startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : null,
       astrologer: json['astrologer'] != null ? LiveAstrologerModel.fromJson(json['astrologer']) : null,
       isBroadcasting: json['is_broadcasting'] ?? false,
+      isCameraOn: json['is_camera_on'] ?? true,
+      isAudioOn: json['is_audio_on'] ?? true,
     );
   }
 
@@ -50,6 +56,8 @@ class LiveSessionModel {
       'started_at': startedAt?.toIso8601String(),
       'astrologer': astrologer?.toJson(),
       'is_broadcasting': isBroadcasting,
+      'is_camera_on': isCameraOn,
+      'is_audio_on': isAudioOn,
     };
   }
 

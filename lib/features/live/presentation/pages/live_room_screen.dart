@@ -81,7 +81,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     // Subscribe to dynamic websocket channel
     try {
       final ws = Get.find<WebSocketService>();
-      ws.subscribeToChannel('live-session.${widget.sessionId}');
+      ws.subscribeToChannel('presence-live-session.${widget.sessionId}');
     } catch (e) {
       debugPrint('[LIVE] Error subscribing to websocket channel: $e');
     }
@@ -204,7 +204,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     _commentController.dispose();
     try {
       final ws = Get.find<WebSocketService>();
-      ws.unsubscribeFromChannel('live-session.${widget.sessionId}');
+      ws.unsubscribeFromChannel('presence-live-session.${widget.sessionId}');
     } catch (e) {
       debugPrint('[LIVE] Error unsubscribing from websocket channel: $e');
     }
