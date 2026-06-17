@@ -41,6 +41,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   VideoTrack? _remoteVideoTrack;
   bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
+  bool _isSpeakerMuted = false;
+
+  void _toggleSpeakerMute() async {
+    final room = _room;
+    setState(() {
+      _isSpeakerMuted = !_isSpeakerMuted;
+    });
+    
+    if (room == null) return;
+    
+    for (var participant in room.remoteParticipants.values) {
+      for (var publication in participant.audioTrackPublications) {
+        try {
+          if (_isSpeakerMuted) {
+            await publication.unsubscribe();
+          } else {
+            await publication.subscribe();
+          }
+        } catch (e) {
+          debugPrint('[LIVE] Error toggling subscription: $e');
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -109,8 +133,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         });
       }
       
-      // Find already subscribed tracks
+      // Find already subscribed tracks and apply speaker mute status
       for (var participant in room.remoteParticipants.values) {
+        for (var trackPublication in participant.audioTrackPublications) {
+          if (_isSpeakerMuted) {
+            trackPublication.unsubscribe();
+          }
+        }
         for (var trackPublication in participant.videoTrackPublications) {
           if (trackPublication.subscribed && trackPublication.track != null) {
             if (mounted) {
@@ -129,6 +158,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           setState(() {
             _remoteVideoTrack = event.track as VideoTrack?;
           });
+        } else if (event.track is AudioTrack) {
+          if (_isSpeakerMuted) {
+            event.publication.unsubscribe();
+          }
         }
       });
       
@@ -463,6 +496,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: Row(
                       children: [
                         _buildCircleActionIcon(Icons.arrow_back, () => Navigator.pop(context)),
+                        const SizedBox(width: 8),
+                        _buildCircleActionIcon(
+                          _isSpeakerMuted ? Icons.volume_off : Icons.volume_up,
+                          _toggleSpeakerMute,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Container(
