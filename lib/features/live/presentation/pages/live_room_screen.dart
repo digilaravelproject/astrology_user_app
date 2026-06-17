@@ -385,7 +385,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           Positioned.fill(
             child: Obx(() {
               final isCameraOn = _liveController.isCameraOn.value;
-              final isAudioOn = _liveController.isAudioOn.value;
               return Stack(
                 children: [
                   Positioned.fill(
@@ -415,58 +414,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   if (!isCameraOn)
                     Positioned.fill(
                       child: Container(
-                        color: Colors.black87,
+                        color: Colors.black.withOpacity(0.8),
                         child: const Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.videocam_off, color: Colors.white54, size: 64),
+                              Icon(Icons.videocam_off, color: Colors.white70, size: 64),
                               SizedBox(height: 12),
                               Text(
-                                "Astrologer's camera is off",
-                                style: TextStyle(color: Colors.white54, fontSize: 16),
+                                "Camera is Stopped",
+                                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                         ),
                       ),
                     ),
-
-                  // Media status overlay icons
-                  Positioned(
-                    right: 16,
-                    bottom: 150, // Positioned safely above comments
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            isCameraOn ? Icons.videocam : Icons.videocam_off,
-                            color: isCameraOn ? Colors.green : Colors.red,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            isAudioOn ? Icons.mic : Icons.mic_off,
-                            color: isAudioOn ? Colors.green : Colors.red,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
                   // Right side vertical action buttons (Share, Report, Speaker Mute)
                   Positioned(
@@ -572,6 +535,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
+                        Obx(() {
+                          final isAudioOn = _liveController.isAudioOn.value;
+                          if (!isAudioOn) {
+                            return Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.all(6),
+                              decoration: const BoxDecoration(
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.mic_off, color: Colors.white, size: 16),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        }),
                         _buildViewerCount(),
                       ],
                     ),
