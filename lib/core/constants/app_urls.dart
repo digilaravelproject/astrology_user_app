@@ -141,4 +141,6 @@ class AppUrls {
   // Live Session System Events
   static const String eventUserJoinedLiveSession = 'UserJoinedLiveSession';
   static const String eventUserLeftLiveSession = 'UserLeftLiveSession';
+  static const String eventLiveSessionEnded = 'LiveSessionEnded';
+  static const String eventAstrologerMediaStatusChanged = 'AstrologerMediaStatusChanged';
 }
