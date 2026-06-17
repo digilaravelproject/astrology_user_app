@@ -42,6 +42,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   VideoTrack? _remoteVideoTrack;
   bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
+  Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
 
   void _toggleSpeakerMute() async {
@@ -96,6 +97,24 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         }
       }
     });
+
+    _mediaWorker = ever(_liveController.isAudioOn, (isAudioOn) async {
+      final room = _room;
+      if (room == null) return;
+      for (var participant in room.remoteParticipants.values) {
+        for (var publication in participant.audioTrackPublications) {
+          try {
+            if (!isAudioOn || _isSpeakerMuted) {
+              await publication.unsubscribe();
+            } else {
+              await publication.subscribe();
+            }
+          } catch (e) {
+            debugPrint('[LIVE] Error auto-toggling audio track: $e');
+          }
+        }
+      }
+    });
   }
 
   Future<void> _connectLiveKit(int sessionId) async {
@@ -137,7 +156,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       // Find already subscribed tracks and apply speaker mute status
       for (var participant in room.remoteParticipants.values) {
         for (var trackPublication in participant.audioTrackPublications) {
-          if (_isSpeakerMuted) {
+          if (_isSpeakerMuted || !_liveController.isAudioOn.value) {
             trackPublication.unsubscribe();
           }
         }
@@ -160,7 +179,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             _remoteVideoTrack = event.track as VideoTrack?;
           });
         } else if (event.track is AudioTrack) {
-          if (_isSpeakerMuted) {
+          if (_isSpeakerMuted || !_liveController.isAudioOn.value) {
             event.publication.unsubscribe();
           }
         }
@@ -199,6 +218,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void dispose() {
     _sessionWorker?.dispose();
+    _mediaWorker?.dispose();
     _disconnectLiveKit();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
@@ -452,11 +472,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        _buildRightActionButton(
-                          icon: _isSpeakerMuted ? Icons.volume_off : Icons.volume_up,
-                          onTap: _toggleSpeakerMute,
-                          isActive: !_isSpeakerMuted,
-                        ),
+                        Obx(() {
+                          final isAstrologerMuted = !_liveController.isAudioOn.value;
+                          final isMuted = _isSpeakerMuted || isAstrologerMuted;
+                          return _buildRightActionButton(
+                            icon: isMuted ? Icons.volume_off : Icons.volume_up,
+                            onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
+                            isActive: !isMuted,
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -534,22 +558,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Obx(() {
-                          final isAudioOn = _liveController.isAudioOn.value;
-                          if (!isAudioOn) {
-                            return Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.mic_off, color: Colors.white, size: 16),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        }),
+
                         _buildViewerCount(),
                       ],
                     ),
@@ -840,7 +849,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   Widget _buildRightActionButton({
     required IconData icon,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
     bool isActive = true,
   }) {
     return GestureDetector(
