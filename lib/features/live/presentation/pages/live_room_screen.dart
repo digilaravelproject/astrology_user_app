@@ -12,6 +12,7 @@ import '../../../astrologers/domain/models/gift_model.dart' as model;
 import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import '../../../../core/services/network/websocket_service.dart';
+import '../../../../core/constants/app_urls.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final int sessionId;
@@ -461,6 +462,36 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       ],
                     ),
                   ),
+
+                  // Right side vertical action buttons (Share, Report, Speaker Mute)
+                  Positioned(
+                    right: 16,
+                    bottom: 210,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildRightActionButton(
+                          icon: Icons.share,
+                          onTap: () {
+                            // Share live stream link/details
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildRightActionButton(
+                          icon: Icons.warning_amber_rounded,
+                          onTap: () {
+                            // Report session
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildRightActionButton(
+                          icon: _isSpeakerMuted ? Icons.volume_off : Icons.volume_up,
+                          onTap: _toggleSpeakerMute,
+                          isActive: !_isSpeakerMuted,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               );
             }),
@@ -496,11 +527,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: Row(
                       children: [
                         _buildCircleActionIcon(Icons.arrow_back, () => Navigator.pop(context)),
-                        const SizedBox(width: 8),
-                        _buildCircleActionIcon(
-                          _isSpeakerMuted ? Icons.volume_off : Icons.volume_up,
-                          _toggleSpeakerMute,
-                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Container(
@@ -686,6 +712,44 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           itemCount: reversedComments.length,
           itemBuilder: (context, index) {
             final comment = reversedComments[index];
+            
+            // System Notification (Join/Leave)
+            if (comment.isSystem) {
+              final avatarUrl = (comment.userAvatar != null && comment.userAvatar!.isNotEmpty)
+                  ? (comment.userAvatar!.startsWith('http')
+                      ? comment.userAvatar!
+                      : '${AppUrls.baseImageUrl}${comment.userAvatar}')
+                  : null;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 10,
+                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl == null
+                          ? const Icon(Icons.person, size: 10, color: Colors.white)
+                          : null,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        comment.message,
+                        style: const TextStyle(color: Colors.grey, fontSize: 11, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            // Normal Comment
+            final avatarUrl = (comment.userAvatar != null && comment.userAvatar!.isNotEmpty)
+                ? (comment.userAvatar!.startsWith('http')
+                    ? comment.userAvatar!
+                    : '${AppUrls.baseImageUrl}${comment.userAvatar}')
+                : null;
+            
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
@@ -693,10 +757,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 children: [
                   CircleAvatar(
                     radius: 12,
-                    backgroundImage: (comment.userAvatar != null && comment.userAvatar!.isNotEmpty) 
-                        ? NetworkImage(comment.userAvatar!) 
-                        : null,
-                    child: (comment.userAvatar == null || comment.userAvatar!.isEmpty)
+                    backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                    child: avatarUrl == null
                         ? const Icon(Icons.person, size: 12, color: Colors.white)
                         : null,
                   ),
@@ -784,6 +846,30 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         icon, 
         color: isHeart ? Colors.red : (icon == Icons.wallet_giftcard_rounded ? Colors.blueAccent : Colors.white), 
         size: 24
+      ),
+    );
+  }
+
+  Widget _buildRightActionButton({
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isActive = true,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.5),
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white24, width: 1),
+        ),
+        child: Icon(
+          icon,
+          color: isActive ? Colors.white : Colors.redAccent,
+          size: 20,
+        ),
       ),
     );
   }
