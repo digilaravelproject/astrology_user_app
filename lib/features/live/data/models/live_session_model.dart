@@ -98,6 +98,7 @@ class LiveCommentModel {
   final String? userAvatar;
   final String message;
   final DateTime createdAt;
+  final bool isSystem;
 
   LiveCommentModel({
     required this.id,
@@ -106,6 +107,7 @@ class LiveCommentModel {
     this.userAvatar,
     required this.message,
     required this.createdAt,
+    this.isSystem = false,
   });
 
   factory LiveCommentModel.fromJson(Map<String, dynamic> json) {
@@ -116,6 +118,7 @@ class LiveCommentModel {
       userAvatar: json['user_avatar'] ?? json['user_image'],
       message: json['message'] ?? '',
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+      isSystem: json['is_system'] ?? false,
     );
   }
 
@@ -127,6 +130,7 @@ class LiveCommentModel {
       'user_avatar': userAvatar,
       'message': message,
       'created_at': createdAt.toIso8601String(),
+      'is_system': isSystem,
     };
   }
 }

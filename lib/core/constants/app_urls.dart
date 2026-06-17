@@ -137,4 +137,8 @@ class AppUrls {
   static const String eventCallDismissed = 'CallDismissed';
   static const String eventCallEnded = 'CallEnded';
   static const String eventIceCandidateSent = 'IceCandidateSent';
+
+  // Live Session System Events
+  static const String eventUserJoinedLiveSession = 'UserJoinedLiveSession';
+  static const String eventUserLeftLiveSession = 'UserLeftLiveSession';
 }

@@ -232,6 +232,10 @@ class WebSocketService extends GetxService {
           _handleAstrologerBroadcastStarted(data['data']);
         } else if (event == 'AstrologerMediaStatusChanged' || event == 'App\\Events\\AstrologerMediaStatusChanged' || event == '.AstrologerMediaStatusChanged') {
           _handleAstrologerMediaStatusChanged(data['data']);
+        } else if (event == AppUrls.eventUserJoinedLiveSession || event == 'App\\Events\\UserJoinedLiveSession' || event == '.UserJoinedLiveSession') {
+          _handleUserJoinedLiveSession(data['data']);
+        } else if (event == AppUrls.eventUserLeftLiveSession || event == 'App\\Events\\UserLeftLiveSession' || event == '.UserLeftLiveSession') {
+          _handleUserLeftLiveSession(data['data']);
         }
       } catch (e) {
         debugPrint('WebSocketService: Error parsing message -> $e');
@@ -465,6 +469,68 @@ class WebSocketService extends GetxService {
       }
     } catch (e) {
       Logger.e('WebSocketService: error handling AstrologerMediaStatusChanged -> $e');
+    }
+  }
+
+  void _handleUserJoinedLiveSession(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
+      final String userName = eventData['user_name'] ?? 'User';
+      final String? userAvatar = eventData['user_avatar'];
+
+      final newComment = LiveCommentModel(
+        id: DateTime.now().millisecondsSinceEpoch,
+        userId: eventData['user_id'] is int ? eventData['user_id'] : 0,
+        userName: userName,
+        userAvatar: userAvatar,
+        message: '$userName joined',
+        createdAt: DateTime.now(),
+        isSystem: true,
+      );
+
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        controller.comments.add(newComment);
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling UserJoinedLiveSession -> $e');
+    }
+  }
+
+  void _handleUserLeftLiveSession(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
+      final String userName = eventData['user_name'] ?? 'User';
+      final String? userAvatar = eventData['user_avatar'];
+
+      final newComment = LiveCommentModel(
+        id: DateTime.now().millisecondsSinceEpoch,
+        userId: eventData['user_id'] is int ? eventData['user_id'] : 0,
+        userName: userName,
+        userAvatar: userAvatar,
+        message: '$userName left',
+        createdAt: DateTime.now(),
+        isSystem: true,
+      );
+
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        controller.comments.add(newComment);
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling UserLeftLiveSession -> $e');
     }
   }
 
