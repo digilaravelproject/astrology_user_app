@@ -230,6 +230,8 @@ class WebSocketService extends GetxService {
           _handleLiveSessionEnded(data['data']);
         } else if (event == 'AstrologerBroadcastStarted' || event == 'App\\Events\\AstrologerBroadcastStarted' || event == '.AstrologerBroadcastStarted') {
           _handleAstrologerBroadcastStarted(data['data']);
+        } else if (event == 'AstrologerMediaStatusChanged' || event == 'App\\Events\\AstrologerMediaStatusChanged' || event == '.AstrologerMediaStatusChanged') {
+          _handleAstrologerMediaStatusChanged(data['data']);
         }
       } catch (e) {
         debugPrint('WebSocketService: Error parsing message -> $e');
@@ -438,6 +440,31 @@ class WebSocketService extends GetxService {
       }
     } catch (e) {
       Logger.e('WebSocketService: error handling AstrologerBroadcastStarted -> $e');
+    }
+  }
+
+  void _handleAstrologerMediaStatusChanged(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      
+      final String type = eventData['type'] ?? '';
+      final String status = eventData['status'] ?? '';
+      
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        if (type == 'camera') {
+          controller.isCameraOn.value = status == 'on';
+        } else if (type == 'audio') {
+          controller.isAudioOn.value = status == 'on';
+        }
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling AstrologerMediaStatusChanged -> $e');
     }
   }
 
