@@ -218,27 +218,63 @@ class WebSocketService extends GetxService {
           _handleIceCandidateSent(data['data']);
         } else if (event == AppUrls.pusherPing) {
            _send(AppUrls.pusherPong);
-        } else if (event == 'LiveSessionStarted' || event == 'App\\Events\\LiveSessionStarted' || event == '.LiveSessionStarted') {
+        } else if (event == AppUrls.eventLiveSessionStarted || event == 'App\\Events\\${AppUrls.eventLiveSessionStarted}' || event == '.${AppUrls.eventLiveSessionStarted}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleLiveSessionStarted(data['data']);
-        } else if (event == 'ViewerCountUpdated' || event == 'App\\Events\\ViewerCountUpdated' || event == '.ViewerCountUpdated') {
+        } else if (event == AppUrls.eventViewerCountUpdated || event == 'App\\Events\\${AppUrls.eventViewerCountUpdated}' || event == '.${AppUrls.eventViewerCountUpdated}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleViewerCountUpdated(data['data']);
-        } else if (event == 'NewLiveComment' || event == 'App\\Events\\NewLiveComment' || event == '.NewLiveComment') {
+        } else if (event == AppUrls.eventNewLiveComment || event == 'App\\Events\\${AppUrls.eventNewLiveComment}' || event == '.${AppUrls.eventNewLiveComment}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleNewLiveComment(data['data']);
-        } else if (event == 'SuperChatReceived' || event == 'App\\Events\\SuperChatReceived' || event == '.SuperChatReceived') {
+        } else if (event == AppUrls.eventSuperChatReceived || event == 'App\\Events\\${AppUrls.eventSuperChatReceived}' || event == '.${AppUrls.eventSuperChatReceived}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleSuperChatReceived(data['data']);
-        } else if (event == AppUrls.eventLiveSessionEnded || event == 'LiveSessionEnded' || event == 'App\\Events\\LiveSessionEnded' || event == '.LiveSessionEnded') {
+        } else if (event == AppUrls.eventLiveSessionEnded || event == 'App\\Events\\${AppUrls.eventLiveSessionEnded}' || event == '.${AppUrls.eventLiveSessionEnded}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleLiveSessionEnded(data['data']);
-        } else if (event == 'AstrologerBroadcastStarted' || event == 'App\\Events\\AstrologerBroadcastStarted' || event == '.AstrologerBroadcastStarted') {
+        } else if (event == AppUrls.eventAstrologerBroadcastStarted || event == 'App\\Events\\${AppUrls.eventAstrologerBroadcastStarted}' || event == '.${AppUrls.eventAstrologerBroadcastStarted}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleAstrologerBroadcastStarted(data['data']);
-        } else if (event == AppUrls.eventAstrologerMediaStatusChanged || event == 'AstrologerMediaStatusChanged' || event == 'App\\Events\\AstrologerMediaStatusChanged' || event == '.AstrologerMediaStatusChanged') {
+        } else if (event == AppUrls.eventAstrologerMediaStatusChanged || event == 'App\\Events\\${AppUrls.eventAstrologerMediaStatusChanged}' || event == '.${AppUrls.eventAstrologerMediaStatusChanged}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleAstrologerMediaStatusChanged(data['data']);
-        } else if (event == AppUrls.eventUserJoinedLiveSession || event == 'App\\Events\\UserJoinedLiveSession' || event == '.UserJoinedLiveSession') {
+        } else if (event == AppUrls.eventUserJoinedLiveSession || event == 'App\\Events\\${AppUrls.eventUserJoinedLiveSession}' || event == '.${AppUrls.eventUserJoinedLiveSession}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleUserJoinedLiveSession(data['data']);
-        } else if (event == AppUrls.eventUserLeftLiveSession || event == 'App\\Events\\UserLeftLiveSession' || event == '.UserLeftLiveSession') {
+        } else if (event == AppUrls.eventUserLeftLiveSession || event == 'App\\Events\\${AppUrls.eventUserLeftLiveSession}' || event == '.${AppUrls.eventUserLeftLiveSession}') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleUserLeftLiveSession(data['data']);
         }
       } catch (e) {
-        debugPrint('WebSocketService: Error parsing message -> $e');
+        Logger.e('WebSocketService: Error parsing message -> $e');
       }
     }
   }
