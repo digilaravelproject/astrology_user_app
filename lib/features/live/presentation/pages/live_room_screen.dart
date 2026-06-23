@@ -435,13 +435,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   
                   if (!isCameraOn)
                     Positioned.fill(
-                      child: Container(
-                        color: Colors.black.withOpacity(0.8),
-                        child: Center(
-                          child: Obx(() {
-                            final session = _liveController.currentSession.value;
-                            final isEnded = session?.status == 'completed';
-                            return Column(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          color: Colors.black.withOpacity(0.4),
+                          child: Center(
+                            child: Obx(() {
+                              final session = _liveController.currentSession.value;
+                              final isEnded = session?.status == 'completed';
+                              return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.videocam_off, color: Colors.white70, size: 64),
