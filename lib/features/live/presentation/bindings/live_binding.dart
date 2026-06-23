@@ -12,37 +12,47 @@ class LiveBinding extends Bindings {
     // Data Source
     Get.lazyPut<LiveRemoteDataSource>(
       () => LiveRemoteDataSource(Get.find<ApiClient>()),
+      fenix: true,
     );
 
     // Repository
     Get.lazyPut<LiveRepository>(
       () => LiveRepositoryImpl(Get.find<LiveRemoteDataSource>()),
+      fenix: true,
     );
 
     // Use Cases
     Get.lazyPut<GetActiveLiveSessionsUseCase>(
       () => GetActiveLiveSessionsUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<GetLiveSessionDetailUseCase>(
       () => GetLiveSessionDetailUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<JoinLiveSessionUseCase>(
       () => JoinLiveSessionUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<LeaveLiveSessionUseCase>(
       () => LeaveLiveSessionUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<SendLiveCommentUseCase>(
       () => SendLiveCommentUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<SendSuperChatUseCase>(
       () => SendSuperChatUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<GetLiveCommentsUseCase>(
       () => GetLiveCommentsUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
     Get.lazyPut<WatchLiveSessionUseCase>(
       () => WatchLiveSessionUseCase(Get.find<LiveRepository>()),
+      fenix: true,
     );
 
     // Controller
@@ -57,6 +67,7 @@ class LiveBinding extends Bindings {
         Get.find<GetLiveCommentsUseCase>(),
         Get.find<WatchLiveSessionUseCase>(),
       ),
+      fenix: true,
     );
   }
 }

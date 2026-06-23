@@ -12,6 +12,7 @@ import '../../matrimony/domain/usecases/search_matrimony_profiles_usecase.dart';
 import '../../matrimony/domain/usecases/block_matrimony_profile_usecase.dart';
 import '../../matrimony/domain/usecases/report_matrimony_profile_usecase.dart';
 import '../../home/controllers/founder_controller.dart';
+import '../../live/presentation/bindings/live_binding.dart';
 import '../../home/domain/repositories/founder_repository.dart';
 import '../../home/domain/services/founder_service.dart';
 import '../../home/domain/usecases/get_founder_words_usecase.dart';
@@ -203,6 +204,9 @@ class DashboardBinding extends Bindings {
       updateKundliUseCase: Get.find<UpdateKundliUseCase>(),
       deleteKundliUseCase: Get.find<DeleteKundliUseCase>(),
     ));
+
+    // Live Session Dependencies
+    LiveBinding().dependencies();
   }
 }
 
