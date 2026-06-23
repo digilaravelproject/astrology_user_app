@@ -202,6 +202,9 @@ class LiveSessionSection extends StatelessWidget {
                 // Golden Pill Button
                 GestureDetector(
                   onTap: () {
+                    if (Get.isRegistered<LiveController>()) {
+                      Get.find<LiveController>().fetchActiveSessions();
+                    }
                     Get.offAll(
                       () => const DashboardScreen(), 
                       arguments: {'index': 4, 'skip_promo': true},
