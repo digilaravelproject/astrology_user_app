@@ -26,6 +26,7 @@ class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   String? _socketId;
+  final Set<String> _subscribedChannels = {};
   int? _userId;
   String? _token;
   
@@ -105,6 +106,7 @@ class WebSocketService extends GetxService {
           Logger.d('|⚠️ Connection closed (onDone)');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _isConnected = false;
+          _socketId = null;
           _reconnect();
         },
         onError: (error) {
@@ -113,6 +115,7 @@ class WebSocketService extends GetxService {
           Logger.e('|⚠️ Exception: $error');
           Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _isConnected = false;
+          _socketId = null;
           _reconnect();
         },
       );
@@ -280,8 +283,9 @@ class WebSocketService extends GetxService {
   }
 
   Future<void> subscribeToChannel(String channelName) async {
+    _subscribedChannels.add(channelName);
     if (!_isConnected || _socketId == null) {
-      Logger.d('Cannot subscribe to channel $channelName, not connected yet.');
+      Logger.d('Cannot subscribe to channel $channelName, not connected yet. Queued for later.');
       return;
     }
     try {
@@ -300,14 +304,19 @@ class WebSocketService extends GetxService {
       );
 
       final authString = response.body?['auth']?.toString();
+      final channelData = response.body?['channel_data'];
       if (authString != null && authString.isNotEmpty) {
         Logger.d('Subscribing to dynamic channel: $channelName');
+        final Map<String, dynamic> subscribeData = {
+          "channel": channelName,
+          "auth": authString
+        };
+        if (channelName.startsWith('presence-') && channelData != null) {
+          subscribeData["channel_data"] = channelData is String ? channelData : jsonEncode(channelData);
+        }
         _send(jsonEncode({
           "event": AppUrls.pusherSubscribe,
-          "data": {
-            "channel": channelName,
-            "auth": authString
-          }
+          "data": subscribeData
         }));
       }
     } catch (e) {
@@ -316,6 +325,7 @@ class WebSocketService extends GetxService {
   }
 
   void unsubscribeFromChannel(String channelName) {
+    _subscribedChannels.remove(channelName);
     if (_isConnected) {
       Logger.d('Unsubscribing from channel: $channelName');
       _send(jsonEncode({
@@ -617,10 +627,11 @@ class WebSocketService extends GetxService {
   Future<void> _authenticateAndSubscribe() async {
     if (_socketId == null || _userId == null) return;
 
-    final List<String> channelsToSubscribe = [
+    final Set<String> channelsToSubscribe = {
       AppUrls.privateUserChannel(_userId!),
       AppUrls.presenceRoomChannel,
-    ];
+      ..._subscribedChannels,
+    };
 
     for (String channelName in channelsToSubscribe) {
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -647,6 +658,7 @@ class WebSocketService extends GetxService {
         // broadcasting/auth returns {"auth": "..."} not standard format
         // so check body['auth'] directly, not response.isSuccess
         final authString = response.body?['auth']?.toString();
+        final channelData = response.body?['channel_data'];
         
         if (authString != null && authString.isNotEmpty) {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -654,12 +666,17 @@ class WebSocketService extends GetxService {
           Logger.d('|🔑 Channel: $channelName');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
+          final Map<String, dynamic> subscribeData = {
+            "channel": channelName,
+            "auth": authString
+          };
+          if (channelName.startsWith('presence-') && channelData != null) {
+            subscribeData["channel_data"] = channelData is String ? channelData : jsonEncode(channelData);
+          }
+          
           _send(jsonEncode({
             "event": AppUrls.pusherSubscribe,
-            "data": {
-              "channel": channelName,
-              "auth": authString
-            }
+            "data": subscribeData
           }));
         } else {
           Logger.e('|❌ WEBSOCKET AUTH FAILED for $channelName, body=${response.body}');
@@ -699,6 +716,8 @@ class WebSocketService extends GetxService {
     Logger.d('|⚠️ Client manually closing connection.');
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     _isConnected = false;
+    _socketId = null;
+    _subscribedChannels.clear();
     _channel?.sink.close();
     _channel = null;
   }
