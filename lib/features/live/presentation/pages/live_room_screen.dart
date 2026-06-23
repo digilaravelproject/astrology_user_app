@@ -463,29 +463,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
 
-                  // Right side vertical action buttons (Share, Report, Speaker Mute)
-                  Positioned(
-                    right: 16,
-                    bottom: 210,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Obx(() {
-                          final session = _liveController.currentSession.value;
-                          final isEnded = session?.status == 'completed';
-                          if (isEnded) return const SizedBox.shrink();
-                          
-                          final isAstrologerMuted = !_liveController.isAudioOn.value;
-                          final isMuted = _isSpeakerMuted || isAstrologerMuted;
-                          return _buildRightActionButton(
-                            icon: isMuted ? Icons.volume_off : Icons.volume_up,
-                            onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
-                            isActive: !isMuted,
-                          );
-                        }),
-                      ],
-                    ),
-                  ),
+
                 ],
               );
             }),
@@ -566,7 +544,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                           ),
                         ),
-
+                        Obx(() {
+                          final session = _liveController.currentSession.value;
+                          final isEnded = session?.status == 'completed';
+                          if (isEnded) return const SizedBox.shrink();
+                          
+                          final isAstrologerMuted = !_liveController.isAudioOn.value;
+                          final isMuted = _isSpeakerMuted || isAstrologerMuted;
+                          return Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            child: _buildRightActionButton(
+                              icon: isMuted ? Icons.volume_off : Icons.volume_up,
+                              onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
+                              isActive: !isMuted,
+                            ),
+                          );
+                        }),
                         _buildViewerCount(),
                       ],
                     ),
