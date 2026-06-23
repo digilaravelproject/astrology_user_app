@@ -15,6 +15,7 @@ import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import '../../../../core/services/network/websocket_service.dart';
 import '../../../../core/constants/app_urls.dart';
+import '../../../astrologers/bindings/astrologers_binding.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final int sessionId;
@@ -34,7 +35,7 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   late LiveController _liveController;
-  final AstrologerController _giftController = Get.find<AstrologerController>();
+  late final AstrologerController _giftController;
   
   final List<Widget> _reactions = [];
   final TextEditingController _commentController = TextEditingController();
@@ -75,6 +76,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   void initState() {
     super.initState();
     _liveController = Get.find<LiveController>();
+    if (!Get.isRegistered<AstrologerController>()) {
+      AstrologersBinding().dependencies();
+    }
+    _giftController = Get.find<AstrologerController>();
+    _commentController.addListener(() {
+      setState(() {});
+    });
     
     // Fetch gifts listing
     _giftController.fetchGifts();
@@ -505,38 +513,35 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: Row(
                       children: [
                         _buildCircleActionIcon(Icons.arrow_back, () => Navigator.pop(context)),
-                        const SizedBox(width: 12),
-                        Expanded(
+                        const SizedBox(width: 8),
+                        Flexible(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                             decoration: BoxDecoration(
                               color: Colors.black.withOpacity(0.3),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 _buildAstrologerAvatar(),
                                 const SizedBox(width: 8),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Flexible(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Flexible(
-                                            child: Obx(() => AppText(
-                                              _liveController.currentSession.value?.astrologer?.name ?? widget.astrologerName,
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w700,
-                                              overflow: TextOverflow.ellipsis,
-                                            )),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          const Icon(Icons.verified, color: Colors.blue, size: 14),
-                                        ],
+                                      Flexible(
+                                        child: Obx(() => AppText(
+                                          _liveController.currentSession.value?.astrologer?.name ?? widget.astrologerName,
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          overflow: TextOverflow.ellipsis,
+                                        )),
                                       ),
+                                      const SizedBox(width: 4),
+                                      const Icon(Icons.verified, color: Colors.blue, size: 14),
+                                      const SizedBox(width: 4),
                                     ],
                                   ),
                                 ),
@@ -544,6 +549,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                           ),
                         ),
+                        const Spacer(),
                         Obx(() {
                           final session = _liveController.currentSession.value;
                           final isEnded = session?.status == 'completed';
@@ -679,7 +685,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.black.withOpacity(0.3),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: Colors.white, size: 20),
@@ -735,7 +741,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             final count = _liveController.currentSession.value?.viewerCount ?? 0;
             return Text(
               '$count',
-              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
             );
           }),
         ],
