@@ -44,6 +44,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Worker? _sessionWorker;
   Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
+  bool _isSendingComment = false;
 
   void _toggleSpeakerMute() async {
     final room = _room;
@@ -73,19 +74,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     super.initState();
     _liveController = Get.find<LiveController>();
     
-    // Join the session
-    _liveController.joinSession(widget.sessionId);
-    
     // Fetch gifts listing
     _giftController.fetchGifts();
 
-    // Subscribe to dynamic websocket channel
+    // Subscribe to dynamic websocket channel FIRST (must complete before join API)
     try {
       final ws = Get.find<WebSocketService>();
       ws.subscribeToChannel('presence-live-session.${widget.sessionId}');
     } catch (e) {
       debugPrint('[LIVE] Error subscribing to websocket channel: $e');
     }
+
+    // Join the session AFTER websocket subscription
+    _liveController.joinSession(widget.sessionId);
 
     // Listen to session changes to connect to LiveKit
     _sessionWorker = ever(_liveController.currentSession, (session) {
@@ -802,6 +803,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             child: TextField(
               controller: _commentController,
               onSubmitted: (val) {
+                if (_isSendingComment) return;
                 _liveController.sendComment(widget.sessionId, val);
                 _commentController.clear();
               },
@@ -820,6 +822,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
           GestureDetector(
             onTap: () {
+              if (_isSendingComment) return;
               _liveController.sendComment(widget.sessionId, _commentController.text);
               _commentController.clear();
             },
