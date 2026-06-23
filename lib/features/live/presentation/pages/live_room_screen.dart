@@ -727,51 +727,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           itemBuilder: (context, index) {
             final comment = reversedComments[index];
             
-            // System Notification (Join/Leave)
-            if (comment.isSystem) {
-              final avatarUrl = (comment.userAvatar != null && comment.userAvatar!.isNotEmpty)
-                  ? (comment.userAvatar!.startsWith('http')
-                      ? comment.userAvatar!
-                      : '${AppUrls.baseImageUrl}${comment.userAvatar}')
-                  : null;
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    ClipOval(
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        color: Colors.grey.shade800,
-                        child: avatarUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: avatarUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => const Icon(Icons.person, size: 10, color: Colors.white),
-                                errorWidget: (context, url, error) => const Icon(Icons.person, size: 10, color: Colors.white),
-                              )
-                            : const Icon(Icons.person, size: 10, color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        comment.message,
-                        style: const TextStyle(color: Colors.grey, fontSize: 11, fontStyle: FontStyle.italic),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            // Normal Comment
             final avatarUrl = (comment.userAvatar != null && comment.userAvatar!.isNotEmpty)
                 ? (comment.userAvatar!.startsWith('http')
                     ? comment.userAvatar!
                     : '${AppUrls.baseImageUrl}${comment.userAvatar}')
                 : null;
-            
+                
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
@@ -794,22 +755,27 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          comment.userName,
-                          color: Colors.white.withOpacity(0.6),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        AppText(
-                          comment.message,
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ],
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: comment.isSystem ? '${comment.userName} ' : '${comment.userName}: ',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
+                          TextSpan(
+                            text: comment.message,
+                            style: TextStyle(
+                              color: comment.isSystem ? Colors.white70 : Colors.white,
+                              fontSize: 13,
+                              fontStyle: comment.isSystem ? FontStyle.italic : FontStyle.normal,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
