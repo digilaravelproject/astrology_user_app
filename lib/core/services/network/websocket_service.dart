@@ -397,6 +397,12 @@ class WebSocketService extends GetxService {
           ? DateTime.tryParse(eventData['created_at']) ?? DateTime.now() 
           : DateTime.now();
 
+      // Backend uses toOthers() - sender doesn't receive this event
+      // But add safety check in case
+      if (userId == currentUserId) {
+        return;
+      }
+
       final newComment = LiveCommentModel(
         id: id,
         userId: userId,
@@ -408,7 +414,7 @@ class WebSocketService extends GetxService {
 
       if (Get.isRegistered<LiveController>()) {
         final controller = Get.find<LiveController>();
-        final exists = controller.comments.any((c) => c.message == message && c.userName == userName);
+        final exists = controller.comments.any((c) => c.id == id);
         if (!exists) {
           controller.comments.add(newComment);
         }

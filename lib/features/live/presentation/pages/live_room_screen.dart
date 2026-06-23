@@ -42,7 +42,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   VideoTrack? _remoteVideoTrack;
   bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
+  Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
+  bool _isSendingComment = false;
 
   void _toggleSpeakerMute() async {
     final room = _room;
@@ -72,19 +74,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     super.initState();
     _liveController = Get.find<LiveController>();
     
-    // Join the session
-    _liveController.joinSession(widget.sessionId);
-    
     // Fetch gifts listing
     _giftController.fetchGifts();
 
-    // Subscribe to dynamic websocket channel
+    // Subscribe to dynamic websocket channel FIRST (must complete before join API)
     try {
       final ws = Get.find<WebSocketService>();
       ws.subscribeToChannel('presence-live-session.${widget.sessionId}');
     } catch (e) {
       debugPrint('[LIVE] Error subscribing to websocket channel: $e');
     }
+
+    // Join the session AFTER websocket subscription
+    _liveController.joinSession(widget.sessionId);
 
     // Listen to session changes to connect to LiveKit
     _sessionWorker = ever(_liveController.currentSession, (session) {
@@ -93,6 +95,24 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           _connectLiveKit(session.id);
         } else if (!session.isBroadcasting && _isLiveKitConnected) {
           _disconnectLiveKit();
+        }
+      }
+    });
+
+    _mediaWorker = ever(_liveController.isAudioOn, (isAudioOn) async {
+      final room = _room;
+      if (room == null) return;
+      for (var participant in room.remoteParticipants.values) {
+        for (var publication in participant.audioTrackPublications) {
+          try {
+            if (!isAudioOn || _isSpeakerMuted) {
+              await publication.unsubscribe();
+            } else {
+              await publication.subscribe();
+            }
+          } catch (e) {
+            debugPrint('[LIVE] Error auto-toggling audio track: $e');
+          }
         }
       }
     });
@@ -137,7 +157,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       // Find already subscribed tracks and apply speaker mute status
       for (var participant in room.remoteParticipants.values) {
         for (var trackPublication in participant.audioTrackPublications) {
-          if (_isSpeakerMuted) {
+          if (_isSpeakerMuted || !_liveController.isAudioOn.value) {
             trackPublication.unsubscribe();
           }
         }
@@ -160,7 +180,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             _remoteVideoTrack = event.track as VideoTrack?;
           });
         } else if (event.track is AudioTrack) {
-          if (_isSpeakerMuted) {
+          if (_isSpeakerMuted || !_liveController.isAudioOn.value) {
             event.publication.unsubscribe();
           }
         }
@@ -199,6 +219,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void dispose() {
     _sessionWorker?.dispose();
+    _mediaWorker?.dispose();
     _disconnectLiveKit();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
@@ -452,11 +473,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        _buildRightActionButton(
-                          icon: _isSpeakerMuted ? Icons.volume_off : Icons.volume_up,
-                          onTap: _toggleSpeakerMute,
-                          isActive: !_isSpeakerMuted,
-                        ),
+                        Obx(() {
+                          final isAstrologerMuted = !_liveController.isAudioOn.value;
+                          final isMuted = _isSpeakerMuted || isAstrologerMuted;
+                          return _buildRightActionButton(
+                            icon: isMuted ? Icons.volume_off : Icons.volume_up,
+                            onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
+                            isActive: !isMuted,
+                          );
+                        }),
                       ],
                     ),
                   ),
@@ -534,22 +559,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Obx(() {
-                          final isAudioOn = _liveController.isAudioOn.value;
-                          if (!isAudioOn) {
-                            return Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.mic_off, color: Colors.white, size: 16),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        }),
+
                         _buildViewerCount(),
                       ],
                     ),
@@ -793,6 +803,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             child: TextField(
               controller: _commentController,
               onSubmitted: (val) {
+                if (_isSendingComment) return;
                 _liveController.sendComment(widget.sessionId, val);
                 _commentController.clear();
               },
@@ -811,6 +822,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
           GestureDetector(
             onTap: () {
+              if (_isSendingComment) return;
               _liveController.sendComment(widget.sessionId, _commentController.text);
               _commentController.clear();
             },
@@ -840,7 +852,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   Widget _buildRightActionButton({
     required IconData icon,
-    required VoidCallback onTap,
+    VoidCallback? onTap,
     bool isActive = true,
   }) {
     return GestureDetector(
