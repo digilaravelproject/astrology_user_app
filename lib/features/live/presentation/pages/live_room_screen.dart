@@ -550,13 +550,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           if (isEnded) return const SizedBox.shrink();
                           
                           final isAstrologerMuted = !_liveController.isAudioOn.value;
-                          final isMuted = _isSpeakerMuted || isAstrologerMuted;
+                          final isUserMuted = _isSpeakerMuted;
+                          final isActuallyMuted = isAstrologerMuted || isUserMuted;
+                          
                           return Container(
                             margin: const EdgeInsets.only(right: 8),
                             child: _buildRightActionButton(
-                              icon: isMuted ? Icons.volume_off : Icons.volume_up,
+                              icon: isActuallyMuted ? Icons.volume_off : Icons.volume_up,
                               onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
-                              isActive: !isMuted,
+                              isActive: !isAstrologerMuted,
+                              activeColor: isActuallyMuted ? Colors.white : Colors.green,
                             ),
                           );
                         }),
@@ -892,6 +895,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     required IconData icon,
     VoidCallback? onTap,
     bool isActive = true,
+    Color activeColor = Colors.white,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -905,7 +909,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         ),
         child: Icon(
           icon,
-          color: isActive ? Colors.white : Colors.grey,
+          color: isActive ? activeColor : Colors.grey,
           size: 20,
         ),
       ),
