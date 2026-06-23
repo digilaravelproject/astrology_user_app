@@ -436,18 +436,33 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     Positioned.fill(
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
-                        child: const Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.videocam_off, color: Colors.white70, size: 64),
-                              SizedBox(height: 12),
-                              Text(
-                                "Camera is Stopped",
-                                style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                        child: Center(
+                          child: Obx(() {
+                            final session = _liveController.currentSession.value;
+                            final isEnded = session?.status == 'completed';
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.videocam_off, color: Colors.white70, size: 64),
+                                const SizedBox(height: 12),
+                                Text(
+                                  isEnded ? "Live Session Ended" : "Camera is Stopped",
+                                  style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                if (isEnded) ...[
+                                  const SizedBox(height: 24),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white24,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text("Go Back"),
+                                  ),
+                                ]
+                              ],
+                            );
+                          }),
                         ),
                       ),
                     ),
