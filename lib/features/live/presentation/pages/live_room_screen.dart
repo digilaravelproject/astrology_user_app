@@ -44,7 +44,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Worker? _sessionWorker;
   Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
-  bool _isSendingComment = false;
+
 
   void _toggleSpeakerMute() async {
     final room = _room;
@@ -803,7 +803,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             child: TextField(
               controller: _commentController,
               onSubmitted: (val) {
-                if (_isSendingComment) return;
+                if (_liveController.isSendingComment.value) return;
                 _liveController.sendComment(widget.sessionId, val);
                 _commentController.clear();
               },
@@ -822,7 +822,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
           GestureDetector(
             onTap: () {
-              if (_isSendingComment) return;
+              if (_liveController.isSendingComment.value) return;
               _liveController.sendComment(widget.sessionId, _commentController.text);
               _commentController.clear();
             },
