@@ -459,6 +459,7 @@ class WebSocketService extends GetxService {
           userId: eventData['user_id'] is int ? eventData['user_id'] : 0,
           userName: userName,
           userAvatar: eventData['user_avatar'],
+          giftIconUrl: eventData['gift'] != null ? eventData['gift']['icon_url'] : null,
           message: '🎁 $message',
           createdAt: DateTime.now(),
         );

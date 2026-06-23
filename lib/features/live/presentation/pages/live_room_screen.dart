@@ -465,13 +465,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _buildRightActionButton(
-                          icon: Icons.share,
-                          onTap: () {
-                            // Share live stream link/details
-                          },
-                        ),
-                        const SizedBox(height: 12),
-                        _buildRightActionButton(
                           icon: Icons.warning_amber_rounded,
                           onTap: () {
                             // Report session
@@ -614,11 +607,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             GestureDetector(
                               onTap: _showGiftSheet,
                               child: _buildCircleIconButton(Icons.wallet_giftcard_rounded, Colors.white),
-                            ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: _addReaction,
-                              child: _buildCircleIconButton(Icons.favorite, Colors.red, isHeart: true),
                             ),
                           ],
                         ),
@@ -820,6 +808,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               fontStyle: comment.isSystem ? FontStyle.italic : FontStyle.normal,
                             ),
                           ),
+                          if (comment.giftIconUrl != null)
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: CachedNetworkImage(
+                                  imageUrl: comment.giftIconUrl!,
+                                  width: 24,
+                                  height: 24,
+                                  placeholder: (context, url) => const SizedBox(width: 24, height: 24),
+                                  errorWidget: (context, url, error) => const Icon(Icons.card_giftcard, size: 20, color: Colors.orange),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
