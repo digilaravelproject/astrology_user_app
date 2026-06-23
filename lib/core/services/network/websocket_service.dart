@@ -450,7 +450,7 @@ class WebSocketService extends GetxService {
       }
       
       final String userName = eventData['user_name'] ?? 'User';
-      final String message = eventData['message'] ?? '';
+      final String giftTitle = eventData['gift'] != null ? eventData['gift']['title'] ?? 'Gift' : 'Gift';
       
       if (Get.isRegistered<LiveController>()) {
         final controller = Get.find<LiveController>();
@@ -460,7 +460,7 @@ class WebSocketService extends GetxService {
           userName: userName,
           userAvatar: eventData['user_avatar'],
           giftIconUrl: eventData['gift'] != null ? eventData['gift']['icon_url'] : null,
-          message: '🎁 $message',
+          message: 'Sent a $giftTitle',
           createdAt: DateTime.now(),
         );
         controller.comments.add(newComment);
