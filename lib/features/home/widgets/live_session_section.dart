@@ -5,6 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../live/presentation/pages/live_room_screen.dart';
+import 'package:get/get.dart';
+import '../../dashboard/screens/dashboard_screen.dart';
+import '../../live/presentation/controllers/live_controller.dart';
+import '../../../core/constants/app_urls.dart';
 
 class LiveSessionSection extends StatelessWidget {
   const LiveSessionSection({super.key});
@@ -196,16 +200,9 @@ class LiveSessionSection extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Golden Pill Button
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LiveRoomScreen(
-                        sessionId: 1,
-                        astrologerName: "Acharya Prakash",
-                        astrologerImage: "https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg",
-                      ),
-                    ),
-                  ),
+                  onTap: () {
+                    Get.offAll(() => const DashboardScreen(), arguments: {'index': 4});
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                     decoration: BoxDecoration(
@@ -326,15 +323,54 @@ class LiveSessionSection extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildAstroPfp('Acharya Prakash', '1.2k', '?'),
-                    _buildAstroPfp('Guru Aditya', '1.1k', '?'),
-                    _buildAstroPfp('Astrologer Riya', '950', 'star'),
-                    _buildAstroPfp('Astrologer Sanjay', '970', '?'),
-                  ],
-                ),
+                Obx(() {
+                  final liveController = Get.find<LiveController>();
+                  final activeSessions = liveController.activeSessions;
+                  
+                  if (activeSessions.isEmpty) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AppText(
+                          'No astrologers currently live',
+                          fontSize: 12,
+                          color: AppColors.deepPink,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
+                    );
+                  }
+                  
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: activeSessions.take(4).map((session) {
+                      final imageUrl = (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
+                          ? (session.astrologer!.profilePhoto!.startsWith('http')
+                              ? session.astrologer!.profilePhoto!
+                              : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
+                          : 'https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg';
+                      
+                      return _buildAstroPfp(
+                        session.astrologer?.name ?? 'Astrologer', 
+                        '${session.viewerCount}', 
+                        '?', 
+                        imageUrl,
+                        () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => LiveRoomScreen(
+                                sessionId: session.id,
+                                astrologerName: session.astrologer?.name ?? 'Astrologer',
+                                astrologerImage: session.astrologer?.profilePhoto ?? '',
+                              ),
+                            ),
+                          );
+                        }
+                      );
+                    }).toList(),
+                  );
+                }),
 
 
               ],
@@ -345,26 +381,28 @@ class LiveSessionSection extends StatelessWidget {
     );
   }
 
-  Widget _buildAstroPfp(String name, String reviews, String badgeType) {
+  Widget _buildAstroPfp(String name, String viewers, String badgeType, String imageUrl, VoidCallback onTap) {
     return Flexible(
-      child: Column(
-        children: [
-          Stack(
-            alignment: Alignment.bottomCenter,
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 65,
-                height: 65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
-                  image: const DecorationImage(
-                    image: NetworkImage('https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg'),
-                    fit: BoxFit.cover,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
+                    image: DecorationImage(
+                      image: NetworkImage(imageUrl),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
               Positioned(
                 bottom: -8,
                 child:
@@ -414,7 +452,7 @@ class LiveSessionSection extends StatelessWidget {
             children: List.generate(5, (index) => const Icon(Icons.star, color: Color(0xFFFFB300), size: 9)),
           ),
           AppText(
-            '($reviews reviews)',
+            '($viewers watching)',
             fontSize: 8,
             fontWeight: FontWeight.w500,
             color: Colors.grey[700],
