@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -460,6 +461,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         ),
                       ),
                     ),
+                  ),
 
                   // Right side vertical action buttons (Share, Report, Speaker Mute)
                   Positioned(
@@ -468,13 +470,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildRightActionButton(
-                          icon: Icons.warning_amber_rounded,
-                          onTap: () {
-                            // Report session
-                          },
-                        ),
-                        const SizedBox(height: 12),
                         Obx(() {
                           final session = _liveController.currentSession.value;
                           final isEnded = session?.status == 'completed';
