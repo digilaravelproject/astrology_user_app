@@ -25,6 +25,7 @@ import 'package:astro_user/features/live/data/models/live_session_model.dart';
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
   bool _isConnected = false;
+  bool _isConnecting = false;
   String? _socketId;
   final Set<String> _subscribedChannels = {};
   int? _userId;
@@ -62,7 +63,8 @@ class WebSocketService extends GetxService {
 
   /// Connects the websocket if user is logged in
   Future<void> connect() async {
-    if (_isConnected) return;
+    if (_isConnected || _isConnecting) return;
+    _isConnecting = true;
 
     try {
       _token = await TokenManager.getToken();
@@ -105,6 +107,7 @@ class WebSocketService extends GetxService {
           Logger.d('|🔌 WEBSOCKET DISCONNECTED');
           Logger.d('|⚠️ Connection closed (onDone)');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _isConnecting = false;
           _isConnected = false;
           _socketId = null;
           _reconnect();
@@ -114,6 +117,7 @@ class WebSocketService extends GetxService {
           Logger.e('|🔌 WEBSOCKET ERROR');
           Logger.e('|⚠️ Exception: $error');
           Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _isConnecting = false;
           _isConnected = false;
           _socketId = null;
           _reconnect();
@@ -124,6 +128,7 @@ class WebSocketService extends GetxService {
       Logger.e('|🔌 WEBSOCKET EXCEPTION');
       Logger.e('|⚠️ Exception: $e');
       Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      _isConnecting = false;
       _reconnect();
     }
   }
@@ -142,6 +147,7 @@ class WebSocketService extends GetxService {
           Logger.d('|✅ WEBSOCKET ESTABLISHED');
           Logger.d('|🔗 Socket ID: $_socketId');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _isConnecting = false;
           _isConnected = true;
           _authenticateAndSubscribe();
         } else if (event == AppUrls.pusherSubscriptionSucceeded) {
