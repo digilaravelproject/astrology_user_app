@@ -602,13 +602,14 @@ class WebSocketService extends GetxService {
         eventData = Map<String, dynamic>.from(rawData);
       }
       
-      final int sessionId = eventData['id'] is int 
-          ? eventData['id'] 
-          : (int.tryParse(eventData['id']?.toString() ?? '') ?? 0);
+      final int sessionId = eventData['session_id'] is int 
+          ? eventData['session_id'] 
+          : (int.tryParse(eventData['session_id']?.toString() ?? '') ?? 
+            (eventData['id'] is int ? eventData['id'] : (int.tryParse(eventData['id']?.toString() ?? '') ?? 0)));
       
       if (Get.isRegistered<LiveController>()) {
         final controller = Get.find<LiveController>();
-        if (controller.currentSession.value?.id == sessionId) {
+        if (sessionId == 0 || controller.currentSession.value?.id == sessionId) {
           controller.isCameraOn.value = false;
           controller.isAudioOn.value = false;
           controller.currentSession.value = LiveSessionModel(
