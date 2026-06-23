@@ -7,6 +7,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../live/presentation/pages/live_room_screen.dart';
 import 'package:get/get.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
+import '../../dashboard/bindings/dashboard_binding.dart';
 import '../../live/presentation/controllers/live_controller.dart';
 import '../../../core/constants/app_urls.dart';
 
@@ -201,7 +202,11 @@ class LiveSessionSection extends StatelessWidget {
                 // Golden Pill Button
                 GestureDetector(
                   onTap: () {
-                    Get.offAll(() => const DashboardScreen(), arguments: {'index': 4});
+                    Get.offAll(
+                      () => const DashboardScreen(), 
+                      arguments: {'index': 4, 'skip_promo': true},
+                      binding: DashboardBinding(),
+                    );
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),

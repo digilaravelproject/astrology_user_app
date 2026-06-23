@@ -66,9 +66,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (argIndex != null && argIndex is int) {
       _selectedIndex = argIndex;
     }
+    
+    final bool skipPromo = Get.arguments?['skip_promo'] ?? false;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showPromotionalSheet();
+      if (!skipPromo) {
+        _showPromotionalSheet();
+      }
       _checkOverlayPermission();
       _checkCurrentActiveSession();
       Get.find<CallController>().checkCurrentActiveCallSession();
