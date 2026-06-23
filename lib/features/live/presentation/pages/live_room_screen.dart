@@ -917,7 +917,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         ),
         child: Icon(
           icon,
-          color: isActive ? Colors.white : Colors.redAccent,
+          color: isActive ? Colors.white : Colors.grey,
           size: 20,
         ),
       ),
