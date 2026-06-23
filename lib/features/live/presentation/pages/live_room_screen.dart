@@ -443,18 +443,20 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             child: Obx(() {
                               final session = _liveController.currentSession.value;
                               final isEnded = session?.status == 'completed';
+                              if (isEnded) return const SizedBox.shrink();
+                              
                               return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.videocam_off, color: Colors.white70, size: 64),
-                                const SizedBox(height: 12),
-                                Text(
-                                  "Camera is Stopped",
-                                  style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            );
-                          }),
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.videocam_off, color: Colors.white70, size: 64),
+                                  const SizedBox(height: 12),
+                                  const Text(
+                                    "Camera is Stopped",
+                                    style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              );
+                            }),
                         ),
                       ),
                     ),
