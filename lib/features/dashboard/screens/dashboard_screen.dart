@@ -21,6 +21,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import '../../live/presentation/controllers/live_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -52,6 +53,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
   void _onItemTapped(int index) {
+    if (index == 4) {
+      if (Get.isRegistered<LiveController>()) {
+        Get.find<LiveController>().fetchActiveSessions();
+      }
+    }
     setState(() {
       _selectedIndex = index;
     });
