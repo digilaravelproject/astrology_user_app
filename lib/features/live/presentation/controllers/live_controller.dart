@@ -225,11 +225,8 @@ class LiveController extends GetxController {
 
   void _startCommentsPolling(int sessionId) {
     _stopCommentsPolling();
-    _commentsPollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      fetchComments(sessionId);
-      // Optional: Refresh session details for viewer count
-      fetchSessionDetail(sessionId);
-    });
+    fetchComments(sessionId);
+    fetchSessionDetail(sessionId);
   }
 
   void _stopCommentsPolling() {

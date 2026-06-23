@@ -447,20 +447,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 Icon(Icons.videocam_off, color: Colors.white70, size: 64),
                                 const SizedBox(height: 12),
                                 Text(
-                                  isEnded ? "Live Session Ended" : "Camera is Stopped",
+                                  "Camera is Stopped",
                                   style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
-                                if (isEnded) ...[
-                                  const SizedBox(height: 24),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white24,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("Go Back"),
-                                  ),
-                                ]
                               ],
                             );
                           }),
@@ -490,6 +479,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         ),
                         const SizedBox(height: 12),
                         Obx(() {
+                          final session = _liveController.currentSession.value;
+                          final isEnded = session?.status == 'completed';
+                          if (isEnded) return const SizedBox.shrink();
+                          
                           final isAstrologerMuted = !_liveController.isAudioOn.value;
                           final isMuted = _isSpeakerMuted || isAstrologerMuted;
                           return _buildRightActionButton(
@@ -507,21 +500,27 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
           
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.4),
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
-                  stops: const [0.0, 0.2, 0.7, 1.0],
+            child: Obx(() {
+              final session = _liveController.currentSession.value;
+              final isEnded = session?.status == 'completed';
+              if (isEnded) return const SizedBox.shrink();
+              
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.4),
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
+                    stops: const [0.0, 0.2, 0.7, 1.0],
+                  ),
                 ),
-              ),
-            ),
+              );
+            }),
           ),
 
           Scaffold(
@@ -585,43 +584,49 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                 const Spacer(),
 
                 // Comments feed & comment bar
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Scrollable real-time comments list
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(context).size.height * 0.25,
+                Obx(() {
+                  final session = _liveController.currentSession.value;
+                  final isEnded = session?.status == 'completed';
+                  if (isEnded) return const SizedBox.shrink();
+                  
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Scrollable real-time comments list
+                        ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxHeight: MediaQuery.of(context).size.height * 0.25,
+                          ),
+                          child: _buildChatList(),
                         ),
-                        child: _buildChatList(),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Input controls
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildCommentInput(),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _showGiftSheet,
-                            child: _buildCircleIconButton(Icons.wallet_giftcard_rounded, Colors.white),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: _addReaction,
-                            child: _buildCircleIconButton(Icons.favorite, Colors.red, isHeart: true),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-                  ),
-                ),
+                        const SizedBox(height: 12),
+                        
+                        // Input controls
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildCommentInput(),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _showGiftSheet,
+                              child: _buildCircleIconButton(Icons.wallet_giftcard_rounded, Colors.white),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: _addReaction,
+                              child: _buildCircleIconButton(Icons.favorite, Colors.red, isHeart: true),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  );
+                }),
               ],
             ),
           ),
@@ -630,14 +635,55 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           Positioned(
             right: 20,
             bottom: 80,
-            child: SizedBox(
-              width: 50,
-              height: 300,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: _reactions,
-              ),
-            ),
+            child: Obx(() {
+              final session = _liveController.currentSession.value;
+              final isEnded = session?.status == 'completed';
+              if (isEnded) return const SizedBox.shrink();
+              
+              return SizedBox(
+                width: 50,
+                height: 300,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: _reactions,
+                ),
+              );
+            }),
+          ),
+          
+          // Live Session Ended Overlay
+          Positioned.fill(
+            child: Obx(() {
+              final session = _liveController.currentSession.value;
+              final isEnded = session?.status == 'completed';
+              if (!isEnded) return const SizedBox.shrink();
+              
+              return Container(
+                color: Colors.black.withOpacity(0.8),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.videocam_off, color: Colors.white70, size: 64),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "Live Session Ended",
+                        style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white24,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Go Back"),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
           ),
         ],
       ),
