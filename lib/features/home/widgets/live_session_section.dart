@@ -35,7 +35,7 @@ class LiveSessionSection extends StatelessWidget {
           const SizedBox(height: 24),
           
           // 3. Astrologer High-Fidelity Card (Nebula/Moon)
-          _buildAstrologerNebulaCard(),
+          _buildAstrologerNebulaCard(context),
           
           const SizedBox(height: 20),
           
@@ -271,7 +271,7 @@ class LiveSessionSection extends StatelessWidget {
     );
   }
 
-  Widget _buildAstrologerNebulaCard() {
+  Widget _buildAstrologerNebulaCard(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -458,6 +458,7 @@ class LiveSessionSection extends StatelessWidget {
             color: Colors.grey[700],
           ),
         ],
+      ),
       ),
     );
   }
