@@ -163,10 +163,7 @@ class LiveController extends GetxController {
         }
         final newComments = data.map((json) => LiveCommentModel.fromJson(json)).toList();
         
-        // Update comments if count changed or check uniqueness
-        if (newComments.length != comments.length) {
-          comments.value = newComments;
-        }
+        comments.value = newComments;
       }
     } catch (e) {
       print('[LIVE] Error fetching comments: $e');
