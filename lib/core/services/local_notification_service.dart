@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -22,7 +23,13 @@ class LocalNotificationService {
         // Tap handler (navigates back or restores app state)
         if (response.payload != null) {
           if (response.payload!.startsWith('call_')) {
-            Get.to(() => const CallScreen());
+            bool isVisible = false;
+            if (Get.isRegistered<CallController>()) {
+              isVisible = Get.find<CallController>().isCallScreenVisible;
+            }
+            if (!isVisible) {
+              Get.to(() => const CallScreen());
+            }
           } else if (FloatingChatBubble.onTapCallback != null) {
             FloatingChatBubble.onTapCallback?.call();
           }

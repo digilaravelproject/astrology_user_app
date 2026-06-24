@@ -272,7 +272,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       CustomSnackbar.showError('Call dismissed: $reason');
     }
     cleanUp();
-    Get.back(); // Close CallScreen
+    if (isCallScreenVisible) {
+      Get.back(); // Close CallScreen safely
+    }
   }
 
   void _handleCallEnded(Map<String, dynamic> data) {
@@ -294,7 +296,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
     
     cleanUp();
-    Get.back(); // Close CallScreen
+    if (isCallScreenVisible) {
+      Get.back(); // Close CallScreen safely
+    }
     
     Future.delayed(const Duration(milliseconds: 300), () {
       CallSummaryDialog.show(

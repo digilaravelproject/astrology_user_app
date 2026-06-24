@@ -169,7 +169,11 @@ class _CallScreenState extends State<CallScreen> {
                         ),
 
                         _buildEndCallButton(onPressed: () {
-                          controller.endCall();
+                          if (controller.status.value == 'ongoing') {
+                            controller.endCall();
+                          } else {
+                            controller.cancelCall();
+                          }
                           Get.back();
                         }),
 
