@@ -9,6 +9,7 @@ import 'translations/translations.dart';
 
 import 'core/services/local_notification_service.dart';
 import 'core/services/keep_alive_service.dart';
+import 'core/services/foreground_task_service.dart';
 
 Future<void> initApp() async {
   // Set environment configuration
@@ -26,6 +27,9 @@ Future<void> initApp() async {
 
   // Initialize keep-alive foreground service
   await initializeKeepAliveService();
+
+  // Initialize call foreground task service
+  await ForegroundTaskService.init();
 
   // Register controllers
   // Get.lazyPut(() => ThemeController());
