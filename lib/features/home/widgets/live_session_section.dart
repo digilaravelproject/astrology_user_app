@@ -16,35 +16,51 @@ class LiveSessionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFFF8F9), // Light pinkish background like the image
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 1. Header Banner
-          _buildHighFidelityHeader(),
-          
-          const SizedBox(height: 24),
-          
-          // 2. Main CTA Card (Red with Gold Button)
-          _buildMainCtaCard(context),
-          
-          const SizedBox(height: 24),
-          
-          // 3. Astrologer High-Fidelity Card (Nebula/Moon)
-          _buildAstrologerNebulaCard(context),
-          
-          const SizedBox(height: 20),
-          
-          // 4. Footer Benefits
-          _buildFooterBenefits(),
-        ],
-      ),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<LiveController>()) {
+        Get.find<LiveController>().fetchActiveSessions();
+      }
+    });
+
+    return Obx(() {
+      if (!Get.isRegistered<LiveController>()) {
+        return const SizedBox.shrink();
+      }
+      final liveController = Get.find<LiveController>();
+      if (liveController.activeSessions.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFF8F9), // Light pinkish background like the image
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. Header Banner
+            _buildHighFidelityHeader(),
+            
+            const SizedBox(height: 24),
+            
+            // 2. Main CTA Card (Red with Gold Button)
+            _buildMainCtaCard(context),
+            
+            const SizedBox(height: 24),
+            
+            // 3. Astrologer High-Fidelity Card (Nebula/Moon)
+            _buildAstrologerNebulaCard(context),
+            
+            const SizedBox(height: 20),
+            
+            // 4. Footer Benefits
+            _buildFooterBenefits(),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildHighFidelityHeader() {

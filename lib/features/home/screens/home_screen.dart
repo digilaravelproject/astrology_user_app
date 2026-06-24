@@ -31,6 +31,7 @@ import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../profile/controllers/profile_controller.dart';
 import '../../profile/bindings/profile_binding.dart';
 import '../widgets/astrologer_filter_bottom_sheet.dart';
+import '../../live/presentation/controllers/live_controller.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -54,6 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.isRegistered<ProfileController>()) {
         Get.find<ProfileController>().refreshProfile();
+      }
+      if (Get.isRegistered<LiveController>()) {
+        Get.find<LiveController>().fetchActiveSessions();
       }
     });
   }
@@ -196,17 +200,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
           SliverToBoxAdapter(
-            child: Container(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 35),
-                    const LiveSessionSection(),
-                    //const SizedBox(height: 35),
-                    // const RemedyServicesSection(),
-                     const SizedBox(height: 130),
-                  ],
-                )
-            ),
+            child: Obx(() {
+              final liveController = Get.isRegistered<LiveController>() ? Get.find<LiveController>() : null;
+              final hasActiveSessions = liveController != null && liveController.activeSessions.isNotEmpty;
+              return Column(
+                children: [
+                  if (hasActiveSessions) const SizedBox(height: 35),
+                  const LiveSessionSection(),
+                  const SizedBox(height: 130),
+                ],
+              );
+            }),
           ),
           
           // // Remaining content
