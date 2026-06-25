@@ -9,11 +9,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../astrologers/controllers/astrologer_controller.dart';
 import '../../../astrologers/domain/models/gift_model.dart' as model;
 import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import '../../../../core/services/network/websocket_service.dart';
+import '../../../../core/services/network/api_client.dart';
 import '../../../../core/constants/app_urls.dart';
 import '../../../astrologers/bindings/astrologers_binding.dart';
 
@@ -161,12 +163,51 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       
       debugPrint('[LIVE] Connecting to LiveKit room: $wsUrl');
       final room = Room();
+      
+      List<RTCIceServer> iceServers = [];
+      try {
+        final apiClient = Get.find<ApiClient>();
+        final response = await apiClient.get(AppUrls.turnCredentials, handleError: false, showErrorScreen: false);
+        if (response.isSuccess && response.body != null) {
+          final data = response.body['data'];
+          if (data != null && data['iceServers'] != null) {
+            iceServers = (data['iceServers'] as List).map((s) {
+              return RTCIceServer(
+                urls: List<String>.from(s['urls'] ?? []),
+                username: s['username']?.toString(),
+                credential: s['credential']?.toString(),
+              );
+            }).toList();
+            debugPrint('[LIVE] Dynamic TURN credentials loaded successfully');
+          }
+        }
+      } catch (e) {
+        debugPrint('[LIVE] Error fetching dynamic TURN credentials: $e');
+      }
+
+      if (iceServers.isEmpty) {
+        debugPrint('[LIVE] Falling back to default TURN credentials');
+        iceServers = [
+          RTCIceServer(
+            urls: [AppConstants.liveKitTurnServerUrl],
+            username: AppConstants.liveKitTurnUsername,
+            credential: AppConstants.liveKitTurnCredential,
+          )
+        ];
+      }
+
       await room.connect(
         wsUrl,
         token,
-        roomOptions: const RoomOptions(
+        connectOptions: ConnectOptions(
+          rtcConfiguration: RTCConfiguration(
+            iceServers: iceServers,
+          ),
+        ),
+        roomOptions: RoomOptions(
           adaptiveStream: true,
           dynacast: true,
+          defaultIceServers: iceServers,
         ),
       );
       

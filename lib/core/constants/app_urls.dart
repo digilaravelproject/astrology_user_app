@@ -128,6 +128,7 @@ class AppUrls {
   static String endCallSession(int sessionId) => '/api/v1/call/$sessionId/end';
   static String sendIceCandidate(int sessionId) => '/api/v1/call/$sessionId/ice-candidate';
   static const String currentCallSession = '/api/v1/call/current-session';
+  static const String turnCredentials = '/api/v1/call/turn-credentials';
   static const String userCallSessions = '/api/v1/call/sessions/user';
   static const String astrologerCallSessions = '/api/v1/call/sessions/astrologer';
 
