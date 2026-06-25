@@ -204,10 +204,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             iceServers: iceServers,
           ),
         ),
-        roomOptions: RoomOptions(
+        roomOptions: const RoomOptions(
           adaptiveStream: true,
           dynacast: true,
-          defaultIceServers: iceServers,
         ),
       );
       
