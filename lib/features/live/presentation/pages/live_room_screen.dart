@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../astrologers/controllers/astrologer_controller.dart';
 import '../../../astrologers/domain/models/gift_model.dart' as model;
 import '../controllers/live_controller.dart';
@@ -161,9 +162,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       
       debugPrint('[LIVE] Connecting to LiveKit room: $wsUrl');
       final room = Room();
+      
+      final turnServer = RTCIceServer(
+        urls: [AppConstants.liveKitTurnServerUrl],
+        username: AppConstants.liveKitTurnUsername,
+        credential: AppConstants.liveKitTurnCredential,
+      );
+
       await room.connect(
         wsUrl,
         token,
+        connectOptions: ConnectOptions(
+          rtcConfiguration: RTCConfiguration(
+            iceServers: [turnServer],
+          ),
+        ),
         roomOptions: const RoomOptions(
           adaptiveStream: true,
           dynacast: true,
