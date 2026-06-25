@@ -128,24 +128,37 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
   }
 
+  bool _isConnectingLiveKit = false;
+
   Future<void> _connectLiveKit(int sessionId) async {
-    if (_isLiveKitConnected || _room != null) return;
-    
-    final watchData = await _liveController.watchLiveSession(sessionId);
-    if (watchData == null) {
-      debugPrint('[LIVE] Watch data is null. Astrologer might not be broadcasting yet.');
-      return;
-    }
-    
-    final String wsUrl = watchData['livekit_ws_url'] ?? '';
-    final String token = watchData['token'] ?? '';
-    
-    if (wsUrl.isEmpty || token.isEmpty) {
-      debugPrint('[LIVE] wsUrl or token is empty');
-      return;
-    }
+    if (_isLiveKitConnected || _isConnectingLiveKit) return;
+    _isConnectingLiveKit = true;
     
     try {
+      if (_room != null) {
+        try {
+          await _room!.disconnect();
+          await _room!.dispose();
+        } catch (e) {
+          debugPrint("Error disposing previous room: $e");
+        }
+        _room = null;
+      }
+      
+      final watchData = await _liveController.watchLiveSession(sessionId);
+      if (watchData == null) {
+        debugPrint('[LIVE] Watch data is null. Astrologer might not be broadcasting yet.');
+        return;
+      }
+      
+      final String wsUrl = watchData['livekit_ws_url'] ?? '';
+      final String token = watchData['token'] ?? '';
+      
+      if (wsUrl.isEmpty || token.isEmpty) {
+        debugPrint('[LIVE] wsUrl or token is empty');
+        return;
+      }
+      
       debugPrint('[LIVE] Connecting to LiveKit room: $wsUrl');
       final room = Room();
       await room.connect(
@@ -212,12 +225,23 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     } catch (e) {
       debugPrint('[LIVE] LiveKit connection error: $e');
       _disconnectLiveKit();
+    } finally {
+      _isConnectingLiveKit = false;
     }
   }
 
-  void _disconnectLiveKit() {
-    _room?.disconnect();
+  void _disconnectLiveKit() async {
+    final roomToDispose = _room;
     _room = null;
+    if (roomToDispose != null) {
+      try {
+        await roomToDispose.disconnect();
+        await roomToDispose.dispose();
+      } catch (e) {
+        debugPrint('[LIVE] Error disconnecting room: $e');
+      }
+    }
+    
     if (mounted) {
       setState(() {
         _isLiveKitConnected = false;
