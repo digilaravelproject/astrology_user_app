@@ -317,12 +317,12 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     // backgroundColor: const Color(0xFF1A0A2E), // Match landing page theme
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             if (_currentStep > 0) {
               _pageController.previousPage(
@@ -388,14 +388,14 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.startWithIntro,
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: Colors.black,
           ),
           const SizedBox(height: 24),
           AppText(
             AppStrings.creatingProfileFor,
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Colors.black,
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -413,15 +413,15 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.deepPink.withOpacity(0.2) : Colors.white.withOpacity(0.05),
+                    color: isSelected ? AppColors.deepPink : Colors.black.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: _errors['profileFor'] != null ? Colors.red : (isSelected ? AppColors.deepPink : Colors.white.withOpacity(0.1)),
+                      color: _errors['profileFor'] != null ? Colors.red : (isSelected ? AppColors.deepPink : Colors.black.withOpacity(0.1)),
                     ),
                   ),
                   child: AppText(
                     option,
-                    color: isSelected ? AppColors.white : Colors.white70,
+                    color: isSelected ? AppColors.white : Colors.black87,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
@@ -458,10 +458,10 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                   value: _countryCode,
                   icon: const Padding(
                     padding: EdgeInsets.only(left: 4),
-                    child: Icon(Icons.arrow_drop_down, color: Colors.white60, size: 20),
+                    child: Icon(Icons.arrow_drop_down, color: Colors.black54, size: 20),
                   ),
-                  dropdownColor: const Color(0xFF1A0A2E),
-                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                  dropdownColor: Colors.white,
+                  style: const TextStyle(color: Colors.black, fontSize: 16),
                   onChanged: (val) => setState(() => _countryCode = val!),
                   items: ["+91", "+1", "+44"].map((code) {
                     return DropdownMenuItem(value: code, child: Text(code));
@@ -474,7 +474,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           AppText(
             AppStrings.matchesContactInfo,
             fontSize: 12,
-            color: Colors.white60,
+            color: Colors.black54,
           ),
           const SizedBox(height: 32),
           _buildSafetyBanner(),
@@ -500,10 +500,10 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.buildYourProfile,
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: Colors.black,
           ),
           const SizedBox(height: 32),
-          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -552,7 +552,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -572,13 +572,13 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.deepPink : Colors.white.withOpacity(0.05),
+          color: isSelected ? AppColors.deepPink : Colors.black.withOpacity(0.05),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? Colors.transparent : Colors.white.withOpacity(0.1)),
+          border: Border.all(color: isSelected ? Colors.transparent : Colors.black.withOpacity(0.1)),
         ),
         child: AppText(
           gender,
-          color: Colors.white,
+          color: isSelected ? Colors.white : Colors.black87,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -607,7 +607,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           AppText(
             AppStrings.verificationMsg,
             fontSize: 14,
-            color: Colors.white60,
+            color: Colors.black54,
           ),
           const SizedBox(height: 32),
           Row(
@@ -651,9 +651,9 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.shield_outlined, size: 16, color: Colors.white60),
+                const Icon(Icons.shield_outlined, size: 16, color: Colors.black54),
                 const SizedBox(width: 8),
-                AppText(AppStrings.infoSafePrivate, fontSize: 12, color: Colors.white60),
+                AppText(AppStrings.infoSafePrivate, fontSize: 12, color: Colors.black54),
               ],
             ),
           ),
@@ -679,7 +679,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.profilesWithPhotosMsg,
             fontSize: 24,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: Colors.black,
           ),
           const SizedBox(height: 40),
           Center(
@@ -697,9 +697,9 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.black.withOpacity(0.05),
                   shape: BoxShape.circle,
-                  border: Border.all(color: _errors['photo'] != null ? Colors.red : Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: _errors['photo'] != null ? Colors.red : Colors.black.withOpacity(0.1)),
                   image: _matrimonyPhoto != null
                       ? DecorationImage(
                           image: FileImage(File(_matrimonyPhoto!.path)),
@@ -711,7 +711,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
                     ? Stack(
                         alignment: Alignment.center,
                         children: [
-                          Icon(Icons.person, size: 60, color: _errors['photo'] != null ? Colors.red.withOpacity(0.5) : Colors.white.withOpacity(0.2)),
+                          Icon(Icons.person, size: 60, color: _errors['photo'] != null ? Colors.red.withOpacity(0.5) : Colors.black.withOpacity(0.2)),
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -733,10 +733,10 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               child: Center(child: AppText(_errors['photo']!, color: Colors.red, fontSize: 12)),
             ),
           const SizedBox(height: 16),
-          Center(child: AppText(AppStrings.addPhoto, fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white)),
+          Center(child: AppText(AppStrings.addPhoto, fontWeight: FontWeight.w700, fontSize: 18, color: Colors.black)),
           const SizedBox(height: 32),
-          Center(child: AppText(AppStrings.photosSafeMsg, color: Colors.white60, fontSize: 14)),
-          Center(child: AppText(AppStrings.photoPrivacyMsg, color: Colors.white54, fontSize: 12)),
+          Center(child: AppText(AppStrings.photosSafeMsg, color: Colors.black54, fontSize: 14)),
+          Center(child: AppText(AppStrings.photoPrivacyMsg, color: Colors.black45, fontSize: 12)),
           const SizedBox(height: 32),
           CustomButton(
             text: widget.isEditMode ? 'Update Profile' : AppStrings.uploadPhotos,
@@ -756,15 +756,15 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: errorText != null ? Colors.red : Colors.white.withOpacity(0.1)),
+            border: Border.all(color: errorText != null ? Colors.red : Colors.black.withOpacity(0.1)),
           ),
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
             maxLines: maxLines,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.black),
             onChanged: (val) {
               if (errorKey != null && _errors.containsKey(errorKey)) {
                 setState(() => _errors.remove(errorKey));
@@ -774,7 +774,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               prefixIcon: prefixIcon,
               prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
               labelText: label,
-              labelStyle: GoogleFonts.inter(color: Colors.white60, fontSize: 14),
+              labelStyle: GoogleFonts.inter(color: Colors.black54, fontSize: 14),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
@@ -783,7 +783,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         if (helperText != null && errorText == null)
           Padding(
             padding: const EdgeInsets.only(top: 4, left: 8),
-            child: AppText(helperText, color: Colors.white38, fontSize: 11),
+            child: AppText(helperText, color: Colors.black38, fontSize: 11),
           ),
         if (showErrorText && errorText != null)
           Padding(
@@ -802,21 +802,21 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: errorText != null ? Colors.red : Colors.white.withOpacity(0.1)),
+            border: Border.all(color: errorText != null ? Colors.red : Colors.black.withOpacity(0.1)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               isExpanded: true,
-              dropdownColor: const Color(0xFF1A0A2E),
-              hint: AppText(label, color: Colors.white60, fontSize: 14),
+              dropdownColor: Colors.white,
+              hint: AppText(label, color: Colors.black54, fontSize: 14),
               value: selectedValue,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.black),
               items: options.map((option) {
                 return DropdownMenuItem(
                   value: option,
-                  child: Text(option, style: GoogleFonts.inter(fontSize: 14, color: Colors.white)),
+                  child: Text(option, style: GoogleFonts.inter(fontSize: 14, color: Colors.black)),
                 );
               }).toList(),
               onChanged: (val) {
@@ -878,18 +878,18 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        border: Border.all(color: Colors.black.withOpacity(0.1)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.verified_user, color: Colors.white70, size: 16),
+              const Icon(Icons.verified_user, color: Colors.black87, size: 16),
               const SizedBox(width: 8),
-              AppText(AppStrings.safetyFirst, fontWeight: FontWeight.w700, color: Colors.white70),
+              AppText(AppStrings.safetyFirst, fontWeight: FontWeight.w700, color: Colors.black87),
             ],
           ),
           const SizedBox(height: 8),
@@ -897,7 +897,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             AppStrings.sangamSafetyMsg,
             fontSize: 12,
             textAlign: TextAlign.center,
-            color: Colors.white60,
+            color: Colors.black54,
           ),
         ],
       ),
