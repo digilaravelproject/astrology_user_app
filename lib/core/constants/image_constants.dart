@@ -9,6 +9,7 @@ class ImageConstants {
   static const String zodiacWheel = '${imagePath}zodiac_wheel.png';
   static const String imageNotFound = '${imagePath}image_not_found.png';
   static const String suryaChariot = '${imagePath}surya_chariot_premium.png';
+  static const String appLogo = '${imagePath}app_logo.png';
   static const String astroMatrimony = '${imagePath}astro_matrimony_premium.png';
 
   // Auth Images

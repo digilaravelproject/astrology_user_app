@@ -53,22 +53,59 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         body: Stack(
           children: [
             CosmicBackground(),
+
+
             SafeArea(
+              child: Center(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: const Duration(milliseconds: 1200),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, entryValue, child) {
+                    final opacity = entryValue.clamp(0.0, 1.0);
+
+                    return AnimatedBuilder(
+                      animation: _floatAnimation,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(
+                            0,
+                            (-30 * (1 - entryValue)) +
+                                (entryValue >= 0.99 ? _floatAnimation.value : 0),
+                          ),
+                          child: Opacity(
+                            opacity: opacity,
+                            child: Image.asset(
+                              ImageConstants.appLogo, // Apna logo/image
+                              width: 220,
+                              height: 220,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            /*SafeArea(
               child: Column(
                 children: [
                   const SizedBox(height: 15),
-                  
+
                   // Surya Path Section with Animation
-                  Expanded(
+                  Center(
                     child: TweenAnimationBuilder<double>(
                       tween: Tween<double>(begin: 0, end: 1),
                       duration: const Duration(milliseconds: 1200),
                       curve: Curves.easeOutCubic,
                       builder: (context, entryValue, child) {
-                        final opacity = (entryValue.isNaN || entryValue.isInfinite) 
-                            ? 0.0 
+                        final opacity = (entryValue.isNaN || entryValue.isInfinite)
+                            ? 0.0
                             : entryValue.clamp(0.0, 1.0);
-                            
+
                         return AnimatedBuilder(
                           animation: _floatAnimation,
                           builder: (context, child) {
@@ -145,8 +182,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       duration: const Duration(milliseconds: 1200),
                       curve: Curves.easeOutCubic,
                       builder: (context, entryValue, child) {
-                        final opacity = (entryValue.isNaN || entryValue.isInfinite) 
-                            ? 0.0 
+                        final opacity = (entryValue.isNaN || entryValue.isInfinite)
+                            ? 0.0
                             : entryValue.clamp(0.0, 1.0);
 
                         return AnimatedBuilder(
@@ -174,7 +211,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   const SizedBox(height: 25),
                 ],
               ),
-            ),
+            ),*/
           ],
         ),
       ),

@@ -317,7 +317,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A0A2E), // Match landing page theme
+     // backgroundColor: const Color(0xFF1A0A2E), // Match landing page theme
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
