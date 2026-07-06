@@ -22,6 +22,10 @@ class AstrologerModel {
   final bool isFollowed;
   final bool isBlocked;
   final int totalOrders;
+  final String? originalChatRatePerMinute;
+  final String? originalCallRatePerMinute;
+  final bool hasOffer;
+  final String? discountPercentage;
 
   AstrologerModel({
     required this.id,
@@ -45,6 +49,10 @@ class AstrologerModel {
     this.totalOrders = 0,
     this.isFollowed = false,
     this.isBlocked = false,
+    this.originalChatRatePerMinute,
+    this.originalCallRatePerMinute,
+    this.hasOffer = false,
+    this.discountPercentage,
   });
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
@@ -72,6 +80,10 @@ class AstrologerModel {
       totalOrders: json['total_orders'] ?? 0,
       isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
       isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
+      originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
+      originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
+      hasOffer: json['has_offer'] == true,
+      discountPercentage: json['offer_details']?['discount_percentage']?.toString(),
     );
   }
 

@@ -812,21 +812,39 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            if (astro.hasOffer && astro.originalChatRatePerMinute != null)
+                              AppText(
+                                '₹ ${double.tryParse(astro.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? astro.originalChatRatePerMinute!}',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textColorSecondary,
+                                style: GoogleFonts.inter(decoration: TextDecoration.lineThrough),
+                              ),
+                            if (astro.hasOffer && astro.originalChatRatePerMinute != null)
+                              const SizedBox(width: 6),
                             AppText(
-                              '₹${astro.chatRate ?? '0'}',
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textColorSecondary,
-                              style: GoogleFonts.inter(decoration: TextDecoration.lineThrough),
-                            ),
-                            const SizedBox(width: 6),
-                            AppText(
-                              '₹${astro.chatRate ?? '0'}',
+                              '₹ ${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}',
                               fontSize: 18,
                               fontWeight: FontWeight.w900,
                               color: AppColors.deepPink,
                             ),
                             AppText('/min', fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+                            if (astro.hasOffer) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: AppText(
+                                  '${astro.discountPercentage ?? ''}% OFF',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -1237,8 +1255,38 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                            Text('₹${_astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                            Row(
+                              children: [
+                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                if (_astrologer?.hasOffer == true)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: Colors.yellow.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                    child: Text(
+                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
+                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_astrologer?.hasOffer == true && _astrologer?.originalChatRatePerMinute != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: Text(
+                                      '₹ ${double.tryParse(_astrologer!.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalChatRatePerMinute!}',
+                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9), decoration: TextDecoration.lineThrough,decorationColor: Colors.white,),
+                                    ),
+                                  ),
+                                Text('₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                              ],
+                            ),
                           ],
                         ),
                       ],
@@ -1293,8 +1341,41 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                            Text('₹${_astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                            Row(
+                              children: [
+                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                if (_astrologer?.hasOffer == true)
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: Colors.yellow.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                    child: Text(
+                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
+                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (_astrologer?.hasOffer == true && _astrologer?.originalCallRatePerMinute != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: Text(
+                                      '₹ ${double.tryParse(_astrologer!.originalCallRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalCallRatePerMinute!}',
+                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9),
+                                          decoration: TextDecoration.lineThrough,
+                                        decorationColor: Colors.white, // Strike-through line color
+                                        ),
+                                    ),
+                                  ),
+                                Text('₹ ${double.tryParse(_astrologer?.callRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                              ],
+                            ),
                           ],
                         ),
                       ],

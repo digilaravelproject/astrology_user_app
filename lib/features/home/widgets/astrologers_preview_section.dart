@@ -221,7 +221,24 @@ class AstrologersPreviewSection extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: AppColors.deepPink.withOpacity(0.8),
                   ),
-                  const SizedBox(height: 12),
+                  if (astro.hasOffer)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: AppText(
+                          '${astro.discountPercentage ?? ''}% OFF',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: astro.hasOffer ? 8 : 12),
 
                   // Buttons Row
                   Align(
