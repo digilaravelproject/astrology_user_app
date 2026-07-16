@@ -151,6 +151,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                             child: AppText('Astrologer data not found', color: Colors.grey),
                           ),
                         ),
+                      if (_astrologer != null && _astrologer!.bio.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: _BioText(bio: _astrologer!.bio),
+                        ),
                       const SizedBox(height: 16),
                       // Gallery Section - commented out
                       // _buildGallerySection(),
@@ -626,12 +631,12 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.deepPink.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: AppColors.deepPink.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -796,19 +801,18 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       color: AppColors.textColorHint,
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: AppText(
-                            'Exp: ${astro.yearsOfExperience} Years',
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textColorPrimary,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        AppText(
+                          'Exp: ${astro.yearsOfExperience} Years',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textColorPrimary,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -861,27 +865,21 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.deepPink,
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.deepPink.withOpacity(0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    border: Border.all(color: Colors.grey.withOpacity(0.3)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.bolt, color: Colors.yellow, size: 14),
+                      const Icon(Icons.bolt, color: Colors.amber, size: 16),
                       const SizedBox(width: 6),
                       Flexible(
                         child: AppText(
                           '₹ 30/session for 30 minute complete guide',
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -892,10 +890,6 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(height: 1, color: const Color(0xFFEEEEEE)),
-          const SizedBox(height: 12),
-          _BioText(bio: astro.bio),
         ],
       ),
     );
@@ -909,12 +903,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -979,7 +968,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               onTap: () => _navigateToAllReviews(),
               child: Center(
                 child: AppText(
-                  'See all ${reviews.length} reviews',
+                  'See all',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.deepPink,
@@ -1001,9 +990,17 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F5),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFCDD2)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1039,7 +1036,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   review.user?.name ?? 'Unknown',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF880E4F),
+                  color: Colors.black87,
                 ),
               ),
              // const Icon(Icons.more_vert, size: 20, color: Colors.grey),
@@ -1050,34 +1047,34 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           const SizedBox(height: 8),
           AppText(
             review.review,
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: FontWeight.w400,
-            color: const Color(0xFF880E4F),
+            color: Colors.grey.shade700,
             style: const TextStyle(height: 1.4),
           ),
           if (review.reply != null) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
+              margin: const EdgeInsets.only(left: 4, top: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEbee),
-                borderRadius: BorderRadius.circular(12),
+                border: Border(left: BorderSide(color: Colors.grey.shade300, width: 2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    _astrologer?.name ?? "Astrologer",
-                    fontSize: 12,
+                    "Reply from ${_astrologer?.name ?? "Astrologer"}",
+                    fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4A148C),
+                    color: Colors.black87,
                   ),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF4A148C),
+                    color: Colors.grey.shade700,
                     style: const TextStyle(height: 1.4),
                   ),
                 ],
@@ -1116,7 +1113,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
           crossAxisSpacing: 12,
-          mainAxisSpacing: 16,
+          mainAxisSpacing: 8,
           childAspectRatio: 0.75,
         ),
         itemCount: _controller.gifts.length,
@@ -1420,12 +1417,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
   Widget _buildGiftSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderColor),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         children: [
           Row(
@@ -1458,7 +1450,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               }),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
           _buildGiftItems(),
         ],
       ),
@@ -1498,38 +1490,62 @@ class _BioTextState extends State<_BioText> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppText(
-          widget.bio,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textColorSecondary,
-          maxLines: isExpanded ? null : 3,
-          overflow: isExpanded ? null : TextOverflow.ellipsis,
-          style: const TextStyle(height: 1.6),
-        ),
-        if (widget.bio.length > 100) ...[
-          const SizedBox(height: 4),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                isExpanded = !isExpanded;
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: AppText(
-                isExpanded ? 'Show less' : 'See more',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.deepPink,
-              ),
-            ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 5,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
           ),
         ],
-      ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText(
+            'About Astrologer',
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textColorPrimary,
+          ),
+          const SizedBox(height: 12),
+          AppText(
+            widget.bio,
+            fontSize: 13,
+            fontWeight: FontWeight.w400,
+            color: Colors.grey.shade700,
+            maxLines: isExpanded ? null : 2,
+            overflow: isExpanded ? null : TextOverflow.ellipsis,
+            style: const TextStyle(height: 1.5),
+          ),
+          if (widget.bio.length > 80) ...[
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: AppText(
+                  isExpanded ? 'Show less' : 'Show more',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepPink,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -568,7 +568,7 @@ class ChatListScreen extends StatelessWidget {
                     astro.areasOfExpertise.join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.deepPink.withOpacity(0.8),
+                    color: Colors.black,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -577,7 +577,7 @@ class ChatListScreen extends StatelessWidget {
                     astro.languages.join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.deepPink.withOpacity(0.8),
+                    color: Colors.black,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -586,7 +586,7 @@ class ChatListScreen extends StatelessWidget {
                     '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.deepPink.withOpacity(0.8),
+                    color: Colors.black,
                   ),
                   const SizedBox(height: 8),
                   // Chat Button
@@ -609,6 +609,9 @@ class ChatListScreen extends StatelessWidget {
                               fontSize: 11,
                               height: 32,
                               borderRadius: 8,
+                              backgroundColor: Colors.transparent,
+                              textColor: const Color(0xFF4CAF50),
+                              borderColor: const Color(0xFF4CAF50),
                               onTap: () {
                                       final walletController = Get.find<WalletController>();
                                       final double balance = double.tryParse(walletController.balance) ?? 0.0;

@@ -79,9 +79,17 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F5),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFCDD2)),
+        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,7 +107,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
                   review.user?.name ?? 'Unknown',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF880E4F),
+                  color: Colors.black87,
                 ),
               ),
               //const Icon(Icons.more_vert, size: 20, color: Colors.grey),
@@ -110,29 +118,29 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
           const SizedBox(height: 8),
           AppText(
             review.review,
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: FontWeight.w400,
-            color: const Color(0xFF880E4F),
+            color: Colors.grey.shade700,
             style: const TextStyle(height: 1.4),
           ),
           if (review.reply != null) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
+              margin: const EdgeInsets.only(left: 4, top: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFEbee),
-                borderRadius: BorderRadius.circular(12),
+                border: Border(left: BorderSide(color: Colors.grey.shade300, width: 2)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText('Vera', fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF4A148C)),
+                  AppText('Reply from Astrologer', fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF4A148C),
+                    color: Colors.grey.shade700,
                     style: const TextStyle(height: 1.4),
                   ),
                 ],
