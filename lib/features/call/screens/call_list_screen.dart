@@ -16,6 +16,8 @@ import '../../../core/constants/app_constants.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../astrologers/screens/astrologer_detail_screen.dart';
+import '../../home/widgets/astrologers_preview_section.dart';
+import '../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../astrologers/bindings/astrologers_binding.dart';
 import '../../astrologers/screens/astrologer_search_screen.dart';
 import 'package:astro_user/routes/route_helper.dart';
@@ -602,31 +604,50 @@ class CallListScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                      : astro.isCallEnabled
-                          ? CustomButton(
-                              text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
-                              icon: Icons.call,
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            CustomButton(
+                              text: 'Session (1 hr 45 min) @ ₹500',
+                              icon: Icons.timer,
                               fontSize: 11,
                               height: 32,
                               borderRadius: 8,
-                              backgroundColor: Colors.transparent,
-                              textColor: const Color(0xFF4CAF50),
-                              borderColor: const Color(0xFF4CAF50),
+                              backgroundColor: Colors.orange,
+                              textColor: Colors.white,
+                              borderColor: Colors.orange,
                               onTap: () {
-                                      final walletController = Get.find<WalletController>();
-                                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                                      WalletHelper.checkBalanceAndProceed(
-                                      context: context,
-                                      type: 'call',
-                                      name: astro.name,
-                                      imageUrl: astro.fullProfilePhoto,
-                                      price: astro.callRate ?? '0',
-                                      providerId: astro.userId,
-                                      simulatedBalance: balance,
-                                    );
+                                SessionBottomSheetHelper.show(context, astro);
                               },
-                            )
-                          : const SizedBox.shrink(),
+                            ),
+                            if (astro.isCallEnabled) ...[
+                              const SizedBox(height: 8),
+                              CustomButton(
+                                text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
+                                icon: Icons.call,
+                                fontSize: 11,
+                                height: 32,
+                                borderRadius: 8,
+                                backgroundColor: Colors.transparent,
+                                textColor: const Color(0xFF4CAF50),
+                                borderColor: const Color(0xFF4CAF50),
+                                onTap: () {
+                                        final walletController = Get.find<WalletController>();
+                                        final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                        WalletHelper.checkBalanceAndProceed(
+                                        context: context,
+                                        type: 'call',
+                                        name: astro.name,
+                                        imageUrl: astro.fullProfilePhoto,
+                                        price: astro.callRate ?? '0',
+                                        providerId: astro.userId,
+                                        simulatedBalance: balance,
+                                      );
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
                 ],
               ),
             ),

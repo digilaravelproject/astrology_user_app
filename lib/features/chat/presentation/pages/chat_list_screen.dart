@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../../../core/widgets/app_text.dart';
 import '../../../../core/widgets/cosmic_background.dart';
 import '../../../../core/widgets/custom_button.dart';
@@ -14,8 +15,8 @@ import '../../../../core/widgets/custom_image_widget.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../astrologers/controllers/astrologer_controller.dart';
-import '../../../astrologers/domain/models/astrologer_model.dart';
 import '../../../astrologers/screens/astrologer_detail_screen.dart';
+import '../../../astrologers/domain/models/astrologer_model.dart';
 import '../../../astrologers/bindings/astrologers_binding.dart';
 import '../../../astrologers/screens/astrologer_search_screen.dart';
 import 'package:astro_user/routes/route_helper.dart';
@@ -602,31 +603,50 @@ class ChatListScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                      : astro.isChatEnabled
-                          ? CustomButton(
-                              text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
-                              icon: Icons.chat,
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            CustomButton(
+                              text: 'Session (1 hr 45 min) @ ₹500',
+                              icon: Icons.timer,
                               fontSize: 11,
                               height: 32,
                               borderRadius: 8,
-                              backgroundColor: Colors.transparent,
-                              textColor: const Color(0xFF4CAF50),
-                              borderColor: const Color(0xFF4CAF50),
+                              backgroundColor: Colors.orange,
+                              textColor: Colors.white,
+                              borderColor: Colors.orange,
                               onTap: () {
-                                      final walletController = Get.find<WalletController>();
-                                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                                      WalletHelper.checkBalanceAndProceed(
-                                      context: context,
-                                      type: 'chat',
-                                      name: astro.name,
-                                      imageUrl: astro.fullProfilePhoto,
-                                      price: astro.chatRate ?? '0',
-                                      providerId: astro.userId,
-                                      simulatedBalance: balance,
-                                    );
+                                SessionBottomSheetHelper.show(context, astro);
                               },
-                            )
-                          : const SizedBox.shrink(),
+                            ),
+                            if (astro.isChatEnabled) ...[
+                              const SizedBox(height: 8),
+                              CustomButton(
+                                text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
+                                icon: Icons.chat,
+                                fontSize: 11,
+                                height: 32,
+                                borderRadius: 8,
+                                backgroundColor: Colors.transparent,
+                                textColor: const Color(0xFF4CAF50),
+                                borderColor: const Color(0xFF4CAF50),
+                                onTap: () {
+                                        final walletController = Get.find<WalletController>();
+                                        final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                        WalletHelper.checkBalanceAndProceed(
+                                        context: context,
+                                        type: 'chat',
+                                        name: astro.name,
+                                        imageUrl: astro.fullProfilePhoto,
+                                        price: astro.chatRate ?? '0',
+                                        providerId: astro.userId,
+                                        simulatedBalance: balance,
+                                      );
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
                 ],
               ),
             ),

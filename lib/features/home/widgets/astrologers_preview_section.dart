@@ -16,6 +16,7 @@ import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
 import '../../wallet/controllers/wallet_controller.dart';
+import '../../../core/utils/session_bottom_sheet_helper.dart';
 
 class AstrologersPreviewSection extends StatelessWidget {
   const AstrologersPreviewSection({Key? key}) : super(key: key);
@@ -273,102 +274,89 @@ class AstrologersPreviewSection extends StatelessWidget {
                   // Buttons Row
                   Align(
                     alignment: Alignment.centerRight,
-
-                    child:
-                        (astro.isAvailableOnline)
-                            ? (astro.hasOffer)
-                                ? CustomButton(
-                                    text: 'Start Session',
-                                    fontSize: 10,
-                                    height: 32,
-                                    backgroundColor: Color(0xFF388E3C),
-                                    width: 110,
-                                    borderRadius: 8,
-                                    onTap: () {
-                                      _showStartSessionBottomSheet(context, astro);
-                                    },
-                                  )
-                                : Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (astro.isChatEnabled) ...[
-                                  CustomButton(
-                                    text: '${AppStrings.chat} ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
-                                    icon: Icons.chat_bubble_outline_rounded,
-                                    fontSize: 10,
-                                    height: 32,
-                                    width: 95,
-                                    borderRadius: 8,
-                                    backgroundColor: Colors.transparent,
-                                    textColor: const Color(0xFF4CAF50),
-                                    borderColor: const Color(0xFF4CAF50),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                    ),
-                                    onTap: () {
-                                      final walletController =
-                                          Get.find<WalletController>();
-                                      final double balance =
-                                          double.tryParse(
-                                            walletController.balance,
-                                          ) ??
-                                          0.0;
-                                      WalletHelper.checkBalanceAndProceed(
-                                        context: context,
-                                        type: 'chat',
-                                        name: astro.name,
-                                        imageUrl: astro.fullProfilePhoto,
-                                        price: astro.chatRate ?? '0',
-                                        providerId: astro.userId,
-                                        simulatedBalance: balance,
-                                      );
-                                    },
-                                  ),
-                                  const SizedBox(width: 8),
-                                ],
-                                if (astro.isCallEnabled)
-                                  CustomButton(
-                                    text: '${AppStrings.call} ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
-                                    icon: Icons.call_outlined,
-                                    fontSize: 10,
-                                    height: 32,
-                                    width: 95,
-                                    borderRadius: 8,
-                                    backgroundColor: Colors.transparent,
-                                    textColor: const Color(0xFF4CAF50),
-                                    borderColor: const Color(0xFF4CAF50),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                    ),
-                                    onTap: () {
-                                      final walletController =
-                                          Get.find<WalletController>();
-                                      final double balance =
-                                          double.tryParse(
-                                            walletController.balance,
-                                          ) ??
-                                          0.0;
-                                      WalletHelper.checkBalanceAndProceed(
-                                        context: context,
-                                        type: 'call',
-                                        name: astro.name,
-                                        imageUrl: astro.fullProfilePhoto,
-                                        price: astro.callRate ?? '0',
-                                        providerId: astro.userId,
-                                        simulatedBalance: balance,
-                                      );
-                                    },
-                                  ),
-                              ],
-                            )
-                            : Text(
-                              "Astrologer is offline.",
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
+                    child: (astro.isAvailableOnline)
+                        ? Wrap(
+                            alignment: WrapAlignment.end,
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              CustomButton(
+                                text: 'Session (1 hr 45 min) @ ₹500',
+                                icon: Icons.timer,
+                                fontSize: 10,
+                                height: 32,
+                                width: 180,
+                                borderRadius: 8,
+                                backgroundColor: Colors.orange,
+                                textColor: Colors.white,
+                                borderColor: Colors.orange,
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                onTap: () {
+                                  SessionBottomSheetHelper.show(context, astro);
+                                },
                               ),
+                              if (astro.isChatEnabled)
+                                CustomButton(
+                                  text: '${AppStrings.chat} ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
+                                  icon: Icons.chat_bubble_outline_rounded,
+                                  fontSize: 10,
+                                  height: 32,
+                                  width: 95,
+                                  borderRadius: 8,
+                                  backgroundColor: Colors.transparent,
+                                  textColor: const Color(0xFF4CAF50),
+                                  borderColor: const Color(0xFF4CAF50),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  onTap: () {
+                                    final walletController = Get.find<WalletController>();
+                                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                    WalletHelper.checkBalanceAndProceed(
+                                      context: context,
+                                      type: 'chat',
+                                      name: astro.name,
+                                      imageUrl: astro.fullProfilePhoto,
+                                      price: astro.chatRate ?? '0',
+                                      providerId: astro.userId,
+                                      simulatedBalance: balance,
+                                    );
+                                  },
+                                ),
+                              if (astro.isCallEnabled)
+                                CustomButton(
+                                  text: '${AppStrings.call} ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
+                                  icon: Icons.call_outlined,
+                                  fontSize: 10,
+                                  height: 32,
+                                  width: 95,
+                                  borderRadius: 8,
+                                  backgroundColor: Colors.transparent,
+                                  textColor: const Color(0xFF4CAF50),
+                                  borderColor: const Color(0xFF4CAF50),
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  onTap: () {
+                                    final walletController = Get.find<WalletController>();
+                                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                                    WalletHelper.checkBalanceAndProceed(
+                                      context: context,
+                                      type: 'call',
+                                      name: astro.name,
+                                      imageUrl: astro.fullProfilePhoto,
+                                      price: astro.callRate ?? '0',
+                                      providerId: astro.userId,
+                                      simulatedBalance: balance,
+                                    );
+                                  },
+                                ),
+                            ],
+                          )
+                        : const Text(
+                            "Astrologer is offline.",
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
                             ),
+                          ),
                   ),
                 ],
               ),
@@ -393,117 +381,7 @@ class AstrologersPreviewSection extends StatelessWidget {
     );
   }
 
-  void _showStartSessionBottomSheet(BuildContext context, AstrologerModel astro) {
-    final walletController = Get.find<WalletController>();
-    final double walletBalance = double.tryParse(walletController.balance) ?? 0.0;
 
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 20),
-              
-              // Balance Info
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.lightPink.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppText(
-                          "Wallet Balance",
-                          fontSize: 14,
-                          color: Colors.grey.shade700,
-                        ),
-                        const SizedBox(height: 4),
-                        AppText(
-                          "₹${walletBalance.toStringAsFixed(2)}",
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.deepPink,
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.account_balance_wallet, color: AppColors.deepPink),
-                    ),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  if (astro.isChatEnabled)
-                    CustomButton(
-                      text: '${AppStrings.chat} ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
-                      icon: Icons.chat_bubble_outline_rounded,
-                      fontSize: 12,
-                      height: 45,
-                      width: 140,
-                      borderRadius: 12,
-                      onTap: () {
-                        // Do nothing for now
-                      },
-                    ),
-                  if (astro.isCallEnabled)
-                    CustomButton(
-                      text: '${AppStrings.call} ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
-                      icon: Icons.call_outlined,
-                      fontSize: 12,
-                      height: 45,
-                      width: 140,
-                      borderRadius: 12,
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF4CAF50),
-                          Color(0xFF388E3C),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        // Do nothing for now
-                      },
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildShimmerList() {
     return Column(
