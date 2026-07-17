@@ -129,6 +129,7 @@ flutter:
     - assets/icons/verify.png
     - assets/images/
     - assets/images/app_icon.png
+    - assets/images/app_logo.png
     - assets/images/astro.jpg
     - assets/images/bg_join_session_home.jpeg
     - assets/images/bg_login.jpeg

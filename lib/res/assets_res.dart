@@ -11,6 +11,7 @@ class AssetsRes {
   static const String BUBBLE_IMG = 'assets/icons/bubble_img.png';
   static const String VERIFY = 'assets/icons/verify.png';
   static const String APP_ICON = 'assets/images/app_icon.png';
+  static const String APP_LOGO = 'assets/images/app_logo.png';
   static const String ASTRO = 'assets/images/astro.jpg';
   static const String BG_JOIN_SESSION_HOME = 'assets/images/bg_join_session_home.jpeg';
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
