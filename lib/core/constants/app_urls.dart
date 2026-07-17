@@ -39,6 +39,9 @@ class AppUrls {
   static const String upgradePlans = '/api/v1/user/plans/upgrade';
   static const String upgradePlansVerify = '/api/v1/user/plans/upgrade/verify';
   static const String purchasePackage = '/api/v1/user/packages/purchase';
+  static const String packageActiveStatus = '/api/v1/user/packages/active-status';
+  static const String packageSessionStart = '/api/v1/user/packages/session/start';
+  static const String packageSessionEnd = '/api/v1/user/packages/session/end';
 
   static const String faqs = '/api/v1/faqs';
   static const String privacyPolicy = '/api/v1/privacy-policy';
@@ -150,4 +153,9 @@ class AppUrls {
   static const String eventNewLiveComment = 'NewLiveComment';
   static const String eventSuperChatReceived = 'SuperChatReceived';
   static const String eventAstrologerBroadcastStarted = 'AstrologerBroadcastStarted';
+
+  // Prepaid Package Session Events
+  static const String eventPackageSubSessionStarted = 'PackageSubSessionStarted';
+  static const String eventPackageSubSessionEnded = 'PackageSubSessionEnded';
+  static const String eventPackageSessionTerminated = 'PackageSessionTerminated';
 }

@@ -20,6 +20,8 @@ class ChatScreen extends StatefulWidget {
   final String initialStatus;
   final String? startedAtString;
 
+  final bool isPackageChat;
+
   const ChatScreen({
     super.key,
     required this.astrologerName,
@@ -27,6 +29,7 @@ class ChatScreen extends StatefulWidget {
     required this.sessionId,
     required this.initialStatus,
     this.startedAtString,
+    this.isPackageChat = false,
   });
 
   @override
@@ -50,6 +53,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
     // Retrieve or instantiate controller
     _controller = Get.find<ChatController>();
+    _controller.isPackageChat = widget.isPackageChat;
     _controller.initSession(
       sessionId: widget.sessionId,
       currentUserId: 0,

@@ -16,6 +16,7 @@ import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:flutter/material.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 
 class CallController extends GetxController with WidgetsBindingObserver {
   final ApiClient _apiClient = Get.find<ApiClient>();
@@ -26,6 +27,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final RxBool isMuted = false.obs;
   final RxBool isSpeakerOn = false.obs;
   bool isCallScreenVisible = false;
+  bool isPackageCall = false;
 
   int? sessionId;
   int? providerId;
@@ -40,12 +42,18 @@ class CallController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _dismissedSubscription;
   StreamSubscription? _iceSubscription;
   StreamSubscription? _endedSubscription;
+  StreamSubscription? _packageTerminatedSub;
 
   @override
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     _setupWebSocketListeners();
+    _packageTerminatedSub = WebSocketService.isPackageSessionTerminated.listen((isTerminated) {
+      if (isTerminated && isPackageCall) {
+        _handlePackageTerminated();
+      }
+    });
   }
 
   void _setupWebSocketListeners() {
@@ -127,12 +135,14 @@ class CallController extends GetxController with WidgetsBindingObserver {
     required int providerId,
     required String providerName,
     required String providerImage,
+    bool isPackageSession = false,
   }) async {
     try {
       _isSummaryShown = false;
       this.providerId = providerId;
       this.providerName = providerName;
       this.providerImage = providerImage;
+      isPackageCall = isPackageSession;
 
       status.value = 'dialing';
       Logger.d('CallController: Dialing astrologer $providerName (ID: $providerId)...');
@@ -143,11 +153,17 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
       // 2. Post to Initiate API
       final response = await _apiClient.post(
-        AppUrls.initiateCall,
-        data: {
-          'provider_id': providerId,
-          'offer': offerDescription.sdp,
-        },
+        isPackageSession ? AppUrls.packageSessionStart : AppUrls.initiateCall,
+        data: isPackageSession
+            ? {
+                'astrologer_id': providerId,
+                'mode': 'call',
+                'offer': offerDescription.sdp,
+              }
+            : {
+                'provider_id': providerId,
+                'offer': offerDescription.sdp,
+              },
         handleError: true,
         showErrorScreen: false,
       );
@@ -155,7 +171,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (response.isSuccess) {
         final bodyMap = response.body;
         // Since response.body already points to the 'data' map from ResponseModel.fromJson (json['data'] ?? json)
-        final sessionData = bodyMap is Map ? (bodyMap['session'] ?? bodyMap['data']?['session']) : null;
+        final sessionData = bodyMap is Map 
+            ? (bodyMap['session'] ?? bodyMap['call_session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']?['call_session']) 
+            : null;
+        if (isPackageSession) {
+          final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
+          if (subSessionData != null) {
+            SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
+          }
+        }
         if (sessionData != null) {
           sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
           webrtcService.activeSessionId = sessionId;
@@ -205,11 +229,16 @@ class CallController extends GetxController with WidgetsBindingObserver {
   Future<void> endCall() async {
     if (sessionId == null) return;
     try {
-      final response = await _apiClient.post(
-        AppUrls.endCallSession(sessionId!),
-        handleError: true,
-        showErrorScreen: false,
-      );
+      final response = isPackageCall && SessionBottomSheetHelper.activeSubSessionId != null
+          ? await _apiClient.post(
+              AppUrls.packageSessionEnd,
+              data: {'sub_session_id': SessionBottomSheetHelper.activeSubSessionId},
+            )
+          : await _apiClient.post(
+              AppUrls.endCallSession(sessionId!),
+              handleError: true,
+              showErrorScreen: false,
+            );
       if (response.isSuccess) {
         if (_isSummaryShown) return;
         _isSummaryShown = true;
@@ -218,11 +247,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
         CustomSnackbar.showSuccess('Call ended successfully.');
         
         final bodyMap = response.body;
-        final sessionData = bodyMap is Map ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']) : null;
+        final sessionData = bodyMap is Map 
+            ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['sub_session'] ?? bodyMap['data']?['sub_session'] ?? bodyMap['data']) 
+            : null;
         int duration = 0;
         double cost = 0.0;
         if (sessionData != null && sessionData is Map) {
-          duration = int.tryParse(sessionData['duration_seconds']?.toString() ?? '') ?? 0;
+          duration = int.tryParse((sessionData['duration_seconds'] ?? sessionData['duration_used'])?.toString() ?? '') ?? 0;
           cost = double.tryParse(sessionData['total_cost']?.toString() ?? '') ?? 0.0;
         }
         
@@ -494,6 +525,26 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  void _handlePackageTerminated() {
+    status.value = 'completed';
+    cleanUp();
+    if (isCallScreenVisible) {
+      Get.back();
+    }
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Session Expired"),
+        content: const Text("Your prepaid package session has expired. Conversation has ended."),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -501,6 +552,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _dismissedSubscription?.cancel();
     _iceSubscription?.cancel();
     _endedSubscription?.cancel();
+    _packageTerminatedSub?.cancel();
     cleanUp();
     super.onClose();
   }

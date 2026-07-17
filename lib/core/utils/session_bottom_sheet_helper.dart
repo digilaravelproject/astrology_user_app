@@ -12,8 +12,15 @@ import '../services/network/api_client.dart';
 import '../constants/app_urls.dart';
 import '../utils/custom_snackbar.dart';
 import '../../features/astrologers/controllers/astrologer_controller.dart';
+import '../../features/call/presentation/pages/call_screen.dart';
+import '../../features/call/presentation/controllers/call_controller.dart';
+import '../../features/chat/presentation/pages/chat_screen.dart';
+import '../../features/chat/presentation/bindings/chat_binding.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SessionBottomSheetHelper {
+  static int? activeSubSessionId;
+
   static void show(BuildContext context, AstrologerModel astro) {
     final walletController = Get.find<WalletController>();
     final double walletBalance = double.tryParse(walletController.balance) ?? 0.0;
@@ -160,7 +167,36 @@ class SessionBottomSheetHelper {
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
-                          onTap: null,
+                          onTap: () async {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => const Center(
+                                child: CircularProgressIndicator(color: AppColors.deepPink),
+                              ),
+                            );
+                            try {
+                              final result = await PackageSessionService.startSubSession(
+                                astrologerId: astro.userId,
+                                mode: 'chat',
+                              );
+                              Navigator.pop(context); // Dismiss loading dialog
+                              Navigator.pop(context); // Dismiss bottom sheet
+                              
+                              activeSubSessionId = result.subSession.id;
+                              
+                              Get.to(() => ChatScreen(
+                                astrologerName: astro.name,
+                                astrologerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
+                                sessionId: result.linkedChatSession!.id,
+                                initialStatus: 'initiated',
+                                isPackageChat: true,
+                              ), binding: ChatBinding());
+                            } catch (e) {
+                              Navigator.pop(context); // Dismiss loading dialog
+                              CustomSnackbar.showError(e.toString());
+                            }
+                          },
                         ),
                       ),
                     if (astro.isChatEnabled && astro.isCallEnabled)
@@ -181,7 +217,33 @@ class SessionBottomSheetHelper {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          onTap: null,
+                          onTap: () async {
+                            var permissionStatus = await Permission.microphone.status;
+                            if (!permissionStatus.isGranted) {
+                              permissionStatus = await Permission.microphone.request();
+                            }
+                            if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+                              await openAppSettings();
+                              return;
+                            }
+
+                            if (permissionStatus.isGranted) {
+                              Navigator.pop(context); // Dismiss bottom sheet
+                              
+                              final callController = Get.isRegistered<CallController>()
+                                  ? Get.find<CallController>()
+                                  : Get.put(CallController());
+                                  
+                              Get.to(() => const CallScreen());
+                              
+                              callController.initiateCall(
+                                providerId: astro.userId,
+                                providerName: astro.name,
+                                providerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
+                                isPackageSession: true,
+                              );
+                            }
+                          },
                         ),
                       ),
                   ],
@@ -312,3 +374,84 @@ class SessionBottomSheetHelper {
     );
   }
 }
+
+class PackageSessionService {
+  static final ApiClient _apiClient = Get.find<ApiClient>();
+
+  /// Check active package status & recovery
+  static Future<ActiveStatusResponse> getActiveStatus(int astrologerId) async {
+    final response = await _apiClient.get(
+      AppUrls.packageActiveStatus,
+      queryParameters: {'astrologer_id': astrologerId},
+    );
+    if (response.isSuccess) {
+      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
+          ? response.body 
+          : {};
+      return ActiveStatusResponse(
+        hasActivePackage: data['has_active_package'] ?? false,
+        purchase: data['package_purchase'] != null 
+            ? PackagePurchase.fromJson(data['package_purchase']) 
+            : null,
+        activeSubSession: data['active_sub_session'] != null 
+            ? PackageSubSession.fromJson(data['active_sub_session']) 
+            : null,
+      );
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
+  /// Start a sub-session (mode: 'chat' | 'call')
+  static Future<StartSubSessionResult> startSubSession({
+    required int astrologerId,
+    required String mode,
+    String? question,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageSessionStart,
+      data: {
+        'astrologer_id': astrologerId,
+        'mode': mode,
+        if (question != null) 'question': question,
+      },
+    );
+    if (response.isSuccess) {
+      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
+          ? response.body 
+          : {};
+      return StartSubSessionResult(
+        subSession: PackageSubSession.fromJson(data['sub_session']),
+        remainingDuration: data['remaining_duration'] ?? 0,
+        linkedChatSession: data['chat_session'] != null
+            ? PackageChatSession.fromJson(data['chat_session'])
+            : null,
+        linkedCallSession: data['call_session'] != null
+            ? PackageCallSession.fromJson(data['call_session'])
+            : null,
+      );
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
+  /// End sub-session
+  static Future<EndSubSessionResult> endSubSession(int subSessionId) async {
+    final response = await _apiClient.post(
+      AppUrls.packageSessionEnd,
+      data: {'sub_session_id': subSessionId},
+    );
+    if (response.isSuccess) {
+      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
+          ? response.body 
+          : {};
+      return EndSubSessionResult(
+        subSession: PackageSubSession.fromJson(data['sub_session']),
+        remainingDuration: data['remaining_duration'] ?? 0,
+      );
+    } else {
+      throw Exception(response.message);
+    }
+  }
+}
+

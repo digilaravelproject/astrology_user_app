@@ -52,6 +52,10 @@ class WebSocketService extends GetxService {
   static final RxMap<String, dynamic> callEndedData = <String, dynamic>{}.obs;
   static final RxMap<String, dynamic> iceCandidateData = <String, dynamic>{}.obs;
 
+  // Prepaid Package Session State
+  static final RxInt packageRemainingSeconds = 0.obs;
+  static final RxBool isPackageSessionTerminated = false.obs;
+
   final String _wsUrl = AppUrls.webSocketUrl;
   
   bool get isConnected => _isConnected;
@@ -281,6 +285,23 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleUserLeftLiveSession(data['data']);
+        } else if (event == AppUrls.eventPackageSubSessionStarted || event == 'App\\Events\\${AppUrls.eventPackageSubSessionStarted}') {
+          Logger.d('Prepaid Package session started: ${data['data']}');
+          final eventData = data['data'];
+          if (eventData != null && eventData is Map) {
+            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+            isPackageSessionTerminated.value = false;
+          }
+        } else if (event == AppUrls.eventPackageSubSessionEnded || event == 'App\\Events\\${AppUrls.eventPackageSubSessionEnded}') {
+          Logger.d('Prepaid Package session ended: ${data['data']}');
+          final eventData = data['data'];
+          if (eventData != null && eventData is Map) {
+            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+          }
+        } else if (event == AppUrls.eventPackageSessionTerminated || event == 'App\\Events\\${AppUrls.eventPackageSessionTerminated}') {
+          Logger.d('Prepaid Package session terminated!');
+          packageRemainingSeconds.value = 0;
+          isPackageSessionTerminated.value = true;
         }
       } catch (e) {
         Logger.e('WebSocketService: Error parsing message -> $e');

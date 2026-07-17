@@ -153,3 +153,157 @@ class AstrologerModel {
     return 'Session ($durationStr) @ ₹$packagePrice';
   }
 }
+
+class PackageSubSession {
+  final int id;
+  final int packagePurchaseId;
+  final String mode; // 'chat' | 'call'
+  final int? chatSessionId; // Use this ID for chat API calls
+  final int? callSessionId; // Use this ID for call/Agora signaling
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final int durationUsed;
+
+  PackageSubSession({
+    required this.id,
+    required this.packagePurchaseId,
+    required this.mode,
+    this.chatSessionId,
+    this.callSessionId,
+    required this.startedAt,
+    this.endedAt,
+    required this.durationUsed,
+  });
+
+  factory PackageSubSession.fromJson(Map<String, dynamic> json) {
+    return PackageSubSession(
+      id: json['id'] ?? 0,
+      packagePurchaseId: json['package_purchase_id'] ?? 0,
+      mode: json['mode'] ?? '',
+      chatSessionId: json['chat_session_id'],
+      callSessionId: json['call_session_id'],
+      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : DateTime.now(),
+      endedAt: json['ended_at'] != null ? DateTime.parse(json['ended_at']) : null,
+      durationUsed: json['duration_used'] ?? 0,
+    );
+  }
+}
+
+class PackageChatSession {
+  final int id;
+  final int consumerId;
+  final int providerId;
+  final String status;
+
+  PackageChatSession({
+    required this.id,
+    required this.consumerId,
+    required this.providerId,
+    required this.status,
+  });
+
+  factory PackageChatSession.fromJson(Map<String, dynamic> json) {
+    return PackageChatSession(
+      id: json['id'] ?? 0,
+      consumerId: json['consumer_id'] ?? 0,
+      providerId: json['provider_id'] ?? 0,
+      status: json['status'] ?? '',
+    );
+  }
+}
+
+class PackageCallSession {
+  final int id;
+  final int consumerId;
+  final int providerId;
+  final String status;
+  final String callType;
+
+  PackageCallSession({
+    required this.id,
+    required this.consumerId,
+    required this.providerId,
+    required this.status,
+    required this.callType,
+  });
+
+  factory PackageCallSession.fromJson(Map<String, dynamic> json) {
+    return PackageCallSession(
+      id: json['id'] ?? 0,
+      consumerId: json['consumer_id'] ?? 0,
+      providerId: json['provider_id'] ?? 0,
+      status: json['status'] ?? '',
+      callType: json['call_type'] ?? 'audio',
+    );
+  }
+}
+
+class ActiveStatusResponse {
+  final bool hasActivePackage;
+  final PackagePurchase? purchase;
+  final PackageSubSession? activeSubSession;
+
+  ActiveStatusResponse({
+    required this.hasActivePackage,
+    this.purchase,
+    this.activeSubSession,
+  });
+}
+
+class StartSubSessionResult {
+  final PackageSubSession subSession;
+  final int remainingDuration;
+  final PackageChatSession? linkedChatSession;
+  final PackageCallSession? linkedCallSession;
+
+  StartSubSessionResult({
+    required this.subSession,
+    required this.remainingDuration,
+    this.linkedChatSession,
+    this.linkedCallSession,
+  });
+}
+
+class EndSubSessionResult {
+  final PackageSubSession subSession;
+  final int remainingDuration;
+
+  EndSubSessionResult({
+    required this.subSession,
+    required this.remainingDuration,
+  });
+}
+
+class PackagePurchase {
+  final int id;
+  final int consumerId;
+  final int providerId;
+  final int totalDuration;
+  final int remainingDuration;
+  final double price;
+  final String status;
+
+  PackagePurchase({
+    required this.id,
+    required this.consumerId,
+    required this.providerId,
+    required this.totalDuration,
+    required this.remainingDuration,
+    required this.price,
+    required this.status,
+  });
+
+  factory PackagePurchase.fromJson(Map<String, dynamic> json) {
+    return PackagePurchase(
+      id: json['id'] ?? 0,
+      consumerId: json['consumer_id'] ?? 0,
+      providerId: json['provider_id'] ?? 0,
+      totalDuration: json['total_duration'] ?? 0,
+      remainingDuration: json['remaining_duration'] ?? 0,
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
+      status: json['status'] ?? '',
+    );
+  }
+}
+
+

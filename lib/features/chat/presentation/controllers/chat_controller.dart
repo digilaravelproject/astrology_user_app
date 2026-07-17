@@ -23,6 +23,10 @@ import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialo
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
+import 'package:astro_user/features/chat/domain/entities/chat_session.dart';
 import 'package:astro_user/features/auth/controllers/auth_controller.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -66,8 +70,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _statusSub;
   StreamSubscription? _dismissSub;
   StreamSubscription? _statusUpdateSub;
+  StreamSubscription? _packageTerminatedSub;
 
   int? get sessionId => _sessionId;
+  bool isPackageChat = false;
 
   @override
   void onInit() {
@@ -98,6 +104,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       messages.clear();
       _sessionId = sessionId;
     }
+    _packageTerminatedSub?.cancel();
+    _packageTerminatedSub = WebSocketService.isPackageSessionTerminated.listen((isTerminated) {
+      if (isTerminated && isPackageChat) {
+        _handlePackageTerminated();
+      }
+    });
     if (currentUserId != 0) {
       _currentUserId = currentUserId;
     } else {
@@ -473,7 +485,27 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     if (_sessionId == null) return;
     isLoading.value = true;
     try {
-      final session = await _endChatSessionUseCase.execute(_sessionId!);
+      final ChatSession? session;
+      if (isPackageChat && SessionBottomSheetHelper.activeSubSessionId != null) {
+        final response = await Get.find<ApiClient>().post(
+          AppUrls.packageSessionEnd,
+          data: {'sub_session_id': SessionBottomSheetHelper.activeSubSessionId},
+        );
+        if (response.isSuccess) {
+          final data = response.body is Map<String, dynamic> ? response.body : {};
+          final int duration = data['sub_session']?['duration_used'] ?? 0;
+          session = ChatSession(
+            id: _sessionId!,
+            durationSeconds: duration,
+            totalCost: 0.0,
+          );
+        } else {
+          throw Exception(response.message);
+        }
+      } else {
+        session = await _endChatSessionUseCase.execute(_sessionId!);
+      }
+
       status.value = 'ended';
       _timer?.cancel();
       FlutterBackgroundService().invoke('stopService');
@@ -560,6 +592,31 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Implement scroll listener logic if needed
   }
 
+  void _handlePackageTerminated() {
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    if (_sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    }
+    FloatingChatBubble.dismiss();
+    WebSocketService.activeSessionId = null;
+    
+    Get.back();
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Session Expired"),
+        content: const Text("Your prepaid package session has expired. Conversation has ended."),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -568,6 +625,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _endSub?.cancel();
     _statusSub?.cancel();
     _dismissSub?.cancel();
+    _packageTerminatedSub?.cancel();
     if (WebSocketService.activeSessionId == _sessionId) {
       WebSocketService.activeSessionId = null;
     }
