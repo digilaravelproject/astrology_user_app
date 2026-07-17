@@ -1211,15 +1211,15 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           CustomButton(
-            text: 'Session (1 hr 45 min) @ ₹500',
+            text: _astrologer?.packageSessionText ?? 'Session (1 hr) @ ₹500',
             icon: Icons.timer,
             fontSize: 14,
             height: 48,
             width: double.infinity,
             borderRadius: 12,
-            backgroundColor: Colors.orange,
+            backgroundColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
             textColor: Colors.white,
-            borderColor: Colors.orange,
+            borderColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
             onTap: () {
               if (_astrologer != null) {
                 SessionBottomSheetHelper.show(context, _astrologer!);

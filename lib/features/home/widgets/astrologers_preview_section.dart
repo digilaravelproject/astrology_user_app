@@ -226,27 +226,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                           ],
                         ),
                       ),
-                      if (astro.hasOffer)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const AppText(
-                                'Fixed Session',
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                              AppText(
-                                '₹500',
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
-                              ),
-                            ],
-                          ),
-                        ),
+
                     ],
                   ),
                   /*
@@ -281,15 +261,15 @@ class AstrologersPreviewSection extends StatelessWidget {
                             runSpacing: 8,
                             children: [
                               CustomButton(
-                                text: 'Session (1 hr 45 min) @ ₹500',
+                                text: astro.packageSessionText,
                                 icon: Icons.timer,
                                 fontSize: 10,
                                 height: 32,
                                 width: 180,
                                 borderRadius: 8,
-                                backgroundColor: Colors.orange,
+                                backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                                 textColor: Colors.white,
-                                borderColor: Colors.orange,
+                                borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 onTap: () {
                                   SessionBottomSheetHelper.show(context, astro);

@@ -26,6 +26,10 @@ class AstrologerModel {
   final String? originalCallRatePerMinute;
   final bool hasOffer;
   final String? discountPercentage;
+  final int? packagePrice;
+  final int? packageDuration;
+  final bool? isPurchase;
+  final int? remainingTime;
 
   AstrologerModel({
     required this.id,
@@ -53,6 +57,10 @@ class AstrologerModel {
     this.originalCallRatePerMinute,
     this.hasOffer = false,
     this.discountPercentage,
+    this.packagePrice,
+    this.packageDuration,
+    this.isPurchase,
+    this.remainingTime,
   });
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
@@ -68,7 +76,7 @@ class AstrologerModel {
       bio: json['bio'] ?? '',
       chatRate: json['chat_rate_per_minute'],
       callRate: json['call_rate_per_minute'],
-      videoCallRate: json['video_call_rate'],
+      videoCallRate: json['video_call_rate_per_minute'] ?? json['video_call_rate'],
       name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
       phone: userData['phone'],
       email: userData['email'],
@@ -84,10 +92,64 @@ class AstrologerModel {
       originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
       hasOffer: json['has_offer'] == true,
       discountPercentage: json['offer_details']?['discount_percentage']?.toString(),
+      packagePrice: json['package_details']?['price'] != null ? int.tryParse(json['package_details']['price'].toString()) : null,
+      packageDuration: json['package_details']?['duration'] != null ? int.tryParse(json['package_details']['duration'].toString()) : null,
+      isPurchase: json['package_details']?['is_purchase'] == true,
+      remainingTime: json['package_details']?['remaining_time'] != null ? int.tryParse(json['package_details']['remaining_time'].toString()) : null,
     );
   }
 
   String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 
   bool get isAvailableOnline => isChatEnabled || isCallEnabled || isVideoCallEnabled;
+
+  String get packageSessionText {
+    if (packagePrice == null || packageDuration == null) {
+      return 'Session (1 hr) @ ₹500';
+    }
+    if (isPurchase == true && remainingTime != null) {
+      final int remainingSeconds = remainingTime!;
+      String remainingTimeStr;
+      if (remainingSeconds < 60) {
+        remainingTimeStr = '$remainingSeconds sec';
+      } else if (remainingSeconds < 3600) {
+        final int mins = remainingSeconds ~/ 60;
+        remainingTimeStr = '$mins min';
+      } else {
+        final int remainingMinutes = remainingSeconds ~/ 60;
+        final int remDays = remainingMinutes ~/ 1440;
+        final int remHours = (remainingMinutes % 1440) ~/ 60;
+        final int remMins = remainingMinutes % 60;
+        
+        if (remDays > 0) {
+          if (remHours > 0) {
+            remainingTimeStr = '$remDays d $remHours hr';
+          } else {
+            remainingTimeStr = '$remDays d';
+          }
+        } else {
+          if (remMins > 0) {
+            remainingTimeStr = '$remHours hr $remMins min';
+          } else {
+            remainingTimeStr = '$remHours hr';
+          }
+        }
+      }
+      return 'Session ($remainingTimeStr)';
+    }
+    final int seconds = packageDuration!;
+    final int hours = seconds ~/ 3600;
+    final int minutes = (seconds % 3600) ~/ 60;
+    
+    String durationStr;
+    if (hours > 0 && minutes > 0) {
+      durationStr = '$hours hr $minutes min';
+    } else if (hours > 0) {
+      durationStr = '$hours hr';
+    } else {
+      durationStr = '$minutes min';
+    }
+    
+    return 'Session ($durationStr) @ ₹$packagePrice';
+  }
 }

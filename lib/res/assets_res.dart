@@ -11,10 +11,9 @@ class AssetsRes {
   static const String BUBBLE_IMG = 'assets/icons/bubble_img.png';
   static const String VERIFY = 'assets/icons/verify.png';
   static const String APP_ICON = 'assets/images/app_icon.png';
-  static const String APP_LOGO = 'assets/images/app_logo.png';
   static const String ASTRO = 'assets/images/astro.jpg';
   static const String BG_JOIN_SESSION_HOME = 'assets/images/bg_join_session_home.jpeg';
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
-  static const String BUBBLE_IMG = 'assets/images/bubble_img.png';
+  static const String BUBBLE_IMG_2 = 'assets/images/bubble_img.png';
   static const String LIVE_SESSION_BG = 'assets/images/live_session_bg.png';
 }

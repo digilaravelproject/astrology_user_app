@@ -75,13 +75,17 @@ class CustomButton extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Text(
-                        text,
-                        style: GoogleFonts.poppins(
-                          color: textColor ?? Colors.white,
-                          fontSize: fontSize,
-                          fontWeight: fontWeight,
-                          letterSpacing: 0.5,
+                      Flexible(
+                        child: Text(
+                          text,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: GoogleFonts.poppins(
+                            color: textColor ?? Colors.white,
+                            fontSize: fontSize,
+                            fontWeight: fontWeight,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ],

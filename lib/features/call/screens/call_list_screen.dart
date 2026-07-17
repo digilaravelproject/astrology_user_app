@@ -608,14 +608,14 @@ class CallListScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             CustomButton(
-                              text: 'Session (1 hr 45 min) @ ₹500',
+                              text: astro.packageSessionText,
                               icon: Icons.timer,
                               fontSize: 11,
                               height: 32,
                               borderRadius: 8,
-                              backgroundColor: Colors.orange,
+                               backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                               textColor: Colors.white,
-                              borderColor: Colors.orange,
+                              borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                               onTap: () {
                                 SessionBottomSheetHelper.show(context, astro);
                               },

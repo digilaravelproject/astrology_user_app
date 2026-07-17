@@ -38,6 +38,7 @@ class AppUrls {
   static const String plans = '/api/v1/user/plans';
   static const String upgradePlans = '/api/v1/user/plans/upgrade';
   static const String upgradePlansVerify = '/api/v1/user/plans/upgrade/verify';
+  static const String purchasePackage = '/api/v1/user/packages/purchase';
 
   static const String faqs = '/api/v1/faqs';
   static const String privacyPolicy = '/api/v1/privacy-policy';
