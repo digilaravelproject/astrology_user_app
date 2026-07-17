@@ -19,6 +19,7 @@ import '../../../core/constants/app_urls.dart';
 import '../widgets/gift_history_bottom_sheet.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../wallet/widgets/recharge_bottom_sheet.dart';
+import '../../../core/utils/session_bottom_sheet_helper.dart';
 
 class AstrologerDetailScreen extends StatefulWidget {
   final int astrologerId;
@@ -1206,8 +1207,28 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
+          CustomButton(
+            text: 'Session (1 hr 45 min) @ ₹500',
+            icon: Icons.timer,
+            fontSize: 14,
+            height: 48,
+            width: double.infinity,
+            borderRadius: 12,
+            backgroundColor: Colors.orange,
+            textColor: Colors.white,
+            borderColor: Colors.orange,
+            onTap: () {
+              if (_astrologer != null) {
+                SessionBottomSheetHelper.show(context, _astrologer!);
+              }
+            },
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
           if (_astrologer?.isChatEnabled == true) ...[
             Expanded(
               child: GestureDetector(
@@ -1379,8 +1400,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     ),
                   ),
                 ),
-              ),
             ),
+            )
+            ],
+          ),
         ],
       ),
     );
@@ -1398,7 +1421,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           BoxShadow(
             color: Colors.pink.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
