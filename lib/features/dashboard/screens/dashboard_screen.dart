@@ -122,9 +122,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (await FlutterOverlayWindow.isActive()) return;
       
       final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
-      if (response.isSuccess && response.body['data'] != null) {
-        final data = response.body['data'];
-        final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
+      if (response.isSuccess && response.body != null) {
+        final data = response.body;
+        final session = (data is Map)
+            ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
+            : null;
         final sessionId = session?['id'];
         final status = session?['status'];
         final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];

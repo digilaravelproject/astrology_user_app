@@ -147,11 +147,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.call, color: Colors.green),
-                      tooltip: "Switch to Call",
-                      onPressed: () => _showSwitchToCallConfirmation(context),
-                    ),
+                    if (widget.isPackageChat)
+                      IconButton(
+                        icon: const Icon(Icons.call, color: Colors.green),
+                        tooltip: "Switch to Call",
+                        onPressed: () => _showSwitchToCallConfirmation(context),
+                      ),
                     TextButton(
                       onPressed: () => _showEndChatConfirmation(context),
                       child: const AppText(
@@ -599,10 +600,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               try {
                 final apiClient = Get.find<ApiClient>();
                 final response = await apiClient.get(AppUrls.getCurrentSession);
-                
-                if (response.isSuccess && response.body['data'] != null) {
-                  final data = response.body['data'];
-                  final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
+                                if (response.isSuccess && response.body != null) {
+                  final data = response.body;
+                  final session = (data is Map)
+                      ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
+                      : null;
                   final providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
                   
                   if (providerId > 0) {
