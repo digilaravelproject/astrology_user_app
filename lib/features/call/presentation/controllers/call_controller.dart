@@ -208,7 +208,10 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> cancelCall() async {
-    if (sessionId == null) return;
+    if (sessionId == null) {
+      cleanUp();
+      return;
+    }
     try {
       final response = await _apiClient.post(
         AppUrls.cancelCall(sessionId!),
@@ -409,6 +412,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
     providerId = null;
     providerName = null;
     providerImage = null;
+
+    if (isCallScreenVisible) {
+      isCallScreenVisible = false;
+      Get.back();
+    }
   }
 
   @override
