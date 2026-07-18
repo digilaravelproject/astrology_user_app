@@ -123,12 +123,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       
       final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
       if (response.isSuccess && response.body['data'] != null) {
-        final session = response.body['data'];
-        final sessionId = session['id'];
-        final status = session['status'];
-        final startedAt = session['started_at'] ?? session['accepted_at'] ?? session['created_at'];
+        final data = response.body['data'];
+        final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
+        final sessionId = session?['id'];
+        final status = session?['status'];
+        final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
         // For user app, other person is provider (astrologer)
-        final name = session['provider']?['name'] ?? 'Astrologer';
+        final name = session?['provider']?['name'] ?? 'Astrologer';
         
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           FloatingChatBubble.show(

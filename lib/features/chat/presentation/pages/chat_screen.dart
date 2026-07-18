@@ -601,8 +601,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 final response = await apiClient.get(AppUrls.getCurrentSession);
                 
                 if (response.isSuccess && response.body['data'] != null) {
-                  final session = response.body['data'];
-                  final providerId = int.tryParse(session['provider_id']?.toString() ?? '') ?? 0;
+                  final data = response.body['data'];
+                  final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
+                  final providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
                   
                   if (providerId > 0) {
                     // End chat session
