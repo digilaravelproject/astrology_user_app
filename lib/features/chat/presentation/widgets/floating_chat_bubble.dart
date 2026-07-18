@@ -18,7 +18,7 @@ class FloatingChatBubble {
 
   static bool _isActive = false;
   static bool get isActive => _isActive;
-  
+
   static StreamSubscription? _overlaySub;
   static const MethodChannel _appRetainChannel = MethodChannel('com.suryapath.user/app_retain');
 
@@ -57,7 +57,7 @@ class FloatingChatBubble {
     required VoidCallback onTap,
   }) async {
     _setupIsolatePort();
-    
+
     if (_isActive && FloatingChatBubble.sessionId == sessionId) {
       // Just update status if already active
       chatStatus.value = status;
@@ -97,7 +97,7 @@ class FloatingChatBubble {
           height: 260,
           width: 260,
         );
-        
+
         await FlutterOverlayWindow.shareData({
           'type': 'init',
           'sessionId': sessionId,
@@ -108,7 +108,7 @@ class FloatingChatBubble {
           'unreadCount': 0,
         });
       }
-      
+
       // Cancel the local notification to avoid duplicates
       try {
         LocalNotificationService.cancelOngoingChatNotification(sessionId);
@@ -256,7 +256,7 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    
+
     // Constraints to keep bubble inside screen bounds
     if (xPosition < 0) xPosition = 0;
     if (xPosition > size.width - 80) xPosition = size.width - 80;
@@ -302,16 +302,16 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                 child: ClipOval(
                   child: widget.imageUrl.isNotEmpty
                       ? Image.network(
-                          widget.imageUrl.startsWith('http')
-                              ? widget.imageUrl
-                              : '${AppUrls.baseImageUrl}${widget.imageUrl}',
-                          fit: BoxFit.cover,
-                          errorBuilder: (c, e, s) => _buildInitials(),
-                        )
+                    widget.imageUrl.startsWith('http')
+                        ? widget.imageUrl
+                        : '${AppUrls.baseImageUrl}${widget.imageUrl}',
+                    fit: BoxFit.cover,
+                    errorBuilder: (c, e, s) => _buildInitials(),
+                  )
                       : _buildInitials(),
                 ),
               ),
-              
+
               // Timing overlay
               Positioned(
                 bottom: -4,
@@ -348,7 +348,7 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                   ),
                 ),
               ),
-              
+
               // Unread count badge
               Obx(() {
                 final count = FloatingChatBubble.unreadCount.value;

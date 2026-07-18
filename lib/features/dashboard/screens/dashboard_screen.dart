@@ -66,13 +66,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Check for initial index from arguments
     final argIndex = Get.arguments?['index'];
     if (argIndex != null && argIndex is int) {
       _selectedIndex = argIndex;
     }
-    
+
     final bool skipPromo = Get.arguments?['skip_promo'] ?? false;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -120,7 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _checkCurrentActiveSession() async {
     try {
       if (await FlutterOverlayWindow.isActive()) return;
-      
+
       final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
       if (response.isSuccess && response.body['data'] != null) {
         final data = response.body['data'];
@@ -130,29 +130,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
         // For user app, other person is provider (astrologer)
         final name = session?['provider']?['name'] ?? 'Astrologer';
-        
+
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           FloatingChatBubble.show(
-             context: Get.context!,
-             sessionId: sessionId,
-             name: name,
-             imageUrl: '', // We don't have the image in this payload
-             status: status,
-             startedAt: startedAt,
-             onTap: () {
-               final currentStatus = FloatingChatBubble.chatStatus.value;
-               FloatingChatBubble.dismiss();
-               Get.to(
-                 () => ChatScreen(
-                   astrologerName: name,
-                   astrologerImage: '',
-                   sessionId: sessionId,
-                   initialStatus: currentStatus,
-                   startedAtString: startedAt,
-                 ),
-                 binding: ChatBinding(),
-               );
-             }
+              context: Get.context!,
+              sessionId: sessionId,
+              name: name,
+              imageUrl: '', // We don't have the image in this payload
+              status: status,
+              startedAt: startedAt,
+              onTap: () {
+                final currentStatus = FloatingChatBubble.chatStatus.value;
+                FloatingChatBubble.dismiss();
+                Get.to(
+                      () => ChatScreen(
+                    astrologerName: name,
+                    astrologerImage: '',
+                    sessionId: sessionId,
+                    initialStatus: currentStatus,
+                    startedAtString: startedAt,
+                  ),
+                  binding: ChatBinding(),
+                );
+              }
           );
         }
       }
@@ -181,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                   child: Image.asset(
                     "assets/images/astro.jpg",
-                   // 'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
+                    // 'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
                     fit: BoxFit.fill,
                     errorBuilder: (context, error, stackTrace) => Container(
                       color: const Color(0xFF2E1A47),
@@ -189,7 +189,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              
+
               // Overlay Gradient
               Positioned.fill(
                 child: Container(
@@ -297,9 +297,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
-                             Navigator.pop(context);
-                             // Navigate effectively implies starting the chat flow
-                             // For now just close, as user might want to browse
+                            Navigator.pop(context);
+                            // Navigate effectively implies starting the chat flow
+                            // For now just close, as user might want to browse
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFF6F00), // Orange color
@@ -337,7 +337,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Color? navGradientColor;
       // Accessing observable to ensure Obx is valid
       final isRegistered = _matrimonyController.isRegistered.value;
-      
+
       if (_selectedIndex == 1) {
         // Matrimony - Use dark color for landing page, white for registered section
         navGradientColor = isRegistered ? Colors.white : const Color(0xFF1A0A2E);
