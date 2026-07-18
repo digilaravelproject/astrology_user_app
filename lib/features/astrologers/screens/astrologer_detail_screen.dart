@@ -20,6 +20,7 @@ import '../widgets/gift_history_bottom_sheet.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../wallet/widgets/recharge_bottom_sheet.dart';
 import '../../../core/utils/session_bottom_sheet_helper.dart';
+import '../../chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 
 class AstrologerDetailScreen extends StatefulWidget {
   final int astrologerId;
@@ -165,7 +166,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       Obx(() => _buildReviewsSection()),
                       const SizedBox(height: 16),
                       // Chat with Assistant
-                      //_buildChatAssistantSection(),
+                      _buildChatAssistantSection(),
                       const SizedBox(height: 16),
                       // Send Gift
                       _buildGiftSection(),
@@ -1410,29 +1411,41 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
   }
 
   Widget _buildChatAssistantSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFFFCDD2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.pink.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.support_agent, color: Color(0xFFE91E63), size: 24),
-          const SizedBox(width: 8),
-          AppText('Chat with Assistant', fontSize: 16, fontWeight: FontWeight.w500, color: const Color(0xFFC2185B)),
-          const Spacer(),
-          const Icon(Icons.chevron_right, color: Color(0xFFE91E63)),
-        ],
+    return GestureDetector(
+      onTap: () {
+        if (_astrologer != null) {
+          final chatAssistanceController = Get.put(ChatAssistanceController());
+          chatAssistanceController.initiateChatAssistance(
+            _astrologer!.userId ?? widget.astrologerId,
+            astroName: _astrologer!.name,
+            astroImage: _astrologer!.fullProfilePhoto,
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFFFCDD2)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.pink.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.support_agent, color: Color(0xFFE91E63), size: 24),
+            const SizedBox(width: 8),
+            const AppText('Assistance Chat', fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFFC2185B)),
+            const Spacer(),
+            const Icon(Icons.chevron_right, color: Color(0xFFE91E63)),
+          ],
+        ),
       ),
     );
   }
