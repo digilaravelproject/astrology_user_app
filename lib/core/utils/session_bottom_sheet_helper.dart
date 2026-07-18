@@ -43,7 +43,10 @@ class SessionBottomSheetHelper {
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.isSuccess && response.body != null) {
-        final data = response.body['data'];
+        final body = response.body;
+        final data = (body is Map && body.containsKey('has_active_package'))
+            ? body
+            : (body is Map ? body['data'] : null);
         if (data != null && data is Map) {
           hasActivePackage = data['has_active_package'] == true;
           if (hasActivePackage) {
@@ -419,9 +422,10 @@ class PackageSessionService {
       queryParameters: {'astrologer_id': astrologerId},
     );
     if (response.isSuccess) {
-      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
-          ? response.body 
-          : {};
+      final body = response.body;
+      final Map<String, dynamic> data = (body is Map && body.containsKey('has_active_package'))
+          ? Map<String, dynamic>.from(body)
+          : (body is Map && body['data'] is Map ? Map<String, dynamic>.from(body['data']) : {});
       return ActiveStatusResponse(
         hasActivePackage: data['has_active_package'] ?? false,
         purchase: data['package_purchase'] != null 
