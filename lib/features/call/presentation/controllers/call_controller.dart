@@ -329,17 +329,21 @@ class CallController extends GetxController with WidgetsBindingObserver {
       cost = double.tryParse(session['total_cost']?.toString() ?? '') ?? 0.0;
     }
     
+    final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
-    if (isCallScreenVisible) {
-      Get.back(); // Close CallScreen safely
-    }
-    
-    Future.delayed(const Duration(milliseconds: 300), () {
-      CallSummaryDialog.show(
-        sessionId: sId,
-        durationSeconds: duration,
-        totalCost: cost,
-      );
+
+    // Close CallScreen safely on main thread
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (wasCallScreenVisible) {
+        Get.back();
+      }
+      Future.delayed(const Duration(milliseconds: 300), () {
+        CallSummaryDialog.show(
+          sessionId: sId,
+          durationSeconds: duration,
+          totalCost: cost,
+        );
+      });
     });
   }
 
@@ -415,7 +419,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
     if (isCallScreenVisible) {
       isCallScreenVisible = false;
-      Get.back();
     }
   }
 
@@ -432,19 +435,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
     if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) return;
-    // FloatingCallBubble.show(
-    //   context: context,
-    //   sessionId: sessionId!,
-    //   name: name,
-    //   imageUrl: image,
-    //   startedAt: status.value == 'ongoing' ? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toUtc().toIso8601String() : null,
-    //   status: status.value,
-    //   onTap: () {
-    //     final currentStatus = FloatingCallBubble.callStatus.value;
-    //     FloatingCallBubble.dismiss();
-    //     Get.to(() => const CallScreen());
-    //   },
-    // );
+    FloatingCallBubble.show(
+      context: context,
+      sessionId: sessionId!,
+      name: name,
+      imageUrl: image,
+      startedAt: status.value == 'ongoing' ? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toUtc().toIso8601String() : null,
+      status: status.value,
+      onTap: () {
+        final currentStatus = FloatingCallBubble.callStatus.value;
+        FloatingCallBubble.dismiss();
+        Get.to(() => const CallScreen());
+      },
+    );
     if (shouldPop) {
       Navigator.of(context).pop();
     }
@@ -456,7 +459,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (response.isSuccess && response.body != null) {
         final bodyMap = response.body;
         final session = bodyMap is Map 
-            ? (bodyMap['session'] ?? bodyMap['data']?['session'])
+            ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['data'] ?? bodyMap)
             : null;
         if (session != null) {
           final sessionStatus = session['status']?.toString();
@@ -504,21 +507,21 @@ class CallController extends GetxController with WidgetsBindingObserver {
             );
 
             // Show Floating Bubble
-            // if (!isCallScreenVisible) {
-            //   FloatingCallBubble.show(
-            //     context: Get.context!,
-            //     sessionId: sessionId!,
-            //     name: providerName!,
-            //     imageUrl: providerImage ?? "",
-            //     startedAt: session['started_at']?.toString(),
-            //     status: status.value,
-            //     onTap: () {
-            //       final currentStatus = FloatingCallBubble.callStatus.value;
-            //       FloatingCallBubble.dismiss();
-            //       Get.to(() => const CallScreen());
-            //     },
-            //   );
-            // }
+            if (!isCallScreenVisible) {
+              FloatingCallBubble.show(
+                context: Get.context!,
+                sessionId: sessionId!,
+                name: providerName!,
+                imageUrl: providerImage ?? "",
+                startedAt: session['started_at']?.toString(),
+                status: status.value,
+                onTap: () {
+                  final currentStatus = FloatingCallBubble.callStatus.value;
+                  FloatingCallBubble.dismiss();
+                  Get.to(() => const CallScreen());
+                },
+              );
+            }
           } else {
             cleanUp();
           }

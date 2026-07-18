@@ -257,32 +257,32 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(12),
                                 child: message.image != null && message.image!.startsWith('http')
                                     ? Image.network(
-                                  message.image!,
-                                  height: 150,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                )
+                                        message.image!,
+                                        height: 150,
+                                        width: 200,
+                                        fit: BoxFit.cover,
+                                      )
                                     : (message.image != null && File(message.image!).existsSync()
-                                    ? Image.file(
-                                  File(message.image!),
-                                  height: 150,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                )
-                                    : Image.network(
-                                  message.attachmentUrl != null && message.attachmentUrl!.startsWith('http')
-                                      ? message.attachmentUrl!
-                                      : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
-                                  height: 150,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (c, e, s) => Container(
-                                    height: 150,
-                                    width: 200,
-                                    color: Colors.grey,
-                                    child: const Icon(Icons.broken_image, color: Colors.white),
-                                  ),
-                                )),
+                                        ? Image.file(
+                                            File(message.image!),
+                                            height: 150,
+                                            width: 200,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.network(
+                                            message.attachmentUrl != null && message.attachmentUrl!.startsWith('http')
+                                                ? message.attachmentUrl!
+                                                : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
+                                            height: 150,
+                                            width: 200,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (c, e, s) => Container(
+                                              height: 150,
+                                              width: 200,
+                                              color: Colors.grey,
+                                              child: const Icon(Icons.broken_image, color: Colors.white),
+                                            ),
+                                          )),
                               )
                             else if (message.type == 'document')
                               Container(
@@ -330,8 +330,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                                     status == 'sending...'
                                         ? Icons.access_time
                                         : status == 'sent'
-                                        ? Icons.check
-                                        : Icons.done_all,
+                                            ? Icons.check
+                                            : Icons.done_all,
                                     size: 16,
                                     color: status == 'seen'
                                         ? Colors.blueAccent
@@ -433,35 +433,35 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               clipBehavior: Clip.hardEdge,
               child: widget.astrologerImage.isNotEmpty
                   ? Image.network(
-                widget.astrologerImage,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Center(
-                    child: Text(
-                      widget.astrologerName.isNotEmpty
-                          ? widget.astrologerName.substring(0, 1).toUpperCase()
-                          : 'A',
-                      style: TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.deepPink,
+                      widget.astrologerImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Text(
+                            widget.astrologerName.isNotEmpty
+                                ? widget.astrologerName.substring(0, 1).toUpperCase()
+                                : 'A',
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.deepPink,
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : Center(
+                      child: Text(
+                        widget.astrologerName.isNotEmpty
+                            ? widget.astrologerName.substring(0, 1).toUpperCase()
+                            : 'A',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.deepPink,
+                        ),
                       ),
                     ),
-                  );
-                },
-              )
-                  : Center(
-                child: Text(
-                  widget.astrologerName.isNotEmpty
-                      ? widget.astrologerName.substring(0, 1).toUpperCase()
-                      : 'A',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.deepPink,
-                  ),
-                ),
-              ),
             ),
             const SizedBox(height: 28),
 
@@ -589,7 +589,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           TextButton(
             onPressed: () async {
               Navigator.of(dialogContext).pop();
-
+              
               // Show loader
               Get.dialog(
                 const Center(child: CircularProgressIndicator(color: AppColors.deepPink)),
@@ -599,16 +599,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               try {
                 final apiClient = Get.find<ApiClient>();
                 final response = await apiClient.get(AppUrls.getCurrentSession);
-
+                
                 if (response.isSuccess && response.body['data'] != null) {
                   final data = response.body['data'];
                   final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
                   final providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
-
+                  
                   if (providerId > 0) {
                     // End chat session
                     await _controller.endChatSession();
-
+                    
                     // Close loader dialog
                     Get.back();
 
@@ -616,7 +616,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     final callController = Get.isRegistered<CallController>()
                         ? Get.find<CallController>()
                         : Get.put(CallController());
-
+                    
                     await callController.initiateCall(
                       providerId: providerId,
                       providerName: widget.astrologerName,
@@ -626,7 +626,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     return;
                   }
                 }
-
+                
                 Get.back(); // close loader
                 CustomSnackbar.showError("Failed to switch: active session details not found.");
               } catch (e) {

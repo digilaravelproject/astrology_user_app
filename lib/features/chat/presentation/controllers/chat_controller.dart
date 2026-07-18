@@ -481,7 +481,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  Future<void> endChatSession() async {
+  Future<void> endChatSession({bool skipSummary = false}) async {
     if (_sessionId == null) return;
     isLoading.value = true;
     try {
@@ -513,11 +513,13 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       FloatingChatBubble.dismiss();
       if (session != null) {
         WebSocketService.activeSessionId = null;
-        ChatSummaryDialog.show(
-          sessionId: session.id,
-          durationSeconds: session.durationSeconds,
-          totalCost: session.totalCost,
-        );
+        if (!skipSummary) {
+          ChatSummaryDialog.show(
+            sessionId: session.id,
+            durationSeconds: session.durationSeconds,
+            totalCost: session.totalCost,
+          );
+        }
       }
     } catch (e) {
       CustomSnackbar.showError(e.toString());
