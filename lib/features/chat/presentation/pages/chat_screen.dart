@@ -12,6 +12,9 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 class ChatScreen extends StatefulWidget {
   final String astrologerName;
@@ -141,14 +144,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           actions: [
             Obx(() {
               if (_controller.status.value == 'ongoing') {
-                return TextButton(
-                  onPressed: () => _showEndChatConfirmation(context),
-                  child: const AppText(
-                    "End Chat",
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.call, color: Colors.green),
+                      tooltip: "Switch to Call",
+                      onPressed: () => _showSwitchToCallConfirmation(context),
+                    ),
+                    TextButton(
+                      onPressed: () => _showEndChatConfirmation(context),
+                      child: const AppText(
+                        "End Chat",
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 );
               }
               return const SizedBox.shrink();
@@ -556,6 +569,74 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               _controller.endChatSession();
             },
             child: const Text("End Chat", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSwitchToCallConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text("Switch to Call"),
+        content: const Text("Are you sure you want to end this chat session and switch to a call?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              
+              // Show loader
+              Get.dialog(
+                const Center(child: CircularProgressIndicator(color: AppColors.deepPink)),
+                barrierDismissible: false,
+              );
+
+              try {
+                final apiClient = Get.find<ApiClient>();
+                final response = await apiClient.get(AppUrls.getCurrentSession);
+                
+                if (response.isSuccess && response.body['data'] != null) {
+                  final session = response.body['data'];
+                  final providerId = int.tryParse(session['provider_id']?.toString() ?? '') ?? 0;
+                  
+                  if (providerId > 0) {
+                    // End chat session
+                    await _controller.endChatSession();
+                    
+                    // Close loader dialog
+                    Get.back();
+
+                    // Initiate call
+                    final callController = Get.isRegistered<CallController>()
+                        ? Get.find<CallController>()
+                        : Get.put(CallController());
+                    
+                    await callController.initiateCall(
+                      providerId: providerId,
+                      providerName: widget.astrologerName,
+                      providerImage: widget.astrologerImage,
+                      isPackageSession: widget.isPackageChat,
+                    );
+                    return;
+                  }
+                }
+                
+                Get.back(); // close loader
+                CustomSnackbar.showError("Failed to switch: active session details not found.");
+              } catch (e) {
+                Get.back(); // close loader
+                CustomSnackbar.showError("Failed to switch: $e");
+              }
+            },
+            child: const Text(
+              "Switch",
+              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
