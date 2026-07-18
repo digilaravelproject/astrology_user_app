@@ -21,12 +21,50 @@ import 'package:permission_handler/permission_handler.dart';
 class SessionBottomSheetHelper {
   static int? activeSubSessionId;
 
-  static void show(BuildContext context, AstrologerModel astro) {
+  static void show(BuildContext context, AstrologerModel astro) async {
+    // 1. Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppColors.deepPink),
+      ),
+    );
+
+    bool hasActivePackage = false;
+    int remainingSeconds = 0;
+
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(
+        '${AppUrls.packageActiveStatus}?astrologer_id=${astro.userId}',
+      );
+      
+      Navigator.pop(context); // Dismiss loading dialog
+
+      if (response.isSuccess && response.body != null) {
+        final data = response.body['data'];
+        if (data != null && data is Map) {
+          hasActivePackage = data['has_active_package'] == true;
+          if (hasActivePackage) {
+            final purchase = data['package_purchase'];
+            if (purchase != null && purchase is Map) {
+              remainingSeconds = int.tryParse(purchase['remaining_duration']?.toString() ?? '') ?? 0;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      Navigator.pop(context); // Dismiss loading dialog in case of exception
+      CustomSnackbar.showError("Failed to check package status: $e");
+      return;
+    }
+
     final walletController = Get.find<WalletController>();
     final double walletBalance = double.tryParse(walletController.balance) ?? 0.0;
 
     // If package is not purchased, verify wallet balance and show confirmation.
-    if (astro.isPurchase == false) {
+    if (!hasActivePackage) {
       final double requiredAmount = (astro.packagePrice ?? 500).toDouble();
       if (walletBalance < requiredAmount) {
         showModalBottomSheet(
@@ -44,7 +82,6 @@ class SessionBottomSheetHelper {
       return;
     }
 
-    final int remainingSeconds = astro.remainingTime ?? 0;
     String remainingTimeStr;
     if (remainingSeconds < 60) {
       remainingTimeStr = '$remainingSeconds sec';
@@ -109,51 +146,48 @@ class SessionBottomSheetHelper {
               const SizedBox(height: 20),
 
               // Remaining Time Info
-              if (astro.remainingTime != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.orange.shade200, width: 1),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade100,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.timer_outlined, color: Colors.orange.shade800, size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            AppText(
-                              "Remaining Package Time",
-                              fontSize: 11,
-                              color: Colors.orange.shade800,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            const SizedBox(height: 2),
-                            AppText(
-                              remainingTimeStr,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.orange.shade900,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.orange.shade200, width: 1),
                 ),
-                const SizedBox(height: 20),
-              ],
-              
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.timer_outlined, color: Colors.orange.shade800, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(
+                            "Remaining Package Time",
+                            fontSize: 11,
+                            color: Colors.orange.shade800,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          const SizedBox(height: 2),
+                          AppText(
+                            remainingTimeStr,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.orange.shade900,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Row(
