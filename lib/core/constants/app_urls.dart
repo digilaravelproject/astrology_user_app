@@ -156,6 +156,7 @@ class AppUrls {
 
   // Chat Assistance API Endpoints
   static const String initiateChatAssistance = '/api/v1/chat-assistance/initiate';
+  static const String chatAssistanceSessions = '/api/v1/chat-assistance/sessions';
   static String getChatAssistanceMessages(int sessionId) => '/api/v1/chat-assistance/$sessionId/messages';
   static String sendChatAssistanceMessage(int sessionId) => '/api/v1/chat-assistance/$sessionId/message';
   static String syncChatAssistanceStatus(int sessionId) => '/api/v1/chat-assistance/$sessionId/sync-status';

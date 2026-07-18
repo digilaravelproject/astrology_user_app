@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../controllers/chat_assistance_controller.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
