@@ -13,6 +13,7 @@ import 'package:astro_user/features/chat/presentation/controllers/chat_controlle
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 
@@ -628,6 +629,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     providerImage: widget.astrologerImage,
                     isPackageSession: widget.isPackageChat,
                   );
+
+                  // Navigate to CallScreen so user sees ringing UI
+                  Get.to(() => const CallScreen());
                   return;
                 }
                 
