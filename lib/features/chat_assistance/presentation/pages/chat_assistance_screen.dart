@@ -8,6 +8,7 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
   const ChatAssistanceScreen({Key? key}) : super(key: key);
@@ -294,16 +295,10 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
 
   Widget _buildMessageInput(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
+        border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
       ),
       child: SafeArea(
         child: Row(
@@ -313,37 +308,44 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
               onPressed: () => _showAttachmentBottomSheet(context),
             ),
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextField(
-                  controller: controller.messageController,
-                  decoration: const InputDecoration(
-                    hintText: 'Type a message...',
-                    border: InputBorder.none,
+              child: TextField(
+                controller: controller.messageController,
+                decoration: InputDecoration(
+                  hintText: "Type a message...",
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                  filled: true,
+                  fillColor: const Color(0xFFF5F5F5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
                   ),
-                  textCapitalization: TextCapitalization.sentences,
-                  minLines: 1,
-                  maxLines: 4,
-                  enabled: !controller.limitReached.value,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
+                textCapitalization: TextCapitalization.sentences,
+                minLines: 1,
+                maxLines: 4,
+                enabled: !controller.limitReached.value,
               ),
             ),
             const SizedBox(width: 8),
             Obx(() => GestureDetector(
               onTap: controller.limitReached.value ? null : controller.sendMessage,
               child: Container(
-                width: 48,
-                height: 48,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: controller.limitReached.value ? Colors.grey : AppColors.deepPink,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.send_rounded,
+                  Iconsax.send_1_copy,
                   color: Colors.white,
                   size: 20,
                 ),
