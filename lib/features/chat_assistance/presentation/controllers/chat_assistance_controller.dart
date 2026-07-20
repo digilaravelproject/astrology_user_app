@@ -61,6 +61,32 @@ class ChatAssistanceController extends GetxController {
     isInitiating.value = true;
     astrologerName = astroName;
     astrologerImage = astroImage;
+    
+    if (_currentUserId == null || _currentUserId == 0) {
+      _currentUserId = WebSocketService.currentUserId;
+      if (_currentUserId == null || _currentUserId == 0) {
+        try {
+          final userDataStr = SharedPrefs.getString(AppConstants.userData);
+          if (userDataStr != null && userDataStr.isNotEmpty) {
+            final userModel = UserModel.fromJsonString(userDataStr);
+            _currentUserId = userModel?.id;
+          }
+        } catch (_) {}
+      }
+    }
+
+    final cacheKey = 'chat_assistance_session_${providerId}_${_currentUserId}';
+    final cachedSessionId = SharedPrefs.getInt(cacheKey);
+    if (cachedSessionId != null && cachedSessionId != 0) {
+      _sessionId = cachedSessionId;
+      messages.clear();
+      await fetchMessages();
+      _setupWebsocketListeners();
+      Get.to(() => const ChatAssistanceScreen());
+      isInitiating.value = false;
+      return;
+    }
+
     try {
       final body = {
         'provider_id': providerId,
@@ -86,6 +112,9 @@ class ChatAssistanceController extends GetxController {
 
         if (session != null) {
           _sessionId = int.tryParse(session['id']?.toString() ?? '');
+          if (_sessionId != null) {
+            SharedPrefs.setInt(cacheKey, _sessionId!);
+          }
           
           // Clear previous messages and fetch history
           messages.clear();
