@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:get/get.dart';
 import '../controllers/chat_assistance_controller.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
@@ -105,7 +109,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                 );
               }),
             ),
-            _buildMessageInput(),
+            _buildMessageInput(context),
           ],
         ),
       ),
@@ -138,24 +142,72 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if (message.type == 'image' && message.image != null)
+            if (message.type == 'image')
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    message.image!,
-                    height: 150,
-                    width: 200,
-                    fit: BoxFit.cover,
-                  ),
+                  child: message.image != null && message.image!.startsWith('http')
+                      ? Image.network(
+                          message.image!,
+                          height: 150,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : (message.image != null
+                          ? Image.file(
+                              File(message.image!),
+                              height: 150,
+                              width: 200,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              message.attachmentUrl != null && message.attachmentUrl!.startsWith('http')
+                                  ? message.attachmentUrl!
+                                  : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
+                              height: 150,
+                              width: 200,
+                              fit: BoxFit.cover,
+                              errorBuilder: (c, e, s) => Container(
+                                height: 150,
+                                width: 200,
+                                color: Colors.grey,
+                                child: const Icon(Icons.broken_image, color: Colors.white),
+                              ),
+                            )),
                 ),
+              )
+            else if (message.type == 'document')
+              Container(
+                padding: const EdgeInsets.all(8),
+                margin: const EdgeInsets.only(bottom: 8.0),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.insert_drive_file, color: message.isMe ? Colors.white : Colors.black54, size: 24),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: AppText(
+                        message.text.replaceFirst('📄 ', ''),
+                        fontSize: 14,
+                        color: message.isMe ? Colors.white : Colors.black87,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              AppText(
+                message.text,
+                fontSize: 14,
+                color: message.isMe ? Colors.white : Colors.black87,
               ),
-            AppText(
-              message.text,
-              fontSize: 14,
-              color: message.isMe ? Colors.white : Colors.black87,
-            ),
             const SizedBox(height: 4),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -219,7 +271,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  Widget _buildMessageInput() {
+  Widget _buildMessageInput(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -235,6 +287,10 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
       child: SafeArea(
         child: Row(
           children: [
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
+              onPressed: () => _showAttachmentBottomSheet(context),
+            ),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -251,6 +307,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   textCapitalization: TextCapitalization.sentences,
                   minLines: 1,
                   maxLines: 4,
+                  enabled: !controller.limitReached.value,
                 ),
               ),
             ),
@@ -273,6 +330,116 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
             )),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: source);
+    if (image != null) {
+      controller.sendImageAttachment(image);
+    }
+  }
+
+  Future<void> _pickDocument() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      controller.sendDocumentAttachment(result.files.single);
+    }
+  }
+
+  void _showAttachmentBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildAttachmentOption(
+                  context: context,
+                  icon: Icons.camera_alt,
+                  color: Colors.blue,
+                  label: "Camera",
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickImage(ImageSource.camera);
+                  },
+                ),
+                _buildAttachmentOption(
+                  context: context,
+                  icon: Icons.photo,
+                  color: Colors.purple,
+                  label: "Gallery",
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickImage(ImageSource.gallery);
+                  },
+                ),
+                _buildAttachmentOption(
+                  context: context,
+                  icon: Icons.description,
+                  color: Colors.orange,
+                  label: "Document",
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _pickDocument();
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAttachmentOption({
+    required BuildContext context,
+    required IconData icon,
+    required Color color,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: 8),
+          AppText(
+            label,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ],
       ),
     );
   }

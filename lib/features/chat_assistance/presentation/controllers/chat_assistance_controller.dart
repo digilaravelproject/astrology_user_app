@@ -9,6 +9,10 @@ import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/auth/domain/models/user_model.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:astro_user/core/services/network/multipart.dart';
 import 'package:astro_user/features/chat_assistance/presentation/pages/chat_assistance_screen.dart';
 
 class ChatAssistanceController extends GetxController {
@@ -66,10 +70,22 @@ class ChatAssistanceController extends GetxController {
       final response = await _apiClient.post(AppUrls.initiateChatAssistance, data: body);
       
       if (response.isSuccess) {
-        final data = response.body['data'];
-        final session = data['session'];
+        final body = response.body;
+        Map<String, dynamic>? session;
+
+        if (body != null && body is Map) {
+          if (body.containsKey('data') && body['data'] != null) {
+            final data = body['data'];
+            if (data is Map && data.containsKey('session')) {
+              session = data['session'];
+            }
+          } else if (body.containsKey('session')) {
+            session = body['session'];
+          }
+        }
+
         if (session != null) {
-          _sessionId = session['id'];
+          _sessionId = int.tryParse(session['id']?.toString() ?? '');
           
           // Clear previous messages and fetch history
           messages.clear();
@@ -159,6 +175,114 @@ class ChatAssistanceController extends GetxController {
           if (response.message.toLowerCase().contains('limit')) {
             limitReached.value = true;
           }
+        }
+        messages.refresh();
+      }
+    } catch (e) {
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = messages[index].copyWith(status: 'failed');
+        messages.refresh();
+      }
+    }
+  }
+
+  Future<void> sendImageAttachment(XFile xFile) async {
+    if (limitReached.value || _sessionId == null) return;
+
+    final tempId = DateTime.now().millisecondsSinceEpoch;
+    final localMsg = ChatMessage(
+      id: tempId,
+      text: '📷 Sending Image...',
+      isMe: true,
+      time: DateTime.now(),
+      status: 'sending...',
+      image: xFile.path,
+      type: 'image',
+    );
+    messages.insert(0, localMsg);
+    _scrollToBottom();
+
+    try {
+      final response = await _apiClient.postMultipartData(
+        AppUrls.sendChatAssistanceMessage(_sessionId!),
+        {'type': 'image', 'message': ''},
+        [MultipartBody('file', xFile)],
+        [],
+      );
+
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        if (response.isSuccess) {
+          final data = response.body['data']['message'];
+          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
+          final attachmentUrl = data['attachment_url']?.toString();
+          messages[index] = messages[index].copyWith(
+            id: serverId, 
+            status: 'sent',
+            image: attachmentUrl,
+            attachmentUrl: attachmentUrl,
+            text: '',
+          );
+        } else {
+          messages[index] = messages[index].copyWith(status: 'failed');
+          if (response.message.toLowerCase().contains('limit')) {
+            limitReached.value = true;
+          }
+          CustomSnackbar.showError(response.message);
+        }
+        messages.refresh();
+      }
+    } catch (e) {
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        messages[index] = messages[index].copyWith(status: 'failed');
+        messages.refresh();
+      }
+    }
+  }
+
+  Future<void> sendDocumentAttachment(PlatformFile platformFile) async {
+    if (limitReached.value || _sessionId == null) return;
+
+    final tempId = DateTime.now().millisecondsSinceEpoch;
+    final localMsg = ChatMessage(
+      id: tempId,
+      text: '📄 ${platformFile.name}',
+      isMe: true,
+      time: DateTime.now(),
+      status: 'sending...',
+      type: 'document',
+    );
+    messages.insert(0, localMsg);
+    _scrollToBottom();
+
+    try {
+      final pickerResult = FilePickerResult([platformFile]);
+      final response = await _apiClient.postMultipartData(
+        AppUrls.sendChatAssistanceMessage(_sessionId!),
+        {'type': 'document', 'message': platformFile.name},
+        [],
+        [MultipartDocument('file', pickerResult)],
+      );
+
+      final index = messages.indexWhere((m) => m.id == tempId);
+      if (index != -1) {
+        if (response.isSuccess) {
+          final data = response.body['data']['message'];
+          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
+          final attachmentUrl = data['attachment_url']?.toString();
+          messages[index] = messages[index].copyWith(
+            id: serverId, 
+            status: 'sent',
+            attachmentUrl: attachmentUrl,
+          );
+        } else {
+          messages[index] = messages[index].copyWith(status: 'failed');
+          if (response.message.toLowerCase().contains('limit')) {
+            limitReached.value = true;
+          }
+          CustomSnackbar.showError(response.message);
         }
         messages.refresh();
       }
