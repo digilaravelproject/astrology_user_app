@@ -22,6 +22,7 @@ import 'package:astro_user/features/chat/presentation/controllers/chat_controlle
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
 
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
