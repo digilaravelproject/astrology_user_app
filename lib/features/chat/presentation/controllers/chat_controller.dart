@@ -62,6 +62,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   int? _sessionId;
   int? _currentUserId;
+  int? _peerId;
   String? _astrologerName;
   Timer? _timer;
   String? _startedAt;
@@ -73,6 +74,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _packageTerminatedSub;
 
   int? get sessionId => _sessionId;
+  int? get peerId => _peerId;
   bool isPackageChat = false;
 
   @override
@@ -316,6 +318,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         currentUserId: _currentUserId!,
       );
       messages.assignAll(result.messages);
+      _peerId = result.peerId;
       if (result.startedAt != null) {
         _startedAt = result.startedAt;
         _setupTimer(result.startedAt);

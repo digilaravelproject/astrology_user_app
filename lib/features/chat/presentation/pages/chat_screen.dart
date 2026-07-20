@@ -597,34 +597,38 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               );
 
               try {
-                final apiClient = Get.find<ApiClient>();
-                final response = await apiClient.get(AppUrls.getCurrentSession);
-                
-                if (response.isSuccess && response.body['data'] != null) {
-                  final data = response.body['data'];
-                  final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
-                  final providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
-                  
-                  if (providerId > 0) {
-                    // End chat session
-                    await _controller.endChatSession();
-                    
-                    // Close loader dialog
-                    Get.back();
+                int providerId = _controller.peerId ?? 0;
 
-                    // Initiate call
-                    final callController = Get.isRegistered<CallController>()
-                        ? Get.find<CallController>()
-                        : Get.put(CallController());
-                    
-                    await callController.initiateCall(
-                      providerId: providerId,
-                      providerName: widget.astrologerName,
-                      providerImage: widget.astrologerImage,
-                      isPackageSession: widget.isPackageChat,
-                    );
-                    return;
+                if (providerId <= 0) {
+                  final apiClient = Get.find<ApiClient>();
+                  final response = await apiClient.get(AppUrls.getCurrentSession);
+                  
+                  if (response.isSuccess && response.body['data'] != null) {
+                    final data = response.body['data'];
+                    final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
+                    providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
                   }
+                }
+                
+                if (providerId > 0) {
+                  // End chat session
+                  await _controller.endChatSession();
+                  
+                  // Close loader dialog
+                  Get.back();
+
+                  // Initiate call
+                  final callController = Get.isRegistered<CallController>()
+                      ? Get.find<CallController>()
+                      : Get.put(CallController());
+                  
+                  await callController.initiateCall(
+                    providerId: providerId,
+                    providerName: widget.astrologerName,
+                    providerImage: widget.astrologerImage,
+                    isPackageSession: widget.isPackageChat,
+                  );
+                  return;
                 }
                 
                 Get.back(); // close loader
