@@ -612,11 +612,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 }
                 
                 if (providerId > 0) {
-                  // End chat session
-                  await _controller.endChatSession();
+                  // End chat session (skip summary so loader can close cleanly)
+                  await _controller.endChatSession(skipSummary: true);
                   
                   // Close loader dialog
-                  Get.back();
+                  if (Get.isDialogOpen ?? false) Get.back();
 
                   // Initiate call
                   final callController = Get.isRegistered<CallController>()
