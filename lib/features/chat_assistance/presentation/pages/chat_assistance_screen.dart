@@ -26,19 +26,40 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
         ),
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: AppColors.deepPink.withOpacity(0.1),
-              backgroundImage: controller.astrologerImage != null 
-                  ? NetworkImage(controller.astrologerImage!) 
-                  : null,
-              child: controller.astrologerImage == null
-                  ? AppText(
-                      controller.astrologerName?.substring(0, 1) ?? 'A',
-                      color: AppColors.deepPink,
-                      fontWeight: FontWeight.bold,
-                    )
-                  : null,
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.deepPink.withOpacity(0.1),
+              ),
+              child: ClipOval(
+                child: (controller.astrologerImage != null && controller.astrologerImage!.isNotEmpty)
+                    ? Image.network(
+                        controller.astrologerImage!.startsWith('http')
+                            ? controller.astrologerImage!
+                            : '${AppUrls.baseImageUrl}${controller.astrologerImage}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: AppText(
+                            controller.astrologerName != null && controller.astrologerName!.isNotEmpty
+                                ? controller.astrologerName!.substring(0, 1).toUpperCase()
+                                : 'A',
+                            color: AppColors.deepPink,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: AppText(
+                          controller.astrologerName != null && controller.astrologerName!.isNotEmpty
+                              ? controller.astrologerName!.substring(0, 1).toUpperCase()
+                              : 'A',
+                          color: AppColors.deepPink,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
