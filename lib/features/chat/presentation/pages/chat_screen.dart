@@ -58,13 +58,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     // Retrieve or instantiate controller
     _controller = Get.find<ChatController>();
     _controller.isPackageChat = widget.isPackageChat;
-    _controller.initSession(
-      sessionId: widget.sessionId,
-      currentUserId: 0,
-      initialStatus: widget.initialStatus,
-      astrologerName: widget.astrologerName,
-      startedAtString: widget.startedAtString,
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.initSession(
+        sessionId: widget.sessionId,
+        currentUserId: 0,
+        initialStatus: widget.initialStatus,
+        astrologerName: widget.astrologerName,
+        startedAtString: widget.startedAtString,
+      );
+    });
 
     _pulseController = AnimationController(
       vsync: this,
