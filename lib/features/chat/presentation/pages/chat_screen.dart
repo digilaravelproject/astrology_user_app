@@ -148,11 +148,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.call, color: Colors.green),
-                      tooltip: "Switch to Call",
-                      onPressed: () => _showSwitchToCallConfirmation(context),
-                    ),
+                    // Call switch icon only for package/session chats
+                    if (widget.isPackageChat)
+                      IconButton(
+                        icon: const Icon(Icons.call, color: Colors.green),
+                        tooltip: "Switch to Call",
+                        onPressed: () => _showSwitchToCallConfirmation(context),
+                      ),
                     TextButton(
                       onPressed: () => _showEndChatConfirmation(context),
                       child: const AppText(
