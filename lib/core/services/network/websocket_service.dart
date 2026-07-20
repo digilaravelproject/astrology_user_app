@@ -20,7 +20,7 @@ import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
-import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
@@ -302,6 +302,24 @@ class WebSocketService extends GetxService {
           Logger.d('Prepaid Package session terminated!');
           packageRemainingSeconds.value = 0;
           isPackageSessionTerminated.value = true;
+        } else if (event == AppUrls.eventChatAssistanceMessageSent || event == 'App\\Events\\ChatAssistanceMessageSent') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleMessageSent(data['data']);
+        } else if (event == AppUrls.eventChatAssistanceMessageStatusUpdated || event == 'App\\Events\\ChatAssistanceMessageStatusUpdated') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleMessageStatusUpdated(data['data']);
+        } else if (event == AppUrls.eventChatAssistanceLimitReached || event == 'App\\Events\\ChatAssistanceLimitReached') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleChatAssistanceLimitReached(data['data']);
         }
       } catch (e) {
         Logger.e('WebSocketService: Error parsing message -> $e');
@@ -1083,6 +1101,16 @@ class WebSocketService extends GetxService {
       iceCandidateData.refresh();
     } catch (e) {
       Logger.e('WebSocketService: error handling IceCandidateSent -> $e');
+    }
+  }
+
+  void _handleChatAssistanceLimitReached(dynamic rawData) {
+    try {
+      if (Get.isRegistered<ChatAssistanceController>()) {
+        Get.find<ChatAssistanceController>().limitReached.value = true;
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling ChatAssistanceLimitReached -> $e');
     }
   }
 }
