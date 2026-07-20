@@ -5,7 +5,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
-
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 
 class CallScreen extends StatefulWidget {
@@ -78,30 +81,51 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Title / Timing
+                  // Top Bar: Title/Status + Switch to Chat icon
                   Padding(
-                    padding: const EdgeInsets.only(top: 40.0),
-                    child: Column(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        if (status == 'ongoing')
-                          Text(
-                            '$minutes:$seconds',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
+                        const SizedBox(width: 48), // Spacer to balance
+                        Column(
+                          children: [
+                            const SizedBox(height: 32),
+                            Text(
+                              status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.5,
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 10),
+                            if (status == 'ongoing')
+                              Text(
+                                '$minutes:$seconds',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                        if (status == 'ongoing')
+                          Padding(
+                            padding: const EdgeInsets.only(top: 32.0),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.chat_bubble_outline_rounded,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                              onPressed: () => _showSwitchToChatDialog(context),
+                            ),
+                          )
+                        else
+                          const SizedBox(width: 48),
                       ],
                     ),
                   ),
@@ -194,6 +218,95 @@ class _CallScreenState extends State<CallScreen> {
         );
       }),
     );
+  }
+
+  void _showSwitchToChatDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.chat_bubble_rounded, color: AppColors.primaryColor, size: 22),
+            SizedBox(width: 10),
+            Text('Switch to Chat', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'End the current call and start a chat session with ${controller.providerName ?? "Astrologer"}?',
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _switchToChat();
+            },
+            icon: const Icon(Icons.chat_bubble_rounded, size: 16),
+            label: const Text('Switch'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _switchToChat() async {
+    final providerId = controller.providerId;
+    final providerName = controller.providerName ?? 'Astrologer';
+    final providerImage = controller.providerImage ?? '';
+
+    // End call first
+    if (controller.status.value == 'ongoing') {
+      await controller.endCall();
+    } else {
+      await controller.cancelCall();
+    }
+    Get.back(); // Pop CallScreen
+
+    // Show loading and call chat initiate
+    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.post(
+        AppUrls.initiateChat,
+        data: {'provider_id': providerId},
+      );
+      Get.back(); // close loader
+
+      if (response.isSuccess) {
+        CustomSnackbar.showSuccess(response.message);
+        
+        int sessionId = 0;
+        if (response.body != null && response.body is Map) {
+          final sessionData = response.body['session'];
+          if (sessionData != null && sessionData is Map) {
+            sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+          }
+        }
+        
+        Get.to(() => ChatScreen(
+          astrologerName: providerName,
+          astrologerImage: providerImage,
+          sessionId: sessionId,
+          initialStatus: 'initiated',
+        ), binding: ChatBinding());
+      } else {
+        CustomSnackbar.showError(response.message);
+      }
+    } catch (e) {
+      Get.back(); // close loader
+      CustomSnackbar.showError(e.toString());
+    }
   }
 
   Widget _buildPulseCircle({required int delay}) {
