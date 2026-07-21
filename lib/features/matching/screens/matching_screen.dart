@@ -10,9 +10,8 @@ import '../../../routes/route_helper.dart';
 import '../../kundli/screens/kundli_matching_screen.dart';
 import '../controllers/matching_controller.dart';
 import '../controllers/kundli_controller.dart';
-import 'create_kundali_screen.dart';
 import 'kundali_matching_screen.dart';
-import 'kundli_screen.dart';
+import '../../kundli/kundli_screen.dart';
 import 'match_making_screen.dart';
 
 class MatchingScreen extends StatefulWidget {
@@ -53,9 +52,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   final TextEditingController _searchController = TextEditingController();
   bool _saveDetails = false;
 
-  // Saved Kundlis List
-
-
   @override
   void initState() {
     super.initState();
@@ -70,6 +66,16 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   @override
   void dispose() {
     _tabController.dispose();
+    _boysNameController.dispose();
+    _boysGenderController.dispose();
+    _boysDobController.dispose();
+    _boysTobController.dispose();
+    _boysPobController.dispose();
+    _girlsNameController.dispose();
+    _girlsGenderController.dispose();
+    _girlsDobController.dispose();
+    _girlsTobController.dispose();
+    _girlsPobController.dispose();
     _boyNameController.dispose();
     _boyDateController.dispose();
     _boyTimeController.dispose();
@@ -91,15 +97,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         showLeading: false,
         backgroundColor: Colors.white,
         titleColor: AppColors.textColorPrimary,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: AppColors.primaryColor),
-            onPressed: () {
-             Get.to((CreateKundaliScreen()));
-              print("Plus clicked");
-            },
-          ),
-        ],
         iconColor: AppColors.textColorPrimary,
       ),
       body: Column(
@@ -485,9 +482,12 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                 if (value == 'view') {
                                   _navigateToKundliScreen(
                                     name: kundli.name,
+                                    gender: kundli.gender,
                                     dob: kundli.formattedDate,
                                     time: kundli.formattedTime,
                                     place: kundli.place,
+                                    latitude: double.tryParse(kundli.latitude),
+                                    longitude: double.tryParse(kundli.longitude),
                                   );
                                 } else if (value == 'edit') {
                                   // Edit kundli - fetch data and show bottom sheet
@@ -761,10 +761,21 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 return dateStr;
               }
 
-              // Convert time format from "10:30 AM" to "10:30"
+              // Convert time format from "7:47 PM" to "19:47:00"
               String convertTime(String timeStr) {
                 try {
-                  return timeStr.replaceAll(' AM', '').replaceAll(' PM', '');
+                  String clean = timeStr.trim();
+                  bool isPm = clean.toUpperCase().contains('PM');
+                  bool isAm = clean.toUpperCase().contains('AM');
+                  clean = clean.replaceAll(' AM', '').replaceAll(' PM', '').replaceAll('am', '').replaceAll('pm', '').trim();
+                  List<String> parts = clean.split(':');
+                  if (parts.length >= 2) {
+                    int hour = int.parse(parts[0]);
+                    int min = int.parse(parts[1]);
+                    if (isPm && hour < 12) hour += 12;
+                    if (isAm && hour == 12) hour = 0;
+                    return "${hour.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}:00";
+                  }
                 } catch (e) {
                   print('Time conversion error: $e');
                 }
@@ -776,12 +787,18 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               final girlDob = convertDate(_girlsDobController.text);
               final girlTob = convertTime(_girlsTobController.text);
 
-              // Fetch matching data
+              // Fetch matching data dynamically
               await matchingController.fetchMatchingData(
                 boyDob: boyDob,
                 boyTob: boyTob,
+                boyLat: 28.6139,
+                boyLng: 77.2090,
+                boyTz: '+05:30',
                 girlDob: girlDob,
                 girlTob: girlTob,
+                girlLat: 19.0760,
+                girlLng: 72.8777,
+                girlTz: '+05:30',
               );
 
               // Navigate only if data is successfully loaded
@@ -1234,12 +1251,15 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       
                       CustomSnackbar.showSuccess('Kundli created successfully');
                       
-                      // Navigate to Kundli screen with birth chart API call
-                      await _navigateToKundliScreen(
+                      // Navigate to Kundli screen
+                      _navigateToKundliScreen(
                         name: kundliController.nameController.text,
+                        gender: kundliController.genderController.text,
                         dob: kundliController.dobController.text,
                         time: kundliController.tobController.text,
                         place: kundliController.pobController.text,
+                        latitude: double.tryParse(latitude),
+                        longitude: double.tryParse(longitude),
                       );
                       } catch (e) {
                         Get.back(); // Close loading if open
@@ -1571,58 +1591,34 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return '$date $time';
   }
 
-  // Navigate to Kundli screen with API call
-  Future<void> _navigateToKundliScreen({
+  // Navigate to Kundli screen
+  void _navigateToKundliScreen({
     required String name,
+    required String gender,
     required String dob,
     required String time,
     required String place,
-  }) async {
-    try {
-      final kundliController = Get.find<KundliController>();
-      
-      // Convert formats
-      final birthDate = _convertDateToApiFormat(dob);
-      final birthTime = _convertTimeToApiFormat(time);
-      final datetime = _createDatetime(birthDate, birthTime);
-      
-      // Static lat/lng for now
-      const latitude = 28.6139;
-      const longitude = 77.2090;
+    double? latitude,
+    double? longitude,
+  }) {
+    final birthDate = _convertDateToApiFormat(dob);
+    final birthTime = _convertTimeToApiFormat(time);
+    final lat = (latitude != null && latitude != 0) ? latitude : 28.6139;
+    final lng = (longitude != null && longitude != 0) ? longitude : 77.2090;
 
-      // Show loading
-      Get.dialog(
-        const Center(child: CircularProgressIndicator()),
-        barrierDismissible: false,
-      );
-
-      // Call API
-      await kundliController.fetchKundliData(
-        birthDate: birthDate,
-        birthTime: birthTime,
-        latitude: latitude,
-        longitude: longitude,
-        datetime: datetime,
-      );
-
-      // Close loading
-      Get.back();
-
-      // Navigate if data loaded successfully
-      if (kundliController.kundliData.value != null) {
-        // Navigate with parameters to prevent re-fetching
-        Get.toNamed(
-          AppRoutes.kundaliScreen,
-          arguments: {
-            'skipFetch': true, // Flag to skip fetching in initState
-          },
-        );
-      }
-    } catch (e) {
-      Get.back(); // Close loading
-      CustomSnackbar.showError('Failed to load kundli data');
-    }
+    Get.to(() => KundliScreen(
+      fullName: name,
+      gender: gender.isEmpty ? 'Male' : gender,
+      dob: birthDate,
+      tob: birthTime,
+      place: place.isEmpty ? 'India' : place,
+      latitude: lat,
+      longitude: lng,
+    ));
   }
+
+
+
 
 }
 

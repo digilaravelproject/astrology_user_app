@@ -15,30 +15,39 @@ class MatchingController extends GetxController {
   Future<void> fetchMatchingData({
     required String boyDob,
     required String boyTob,
+    required double boyLat,
+    required double boyLng,
+    required String boyTz,
     required String girlDob,
     required String girlTob,
+    required double girlLat,
+    required double girlLng,
+    required String girlTz,
   }) async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
 
       print('[MATCHING_APP] [DEBUG] Controller: Fetching matching data');
-      print('[MATCHING_APP] [DEBUG] Boy DOB: $boyDob, TOB: $boyTob');
-      print('[MATCHING_APP] [DEBUG] Girl DOB: $girlDob, TOB: $girlTob');
+      print('[MATCHING_APP] [DEBUG] Boy DOB: $boyDob, TOB: $boyTob, Lat: $boyLat, Lng: $boyLng, TZ: $boyTz');
+      print('[MATCHING_APP] [DEBUG] Girl DOB: $girlDob, TOB: $girlTob, Lat: $girlLat, Lng: $girlLng, TZ: $girlTz');
 
-      // Static lat/lng for now (New Delhi and Mumbai)
+      // Build ISO datetime strings: "2001-07-21T04:52:00"
+      final maleDatetime = "${boyDob}T$boyTob";
+      final femaleDatetime = "${girlDob}T$girlTob";
+
       final request = MatchingRequestModel(
-        boy: PersonDetails(
-          dateOfBirth: boyDob,
-          timeOfBirth: boyTob,
-          latitude: 28.6139,
-          longitude: 77.2090,
+        male: PersonDetails(
+          datetime: maleDatetime,
+          latitude: boyLat,
+          longitude: boyLng,
+          timezone: boyTz,
         ),
-        girl: PersonDetails(
-          dateOfBirth: girlDob,
-          timeOfBirth: girlTob,
-          latitude: 19.0760,
-          longitude: 72.8777,
+        female: PersonDetails(
+          datetime: femaleDatetime,
+          latitude: girlLat,
+          longitude: girlLng,
+          timezone: girlTz,
         ),
       );
 
