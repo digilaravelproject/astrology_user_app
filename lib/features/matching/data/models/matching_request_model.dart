@@ -1,39 +1,39 @@
 class MatchingRequestModel {
-  final PersonDetails boy;
-  final PersonDetails girl;
+  final PersonDetails male;
+  final PersonDetails female;
 
   MatchingRequestModel({
-    required this.boy,
-    required this.girl,
+    required this.male,
+    required this.female,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'boy': boy.toJson(),
-      'girl': girl.toJson(),
+      'male': male.toJson(),
+      'female': female.toJson(),
     };
   }
 }
 
 class PersonDetails {
-  final String dateOfBirth;
-  final String timeOfBirth;
+  final String datetime;
   final double latitude;
   final double longitude;
+  final String timezone;
 
   PersonDetails({
-    required this.dateOfBirth,
-    required this.timeOfBirth,
+    required this.datetime,
     required this.latitude,
     required this.longitude,
+    required this.timezone,
   });
 
   Map<String, dynamic> toJson() {
     return {
-      'date_of_birth': dateOfBirth,
-      'time_of_birth': timeOfBirth,
+      'datetime': datetime,
       'latitude': latitude,
       'longitude': longitude,
+      'timezone': timezone,
     };
   }
 }

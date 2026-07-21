@@ -1,6 +1,6 @@
 import 'package:astro_user/features/astrologers/screens/astrologer_detail_screen.dart';
 import 'package:astro_user/features/matching/bindings/kundli_binding.dart';
-import 'package:astro_user/features/matching/screens/kundli_screen.dart';
+import 'package:astro_user/features/kundli/kundli_screen.dart';
 import 'package:astro_user/features/panchang/panchang_screen.dart';
 import 'package:astro_user/features/panchang/bindings/panchang_binding.dart';
 import 'package:astro_user/features/profile/bindings/profile_binding.dart';
@@ -252,9 +252,14 @@ class RouteHelper {
 
     GetPage(
       name: AppRoutes.kundaliScreen,
-      page: () => const KundliScreen(),
+      page: () => const KundliScreen(
+        fullName: 'User',
+        gender: 'Male',
+        dob: '1995-01-15',
+        tob: '10:30:00',
+        place: 'New Delhi',
+      ),
       transition: Transition.fadeIn,
-      binding: KundliBinding(),
     ),
 
     GetPage(
