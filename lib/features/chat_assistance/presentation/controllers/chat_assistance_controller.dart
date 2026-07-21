@@ -82,6 +82,9 @@ class ChatAssistanceController extends GetxController {
       messages.clear();
       await fetchMessages();
       _setupWebsocketListeners();
+      if (!Get.isRegistered<ChatAssistanceController>()) {
+        Get.put(this);
+      }
       Get.to(() => const ChatAssistanceScreen());
       isInitiating.value = false;
       return;
@@ -124,6 +127,9 @@ class ChatAssistanceController extends GetxController {
           _setupWebsocketListeners();
 
           // Navigate to Chat Assistance Screen
+          if (!Get.isRegistered<ChatAssistanceController>()) {
+            Get.put(this);
+          }
           Get.to(() => const ChatAssistanceScreen());
         }
       } else {
