@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
-import '../kundli_chart_widget.dart';
+import '../../../kundli/kundli_chart_widget.dart';
 
 class DivisionalChartTab extends StatefulWidget {
   const DivisionalChartTab({super.key});
@@ -132,7 +132,7 @@ class _DivisionalChartTabState extends State<DivisionalChartTab> {
         aspectRatio: 1,
         child: KundliChartWidget(
           title: "$_selectedChartType Chart ($_selectedStyle)",
-          planetData: _divisionalPlanetData,
+          northIndianPlanetData: _divisionalPlanetData,
         ),
       ),
     );

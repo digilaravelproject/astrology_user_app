@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
-import '../kundli_chart_widget.dart';
+import '../../../kundli/kundli_chart_widget.dart';
 
 class KPTab extends StatelessWidget {
   const KPTab({super.key});
@@ -51,7 +51,7 @@ class KPTab extends StatelessWidget {
             aspectRatio: 1,
             child: KundliChartWidget(
               title: "",
-              planetData: _kpPlanetData,
+              northIndianPlanetData: _kpPlanetData,
             ),
           ),
         ),

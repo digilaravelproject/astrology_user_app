@@ -6,6 +6,7 @@ class CreateKundliRequestModel {
   final String latitude;
   final String longitude;
   final String datetime;
+  final String? place;
 
   CreateKundliRequestModel({
     required this.name,
@@ -15,10 +16,11 @@ class CreateKundliRequestModel {
     required this.latitude,
     required this.longitude,
     required this.datetime,
+    this.place,
   });
 
   Map<String, dynamic> toJson() {
-    return {
+    final map = <String, dynamic>{
       'name': name,
       'gender': gender,
       'birth_date': birthDate,
@@ -27,5 +29,9 @@ class CreateKundliRequestModel {
       'longitude': longitude,
       'datetime': datetime,
     };
+    if (place != null && place!.isNotEmpty) {
+      map['place'] = place;
+    }
+    return map;
   }
 }

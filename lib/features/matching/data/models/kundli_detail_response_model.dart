@@ -23,6 +23,7 @@ class KundliDetailData {
   final String latitude;
   final String longitude;
   final String datetime;
+  final String place;
   final String createdAt;
   final String updatedAt;
 
@@ -35,6 +36,7 @@ class KundliDetailData {
     required this.latitude,
     required this.longitude,
     required this.datetime,
+    this.place = '',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -49,6 +51,7 @@ class KundliDetailData {
       latitude: json['latitude']?.toString() ?? '',
       longitude: json['longitude']?.toString() ?? '',
       datetime: json['datetime'] as String? ?? '',
+      place: json['place'] as String? ?? '',
       createdAt: json['created_at'] as String? ?? '',
       updatedAt: json['updated_at'] as String? ?? '',
     );
@@ -83,5 +86,5 @@ class KundliDetailData {
     return birthTime;
   }
 
-  String get place => 'India';
+  String get displayPlace => place.isNotEmpty ? place : 'Unknown';
 }

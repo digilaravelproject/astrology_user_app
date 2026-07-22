@@ -29,6 +29,11 @@ class MatchingData {
   final String recommendation;
   final GunaMilan gunaMilan;
   final Doshas doshas;
+  final PersonAstrologyInfo? maleInfo;
+  final PersonAstrologyInfo? femaleInfo;
+  final String summary;
+  final List<String> strengths;
+  final List<String> challenges;
 
   MatchingData({
     required this.compatibilityScore,
@@ -38,6 +43,11 @@ class MatchingData {
     required this.recommendation,
     required this.gunaMilan,
     required this.doshas,
+    this.maleInfo,
+    this.femaleInfo,
+    this.summary = '',
+    this.strengths = const [],
+    this.challenges = const [],
   });
 
   factory MatchingData.fromJson(Map<String, dynamic> json) {
@@ -50,6 +60,17 @@ class MatchingData {
     final ver = json['match_result'] ?? json['verdict'] ?? '';
     final rec = json['recommendation'] ?? '';
 
+    final interp = json['interpretation'] as Map<String, dynamic>? ?? {};
+    final summaryText = interp['summary'] ?? interp['marriageProspects'] ?? '';
+    List<String> strList = [];
+    if (interp['strengths'] is List) {
+      strList = List<String>.from(interp['strengths'].map((s) => s.toString()));
+    }
+    List<String> chalList = [];
+    if (interp['challenges'] is List) {
+      chalList = List<String>.from(interp['challenges'].map((c) => c.toString()));
+    }
+
     return MatchingData(
       compatibilityScore: totalPoints,
       maxScore: maxPts,
@@ -58,6 +79,11 @@ class MatchingData {
       recommendation: rec,
       gunaMilan: GunaMilan.fromJson(json['gunaDetails'] ?? json['guna_milan'] ?? {}),
       doshas: Doshas.fromJson(json['doshas'] ?? {}, parentJson: json),
+      maleInfo: json['male_info'] != null ? PersonAstrologyInfo.fromJson(json['male_info']) : null,
+      femaleInfo: json['female_info'] != null ? PersonAstrologyInfo.fromJson(json['female_info']) : null,
+      summary: summaryText,
+      strengths: strList,
+      challenges: chalList,
     );
   }
 }
@@ -110,22 +136,49 @@ class GunaMilan {
   }
 }
 
+class PersonAstrologyInfo {
+  final String moonNakshatra;
+  final String moonSign;
+
+  PersonAstrologyInfo({
+    required this.moonNakshatra,
+    required this.moonSign,
+  });
+
+  factory PersonAstrologyInfo.fromJson(Map<String, dynamic> json) {
+    return PersonAstrologyInfo(
+      moonNakshatra: json['moon_nakshatra'] ?? json['nakshatra'] ?? '',
+      moonSign: json['moon_sign'] ?? json['sign'] ?? '',
+    );
+  }
+}
+
 class GunaDetail {
   final dynamic score; // Can be int or double
   final int max;
   final String description;
+  final String significance;
+  final List<String> tips;
 
   GunaDetail({
     required this.score,
     required this.max,
     required this.description,
+    this.significance = '',
+    this.tips = const [],
   });
 
   factory GunaDetail.fromJson(Map<String, dynamic> json) {
+    List<String> tipsList = [];
+    if (json['tips'] is List) {
+      tipsList = List<String>.from((json['tips'] as List).map((t) => t.toString()));
+    }
     return GunaDetail(
       score: json['score'] ?? 0,
       max: json['maxPoints'] ?? json['max'] ?? 0,
       description: json['interpretation'] ?? json['description'] ?? '',
+      significance: json['significance'] ?? '',
+      tips: tipsList,
     );
   }
 }
