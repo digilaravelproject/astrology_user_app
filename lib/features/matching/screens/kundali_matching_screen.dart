@@ -312,38 +312,7 @@ class _ResultsTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // Share Matching PDF Button
-                Center(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final shareSummary = '''
-✨ Kundli Matching Report ✨
-Score: ${score.toStringAsFixed(1)} / $maxScore
-Verdict: $verdict
-${recommendation.isNotEmpty ? "Recommendation: $recommendation\n" : ""}$mangalDoshaText
-''';
-                      Share.share(shareSummary);
-                    },
-                    icon: const Icon(Icons.share, color: AppColors.white, size: 18),
-                    label: const Text(
-                      'SHARE MATCHING PDF',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      elevation: 2,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
+
 
                 // Talk To Astrologers Button
                 SizedBox(
