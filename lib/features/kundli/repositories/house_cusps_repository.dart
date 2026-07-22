@@ -25,7 +25,27 @@ class HouseCuspsRepository {
       final response = await _client.getKpHouseCusps(payload);
 
       if (response.statusCode == 200) {
-        return HouseCuspsModel.fromJson(response.data);
+        final List<dynamic> rawList = response.data is List ? response.data : [response.data];
+        
+        final mappedCusps = rawList.map((item) {
+          if (item is Map) {
+            return {
+              'number': item['house_id'] ?? item['house'],
+              'sign': item['sign'],
+              'signNumber': item['sign_id'] ?? item['signNumber'],
+              'cusp': item['cusp_full_degree'] ?? item['cuspLongitude'],
+              'degree': item['cusp_full_degree'] ?? item['cuspLongitude'],
+            };
+          }
+          return item;
+        }).toList();
+
+        final transformedJson = {
+          'success': true,
+          'data': mappedCusps
+        };
+
+        return HouseCuspsModel.fromJson(transformedJson);
       }
     } catch (e) {
       Logger.e('Error fetching house cusps', error: e);
