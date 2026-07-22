@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:astro_user/core/constants/app_urls.dart';
+import '../../../../core/services/network/astrology_api_client.dart';
 
 import '../../../../core/services/network/api_client.dart';
 import '../../domain/repositories/kundli_repository.dart';
@@ -8,45 +10,35 @@ import '../models/create_kundli_request_model.dart';
 import '../models/create_kundli_response_model.dart';
 import '../models/kundli_list_response_model.dart';
 import '../models/kundli_detail_response_model.dart';
-import 'package:dio/dio.dart';
 
 class KundliRepositoryImpl implements KundliRepository {
   final ApiClient apiClient;
-  final Dio _vedikaApiDio;
+  final AstrologyApiClient _astroClient;
 
-  KundliRepositoryImpl({required this.apiClient}) : _vedikaApiDio = Dio() {
-    // Vedika API configuration (for birth chart only)
-    _vedikaApiDio.options.baseUrl = 'https://api.vedika.io/sandbox';
-    _vedikaApiDio.options.connectTimeout = const Duration(seconds: 30);
-    _vedikaApiDio.options.receiveTimeout = const Duration(seconds: 30);
-    _vedikaApiDio.options.headers = {
-      'Content-Type': 'application/json',
-    };
-  }
+  KundliRepositoryImpl({required this.apiClient, AstrologyApiClient? astroClient})
+      : _astroClient = astroClient ?? AstrologyApiClient();
 
   @override
   Future<KundliResponseModel> getBirthChart(KundliRequestModel request) async {
     try {
-      print('[KUNDLI_APP] [DEBUG] Repository: Fetching birth chart');
-      print('[KUNDLI_APP] [DEBUG] Repository: Request data: ${request.toJson()}');
-      
-      final response = await _vedikaApiDio.post(
-        '/kundali/birth-chart',
-        data: request.toJson(),
+      final payload = _astroClient.buildBirthPayload(
+        datetime: request.datetime,
+        latitude: request.latitude,
+        longitude: request.longitude,
+        timezone: '5.5',
       );
 
-      print('[KUNDLI_APP] [DEBUG] Repository: Response status: ${response.statusCode}');
-      print('[KUNDLI_APP] [DEBUG] Repository: Response data: ${response.data}');
-      
+      final response = await _astroClient.getBirthChart(payload);
+
       if (response.statusCode == 200) {
-        final model = KundliResponseModel.fromJson(response.data as Map<String, dynamic>);
-        print('[KUNDLI_APP] [DEBUG] Repository: Model created successfully');
-        return model;
+        final Map<String, dynamic> dataMap = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : response.data as Map<String, dynamic>;
+        return KundliResponseModel.fromJson(dataMap);
       } else {
         throw Exception('Failed to load kundli data: ${response.statusCode}');
       }
     } catch (e) {
-      print('[KUNDLI_APP] [ERROR] Repository error: $e');
       throw Exception('Error fetching kundli: $e');
     }
   }

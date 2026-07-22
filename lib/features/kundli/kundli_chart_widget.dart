@@ -16,10 +16,11 @@ class KundliChartWidget extends StatefulWidget {
     required this.title, 
     this.northIndianSvg,
     this.southIndianSvg,
-    this.northIndianPlanetData,
+    Map<int, List<String>>? planetData,
+    Map<int, List<String>>? northIndianPlanetData,
     this.southIndianPlanetData,
     this.isLoading = false,
-  });
+  }) : northIndianPlanetData = northIndianPlanetData ?? planetData;
 
   @override
   State<KundliChartWidget> createState() => _KundliChartWidgetState();

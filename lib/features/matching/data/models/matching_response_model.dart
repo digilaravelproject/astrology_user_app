@@ -41,14 +41,11 @@ class MatchingData {
   });
 
   factory MatchingData.fromJson(Map<String, dynamic> json) {
-    // Vedika API response uses `total_points`, `maximum_points`, `percentage`, `match_result`, `recommendation`, `gunaDetails`
-    final totalPoints = (json['total_points'] ?? json['compatibility_score'] ?? 0).toDouble();
-    final maxPts = (json['maximum_points'] ?? json['max_score'] ?? 36) is int 
-        ? (json['maximum_points'] ?? json['max_score'] ?? 36) as int
-        : ((json['maximum_points'] ?? json['max_score'] ?? 36) as num).toInt();
-    final pct = (json['percentage'] ?? 0).toDouble();
-    final ver = json['match_result'] ?? json['verdict'] ?? '';
-    final rec = json['recommendation'] ?? '';
+    final totalPoints = (json['total']?['received_points'] ?? json['total_points'] ?? json['compatibility_score'] ?? 0).toDouble();
+    final maxPts = 36;
+    final pct = (json['percentage'] ?? (totalPoints / maxPts * 100)).toDouble();
+    final ver = json['conclusion']?['report'] ?? json['match_result'] ?? json['verdict'] ?? '';
+    final rec = json['recommendation'] ?? json['bot_response'] ?? '';
 
     return MatchingData(
       compatibilityScore: totalPoints,
@@ -56,7 +53,7 @@ class MatchingData {
       percentage: pct,
       verdict: ver,
       recommendation: rec,
-      gunaMilan: GunaMilan.fromJson(json['gunaDetails'] ?? json['guna_milan'] ?? {}),
+      gunaMilan: GunaMilan.fromJson(json['gunaDetails'] ?? json['guna_milan'] ?? json),
       doshas: Doshas.fromJson(json['doshas'] ?? {}, parentJson: json),
     );
   }
@@ -86,12 +83,12 @@ class GunaMilan {
   factory GunaMilan.fromJson(Map<String, dynamic> json) {
     return GunaMilan(
       varna: GunaDetail.fromJson(json['varna'] ?? {}),
-      vashya: GunaDetail.fromJson(json['vasya'] ?? json['vashya'] ?? {}),
+      vashya: GunaDetail.fromJson(json['vashya'] ?? json['vasya'] ?? {}),
       tara: GunaDetail.fromJson(json['tara'] ?? {}),
       yoni: GunaDetail.fromJson(json['yoni'] ?? {}),
-      grahaMaitri: GunaDetail.fromJson(json['grahaMaitri'] ?? json['graha_maitri'] ?? {}),
-      gana: GunaDetail.fromJson(json['gana'] ?? {}),
-      bhakoot: GunaDetail.fromJson(json['bhakoot'] ?? {}),
+      grahaMaitri: GunaDetail.fromJson(json['grahaMaitri'] ?? json['graha_maitri'] ?? json['maitri'] ?? {}),
+      gana: GunaDetail.fromJson(json['gana'] ?? json['gan'] ?? {}),
+      bhakoot: GunaDetail.fromJson(json['bhakoot'] ?? json['bhakut'] ?? {}),
       nadi: GunaDetail.fromJson(json['nadi'] ?? {}),
     );
   }
@@ -123,9 +120,9 @@ class GunaDetail {
 
   factory GunaDetail.fromJson(Map<String, dynamic> json) {
     return GunaDetail(
-      score: json['score'] ?? 0,
-      max: json['maxPoints'] ?? json['max'] ?? 0,
-      description: json['interpretation'] ?? json['description'] ?? '',
+      score: json['received_points'] ?? json['obtained_points'] ?? json['score'] ?? 0,
+      max: json['total_points'] ?? json['maxPoints'] ?? json['max'] ?? 0,
+      description: json['description'] ?? json['interpretation'] ?? json['bot_response'] ?? '',
     );
   }
 }

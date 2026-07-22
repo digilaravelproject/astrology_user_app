@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:astro_user/features/kundli/kundli_chart_widget.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_text.dart';
-import '../kundli_chart_widget.dart';
 
 class DivisionalChartTab extends StatefulWidget {
   const DivisionalChartTab({super.key});

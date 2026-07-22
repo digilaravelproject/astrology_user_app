@@ -4,6 +4,7 @@ import '../../../core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/widgets/location_search_screen.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/route_helper.dart';
@@ -26,29 +27,35 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   String? profile1Name;
   String? profile2Name;
 
+  // Selected Latitudes and Longitudes
+  double _boyLat = 28.6139;
+  double _boyLng = 77.2090;
+  double _girlLat = 19.0760;
+  double _girlLng = 72.8777;
+
   // Matching Boy Controllers
-  final TextEditingController _boysNameController = TextEditingController();
-  final TextEditingController _boysGenderController = TextEditingController();
-  final TextEditingController _boysDobController = TextEditingController();
-  final TextEditingController _boysTobController = TextEditingController();
-  final TextEditingController _boysPobController = TextEditingController();
+  final TextEditingController _boysNameController = TextEditingController(text: 'John');
+  final TextEditingController _boysGenderController = TextEditingController(text: 'Male');
+  final TextEditingController _boysDobController = TextEditingController(text: '22-Jul-2026');
+  final TextEditingController _boysTobController = TextEditingController(text: '11:07 AM');
+  final TextEditingController _boysPobController = TextEditingController(text: 'Agra, UP, India');
 
   // Matching Girl Controllers
-  final TextEditingController _girlsNameController = TextEditingController();
-  final TextEditingController _girlsGenderController = TextEditingController();
-  final TextEditingController _girlsDobController = TextEditingController();
-  final TextEditingController _girlsTobController = TextEditingController();
-  final TextEditingController _girlsPobController = TextEditingController();
+  final TextEditingController _girlsNameController = TextEditingController(text: 'Awi');
+  final TextEditingController _girlsGenderController = TextEditingController(text: 'Female');
+  final TextEditingController _girlsDobController = TextEditingController(text: '22-Jul-2026');
+  final TextEditingController _girlsTobController = TextEditingController(text: '11:07 AM');
+  final TextEditingController _girlsPobController = TextEditingController(text: 'Agra, UP, India');
 
   // Controllers for Open Kundli tab
-  final TextEditingController _boyNameController = TextEditingController();
-  final TextEditingController _boyDateController = TextEditingController();
-  final TextEditingController _boyTimeController = TextEditingController();
-  final TextEditingController _boyPlaceController = TextEditingController();
-  final TextEditingController _girlNameController = TextEditingController();
-  final TextEditingController _girlDateController = TextEditingController();
-  final TextEditingController _girlTimeController = TextEditingController();
-  final TextEditingController _girlPlaceController = TextEditingController();
+  final TextEditingController _boyNameController = TextEditingController(text: 'John');
+  final TextEditingController _boyDateController = TextEditingController(text: '22-Jul-2026');
+  final TextEditingController _boyTimeController = TextEditingController(text: '11:07 AM');
+  final TextEditingController _boyPlaceController = TextEditingController(text: 'Agra, UP, India');
+  final TextEditingController _girlNameController = TextEditingController(text: 'Awi');
+  final TextEditingController _girlDateController = TextEditingController(text: '22-Jul-2026');
+  final TextEditingController _girlTimeController = TextEditingController(text: '11:07 AM');
+  final TextEditingController _girlPlaceController = TextEditingController(text: 'Agra, UP, India');
   final TextEditingController _searchController = TextEditingController();
   bool _saveDetails = false;
 
@@ -606,6 +613,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildField("Name", "Enter boy's name", sax.Iconsax.user_copy, controller: _boysNameController),
                   _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _boysDobController, isPicker: true, onTap: () {
                     boyDobError.value = '';
                     _selectDate(context, _boysDobController);
@@ -634,7 +642,19 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           ),
                         )
                       : const SizedBox.shrink()),
-                  _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _boysPobController),
+                  _buildField("Birth Place", "Select birth place", sax.Iconsax.location_copy, controller: _boysPobController, isPicker: true, onTap: () async {
+                    boyPobError.value = '';
+                    final result = await Navigator.of(context, rootNavigator: true)
+                        .push<LocationResult>(MaterialPageRoute(
+                      builder: (_) => const LocationSearchScreen(title: "Select Boy's Birth Place"),
+                      fullscreenDialog: true,
+                    ));
+                    if (result != null) {
+                      _boysPobController.text = result.displayName;
+                      _boyLat = result.latitude;
+                      _boyLng = result.longitude;
+                    }
+                  }),
                   Obx(() => boyPobError.value.isNotEmpty
                       ? Padding(
                           padding: const EdgeInsets.only(left: 14, top: 4),
@@ -655,6 +675,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildField("Name", "Enter girl's name", sax.Iconsax.user_copy, controller: _girlsNameController),
                   _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _girlsDobController, isPicker: true, onTap: () {
                     girlDobError.value = '';
                     _selectDate(context, _girlsDobController);
@@ -683,7 +704,19 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           ),
                         )
                       : const SizedBox.shrink()),
-                  _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: _girlsPobController),
+                  _buildField("Birth Place", "Select birth place", sax.Iconsax.location_copy, controller: _girlsPobController, isPicker: true, onTap: () async {
+                    girlPobError.value = '';
+                    final result = await Navigator.of(context, rootNavigator: true)
+                        .push<LocationResult>(MaterialPageRoute(
+                      builder: (_) => const LocationSearchScreen(title: "Select Girl's Birth Place"),
+                      fullscreenDialog: true,
+                    ));
+                    if (result != null) {
+                      _girlsPobController.text = result.displayName;
+                      _girlLat = result.latitude;
+                      _girlLng = result.longitude;
+                    }
+                  }),
                   Obx(() => girlPobError.value.isNotEmpty
                       ? Padding(
                           padding: const EdgeInsets.only(left: 14, top: 4),
@@ -789,15 +822,21 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
               // Fetch matching data dynamically
               await matchingController.fetchMatchingData(
+                boyName: _boysNameController.text.trim().isEmpty ? 'Boy' : _boysNameController.text.trim(),
+                boyGender: 'Male',
                 boyDob: boyDob,
                 boyTob: boyTob,
-                boyLat: 28.6139,
-                boyLng: 77.2090,
+                boyPlace: _boysPobController.text.trim(),
+                boyLat: _boyLat,
+                boyLng: _boyLng,
                 boyTz: '+05:30',
+                girlName: _girlsNameController.text.trim().isEmpty ? 'Girl' : _girlsNameController.text.trim(),
+                girlGender: 'Female',
                 girlDob: girlDob,
                 girlTob: girlTob,
-                girlLat: 19.0760,
-                girlLng: 72.8777,
+                girlPlace: _girlsPobController.text.trim(),
+                girlLat: _girlLat,
+                girlLng: _girlLng,
                 girlTz: '+05:30',
               );
 
@@ -1037,6 +1076,12 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     final tobError = ''.obs;
     final pobError = ''.obs;
     final genderError = ''.obs;
+    final selectedLat = (kundliController.selectedLatitude.value.isNotEmpty
+        ? kundliController.selectedLatitude.value
+        : '28.7041').obs;
+    final selectedLng = (kundliController.selectedLongitude.value.isNotEmpty
+        ? kundliController.selectedLongitude.value
+        : '77.1025').obs;
 
     Get.bottomSheet(
       Container(
@@ -1119,7 +1164,32 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           color: Colors.red,
                         ),
                       ),
-                    _buildField("Birth Place", "Enter birth place", sax.Iconsax.location_copy, controller: kundliController.pobController),
+                    _buildField(
+                      "Birth Place",
+                      "Enter birth place",
+                      sax.Iconsax.location_copy,
+                      controller: kundliController.pobController,
+                      isPicker: true,
+                      onTap: () async {
+                        pobError.value = '';
+                        final LocationResult? result = await Navigator.of(
+                          Get.context!,
+                          rootNavigator: true,
+                        ).push<LocationResult>(
+                          MaterialPageRoute(
+                            builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
+                            fullscreenDialog: true,
+                          ),
+                        );
+                        if (result != null) {
+                          kundliController.pobController.text = result.displayName;
+                          selectedLat.value = result.latitude.toString();
+                          selectedLng.value = result.longitude.toString();
+                          kundliController.selectedLatitude.value = result.latitude.toString();
+                          kundliController.selectedLongitude.value = result.longitude.toString();
+                        }
+                      },
+                    ),
                     if (pobError.value.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(left: 14, top: 4),
@@ -1172,6 +1242,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     
                     if (hasError) return;
                     
+                    final latitude = selectedLat.value;
+                    final longitude = selectedLng.value;
+
                     if (isEdit) {
                       // Update existing kundli
                       try {
@@ -1179,10 +1252,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         final birthDate = _convertDateToApiFormat(kundliController.dobController.text);
                         final birthTime = _convertTimeToApiFormat(kundliController.tobController.text);
                         final datetime = _createDatetime(birthDate, birthTime);
-                        
-                        // Static lat/lng for now
-                        const latitude = '28.7041';
-                        const longitude = '77.1025';
                         
                         // Close bottom sheet
                         Get.back();
@@ -1203,6 +1272,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           latitude: latitude,
                           longitude: longitude,
                           datetime: datetime,
+                          place: kundliController.pobController.text,
                         );
                         
                         // Close loading
@@ -1222,10 +1292,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         final birthTime = _convertTimeToApiFormat(kundliController.tobController.text); // Already includes :00
                         final datetime = _createDatetime(birthDate, birthTime);
                         
-                        // Static lat/lng for now
-                        const latitude = '28.7041';
-                        const longitude = '77.1025';
-                        
                         // Close bottom sheet
                         Get.back();
                       
@@ -1244,6 +1310,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         latitude: latitude,
                         longitude: longitude,
                         datetime: datetime,
+                        place: kundliController.pobController.text,
                       );
                       
                       // Close loading
@@ -1532,20 +1599,36 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return months[month - 1];
   }
 
-  // Convert date from "15-Jan-1995" to "1995-01-15"
+  // Convert date to "YYYY-MM-DD"
   String _convertDateToApiFormat(String dateStr) {
     try {
-      final parts = dateStr.split('-');
+      final text = dateStr.trim();
+      final ymdRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
+      if (ymdRegex.hasMatch(text)) {
+        return text;
+      }
+
+      final monthMap = {
+        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
+        'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
+        'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+      };
+
+      final parts = text.split(RegExp(r'[-/\s]'));
       if (parts.length == 3) {
-        final day = parts[0].padLeft(2, '0');
-        final monthMap = {
-          'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-          'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-          'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-        };
-        final month = monthMap[parts[1]] ?? '01';
-        final year = parts[2];
-        return '$year-$month-$day';
+        if (parts[0].length == 4) {
+          final year = parts[0];
+          final month = parts[1].padLeft(2, '0');
+          final day = parts[2].padLeft(2, '0');
+          return '$year-$month-$day';
+        }
+        if (parts[2].length == 4) {
+          final day = parts[0].padLeft(2, '0');
+          final year = parts[2];
+          final mStr = parts[1].toLowerCase();
+          final month = monthMap[mStr] ?? parts[1].padLeft(2, '0');
+          return '$year-$month-$day';
+        }
       }
     } catch (e) {
       print('Date conversion error: $e');
@@ -1553,30 +1636,30 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return dateStr;
   }
 
-  // Convert time from "10:30 AM" or "3:22 PM" to "10:30:00" or "15:22:00" (24-hour format with seconds)
+  // Convert time to "HH:mm:ss" (24-hour format with seconds)
   String _convertTimeToApiFormat(String timeStr) {
     try {
-      // Remove AM/PM and parse
-      final isPM = timeStr.toUpperCase().contains('PM');
-      final isAM = timeStr.toUpperCase().contains('AM');
-      
-      String cleanTime = timeStr.replaceAll(' AM', '').replaceAll(' PM', '').replaceAll('AM', '').replaceAll('PM', '').trim();
-      
+      final text = timeStr.trim();
+      final isPM = text.toUpperCase().contains('PM');
+      final isAM = text.toUpperCase().contains('AM');
+
+      String cleanTime = text.replaceAll(RegExp(r'[a-zA-Z\s]'), '').trim();
       final parts = cleanTime.split(':');
       if (parts.length >= 2) {
         int hour = int.parse(parts[0]);
         int minute = int.parse(parts[1]);
-        
-        // Convert to 24-hour format
+        int second = parts.length > 2 ? (int.tryParse(parts[2]) ?? 0) : 0;
+
         if (isPM && hour != 12) {
           hour += 12;
         } else if (isAM && hour == 12) {
           hour = 0;
         }
-        
+
         final hourStr = hour.toString().padLeft(2, '0');
         final minuteStr = minute.toString().padLeft(2, '0');
-        return '$hourStr:$minuteStr:00';
+        final secondStr = second.toString().padLeft(2, '0');
+        return '$hourStr:$minuteStr:$secondStr';
       }
     } catch (e) {
       print('Time conversion error: $e');
@@ -1584,11 +1667,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return timeStr;
   }
 
-  // Create datetime string from date and time
+  // Create datetime string from date and time: "YYYY-MM-DD HH:mm:ss"
   String _createDatetime(String date, String time) {
-    // date format: "1995-01-15", time format: "10:30:00" or "15:22:00"
-    // Return format: "1995-01-15 10:30:00" (space, not T)
-    return '$date $time';
+    final validDate = _convertDateToApiFormat(date);
+    final validTime = _convertTimeToApiFormat(time);
+    return '$validDate $validTime';
   }
 
   // Navigate to Kundli screen
@@ -1844,6 +1927,17 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
             // Place of Birth
             TextField(
               controller: _pobController,
+              readOnly: true,
+              onTap: () async {
+                final result = await Navigator.of(context, rootNavigator: true)
+                    .push<LocationResult>(MaterialPageRoute(
+                  builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
+                  fullscreenDialog: true,
+                ));
+                if (result != null) {
+                  _pobController.text = result.displayName;
+                }
+              },
               decoration: InputDecoration(
                 hintText: 'Place of Birth',
                 suffixIcon: const Icon(Icons.location_on_outlined, size: 20),

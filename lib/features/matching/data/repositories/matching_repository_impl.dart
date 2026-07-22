@@ -1,47 +1,61 @@
-import 'package:dio/dio.dart';
-import '../../../../core/constants/vedika_constants.dart';
+import 'dart:convert';
+import '../../../../core/services/network/astrology_api_client.dart';
 import '../../domain/repositories/matching_repository.dart';
 import '../models/matching_request_model.dart';
 import '../models/matching_response_model.dart';
 
 class MatchingRepositoryImpl implements MatchingRepository {
-  final Dio _dio;
+  final AstrologyApiClient _client;
 
-  MatchingRepositoryImpl() : _dio = Dio() {
-    _dio.options.baseUrl = VedikaConstants.baseUrl;
-    _dio.options.connectTimeout = const Duration(seconds: 30);
-    _dio.options.receiveTimeout = const Duration(seconds: 30);
-    _dio.options.headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': VedikaConstants.apiKey,
+  MatchingRepositoryImpl({AstrologyApiClient? client})
+      : _client = client ?? AstrologyApiClient();
+
+  Map<String, dynamic> _buildPersonPayload(PersonDetails details, String prefix) {
+    DateTime dt;
+    try {
+      dt = DateTime.parse(details.datetime);
+    } catch (_) {
+      dt = DateTime.now();
+    }
+    
+    double tzOffset = 5.5;
+    try {
+      final sign = details.timezone.startsWith('-') ? -1 : 1;
+      final parts = details.timezone.replaceAll('+', '').replaceAll('-', '').split(':');
+      tzOffset = sign * (double.parse(parts[0]) + (parts.length > 1 ? double.parse(parts[1]) / 60 : 0));
+    } catch (_) {}
+
+    return {
+      '${prefix}day': dt.day,
+      '${prefix}month': dt.month,
+      '${prefix}year': dt.year,
+      '${prefix}hour': dt.hour,
+      '${prefix}min': dt.minute,
+      '${prefix}lat': details.latitude,
+      '${prefix}lon': details.longitude,
+      '${prefix}tzone': tzOffset,
     };
   }
 
   @override
   Future<MatchingResponseModel> getMatching(MatchingRequestModel request) async {
     try {
-      print('[MATCHING_APP] [DEBUG] Repository: Fetching matching data');
-      print('[MATCHING_APP] [DEBUG] Repository: Request data: ${request.toJson()}');
-      
-      final response = await _dio.post(
-        VedikaConstants.matchingAshtakootaEndpoint,
-        data: request.toJson(),
-      );
+      final malePayload = _buildPersonPayload(request.male, 'm_');
+      final femalePayload = _buildPersonPayload(request.female, 'f_');
+      final payload = {...malePayload, ...femalePayload};
 
-      print('[MATCHING_APP] [DEBUG] Repository: Response status: ${response.statusCode}');
-      print('[MATCHING_APP] [DEBUG] Repository: Response data: ${response.data}');
-      
+      final response = await _client.getMatching(payload);
+
       if (response.statusCode == 200) {
-        final model = MatchingResponseModel.fromJson(response.data as Map<String, dynamic>);
-        print('[MATCHING_APP] [DEBUG] Repository: Model created successfully');
-        return model;
+        final Map<String, dynamic> dataMap = response.data is String
+            ? jsonDecode(response.data as String) as Map<String, dynamic>
+            : response.data as Map<String, dynamic>;
+        return MatchingResponseModel.fromJson(dataMap);
       } else {
         throw Exception('Failed to load matching data: ${response.statusCode}');
       }
     } catch (e) {
-      print('[MATCHING_APP] [ERROR] Repository error: $e');
       throw Exception('Error fetching matching: $e');
     }
   }
 }
-

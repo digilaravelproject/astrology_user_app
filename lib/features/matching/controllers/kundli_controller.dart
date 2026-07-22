@@ -47,6 +47,8 @@ class KundliController extends GetxController {
   final RxBool isLoadingDetail = false.obs;
   final RxString errorMessage = ''.obs;
   final RxInt editingKundliId = 0.obs; // 0 means create mode, >0 means edit mode
+  final RxString selectedLatitude = ''.obs;
+  final RxString selectedLongitude = ''.obs;
 
   @override
   void onInit() {
@@ -70,6 +72,8 @@ class KundliController extends GetxController {
     dobController.clear();
     tobController.clear();
     pobController.clear();
+    selectedLatitude.value = '';
+    selectedLongitude.value = '';
     editingKundliId.value = 0; // Reset to create mode
   }
 
@@ -83,6 +87,8 @@ class KundliController extends GetxController {
       
       kundliDetailData.value = result;
       editingKundliId.value = id;
+      selectedLatitude.value = result.data.latitude?.toString() ?? '';
+      selectedLongitude.value = result.data.longitude?.toString() ?? '';
       
       print('[KUNDLI_APP] [DEBUG] Controller: Data received - name: ${result.data.name}, gender: ${result.data.gender}');
       print('[KUNDLI_APP] [DEBUG] Controller: Formatted date: ${result.data.formattedDate}');
@@ -140,6 +146,7 @@ class KundliController extends GetxController {
     required String latitude,
     required String longitude,
     required String datetime,
+    String? place,
   }) async {
     try {
       isLoading.value = true;
@@ -153,6 +160,7 @@ class KundliController extends GetxController {
         latitude: latitude,
         longitude: longitude,
         datetime: datetime,
+        place: place,
       );
 
       print('[KUNDLI_APP] [DEBUG] Controller: Creating kundli');
@@ -186,6 +194,7 @@ class KundliController extends GetxController {
     required String latitude,
     required String longitude,
     required String datetime,
+    String? place,
   }) async {
     try {
       isLoading.value = true;
@@ -199,6 +208,7 @@ class KundliController extends GetxController {
         latitude: latitude,
         longitude: longitude,
         datetime: datetime,
+        place: place,
       );
 
       print('[KUNDLI_APP] [DEBUG] Controller: Updating kundli id: $id');

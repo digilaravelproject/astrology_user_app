@@ -92,7 +92,7 @@ class AppUrls {
 
 
 
-  static String getPanchangByDate(String date) => 'https://api.vedika.io/sandbox/panchang/$date';
+
 
   // WebSocket / Pusher Events
   static const String pusherConnectionEstablished = 'pusher:connection_established';
