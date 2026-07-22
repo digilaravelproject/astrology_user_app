@@ -12,9 +12,10 @@ class MatchingResponseModel {
   });
 
   factory MatchingResponseModel.fromJson(Map<String, dynamic> json) {
+    final hasRootData = json.containsKey('total') || json.containsKey('conclusion') || json.containsKey('varna');
     return MatchingResponseModel(
-      success: json['success'] ?? false,
-      data: MatchingData.fromJson(json['data'] ?? {}),
+      success: json['success'] ?? hasRootData,
+      data: MatchingData.fromJson(json['data'] ?? json),
       billing: BillingInfo.fromJson(json['billing'] ?? {}),
       meta: MetaInfo.fromJson(json['meta'] ?? {}),
     );
