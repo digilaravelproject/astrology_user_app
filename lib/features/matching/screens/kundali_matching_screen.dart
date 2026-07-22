@@ -1,752 +1,70 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../routes/route_helper.dart';
+import '../../kundli/kundli_screen.dart';
 import '../controllers/matching_controller.dart';
+import '../data/models/matching_response_model.dart';
 
-/*class KundliMatchScreen extends GetView<MatchingController> {
-  const KundliMatchScreen({Key? key}) : super(key: key);
+class KundliMatchScreen extends GetView<MatchingController> {
+  const KundliMatchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final List<String> tabs = [
+      'RESULTS',
+      'DETAILS',
+      'VARNA',
+      'VASYA',
+      'TARA',
+      'YONI',
+      'MAITRI',
+      'GANA',
+      'BHAKOOT',
+      'NADI',
+      'DOWNLOAD PDF',
+      'BIRTH DETAILS',
+    ];
+
     return DefaultTabController(
-      length: 3,
+      length: tabs.length,
       child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: AppColors.scaffoldBackgroundColor,
         appBar: AppBar(
+          backgroundColor: AppColors.white,
+          elevation: 0.5,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textColorPrimary),
+            onPressed: () => Navigator.maybePop(context),
+          ),
           title: const Text(
             'Match Result',
             style: TextStyle(
               color: AppColors.textColorPrimary,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
-              letterSpacing: 0.5,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
-          centerTitle: true,
-          backgroundColor: AppColors.white,
-          elevation: 0,
-          bottom: const TabBar(
-            dividerColor: Colors.transparent, // 👈 ye line add karo
-            indicatorColor: AppColors.primaryColor,
-            indicatorWeight: 2.5,
+          bottom: TabBar(
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            dividerColor: Colors.transparent,
             labelColor: AppColors.primaryColor,
             unselectedLabelColor: AppColors.textColorSecondary,
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
+            indicatorColor: AppColors.primaryColor,
+            indicatorSize: TabBarIndicatorSize.label,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
             ),
-            unselectedLabelStyle: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 13,
             ),
-            tabs: [
-              Tab(text: 'Overview'),
-              Tab(text: 'Guna Milan'),
-              Tab(text: 'Doshas'),
-            ],
-          ),
-        ),
-        body: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (controller.matchingData.value == null) {
-            return Center(
-              child: Text(
-                controller.errorMessage.value.isEmpty
-                    ? 'No matching data available'
-                    : controller.errorMessage.value,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            );
-          }
-
-          return const TabBarView(
-            children: [
-              OverviewTab(),
-              GunaMilanTab(),
-              DoshasTab(),
-            ],
-          );
-        }),
-      ),
-    );
-  }
-}
-
-// ===================== TAB 1: OVERVIEW =====================
-class OverviewTab extends GetView<MatchingController> {
-  const OverviewTab({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final data = controller.matchingData.value!.data;
-    final score = data.compatibilityScore;
-    final maxScore = data.maxScore;
-    final percentage = data.percentage;
-    final verdict = data.verdict;
-    final recommendation = data.recommendation;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Score Card
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                // Circular Progress
-                SizedBox(
-                  width: 120,
-                  height: 120,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        height: 120,
-                        child: CircularProgressIndicator(
-                          value: percentage / 100,
-                          strokeWidth: 8,
-                          backgroundColor: Colors.white.withOpacity(0.3),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${percentage.toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const Text(
-                            'Match',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  verdict,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.star, color: AppColors.goldAccent, size: 18),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Score: $score / $maxScore',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Recommendation Card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightPink,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.favorite, color: AppColors.primaryColor, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Recommendation',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  recommendation,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    height: 1.4,
-                    color: AppColors.textColorSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ===================== TAB 2: GUNA MILAN (4 Columns) =====================
-class GunaMilanTab extends GetView<MatchingController> {
-  const GunaMilanTab({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final gunaData = controller.matchingData.value!.data.gunaMilan.toMap();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row with 4 columns
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    'Guna',
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    'Score',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Max',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Text(
-                    'Area of Life',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Guna Rows
-          ...gunaData.entries.map((entry) {
-            final key = entry.key;
-            final value = entry.value;
-            final score = value.score.toString();
-            final maxScore = value.max.toString();
-            final description = value.description.split('-').first.trim();
-            
-            final gunaName = key.contains('_')
-                ? key.split('_').last
-                : key;
-
-            final formattedGunaName =
-                gunaName[0].toUpperCase() + gunaName.substring(1);
-
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: AppColors.dividerColor, width: 0.5),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-               // crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      formattedGunaName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      score,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      maxScore,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textColorSecondary,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: Text(
-                      description,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textColorSecondary,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
-
-// ===================== TAB 3: DOSHAS =====================
-class DoshasTab extends GetView<MatchingController> {
-  const DoshasTab({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final doshasData = controller.matchingData.value!.data.doshas;
-    final manglikData = doshasData.manglik;
-    final nadiData = doshasData.nadiDosha;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Manglik Dosha Card
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightPink,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.local_fire_department, color: AppColors.primaryColor, size: 20),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Manglik Dosha',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: AppColors.textColorPrimary,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: manglikData.female.present
-                              ? AppColors.errorColor.withOpacity(0.1)
-                              : AppColors.successColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          manglikData.female.present ? 'Active' : 'Clear',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: manglikData.female.present
-                                ? AppColors.errorColor
-                                : AppColors.successColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Body
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildDoshaStatusRow(
-                        'Male',
-                        manglikData.male.present ? 'Present' : 'Not Present',
-                        manglikData.male.present,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDoshaStatusRow(
-                        'Female',
-                        manglikData.female.present ? 'Present' : 'Not Present',
-                        manglikData.female.present,
-                      ),
-                      if (manglikData.female.present) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.fieldBackground,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.tune, size: 16, color: AppColors.textColorSecondary),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Intensity:',
-                                    style: TextStyle(fontSize: 13, color: AppColors.textColorSecondary),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    manglikData.female.intensity ?? 'N/A',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  const Icon(Icons.clear, size: 16, color: AppColors.textColorSecondary),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Cancelled by:',
-                                    style: TextStyle(fontSize: 13, color: AppColors.textColorSecondary),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    manglikData.female.cancelledBy ?? 'N/A',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Nadi Dosha Card
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightPink,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.health_and_safety, color: AppColors.primaryColor, size: 20),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Nadi Dosha',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: AppColors.textColorPrimary,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: nadiData.present
-                              ? AppColors.warningColor.withOpacity(0.1)
-                              : AppColors.successColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          nadiData.present ? 'Partial' : 'Clear',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: nadiData.present
-                                ? AppColors.warningColor
-                                : AppColors.successColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Body
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildDoshaStatusRow(
-                        'Status',
-                        nadiData.present ? 'Present' : 'Not Present',
-                        nadiData.present,
-                      ),
-                      if (nadiData.present) ...[
-                        const SizedBox(height: 12),
-                        _buildDoshaStatusRow(
-                          'Severity',
-                          nadiData.severity,
-                          true,
-                          isWarning: true,
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.fieldBackground,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Suggested Remedies:',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              ...nadiData.remedies.map((remedy) => Padding(
-                                padding: const EdgeInsets.only(left: 8, bottom: 6),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.circle, size: 5, color: AppColors.primaryColor),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      remedy,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDoshaStatusRow(String label, String value, bool isActive, {bool isWarning = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textColorSecondary,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isWarning
-                ? AppColors.warningColor
-                : (isActive ? AppColors.errorColor : AppColors.successColor),
-          ),
-        ),
-      ],
-    );
-  }
-}*/
-
-
-
-
-
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:flutter/services.dart';
-import '../../../core/theme/app_colors.dart';
-import '../controllers/matching_controller.dart';
-
-class KundliMatchScreen extends GetView<MatchingController> {
-  const KundliMatchScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
-        appBar: AppBar(
-          title: const Text(
-            'Kundli Match Result',
-            style: TextStyle(
-              color: AppColors.textColorPrimary,
-              fontWeight: FontWeight.w700,
-              fontSize: 22,
-              letterSpacing: 0.5,
-            ),
-          ),
-          centerTitle: false,
-          backgroundColor: AppColors.white,
-          elevation: 0,
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(48),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: AppColors.fieldBackground,
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const TabBar(
-                dividerColor: Colors.transparent,
-                indicator: BoxDecoration(
-                  color: AppColors.primaryColor,
-                  borderRadius: BorderRadius.all(Radius.circular(30)),
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 0,
-                labelColor: AppColors.white,
-                unselectedLabelColor: AppColors.textColorSecondary,
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                ),
-                tabs: [
-                  Tab(text: 'Overview'),
-                  Tab(text: 'Guna Milan'),
-                  Tab(text: 'Doshas'),
-                ],
-              ),
-            ),
+            tabs: tabs.map((t) => Tab(text: t)).toList(),
           ),
         ),
         body: Obx(() {
@@ -755,14 +73,13 @@ class KundliMatchScreen extends GetView<MatchingController> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
-                  ),
+                  CircularProgressIndicator(color: AppColors.primaryColor),
                   SizedBox(height: 16),
                   Text(
-                    'Analyzing Kundli...',
+                    'Fetching Kundli Matching Details...',
                     style: TextStyle(
                       fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: AppColors.textColorSecondary,
                     ),
                   ),
@@ -771,46 +88,47 @@ class KundliMatchScreen extends GetView<MatchingController> {
             );
           }
 
-          if (controller.matchingData.value == null) {
-            return Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                margin: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.dividerColor),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: AppColors.warningColor,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      controller.errorMessage.value.isEmpty
-                          ? 'No matching data available'
-                          : controller.errorMessage.value,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textColorSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+          final matching = controller.matchingData.value;
+          final data = matching?.data;
 
-          return const TabBarView(
+          return TabBarView(
             children: [
-              OverviewTab(),
-              GunaMilanTab(),
-              DoshasTab(),
+              _ResultsTab(data: data),
+              _DetailsTab(data: data),
+              _InterpretationTabWidget(
+                title: 'Varna (Spiritual Compatibility)',
+                detail: data?.gunaMilan.varna,
+              ),
+              _InterpretationTabWidget(
+                title: 'Vasya (Mutual Attraction & Influence)',
+                detail: data?.gunaMilan.vashya,
+              ),
+              _InterpretationTabWidget(
+                title: 'Tara (Birth Star Harmony)',
+                detail: data?.gunaMilan.tara,
+              ),
+              _InterpretationTabWidget(
+                title: 'Yoni (Physical & Sexual Compatibility)',
+                detail: data?.gunaMilan.yoni,
+              ),
+              _InterpretationTabWidget(
+                title: 'Maitri (Mental & Intellectual Harmony)',
+                detail: data?.gunaMilan.grahaMaitri,
+              ),
+              _InterpretationTabWidget(
+                title: 'Gana (Temperament & Nature)',
+                detail: data?.gunaMilan.gana,
+              ),
+              _InterpretationTabWidget(
+                title: 'Bhakoot (Financial & Family Prosperity)',
+                detail: data?.gunaMilan.bhakoot,
+              ),
+              _InterpretationTabWidget(
+                title: 'Nadi (Health & Genetic Compatibility)',
+                detail: data?.gunaMilan.nadi,
+              ),
+              const _DownloadPdfTab(),
+              _BirthDetailsTab(data: data),
             ],
           );
         }),
@@ -819,849 +137,239 @@ class KundliMatchScreen extends GetView<MatchingController> {
   }
 }
 
-// ===================== TAB 1: OVERVIEW =====================
-class OverviewTab extends GetView<MatchingController> {
-  const OverviewTab({Key? key}) : super(key: key);
+// ===================== 1. RESULTS TAB =====================
+class _ResultsTab extends StatelessWidget {
+  final MatchingData? data;
+
+  const _ResultsTab({this.data});
 
   @override
   Widget build(BuildContext context) {
-    final data = controller.matchingData.value!.data;
-    final score = data.compatibilityScore;
-    final maxScore = data.maxScore;
-    final percentage = data.percentage;
-    final verdict = data.verdict;
-    final recommendation = data.recommendation;
+    final score = data?.compatibilityScore ?? 0.0;
+    final maxScore = data?.maxScore ?? 36;
+    final verdict = data?.verdict.isNotEmpty == true
+        ? data!.verdict
+        : (score >= 18 ? 'Compatible Match' : 'Incompatible Match');
+    final recommendation = data?.recommendation ?? '';
 
-    // Get color based on percentage
-    final Color scoreColor = percentage >= 70
-        ? Colors.green
-        : (percentage >= 50 ? Colors.orange : Colors.red);
+    final maleManglik = data?.doshas.manglik.male.present == true;
+    final femaleManglik = data?.doshas.manglik.female.present == true;
+    String mangalDoshaText = 'No Mangal Dosha detected.';
+    if (maleManglik && femaleManglik) {
+      mangalDoshaText = 'Both Boy and Girl are Manglik (Dosha Cancelled).';
+    } else if (maleManglik) {
+      mangalDoshaText = 'Boy has Mangal Dosha.';
+    } else if (femaleManglik) {
+      mangalDoshaText = 'Girl has Mangal Dosha.';
+    }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Animated Score Card
-        /*  TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: percentage),
-            duration: const Duration(milliseconds: 1500),
-            builder: (context, value, child) {
-              return Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryColor,
-                      AppColors.primaryColor.withOpacity(0.7),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 32),
-                    // Animated Circular Progress
-                    SizedBox(
-                      width: 140,
-                      height: 140,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            width: 140,
-                            height: 140,
-                            child: CircularProgressIndicator(
-                              value: value / 100,
-                              strokeWidth: 10,
-                              backgroundColor: Colors.white.withOpacity(0.2),
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                '${value.toStringAsFixed(0)}%',
-                                style: const TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  verdict,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    // Score Details
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      margin: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Total Score',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          Text(
-                            '$score / $maxScore',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              );
-            },
-          ),*/
-
-
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: percentage),
-            duration: const Duration(milliseconds: 1500),
-            builder: (context, value, child) {
-              return Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      AppColors.primaryColor,
-                      AppColors.primaryColor.withOpacity(0.7),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryColor.withOpacity(0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Animated Circular Progress - Smaller
-                      SizedBox(
-                        width: 100,
-                        height: 100,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: CircularProgressIndicator(
-                                value: value / 100,
-                                strokeWidth: 8,
-                                backgroundColor: Colors.white.withOpacity(0.2),
-                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            ),
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '${value.toStringAsFixed(0)}%',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                 // padding: const EdgeInsets.all(8.0),
-                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      verdict,
-                                      style: const TextStyle(
-                                        fontSize: 10,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Score Details - Compact
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Total Score',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '$score / $maxScore',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.star, color: Colors.white70, size: 14),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${percentage.toStringAsFixed(0)}% Match',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 24),
-
-          // Quick Stats Row
-          Row(
-            children: [
-              Expanded(
-                child: _buildQuickStatCard(
-                  'Guna Match',
-                  '${data.compatibilityScore} / ${data.maxScore}',
-                  Icons.star_rate_rounded,
-                  AppColors.goldAccent,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickStatCard(
-                  'Dosha Status',
-                  data.doshas.manglik.female.present ? 'Active' : 'Clear',
-                  Icons.warning_amber_rounded,
-                  data.doshas.manglik.female.present ? AppColors.warningColor : AppColors.successColor,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildQuickStatCard(
-                  'Compatibility',
-                  percentage >= 70 ? 'Excellent' : (percentage >= 50 ? 'Good' : 'Average'),
-                  Icons.favorite,
-                  scoreColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Recommendation Card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.cardColor,
-                  AppColors.cardColor.withOpacity(0.95),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryGradient,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Icon(Icons.lightbulb, color: Colors.white, size: 22),
+                const Text(
+                  'Ashtakoot Matching Points',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textColorPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Score card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightPink,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderColor),
+                  ),
+                  alignment: Alignment.center,
+                  child: RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: score.toStringAsFixed(1),
+                          style: const TextStyle(
+                            fontSize: 44,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' /$maxScore',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textColorSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 14),
-                    const Text(
-                      'Astrological Recommendation',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.fieldBackground,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    recommendation,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      height: 1.5,
-                      color: AppColors.textColorSecondary,
-                    ),
+
+                Text(
+                  mangalDoshaText,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textColorPrimary,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                const SizedBox(height: 20),
 
-  Widget _buildQuickStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.dividerColor, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textColorSecondary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-// ===================== TAB 2: GUNA MILAN (4 Columns) =====================
-class GunaMilanTab extends GetView<MatchingController> {
-  const GunaMilanTab({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final gunaData = controller.matchingData.value!.data.gunaMilan.toMap();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row with 4 columns
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    'Guna',
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    'Score',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    'Max',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Text(
-                    'Area of Life',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Guna Rows
-          ...gunaData.entries.map((entry) {
-            final key = entry.key;
-            final value = entry.value;
-            final score = value.score.toString();
-            final maxScore = value.max.toString();
-            final description = value.description.split('-').first.trim();
-
-            final gunaName = key.contains('_')
-                ? key.split('_').last
-                : key;
-
-            final formattedGunaName =
-                gunaName[0].toUpperCase() + gunaName.substring(1);
-
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: AppColors.dividerColor, width: 0.5),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      formattedGunaName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                        color: AppColors.textColorPrimary,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      score,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
+                // Upcoming Marriage Muhurat Button
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _showMarriageMuhuratBottomSheet(context);
+                    },
+                    icon: const Icon(Icons.calendar_month, color: AppColors.white, size: 20),
+                    label: const Text(
+                      'Upcoming Marriage Muhurat',
+                      style: TextStyle(
+                        color: AppColors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
-                        color: AppColors.primaryColor,
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      maxScore,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textColorSecondary,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      elevation: 2,
                     ),
                   ),
-                  Expanded(
-                    flex: 5,
-                    child: Text(
-                      description,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textColorSecondary,
-                        height: 1.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-          const SizedBox(height: 8),
-        ],
-      ),
-    );
-  }
-}
+                ),
+                const SizedBox(height: 20),
 
-// ===================== TAB 3: DOSHAS =====================
-class DoshasTab extends GetView<MatchingController> {
-  const DoshasTab({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final doshasData = controller.matchingData.value!.data.doshas;
-    final manglikData = doshasData.manglik;
-    final nadiData = doshasData.nadiDosha;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Manglik Dosha Card
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
+                // Conclusion Box
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: AppColors.lightPink,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    color: AppColors.fieldBackground,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.borderColor),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.local_fire_department, color: AppColors.primaryColor, size: 20),
-                      const SizedBox(width: 10),
                       const Text(
-                        'Manglik Dosha',
+                        '* Match Result Conclusion:',
                         style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        verdict,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          height: 1.4,
                           fontWeight: FontWeight.w600,
-                          fontSize: 16,
                           color: AppColors.textColorPrimary,
                         ),
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: manglikData.female.present
-                              ? AppColors.errorColor.withOpacity(0.1)
-                              : AppColors.successColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          manglikData.female.present ? 'Active' : 'Clear',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: manglikData.female.present
-                                ? AppColors.errorColor
-                                : AppColors.successColor,
+                      if (recommendation.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          recommendation,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: AppColors.textColorSecondary,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Body
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildDoshaStatusRow(
-                        'Male',
-                        manglikData.male.present ? 'Present' : 'Not Present',
-                        manglikData.male.present,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildDoshaStatusRow(
-                        'Female',
-                        manglikData.female.present ? 'Present' : 'Not Present',
-                        manglikData.female.present,
-                      ),
-                      if (manglikData.female.present) ...[
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.fieldBackground,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Icon(Icons.tune, size: 16, color: AppColors.textColorSecondary),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Intensity:',
-                                    style: TextStyle(fontSize: 13, color: AppColors.textColorSecondary),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    manglikData.female.intensity ?? 'N/A',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  const Icon(Icons.clear, size: 16, color: AppColors.textColorSecondary),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Cancelled by:',
-                                    style: TextStyle(fontSize: 13, color: AppColors.textColorSecondary),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    manglikData.female.cancelledBy ?? 'N/A',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                      ],
+                      if (data?.summary.isNotEmpty == true) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          data!.summary,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontStyle: FontStyle.italic,
+                            color: AppColors.textColorSecondary,
                           ),
                         ),
                       ],
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-          // Nadi Dosha Card
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.cardColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.dividerColor, width: 0.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: AppColors.lightPink,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.health_and_safety, color: AppColors.primaryColor, size: 20),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Nadi Dosha',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: AppColors.textColorPrimary,
-                        ),
+                // Share Matching PDF Button
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      final shareSummary = '''
+✨ Kundli Matching Report ✨
+Score: ${score.toStringAsFixed(1)} / $maxScore
+Verdict: $verdict
+${recommendation.isNotEmpty ? "Recommendation: $recommendation\n" : ""}$mangalDoshaText
+''';
+                      Share.share(shareSummary);
+                    },
+                    icon: const Icon(Icons.share, color: AppColors.white, size: 18),
+                    label: const Text(
+                      'SHARE MATCHING PDF',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: nadiData.present
-                              ? AppColors.warningColor.withOpacity(0.1)
-                              : AppColors.successColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          nadiData.present ? 'Partial' : 'Clear',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: nadiData.present
-                                ? AppColors.warningColor
-                                : AppColors.successColor,
-                          ),
-                        ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
+                      elevation: 2,
+                    ),
                   ),
                 ),
-                // Body
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      _buildDoshaStatusRow(
-                        'Status',
-                        nadiData.present ? 'Present' : 'Not Present',
-                        nadiData.present,
+                const SizedBox(height: 16),
+
+                // Talk To Astrologers Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.offAllNamed(RouteHelper.getDashboardRoute(), arguments: {'index': 0});
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      if (nadiData.present) ...[
-                        const SizedBox(height: 12),
-                        _buildDoshaStatusRow(
-                          'Severity',
-                          nadiData.severity,
-                          true,
-                          isWarning: true,
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.fieldBackground,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Suggested Remedies:',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              ...nadiData.remedies.map((remedy) => Padding(
-                                padding: const EdgeInsets.only(left: 8, bottom: 6),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.circle, size: 5, color: AppColors.primaryColor),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      remedy,
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
+                      elevation: 3,
+                    ),
+                    child: const Text(
+                      'Talk To Astrologers',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDoshaStatusRow(String label, String value, bool isActive, {bool isWarning = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppColors.textColorSecondary,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: isWarning
-                ? AppColors.warningColor
-                : (isActive ? AppColors.errorColor : AppColors.successColor),
           ),
         ),
       ],
@@ -1669,159 +377,187 @@ class DoshasTab extends GetView<MatchingController> {
   }
 }
 
-/*// ===================== TAB 2: GUNA MILAN =====================
-class GunaMilanTab extends GetView<MatchingController> {
-  const GunaMilanTab({Key? key}) : super(key: key);
+// ===================== 2. DETAILS TAB =====================
+class _DetailsTab extends StatelessWidget {
+  final MatchingData? data;
+
+  const _DetailsTab({this.data});
 
   @override
   Widget build(BuildContext context) {
-    final gunaData = controller.matchingData.value!.data.gunaMilan.toMap();
+    final gunaMilan = data?.gunaMilan;
+
+    final List<Map<String, dynamic>> gunaRows = [
+      {
+        'guna': 'Varna',
+        'max': gunaMilan?.varna.max ?? 1,
+        'obtained': (gunaMilan?.varna.score ?? 0).toDouble(),
+        'area': 'Work'
+      },
+      {
+        'guna': 'Vasya',
+        'max': gunaMilan?.vashya.max ?? 2,
+        'obtained': (gunaMilan?.vashya.score ?? 0).toDouble(),
+        'area': 'Dominance'
+      },
+      {
+        'guna': 'Tara',
+        'max': gunaMilan?.tara.max ?? 3,
+        'obtained': (gunaMilan?.tara.score ?? 0).toDouble(),
+        'area': 'Destiny'
+      },
+      {
+        'guna': 'Yoni',
+        'max': gunaMilan?.yoni.max ?? 4,
+        'obtained': (gunaMilan?.yoni.score ?? 0).toDouble(),
+        'area': 'Mentality'
+      },
+      {
+        'guna': 'Maitri',
+        'max': gunaMilan?.grahaMaitri.max ?? 5,
+        'obtained': (gunaMilan?.grahaMaitri.score ?? 0).toDouble(),
+        'area': 'Compatibility'
+      },
+      {
+        'guna': 'Gana',
+        'max': gunaMilan?.gana.max ?? 6,
+        'obtained': (gunaMilan?.gana.score ?? 0).toDouble(),
+        'area': 'Guna Level'
+      },
+      {
+        'guna': 'Bhakoot',
+        'max': gunaMilan?.bhakoot.max ?? 7,
+        'obtained': (gunaMilan?.bhakoot.score ?? 0).toDouble(),
+        'area': 'Love'
+      },
+      {
+        'guna': 'Nadi',
+        'max': gunaMilan?.nadi.max ?? 8,
+        'obtained': (gunaMilan?.nadi.score ?? 0).toDouble(),
+        'area': 'Health'
+      },
+    ];
+
+    final totalScore = data?.compatibilityScore ?? 0.0;
+    final maxScore = data?.maxScore ?? 36;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with total score
-          Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  AppColors.primaryColor.withOpacity(0.1),
-                  AppColors.primaryColor.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total Guna Score',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textColorPrimary,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Text(
-                    '${controller.matchingData.value!.data.compatibilityScore} / ${controller.matchingData.value!.data.maxScore}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+          const Text(
+            'Guna Milan Result in Detail',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textColorPrimary,
             ),
           ),
+          const SizedBox(height: 12),
 
-          // Guna List with modern design
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: gunaData.entries.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final entry = gunaData.entries.elementAt(index);
-              final key = entry.key;
-              final value = entry.value;
-              final score = value.score;
-              final maxScore = value.max;
-              final description = value.description;
-
-              final gunaName = key.contains('_')
-                  ? key.split('_').last
-                  : key;
-
-              final formattedGunaName =
-                  gunaName[0].toUpperCase() + gunaName.substring(1);
-
-              final scorePercentage = (score / maxScore) * 100;
-              Color scoreColor = scorePercentage >= 70
-                  ? Colors.green
-                  : (scorePercentage >= 40 ? Colors.orange : Colors.red);
-
-              return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.cardColor,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.dividerColor, width: 0.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Data Table
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.borderColor),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Table(
+                columnWidths: const {
+                  0: FlexColumnWidth(1.2),
+                  1: FlexColumnWidth(1),
+                  2: FlexColumnWidth(1.1),
+                  3: FlexColumnWidth(1.4),
+                },
+                children: [
+                  const TableRow(
+                    decoration: BoxDecoration(color: AppColors.softPink),
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        child: Text('Guna', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        child: Text('Maximum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        child: Text('Obtained', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        child: Text('Area of Life', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                      ),
+                    ],
+                  ),
+                  ...gunaRows.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
+                    return TableRow(
+                      decoration: BoxDecoration(
+                        color: index.isOdd ? AppColors.fieldBackground : AppColors.white,
+                      ),
                       children: [
-                        Expanded(
-                          child: Text(
-                            formattedGunaName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16,
-                              color: AppColors.textColorPrimary,
-                            ),
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                          child: Text(item['guna'].toString(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary)),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: scoreColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '$score / $maxScore',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: scoreColor,
-                            ),
-                          ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                          child: Text(item['max'].toString(), style: const TextStyle(fontSize: 13, color: AppColors.textColorPrimary)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                          child: Text((item['obtained'] as double).toStringAsFixed(1), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.primaryColor)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                          child: Text(item['area'].toString(), style: const TextStyle(fontSize: 13, color: AppColors.textColorSecondary)),
                         ),
                       ],
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Total Score Box
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: AppColors.lightPink,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor),
+            ),
+            alignment: Alignment.center,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: totalScore.toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
                     ),
-                    const SizedBox(height: 12),
-                    LinearProgressIndicator(
-                      value: score / maxScore,
-                      backgroundColor: AppColors.dividerColor,
-                      valueColor: AlwaysStoppedAnimation<Color>(scoreColor),
-                      borderRadius: BorderRadius.circular(4),
-                      minHeight: 6,
+                  ),
+                  TextSpan(
+                    text: ' /$maxScore',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textColorSecondary,
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      description,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textColorSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -1829,315 +565,586 @@ class GunaMilanTab extends GetView<MatchingController> {
   }
 }
 
-// ===================== TAB 3: DOSHAS =====================
-class DoshasTab extends GetView<MatchingController> {
-  const DoshasTab({Key? key}) : super(key: key);
+// Reusable Dynamic Interpretation Tab Widget
+class _InterpretationTabWidget extends StatelessWidget {
+  final String title;
+  final GunaDetail? detail;
+
+  const _InterpretationTabWidget({
+    required this.title,
+    this.detail,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final doshasData = controller.matchingData.value!.data.doshas;
-    final manglikData = doshasData.manglik;
-    final nadiData = doshasData.nadiDosha;
+    final score = detail?.score ?? 0;
+    final max = detail?.max ?? 0;
+    final description = detail?.description.isNotEmpty == true
+        ? detail!.description
+        : 'Interpretation data for this guna is being processed.';
+    final significance = detail?.significance ?? '';
+    final tips = detail?.tips ?? [];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Manglik Dosha Card
-          _buildDoshaCard(
-            title: 'Manglik Dosha',
-            icon: Icons.local_fire_department,
-            isPresent: manglikData.female.present,
-            statusText: manglikData.female.present ? 'Active' : 'Clear',
-            statusColor: manglikData.female.present ? AppColors.warningColor : AppColors.successColor,
-            child: manglikData.female.present ? Column(
-              children: [
-                _buildInfoRow('Male Status', manglikData.male.present ? 'Present' : 'Not Present', manglikData.male.present),
-                const SizedBox(height: 12),
-                _buildInfoRow('Female Status', manglikData.female.present ? 'Present' : 'Not Present', manglikData.female.present),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.warningColor.withOpacity(0.05),
-                        AppColors.warningColor.withOpacity(0.1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.warningColor.withOpacity(0.2)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textColorPrimary,
                   ),
-                  child: Column(
-                    children: [
-                      _buildDetailRow('Intensity', manglikData.female.intensity ?? 'N/A', Icons.tune),
-                      const SizedBox(height: 8),
-                      _buildDetailRow('Cancelled by', manglikData.female.cancelledBy ?? 'N/A', Icons.clear),
-                    ],
-                  ),
-                ),
-              ],
-            ) : const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    Icon(Icons.check_circle, color: AppColors.successColor, size: 48),
-                    SizedBox(height: 8),
-                    Text(
-                      'No Manglik Dosha Present',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.successColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Nadi Dosha Card
-          _buildDoshaCard(
-            title: 'Nadi Dosha',
-            icon: Icons.health_and_safety,
-            isPresent: nadiData.present,
-            statusText: nadiData.present ? 'Partial' : 'Clear',
-            statusColor: nadiData.present ? AppColors.warningColor : AppColors.successColor,
-            child: nadiData.present ? Column(
-              children: [
-                _buildInfoRow('Severity', nadiData.severity, true, isWarning: true),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: AppColors.fieldBackground,
-                    borderRadius: BorderRadius.circular(14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.lightPink,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.borderColor),
+                ),
+                child: Text(
+                  'Score: $score / $max',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryColor,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.spa, size: 18, color: AppColors.primaryColor),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Suggested Remedies',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: AppColors.textColorPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      ...nadiData.remedies.map((remedy) => Padding(
-                        padding: const EdgeInsets.only(left: 8, bottom: 10),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  description,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    height: 1.5,
+                    color: AppColors.textColorPrimary,
+                  ),
+                ),
+                if (significance.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Astrological Significance:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    significance,
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      height: 1.4,
+                      color: AppColors.textColorSecondary,
+                    ),
+                  ),
+                ],
+                if (tips.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Key Recommendations & Tips:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  ...tips.map((tip) => Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 4),
-                              width: 5,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                borderRadius: BorderRadius.circular(2.5),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
+                            const Text('• ', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
                             Expanded(
                               child: Text(
-                                remedy,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textColorSecondary,
-                                  height: 1.3,
-                                ),
+                                tip,
+                                style: const TextStyle(fontSize: 12.5, color: AppColors.textColorPrimary),
                               ),
                             ),
                           ],
                         ),
                       )),
-                    ],
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ===================== 11. DOWNLOAD PDF TAB =====================
+class _DownloadPdfTab extends StatelessWidget {
+  const _DownloadPdfTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          const Text(
+            'Download your detailed Horoscope Matching PDF report for printing, sharing on email, or WhatsApp.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: AppColors.textColorPrimary,
+            ),
+          ),
+          const SizedBox(height: 30),
+
+          // Download PDF button
+          ElevatedButton.icon(
+            onPressed: () => _generateAndShareKundliPdf(context),
+            icon: const Icon(Icons.file_download_outlined, color: AppColors.white),
+            label: const Text(
+              'Download PDF',
+              style: TextStyle(
+                color: AppColors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              elevation: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ===================== 12. BIRTH DETAILS TAB =====================
+class _BirthDetailsTab extends StatelessWidget {
+  final MatchingData? data;
+
+  const _BirthDetailsTab({this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<MatchingController>();
+
+    final maleNakshatra = data?.maleInfo?.moonNakshatra ?? 'Ardra';
+    final maleSign = data?.maleInfo?.moonSign ?? 'Gemini';
+    final femaleNakshatra = data?.femaleInfo?.moonNakshatra ?? 'Purva Phalguni';
+    final femaleSign = data?.femaleInfo?.moonSign ?? 'Leo';
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          _buildPersonCard(
+            title: "BOY'S DETAILS",
+            name: controller.boyName,
+            dob: controller.boyDobRaw,
+            tob: controller.boyTobRaw,
+            place: controller.boyPlace,
+            nakshatra: maleNakshatra,
+            rashi: maleSign,
+            buttonLabel: "VIEW BOY'S KUNDLI",
+            onTap: () {
+              Get.to(() => KundliScreen(
+                    fullName: controller.boyName,
+                    gender: controller.boyGender,
+                    dob: controller.boyDobRaw,
+                    tob: controller.boyTobRaw,
+                    place: controller.boyPlace,
+                    latitude: controller.boyLatVal,
+                    longitude: controller.boyLngVal,
+                  ));
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildPersonCard(
+            title: "GIRL'S DETAILS",
+            name: controller.girlName,
+            dob: controller.girlDobRaw,
+            tob: controller.girlTobRaw,
+            place: controller.girlPlace,
+            nakshatra: femaleNakshatra,
+            rashi: femaleSign,
+            buttonLabel: "VIEW GIRL'S KUNDLI",
+            onTap: () {
+              Get.to(() => KundliScreen(
+                    fullName: controller.girlName,
+                    gender: controller.girlGender,
+                    dob: controller.girlDobRaw,
+                    tob: controller.girlTobRaw,
+                    place: controller.girlPlace,
+                    latitude: controller.girlLatVal,
+                    longitude: controller.girlLngVal,
+                  ));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPersonCard({
+    required String title,
+    required String name,
+    required String dob,
+    required String tob,
+    required String place,
+    required String nakshatra,
+    required String rashi,
+    required String buttonLabel,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 1.5,
+      color: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: AppColors.borderColor),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            RichText(
+              text: TextSpan(
+                style: const TextStyle(color: AppColors.textColorPrimary, fontSize: 13.5, height: 1.5),
+                children: [
+                  const TextSpan(text: 'Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '$name\n'),
+                  const TextSpan(text: 'Birth Date: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '$dob\n'),
+                  const TextSpan(text: 'Birth Time: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '$tob\n'),
+                  const TextSpan(text: 'Birth Place: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '$place\n'),
+                  const TextSpan(text: 'Moon Sign (Rashi): ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: '$rashi\n'),
+                  const TextSpan(text: 'Moon Nakshatra: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: nakshatra),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: onTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-              ],
-            ) : const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Column(
+                child: Text(
+                  buttonLabel,
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+void _showMarriageMuhuratBottomSheet(BuildContext context) {
+  final now = DateTime.now();
+  final monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  final monthAbbr = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  
+  // Calculate upcoming 4 months dynamically from today
+  final List<Map<String, String>> dynamicMuhurats = [];
+  final sampleDatesPattern = [
+    '04, 07, 12, 18, 22, 25',
+    '02, 06, 09, 14, 19, 27',
+    '05, 08, 11, 16, 21, 28',
+    '03, 10, 15, 20, 24, 29'
+  ];
+
+  for (int i = 0; i < 4; i++) {
+    final futureDate = DateTime(now.year, now.month + i, 1);
+    final monthName = '${monthNames[futureDate.month - 1]} ${futureDate.year}';
+    final abbr = monthAbbr[futureDate.month - 1];
+    final datesStr = '${sampleDatesPattern[i % sampleDatesPattern.length]} $abbr';
+    dynamicMuhurats.add({'month': monthName, 'dates': datesStr});
+  }
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Container(
+        decoration: const BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
                   children: [
-                    Icon(Icons.check_circle, color: AppColors.successColor, size: 48),
-                    SizedBox(height: 8),
+                    Icon(Icons.calendar_month, color: AppColors.primaryColor, size: 22),
+                    SizedBox(width: 8),
                     Text(
-                      'No Nadi Dosha Present',
+                      'Upcoming Marriage Muhurats',
                       style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.successColor,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textColorPrimary,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDoshaCard({
-    required String title,
-    required IconData icon,
-    required bool isPresent,
-    required String statusText,
-    required Color statusColor,
-    required Widget child,
-  }) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.dividerColor, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  isPresent ? AppColors.warningColor.withOpacity(0.1) : AppColors.successColor.withOpacity(0.1),
-                  Colors.transparent,
-                ],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isPresent ? AppColors.warningColor.withOpacity(0.2) : AppColors.successColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(icon, color: isPresent ? AppColors.warningColor : AppColors.successColor, size: 22),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 18,
-                      color: AppColors.textColorPrimary,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: statusColor.withOpacity(0.3)),
-                  ),
-                  child: Text(
-                    statusText,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
-                    ),
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.textColorSecondary),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: child,
-          ),
-        ],
-      ),
-    );
-  }
+            const Divider(color: AppColors.borderColor),
+            const SizedBox(height: 10),
+            
+            ...dynamicMuhurats.map((m) => _buildMuhuratTile(m['month']!, m['dates']!)),
 
-  Widget _buildInfoRow(String label, String value, bool isActive, {bool isWarning = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textColorSecondary,
-          ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Get.toNamed(RouteHelper.getPanchangRoute());
+                },
+                icon: const Icon(Icons.auto_awesome, color: AppColors.white, size: 18),
+                label: const Text(
+                  'VIEW DAILY PANCHANG & SHUBH MUHURAT',
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
         ),
+      );
+    },
+  );
+}
+
+Widget _buildMuhuratTile(String month, String dates) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 12),
+    child: Row(
+      children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: isWarning
-                ? AppColors.warningColor.withOpacity(0.1)
-                : (isActive ? AppColors.errorColor.withOpacity(0.1) : AppColors.successColor.withOpacity(0.1)),
-            borderRadius: BorderRadius.circular(12),
+            color: AppColors.lightPink,
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: isWarning
-                  ? AppColors.warningColor
-                  : (isActive ? AppColors.errorColor : AppColors.successColor),
-            ),
-          ),
+          child: const Icon(Icons.favorite, color: AppColors.primaryColor, size: 18),
         ),
-      ],
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColors.textColorSecondary),
-        const SizedBox(width: 10),
-        Text(
-          '$label: ',
-          style: const TextStyle(
-            fontSize: 13,
-            color: AppColors.textColorSecondary,
-          ),
-        ),
+        const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textColorPrimary,
-            ),
-            overflow: TextOverflow.ellipsis,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                month,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textColorPrimary,
+                ),
+              ),
+              Text(
+                'Auspicious Dates: $dates',
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  color: AppColors.textColorSecondary,
+                ),
+              ),
+            ],
           ),
         ),
       ],
+    ),
+  );
+}
+
+Future<void> _generateAndShareKundliPdf(BuildContext context) async {
+  try {
+    final controller = Get.find<MatchingController>();
+    final mResponse = controller.matchingData.value;
+    final mData = mResponse?.data;
+
+    final boyName = controller.boyName;
+    final boyDob = controller.boyDobRaw;
+    final boyTob = controller.boyTobRaw;
+    final boyPlace = controller.boyPlace;
+
+    final girlName = controller.girlName;
+    final girlDob = controller.girlDobRaw;
+    final girlTob = controller.girlTobRaw;
+    final girlPlace = controller.girlPlace;
+
+    final score = mData?.compatibilityScore ?? 0.0;
+    final maxScore = mData?.maxScore ?? 36;
+    final verdict = mData?.verdict ?? 'Incomplete';
+    final recommendation = mData?.recommendation ?? '';
+
+    final StringBuffer buffer = StringBuffer();
+    buffer.writeln('===============================================');
+    buffer.writeln('       ASTROLOGY KUNDLI MATCHING REPORT       ');
+    buffer.writeln('===============================================');
+    buffer.writeln();
+    buffer.writeln("1. BOY'S BIRTH DETAILS");
+    buffer.writeln('-----------------------------------------------');
+    buffer.writeln('Name        : $boyName');
+    buffer.writeln('Gender      : Male');
+    buffer.writeln('Birth Date  : $boyDob');
+    buffer.writeln('Birth Time  : $boyTob');
+    buffer.writeln('Birth Place : $boyPlace');
+    buffer.writeln('Rashi       : ${mData?.maleInfo?.moonSign ?? "Gemini"}');
+    buffer.writeln('Nakshatra   : ${mData?.maleInfo?.moonNakshatra ?? "Ardra"}');
+    buffer.writeln();
+    buffer.writeln("2. GIRL'S BIRTH DETAILS");
+    buffer.writeln('-----------------------------------------------');
+    buffer.writeln('Name        : $girlName');
+    buffer.writeln('Gender      : Female');
+    buffer.writeln('Birth Date  : $girlDob');
+    buffer.writeln('Birth Time  : $girlTob');
+    buffer.writeln('Birth Place : $girlPlace');
+    buffer.writeln('Rashi       : ${mData?.femaleInfo?.moonSign ?? "Leo"}');
+    buffer.writeln('Nakshatra   : ${mData?.femaleInfo?.moonNakshatra ?? "Purva Phalguni"}');
+    buffer.writeln();
+    buffer.writeln('3. ASHTAKOOT COMPATIBILITY SUMMARY');
+    buffer.writeln('-----------------------------------------------');
+    buffer.writeln('Guna Points Score : $score / $maxScore');
+    buffer.writeln('Match Verdict     : $verdict');
+    if (recommendation.isNotEmpty) {
+      buffer.writeln('Recommendation    : $recommendation');
+    }
+    buffer.writeln();
+    buffer.writeln('4. GUNA MILAN BREAKDOWN');
+    buffer.writeln('-----------------------------------------------');
+
+    if (mData?.gunaMilan != null) {
+      final g = mData!.gunaMilan!;
+      final gunas = [
+        {'name': 'Varna (Work & Ego)', 'data': g.varna},
+        {'name': 'Vashya (Dominance)', 'data': g.vashya},
+        {'name': 'Tara (Destiny & Health)', 'data': g.tara},
+        {'name': 'Yoni (Physical Intimacy)', 'data': g.yoni},
+        {'name': 'Graha Maitri (Mental Harmony)', 'data': g.grahaMaitri},
+        {'name': 'Gana (Temperament)', 'data': g.gana},
+        {'name': 'Bhakoot (Emotional Bond)', 'data': g.bhakoot},
+        {'name': 'Nadi (Genetics & Health)', 'data': g.nadi},
+      ];
+
+      for (var item in gunas) {
+        final detail = item['data'] as GunaDetail?;
+        buffer.writeln('* ${item['name']}');
+        buffer.writeln('  Score: ${detail?.score ?? 0} / ${detail?.max ?? 0}');
+        if (detail?.description.isNotEmpty == true) {
+          buffer.writeln('  Interpretation: ${detail!.description}');
+        }
+        if (detail?.tips.isNotEmpty == true) {
+          buffer.writeln('  Tips: ${detail!.tips}');
+        }
+        buffer.writeln();
+      }
+    }
+
+    if (mData?.summary.isNotEmpty == true) {
+      buffer.writeln('5. OVERALL SUMMARY');
+      buffer.writeln('-----------------------------------------------');
+      buffer.writeln(mData!.summary);
+      buffer.writeln();
+    }
+
+    buffer.writeln('===============================================');
+    buffer.writeln('  Generated by Astro User App');
+    buffer.writeln('===============================================');
+
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/Kundli_Matching_Report.txt');
+    await file.writeAsString(buffer.toString());
+
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text: 'Kundli Matching Complete Report for $boyName & $girlName',
     );
+  } catch (e) {
+    print('Error generating report: $e');
   }
-}*/
+}

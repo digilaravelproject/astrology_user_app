@@ -27,11 +27,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   String? profile1Name;
   String? profile2Name;
 
-  // Selected Latitudes and Longitudes
-  double _boyLat = 28.6139;
-  double _boyLng = 77.2090;
-  double _girlLat = 19.0760;
-  double _girlLng = 72.8777;
+  // Selected Latitudes and Longitudes (Default to Agra coordinates to match initial text)
+  double _boyLat = 27.1767;
+  double _boyLng = 78.0081;
+  double _girlLat = 27.1767;
+  double _girlLng = 78.0081;
 
   // Matching Boy Controllers
   final TextEditingController _boysNameController = TextEditingController(text: 'John');
