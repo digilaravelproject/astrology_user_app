@@ -40,7 +40,25 @@ class DashaRepository {
       final response = await _client.getVimshottariDasha(payload);
 
       if (response.statusCode == 200) {
-        return DashaModel.fromJson(response.data);
+        final List<dynamic> rawList = response.data is List ? response.data : [response.data];
+        final mappedList = rawList.map((item) {
+          if (item is Map) {
+            return {
+              'planet': item['planet'],
+              'start_date': item['start'] ?? item['start_date'],
+              'end_date': item['end'] ?? item['end_date'],
+              'vedic_name': item['vedic_name'],
+            };
+          }
+          return item;
+        }).toList();
+        final transformedJson = {
+          'success': true,
+          'data': {
+            'maha_dasha': mappedList,
+          }
+        };
+        return DashaModel.fromJson(transformedJson);
       }
     } catch (e) {
       Logger.e('Error fetching Vimshottari dasha', error: e);
@@ -65,7 +83,24 @@ class DashaRepository {
       final response = await _client.getYoginiDasha(payload);
 
       if (response.statusCode == 200) {
-        return YoginiDashaModel.fromJson(response.data);
+        final List<dynamic> rawList = response.data is List ? response.data : [response.data];
+        final mappedList = rawList.map((item) {
+          if (item is Map) {
+            return {
+              'yogini': item['dasha_name'] ?? item['yogini'],
+              'startDate': item['start_date'] ?? item['start'],
+              'endDate': item['end_date'] ?? item['end'],
+            };
+          }
+          return item;
+        }).toList();
+        final transformedJson = {
+          'success': true,
+          'data': {
+            'mahadashas': mappedList,
+          }
+        };
+        return YoginiDashaModel.fromJson(transformedJson);
       }
     } catch (e) {
       Logger.e('Error fetching Yogini dasha', error: e);
