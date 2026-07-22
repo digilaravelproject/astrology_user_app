@@ -50,6 +50,7 @@ class KundliItem {
   final String latitude;
   final String longitude;
   final String datetime;
+  final String place;
   final String createdAt;
   final String updatedAt;
 
@@ -62,6 +63,7 @@ class KundliItem {
     required this.latitude,
     required this.longitude,
     required this.datetime,
+    this.place = '',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -77,6 +79,7 @@ class KundliItem {
       latitude: json['latitude'] ?? '',
       longitude: json['longitude'] ?? '',
       datetime: json['datetime'] ?? '',
+      place: json['place'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );
@@ -112,6 +115,6 @@ class KundliItem {
     return birthTime;
   }
 
-  // Helper to get place (for now just return "India" as placeholder)
-  String get place => 'India';
+  // Helper to get place display text
+  String get displayPlace => place.isNotEmpty ? place : 'Unknown';
 }

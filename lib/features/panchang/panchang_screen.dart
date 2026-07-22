@@ -118,10 +118,6 @@ class PanchangScreen extends GetView<PanchangController> {
                           ),
                           onPressed: controller.toggleCalendar,
                         ),
-                        IconButton(
-                          icon: const Icon(Iconsax.location_copy, color: AppColors.primaryColor),
-                          onPressed: () {},
-                        ),
                       ],
                     ),
                   ],
