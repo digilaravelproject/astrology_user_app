@@ -28,10 +28,8 @@ class CreateKundliRequestModel {
       'latitude': latitude,
       'longitude': longitude,
       'datetime': datetime,
+      'birth_place': place,
     };
-    if (place != null && place!.isNotEmpty) {
-      map['place'] = place;
-    }
     return map;
   }
 }

@@ -51,7 +51,7 @@ class KundliDetailData {
       latitude: json['latitude']?.toString() ?? '',
       longitude: json['longitude']?.toString() ?? '',
       datetime: json['datetime'] as String? ?? '',
-      place: json['place'] as String? ?? '',
+      place: json['birth_place'] as String? ?? json['place'] as String? ?? '',
       createdAt: json['created_at'] as String? ?? '',
       updatedAt: json['updated_at'] as String? ?? '',
     );

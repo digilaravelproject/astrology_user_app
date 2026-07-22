@@ -79,7 +79,7 @@ class KundliItem {
       latitude: json['latitude'] ?? '',
       longitude: json['longitude'] ?? '',
       datetime: json['datetime'] ?? '',
-      place: json['place'] ?? '',
+      place: json['birth_place'] ?? json['place'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );
