@@ -395,49 +395,49 @@ class _DetailsTab extends StatelessWidget {
         'guna': 'Varna',
         'max': gunaMilan?.varna.max ?? 1,
         'obtained': (gunaMilan?.varna.score ?? 0).toDouble(),
-        'area': 'Work'
+        'area': '${gunaMilan?.varna.maleKootAttribute.isNotEmpty == true ? gunaMilan!.varna.maleKootAttribute : "N/A"} / ${gunaMilan?.varna.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.varna.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Vasya',
         'max': gunaMilan?.vashya.max ?? 2,
         'obtained': (gunaMilan?.vashya.score ?? 0).toDouble(),
-        'area': 'Dominance'
+        'area': '${gunaMilan?.vashya.maleKootAttribute.isNotEmpty == true ? gunaMilan!.vashya.maleKootAttribute : "N/A"} / ${gunaMilan?.vashya.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.vashya.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Tara',
         'max': gunaMilan?.tara.max ?? 3,
         'obtained': (gunaMilan?.tara.score ?? 0).toDouble(),
-        'area': 'Destiny'
+        'area': '${gunaMilan?.tara.maleKootAttribute.isNotEmpty == true ? gunaMilan!.tara.maleKootAttribute : "N/A"} / ${gunaMilan?.tara.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.tara.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Yoni',
         'max': gunaMilan?.yoni.max ?? 4,
         'obtained': (gunaMilan?.yoni.score ?? 0).toDouble(),
-        'area': 'Mentality'
+        'area': '${gunaMilan?.yoni.maleKootAttribute.isNotEmpty == true ? gunaMilan!.yoni.maleKootAttribute : "N/A"} / ${gunaMilan?.yoni.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.yoni.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Maitri',
         'max': gunaMilan?.grahaMaitri.max ?? 5,
         'obtained': (gunaMilan?.grahaMaitri.score ?? 0).toDouble(),
-        'area': 'Compatibility'
+        'area': '${gunaMilan?.grahaMaitri.maleKootAttribute.isNotEmpty == true ? gunaMilan!.grahaMaitri.maleKootAttribute : "N/A"} / ${gunaMilan?.grahaMaitri.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.grahaMaitri.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Gana',
         'max': gunaMilan?.gana.max ?? 6,
         'obtained': (gunaMilan?.gana.score ?? 0).toDouble(),
-        'area': 'Guna Level'
+        'area': '${gunaMilan?.gana.maleKootAttribute.isNotEmpty == true ? gunaMilan!.gana.maleKootAttribute : "N/A"} / ${gunaMilan?.gana.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.gana.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Bhakoot',
         'max': gunaMilan?.bhakoot.max ?? 7,
         'obtained': (gunaMilan?.bhakoot.score ?? 0).toDouble(),
-        'area': 'Love'
+        'area': '${gunaMilan?.bhakoot.maleKootAttribute.isNotEmpty == true ? gunaMilan!.bhakoot.maleKootAttribute : "N/A"} / ${gunaMilan?.bhakoot.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.bhakoot.femaleKootAttribute : "N/A"}'
       },
       {
         'guna': 'Nadi',
         'max': gunaMilan?.nadi.max ?? 8,
         'obtained': (gunaMilan?.nadi.score ?? 0).toDouble(),
-        'area': 'Health'
+        'area': '${gunaMilan?.nadi.maleKootAttribute.isNotEmpty == true ? gunaMilan!.nadi.maleKootAttribute : "N/A"} / ${gunaMilan?.nadi.femaleKootAttribute.isNotEmpty == true ? gunaMilan!.nadi.femaleKootAttribute : "N/A"}'
       },
     ];
 
@@ -472,7 +472,7 @@ class _DetailsTab extends StatelessWidget {
                   0: FlexColumnWidth(1.2),
                   1: FlexColumnWidth(1),
                   2: FlexColumnWidth(1.1),
-                  3: FlexColumnWidth(1.4),
+                  3: FlexColumnWidth(1.6),
                 },
                 children: [
                   const TableRow(
@@ -492,7 +492,7 @@ class _DetailsTab extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                        child: Text('Area of Life', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                        child: Text('Attributes (B/G)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
                       ),
                     ],
                   ),
@@ -824,10 +824,18 @@ class _BirthDetailsTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<MatchingController>();
 
-    final maleNakshatra = data?.maleInfo?.moonNakshatra ?? 'Ardra';
-    final maleSign = data?.maleInfo?.moonSign ?? 'Gemini';
-    final femaleNakshatra = data?.femaleInfo?.moonNakshatra ?? 'Purva Phalguni';
-    final femaleSign = data?.femaleInfo?.moonSign ?? 'Leo';
+    final maleNakshatra = data?.maleInfo?.moonNakshatra.isNotEmpty == true
+        ? data!.maleInfo!.moonNakshatra
+        : (data?.gunaMilan.tara.maleKootAttribute.isNotEmpty == true ? data!.gunaMilan.tara.maleKootAttribute : 'Ardra');
+    final maleSign = data?.maleInfo?.moonSign.isNotEmpty == true
+        ? data!.maleInfo!.moonSign
+        : (data?.gunaMilan.bhakoot.maleKootAttribute.isNotEmpty == true ? data!.gunaMilan.bhakoot.maleKootAttribute : 'Gemini');
+    final femaleNakshatra = data?.femaleInfo?.moonNakshatra.isNotEmpty == true
+        ? data!.femaleInfo!.moonNakshatra
+        : (data?.gunaMilan.tara.femaleKootAttribute.isNotEmpty == true ? data!.gunaMilan.tara.femaleKootAttribute : 'Purva Phalguni');
+    final femaleSign = data?.femaleInfo?.moonSign.isNotEmpty == true
+        ? data!.femaleInfo!.moonSign
+        : (data?.gunaMilan.bhakoot.femaleKootAttribute.isNotEmpty == true ? data!.gunaMilan.bhakoot.femaleKootAttribute : 'Leo');
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -1227,15 +1235,31 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                 pw.TableRow(
                   children: [
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Rashi')),
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(mData?.maleInfo?.moonSign ?? "Gemini")),
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(mData?.femaleInfo?.moonSign ?? "Leo")),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
+                      mData?.maleInfo?.moonSign.isNotEmpty == true
+                          ? mData!.maleInfo!.moonSign
+                          : (mData?.gunaMilan.bhakoot.maleKootAttribute.isNotEmpty == true ? mData!.gunaMilan.bhakoot.maleKootAttribute : 'Gemini')
+                    )),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
+                      mData?.femaleInfo?.moonSign.isNotEmpty == true
+                          ? mData!.femaleInfo!.moonSign
+                          : (mData?.gunaMilan.bhakoot.femaleKootAttribute.isNotEmpty == true ? mData!.gunaMilan.bhakoot.femaleKootAttribute : 'Leo')
+                    )),
                   ],
                 ),
                 pw.TableRow(
                   children: [
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Nakshatra')),
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(mData?.maleInfo?.moonNakshatra ?? "Ardra")),
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(mData?.femaleInfo?.moonNakshatra ?? "Purva Phalguni")),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
+                      mData?.maleInfo?.moonNakshatra.isNotEmpty == true
+                          ? mData!.maleInfo!.moonNakshatra
+                          : (mData?.gunaMilan.tara.maleKootAttribute.isNotEmpty == true ? mData!.gunaMilan.tara.maleKootAttribute : 'Ardra')
+                    )),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
+                      mData?.femaleInfo?.moonNakshatra.isNotEmpty == true
+                          ? mData!.femaleInfo!.moonNakshatra
+                          : (mData?.gunaMilan.tara.femaleKootAttribute.isNotEmpty == true ? mData!.gunaMilan.tara.femaleKootAttribute : 'Purva Phalguni')
+                    )),
                   ],
                 ),
               ],
