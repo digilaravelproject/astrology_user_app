@@ -115,9 +115,9 @@ class GunaMilan {
       vashya: GunaDetail.fromJson(json['vasya'] ?? json['vashya'] ?? {}),
       tara: GunaDetail.fromJson(json['tara'] ?? {}),
       yoni: GunaDetail.fromJson(json['yoni'] ?? {}),
-      grahaMaitri: GunaDetail.fromJson(json['grahaMaitri'] ?? json['graha_maitri'] ?? {}),
-      gana: GunaDetail.fromJson(json['gana'] ?? {}),
-      bhakoot: GunaDetail.fromJson(json['bhakoot'] ?? {}),
+      grahaMaitri: GunaDetail.fromJson(json['grahaMaitri'] ?? json['graha_maitri'] ?? json['maitri'] ?? {}),
+      gana: GunaDetail.fromJson(json['gana'] ?? json['gan'] ?? {}),
+      bhakoot: GunaDetail.fromJson(json['bhakoot'] ?? json['bhakut'] ?? {}),
       nadi: GunaDetail.fromJson(json['nadi'] ?? {}),
     );
   }
