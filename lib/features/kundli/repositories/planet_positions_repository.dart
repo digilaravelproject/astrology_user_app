@@ -25,7 +25,41 @@ class PlanetPositionsRepository {
       final response = await _client.getPlanetPositions(payload);
 
       if (response.statusCode == 200) {
-        return PlanetPositionsModel.fromJson(response.data);
+        final List<dynamic> rawList = response.data is List ? response.data : [response.data];
+        
+        final signsList = [
+          'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+          'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+        ];
+
+        final mappedPlanets = rawList.map((item) {
+          if (item is Map) {
+            final signName = item['sign']?.toString() ?? 'Aries';
+            final signIndex = signsList.indexOf(signName) + 1; // 1-based index
+
+            return {
+              'name': item['name'],
+              'sign': signName,
+              'normDegree': item['normDegree'],
+              'nakshatra': {
+                'name': item['nakshatra']?.toString() ?? 'N/A'
+              },
+              'house': item['house'],
+              'signNumber': signIndex,
+              'fullDegree': item['fullDegree'],
+            };
+          }
+          return item;
+        }).toList();
+
+        final transformedJson = {
+          'success': true,
+          'data': {
+            'planets': mappedPlanets
+          }
+        };
+
+        return PlanetPositionsModel.fromJson(transformedJson);
       }
     } catch (e) {
       Logger.e('Error fetching planet positions', error: e);
