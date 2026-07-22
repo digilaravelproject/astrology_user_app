@@ -820,13 +820,30 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
       child: Column(
         children: [
           Obx(() {
-            final chartData = _birthChartController.birthChartModel.value?.data?.chart;
+            final planets = _birthChartController.birthChartModel.value?.data?.planets ?? [];
+            
+            // Map data for North Indian chart (key = house)
+            final northPlanetData = <int, List<String>>{};
+            for (var planet in planets) {
+              if (planet.house != null && planet.name != null) {
+                northPlanetData.putIfAbsent(planet.house!, () => []).add(planet.name!.substring(0, 2));
+              }
+            }
+
+            // Map data for South Indian chart (key = signNumber)
+            final southPlanetData = <int, List<String>>{};
+            for (var planet in planets) {
+              if (planet.signNumber != null && planet.name != null) {
+                southPlanetData.putIfAbsent(planet.signNumber!, () => []).add(planet.name!.substring(0, 2));
+              }
+            }
+
             return SizedBox(
               height: 300,
               child: KundliChartWidget(
                 title: "Varshphal Chart - Year $currentYear",
-                northIndianSvg: chartData?.northIndian,
-                southIndianSvg: chartData?.southIndian,
+                northIndianPlanetData: northPlanetData,
+                southIndianPlanetData: southPlanetData,
                 isLoading: _birthChartController.isLoading.value,
               ),
             );
