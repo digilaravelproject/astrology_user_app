@@ -642,6 +642,69 @@ class _InterpretationTabWidget extends StatelessWidget {
                     color: AppColors.textColorPrimary,
                   ),
                 ),
+                if (detail?.maleKootAttribute.isNotEmpty == true || detail?.femaleKootAttribute.isNotEmpty == true) ...[
+                  const SizedBox(height: 16),
+                  const Divider(color: AppColors.borderColor),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Boy's Attribute",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textColorSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              detail?.maleKootAttribute ?? 'N/A',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        height: 30,
+                        width: 1,
+                        color: AppColors.borderColor,
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Girl's Attribute",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textColorSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              detail?.femaleKootAttribute ?? 'N/A',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 if (significance.isNotEmpty) ...[
                   const SizedBox(height: 14),
                   const Text(
