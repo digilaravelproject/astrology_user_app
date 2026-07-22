@@ -51,13 +51,12 @@ class MatchingData {
   });
 
   factory MatchingData.fromJson(Map<String, dynamic> json) {
-    // Vedika API response uses `total_points`, `maximum_points`, `percentage`, `match_result`, `recommendation`, `gunaDetails`
-    final totalPoints = (json['total_points'] ?? json['compatibility_score'] ?? 0).toDouble();
-    final maxPts = (json['maximum_points'] ?? json['max_score'] ?? 36) is int 
-        ? (json['maximum_points'] ?? json['max_score'] ?? 36) as int
-        : ((json['maximum_points'] ?? json['max_score'] ?? 36) as num).toInt();
-    final pct = (json['percentage'] ?? 0).toDouble();
-    final ver = json['match_result'] ?? json['verdict'] ?? '';
+    final totalPoints = (json['total']?['received_points'] ?? json['total_points'] ?? json['compatibility_score'] ?? 0).toDouble();
+    final maxPts = (json['total']?['total_points'] ?? json['maximum_points'] ?? json['max_score'] ?? 36) is int 
+        ? (json['total']?['total_points'] ?? json['maximum_points'] ?? json['max_score'] ?? 36) as int
+        : ((json['total']?['total_points'] ?? json['maximum_points'] ?? json['max_score'] ?? 36) as num).toInt();
+    final pct = (json['percentage'] ?? (maxPts > 0 ? (totalPoints / maxPts * 100) : 0)).toDouble();
+    final ver = json['conclusion']?['report'] ?? json['match_result'] ?? json['verdict'] ?? '';
     final rec = json['recommendation'] ?? '';
 
     final interp = json['interpretation'] as Map<String, dynamic>? ?? {};
@@ -77,7 +76,7 @@ class MatchingData {
       percentage: pct,
       verdict: ver,
       recommendation: rec,
-      gunaMilan: GunaMilan.fromJson(json['gunaDetails'] ?? json['guna_milan'] ?? {}),
+      gunaMilan: GunaMilan.fromJson(json['gunaDetails'] ?? json['guna_milan'] ?? json),
       doshas: Doshas.fromJson(json['doshas'] ?? {}, parentJson: json),
       maleInfo: json['male_info'] != null ? PersonAstrologyInfo.fromJson(json['male_info']) : null,
       femaleInfo: json['female_info'] != null ? PersonAstrologyInfo.fromJson(json['female_info']) : null,
@@ -174,9 +173,9 @@ class GunaDetail {
       tipsList = List<String>.from((json['tips'] as List).map((t) => t.toString()));
     }
     return GunaDetail(
-      score: json['score'] ?? 0,
-      max: json['maxPoints'] ?? json['max'] ?? 0,
-      description: json['interpretation'] ?? json['description'] ?? '',
+      score: json['received_points'] ?? json['obtained_points'] ?? json['score'] ?? 0,
+      max: json['total_points'] ?? json['maxPoints'] ?? json['max'] ?? 0,
+      description: json['description'] ?? json['interpretation'] ?? '',
       significance: json['significance'] ?? '',
       tips: tipsList,
     );
