@@ -252,13 +252,18 @@ class RouteHelper {
 
     GetPage(
       name: AppRoutes.kundaliScreen,
-      page: () => const KundliScreen(
-        fullName: 'User',
-        gender: 'Male',
-        dob: '1995-01-15',
-        tob: '10:30:00',
-        place: 'New Delhi',
-      ),
+      page: () {
+        final args = Get.arguments is Map<String, dynamic> ? Get.arguments as Map<String, dynamic> : {};
+        return KundliScreen(
+          fullName: args['fullName'] ?? args['name'] ?? '',
+          gender: args['gender'] ?? '',
+          dob: args['dob'] ?? '',
+          tob: args['tob'] ?? args['time'] ?? '',
+          place: args['place'] ?? '',
+          latitude: (args['latitude'] is num) ? (args['latitude'] as num).toDouble() : (double.tryParse(args['latitude']?.toString() ?? '') ?? 0.0),
+          longitude: (args['longitude'] is num) ? (args['longitude'] as num).toDouble() : (double.tryParse(args['longitude']?.toString() ?? '') ?? 0.0),
+        );
+      },
       transition: Transition.fadeIn,
     ),
 

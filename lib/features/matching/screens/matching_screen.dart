@@ -27,35 +27,35 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   String? profile1Name;
   String? profile2Name;
 
-  // Selected Latitudes and Longitudes (Default to Agra coordinates to match initial text)
-  double _boyLat = 27.1767;
-  double _boyLng = 78.0081;
-  double _girlLat = 27.1767;
-  double _girlLng = 78.0081;
+  // Selected Latitudes and Longitudes
+  double _boyLat = 0.0;
+  double _boyLng = 0.0;
+  double _girlLat = 0.0;
+  double _girlLng = 0.0;
 
   // Matching Boy Controllers
-  final TextEditingController _boysNameController = TextEditingController(text: 'John');
+  final TextEditingController _boysNameController = TextEditingController();
   final TextEditingController _boysGenderController = TextEditingController(text: 'Male');
-  final TextEditingController _boysDobController = TextEditingController(text: '22-Jul-2026');
-  final TextEditingController _boysTobController = TextEditingController(text: '11:07 AM');
-  final TextEditingController _boysPobController = TextEditingController(text: 'Agra, UP, India');
+  final TextEditingController _boysDobController = TextEditingController();
+  final TextEditingController _boysTobController = TextEditingController();
+  final TextEditingController _boysPobController = TextEditingController();
 
   // Matching Girl Controllers
-  final TextEditingController _girlsNameController = TextEditingController(text: 'Awi');
+  final TextEditingController _girlsNameController = TextEditingController();
   final TextEditingController _girlsGenderController = TextEditingController(text: 'Female');
-  final TextEditingController _girlsDobController = TextEditingController(text: '22-Jul-2026');
-  final TextEditingController _girlsTobController = TextEditingController(text: '11:07 AM');
-  final TextEditingController _girlsPobController = TextEditingController(text: 'Agra, UP, India');
+  final TextEditingController _girlsDobController = TextEditingController();
+  final TextEditingController _girlsTobController = TextEditingController();
+  final TextEditingController _girlsPobController = TextEditingController();
 
   // Controllers for Open Kundli tab
-  final TextEditingController _boyNameController = TextEditingController(text: 'John');
-  final TextEditingController _boyDateController = TextEditingController(text: '22-Jul-2026');
-  final TextEditingController _boyTimeController = TextEditingController(text: '11:07 AM');
-  final TextEditingController _boyPlaceController = TextEditingController(text: 'Agra, UP, India');
-  final TextEditingController _girlNameController = TextEditingController(text: 'Awi');
-  final TextEditingController _girlDateController = TextEditingController(text: '22-Jul-2026');
-  final TextEditingController _girlTimeController = TextEditingController(text: '11:07 AM');
-  final TextEditingController _girlPlaceController = TextEditingController(text: 'Agra, UP, India');
+  final TextEditingController _boyNameController = TextEditingController();
+  final TextEditingController _boyDateController = TextEditingController();
+  final TextEditingController _boyTimeController = TextEditingController();
+  final TextEditingController _boyPlaceController = TextEditingController();
+  final TextEditingController _girlNameController = TextEditingController();
+  final TextEditingController _girlDateController = TextEditingController();
+  final TextEditingController _girlTimeController = TextEditingController();
+  final TextEditingController _girlPlaceController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   bool _saveDetails = false;
 

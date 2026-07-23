@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class AstrologyApiConstants {
+class VedikaConstants {
   static const String baseUrl = 'https://json.astrologyapi.com/v1';
   
   static const String userId = '655788';
@@ -16,21 +16,21 @@ class AstrologyApiConstants {
     'Authorization': basicAuth,
   };
 
-  // Endpoints
-  static const String panchangEndpoint = '/advanced_panchang';
+  // AstrologyAPI Endpoints
+  static const String panchangEndpoint = '/basic_panchang';
   static const String vimshottariDashaEndpoint = '/major_vdasha';
-  static const String yoginiDashaEndpoint = '/major_yogini_dasha';
+  static const String yoginiDashaEndpoint = '/yogini_dasha';
   static const String ashtakavargaEndpoint = '/sarvashtak';
   static const String planetPositionsEndpoint = '/planets';
   static const String shadbalaEndpoint = '/shadbala';
   static const String remediesGemstoneEndpoint = '/basic_gem_suggestion';
   static const String birthChartEndpoint = '/horo_chart/d1';
   static const String navamshaEndpoint = '/horo_chart/d9';
+  
   static const String transitEndpoint = '/planet_transit';
   static const String divisionalChartEndpoint = '/horo_chart';
-  static const String houseCuspsEndpoint = '/kp_house_cusps';
+  static const String houseCuspsEndpoint = '/general_house_cusps';
   static const String kpFullReportEndpoint = '/kp_planets';
   static const String sadeSatiAdvancedEndpoint = '/sadhesati_current_status';
-  static const String sadeSatiLifeDetailsEndpoint = '/sadhesati_life_details';
   static const String matchingAshtakootaEndpoint = '/match_ashtakoot_points';
 }
