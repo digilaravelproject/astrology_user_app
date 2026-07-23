@@ -1076,12 +1076,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     final tobError = ''.obs;
     final pobError = ''.obs;
     final genderError = ''.obs;
-    final selectedLat = (kundliController.selectedLatitude.value.isNotEmpty
-        ? kundliController.selectedLatitude.value
-        : '28.7041').obs;
-    final selectedLng = (kundliController.selectedLongitude.value.isNotEmpty
-        ? kundliController.selectedLongitude.value
-        : '77.1025').obs;
+    final selectedLat = kundliController.selectedLatitude.value.obs;
+    final selectedLng = kundliController.selectedLongitude.value.obs;
 
     Get.bottomSheet(
       Container(
@@ -1686,8 +1682,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   }) {
     final birthDate = _convertDateToApiFormat(dob);
     final birthTime = _convertTimeToApiFormat(time);
-    final lat = (latitude != null && latitude != 0) ? latitude : 28.6139;
-    final lng = (longitude != null && longitude != 0) ? longitude : 77.2090;
+    final lat = latitude ?? 0.0;
+    final lng = longitude ?? 0.0;
 
     Get.to(() => KundliScreen(
       fullName: name,
