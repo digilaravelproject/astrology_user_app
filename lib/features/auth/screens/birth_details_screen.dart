@@ -10,6 +10,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/utils/custom_snackbar.dart';
+import '../../../core/widgets/location_search_screen.dart';
 import '../controllers/auth_controller.dart';
 
 class BirthDetailsScreen extends StatefulWidget {
@@ -22,6 +23,8 @@ class BirthDetailsScreen extends StatefulWidget {
 class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  double? _latitude;
+  double? _longitude;
   final TextEditingController _placeController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
@@ -162,6 +165,8 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         dob: selectedDate!,
                         tob: selectedTime!,
                         placeOfBirth: _placeController.text.trim(),
+                        latitude: _latitude,
+                        longitude: _longitude,
                       );
                     },
                   );
@@ -221,38 +226,57 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   }
 
   Widget _buildPlaceField() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+    return GestureDetector(
+      onTap: () async {
+        final result = await Navigator.of(context, rootNavigator: true).push<LocationResult>(
+          MaterialPageRoute(
+            builder: (_) => const LocationSearchScreen(title: "Select Place of Birth"),
+            fullscreenDialog: true,
           ),
-        ],
-      ),
-      child: TextField(
-        controller: _placeController,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        decoration: InputDecoration(
-          hintText: AppStrings.enterCity,
-          hintStyle: TextStyle(color: Colors.black.withOpacity(0.2)),
-          prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.deepPink),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+        );
+        if (result != null) {
+          setState(() {
+            _placeController.text = result.displayName;
+            _latitude = result.latitude;
+            _longitude = result.longitude;
+          });
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: AbsorbPointer(
+          child: TextField(
+            controller: _placeController,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            decoration: InputDecoration(
+              hintText: AppStrings.enterCity,
+              hintStyle: TextStyle(color: Colors.black.withOpacity(0.2)),
+              prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.deepPink),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(color: AppColors.deepPink, width: 2.0),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: AppColors.deepPink, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         ),
       ),
     );

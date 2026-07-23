@@ -197,6 +197,8 @@ class AuthController extends GetxController {
     required DateTime dob,
     required TimeOfDay tob,
     required String placeOfBirth,
+    double? latitude,
+    double? longitude,
   }) async {
     try {
       isLoading.value = true;
@@ -212,13 +214,15 @@ class AuthController extends GetxController {
       final localizationController = Get.find<LocalizationController>();
       final String selectedLang = localizationController.languages[localizationController.selectedIndex].languageName;
 
-      final data = {
+      final Map<String, dynamic> data = {
         "name": nameController.text.trim(),
         "gender": selectedGender.value,
         "date_of_birth": dobString,
         "time_of_birth": tobString,
         "place_of_birth": placeOfBirth,
         "languages": [selectedLang],
+        if (latitude != null) "latitude": latitude,
+        if (longitude != null) "longitude": longitude,
       };
 
       final updatedUser = await _updateProfileUseCase.execute(userId, data);
