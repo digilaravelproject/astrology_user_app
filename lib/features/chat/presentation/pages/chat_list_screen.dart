@@ -43,7 +43,7 @@ class ChatListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: 'Chat with Astrologers',
+        title: 'Chat',
         showLeading: false,
         actions: [
           _buildActionItem(Icons.notifications_outlined, () {}),
