@@ -1651,6 +1651,13 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   String _convertDateToApiFormat(String dateStr) {
     try {
       final text = dateStr.trim();
+      if (text.contains('T')) {
+        final localDt = DateTime.parse(text).toLocal();
+        final y = localDt.year.toString().padLeft(4, '0');
+        final m = localDt.month.toString().padLeft(2, '0');
+        final d = localDt.day.toString().padLeft(2, '0');
+        return '$y-$m-$d';
+      }
       final ymdRegex = RegExp(r'^\d{4}-\d{2}-\d{2}$');
       if (ymdRegex.hasMatch(text)) {
         return text;
