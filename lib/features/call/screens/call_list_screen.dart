@@ -44,7 +44,7 @@ class CallListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: 'Call Astrologers',
+        title: 'Call',
         showLeading: false,
         actions: [
           _buildActionItem(Icons.notifications_outlined, () {}),
