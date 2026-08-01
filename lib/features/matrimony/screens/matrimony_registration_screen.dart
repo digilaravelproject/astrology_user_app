@@ -12,6 +12,7 @@ import '../controllers/matrimony_controller.dart';
 import '../domain/models/matrimony_profile_model.dart';
 import '../widgets/matrimony_section.dart';
 import 'matrimony_profile_screen.dart';
+import 'package:flutter/services.dart';
 import 'matrimony_screen.dart';
 import '../../profile/controllers/profile_controller.dart';
 
@@ -47,6 +48,10 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   final TextEditingController _dayController = TextEditingController();
   final TextEditingController _monthController = TextEditingController();
   final TextEditingController _yearController = TextEditingController();
+  
+  final FocusNode _dayFocus = FocusNode();
+  final FocusNode _monthFocus = FocusNode();
+  final FocusNode _yearFocus = FocusNode();
   
   final TextEditingController _heightController = TextEditingController();
   String? _selectedMaritalStatus;
@@ -302,6 +307,9 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     _dayController.dispose();
     _monthController.dispose();
     _yearController.dispose();
+    _dayFocus.dispose();
+    _monthFocus.dispose();
+    _yearFocus.dispose();
     _heightController.dispose();
     _locationController.dispose();
     _educationController.dispose();
@@ -450,6 +458,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             _mobileController,
             keyboardType: TextInputType.phone,
             errorKey: 'mobile',
+            inputFormatters: [LengthLimitingTextInputFormatter(10)],
             prefixIcon: Container(
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.only(left: 16),
@@ -476,8 +485,8 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             fontSize: 12,
             color: Colors.black54,
           ),
-          const SizedBox(height: 32),
-          _buildSafetyBanner(),
+         // const SizedBox(height: 32),
+          //_buildSafetyBanner(),
           const SizedBox(height: 40),
           CustomButton(
             text: AppStrings.next,
@@ -508,11 +517,39 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(child: _buildTextField(AppStrings.day, _dayController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
+              Expanded(
+                child: _buildTextField(AppStrings.day, _dayController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false, focusNode: _dayFocus, inputFormatters: [LengthLimitingTextInputFormatter(2)], onChangedCustom: (val) {
+                  if (val.isNotEmpty) {
+                    final intVal = int.tryParse(val);
+                    if (intVal != null && intVal > 31) {
+                      _dayController.text = '31';
+                      _dayController.selection = TextSelection.fromPosition(TextPosition(offset: _dayController.text.length));
+                    }
+                    if (val.length == 2 || (intVal != null && intVal > 3)) {
+                      FocusScope.of(context).requestFocus(_monthFocus);
+                    }
+                  }
+                }),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.month, _monthController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
+              Expanded(
+                child: _buildTextField(AppStrings.month, _monthController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false, focusNode: _monthFocus, inputFormatters: [LengthLimitingTextInputFormatter(2)], onChangedCustom: (val) {
+                  if (val.isNotEmpty) {
+                    final intVal = int.tryParse(val);
+                    if (intVal != null && intVal > 12) {
+                      _monthController.text = '12';
+                      _monthController.selection = TextSelection.fromPosition(TextPosition(offset: _monthController.text.length));
+                    }
+                    if (val.length == 2 || (intVal != null && intVal > 1)) {
+                      FocusScope.of(context).requestFocus(_yearFocus);
+                    }
+                  }
+                }),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildTextField(AppStrings.year, _yearController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false)),
+              Expanded(
+                child: _buildTextField(AppStrings.year, _yearController, keyboardType: TextInputType.number, errorKey: 'dob', showErrorText: false, focusNode: _yearFocus, inputFormatters: [LengthLimitingTextInputFormatter(4)]),
+              ),
             ],
           ),
           if (_errors['dob'] != null)
@@ -523,7 +560,47 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           const SizedBox(height: 16),
           _buildGenderSelection(),
           const SizedBox(height: 16),
-          _buildTextField(AppStrings.heightReq, _heightController, errorKey: 'height'),
+          _buildTextField(
+            AppStrings.heightReq, 
+            _heightController, 
+            errorKey: 'height',
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+            onChangedCustom: (val) {
+              if (val.isEmpty) return;
+              String digits = val.replaceAll(RegExp(r'[^0-9]'), '');
+              if (digits.isEmpty) {
+                _heightController.clear();
+                return;
+              }
+              int feet = int.parse(digits.substring(0, 1));
+              if (feet > 8) feet = 8;
+              if (feet < 3 && digits.length > 1) { } // Optional: could limit minimum feet too
+              
+              String inchesStr = '';
+              if (digits.length > 1) {
+                inchesStr = digits.substring(1);
+                if (inchesStr.length > 2) inchesStr = inchesStr.substring(0, 2);
+                int inches = int.parse(inchesStr);
+                if (inches > 11) {
+                  inchesStr = '11';
+                }
+              }
+
+              String formatted = feet.toString();
+              if (digits.length > 1 || val.contains('.')) {
+                formatted = '$feet.';
+                if (inchesStr.isNotEmpty) formatted += inchesStr;
+              }
+
+              if (val != formatted) {
+                _heightController.value = TextEditingValue(
+                  text: formatted,
+                  selection: TextSelection.collapsed(offset: formatted.length),
+                );
+              }
+            },
+          ),
           const SizedBox(height: 16),
           _buildDropdownField(AppStrings.maritalStatusReq, _maritalStatusOptions, (val) => setState(() => _selectedMaritalStatus = val), _selectedMaritalStatus, errorKey: 'maritalStatus'),
           const SizedBox(height: 16),
@@ -591,7 +668,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+         /* Row(
             children: [
               const Icon(Icons.verified_user, color: Colors.blue, size: 28),
               const SizedBox(width: 12),
@@ -603,13 +680,13 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          AppText(
-            AppStrings.verificationMsg,
-            fontSize: 14,
-            color: Colors.black54,
-          ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 12),*/
+          // AppText(
+          //   AppStrings.verificationMsg,
+          //   fontSize: 14,
+          //   color: Colors.black54,
+          // ),
+           const SizedBox(height: 20),
           Row(
             children: [
               _buildVerificationChip(AppStrings.panCard, _isPanSelected, () {
@@ -645,7 +722,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           const SizedBox(height: 32),
           if (_isPanSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.panNumber, _panController, errorKey: 'pan', helperText: "Example: ABCDE1234F")),
           if (_isDrivingLicenceSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.drivingLicenceNumber, _drivingLicenceController, errorKey: 'driving', helperText: "Example: DL-1420110012345")),
-          if (_isAadhaarSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.aadhaarCardNumber, _aadhaarController, errorKey: 'aadhaar', helperText: "Example: 1234 5678 9012")),
+          if (_isAadhaarSelected) Padding(padding: const EdgeInsets.only(bottom: 16), child: _buildTextField(AppStrings.aadhaarCardNumber, _aadhaarController, errorKey: 'aadhaar', keyboardType: TextInputType.number, inputFormatters: [LengthLimitingTextInputFormatter(12)], helperText: "Example: 123456789012")),
           const SizedBox(height: 32),
           Center(
             child: Row(
@@ -670,13 +747,14 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
   }
 
   Widget _buildStep4() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppText(
-            AppStrings.profilesWithPhotosMsg,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AppText(
+              AppStrings.profilesWithPhotosMsg,
             fontSize: 24,
             fontWeight: FontWeight.w900,
             color: Colors.black,
@@ -746,10 +824,11 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           ),
         ],
       ),
+      )
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1, String? errorKey, Widget? prefixIcon, bool showErrorText = true, String? helperText}) {
+  Widget _buildTextField(String label, TextEditingController controller, {TextInputType? keyboardType, int maxLines = 1, String? errorKey, Widget? prefixIcon, bool showErrorText = true, String? helperText, List<TextInputFormatter>? inputFormatters, Function(String)? onChangedCustom, FocusNode? focusNode}) {
     final errorText = errorKey != null ? _errors[errorKey] : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -762,10 +841,13 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           ),
           child: TextField(
             controller: controller,
+            focusNode: focusNode,
             keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             maxLines: maxLines,
             style: const TextStyle(color: Colors.black),
             onChanged: (val) {
+              if (onChangedCustom != null) onChangedCustom(val);
               if (errorKey != null && _errors.containsKey(errorKey)) {
                 setState(() => _errors.remove(errorKey));
               }
