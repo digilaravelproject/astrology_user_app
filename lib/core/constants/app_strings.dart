@@ -65,7 +65,7 @@ class AppStrings {
   static String get guest => 'Guest'.tr;
   static String get foundersWords => "Founder's Words for Users".tr;
   static String get founderMessage => "Welcome to our astrology app! Here, you'll find insights and advice to guide you in love, career, and life through the vedic sciences. ✨".tr;
-  static String get yourFounder => "- Your Founder".tr;
+  static String get yourFounder => "- Founder".tr;
   static String get viewAll => "VIEW ALL".tr;
   static String get filter => "Filter".tr;
   static String get all => "All".tr;
