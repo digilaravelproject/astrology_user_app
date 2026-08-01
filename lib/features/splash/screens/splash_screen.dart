@@ -75,11 +75,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           ),
                           child: Opacity(
                             opacity: opacity,
-                            child: Image.asset(
-                              ImageConstants.appLogo, // Apna logo/image
-                              width: 220,
-                              height: 220,
-                              fit: BoxFit.contain,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Image.asset(
+                                ImageConstants.app_Logo, // Apna logo/image
+                                width: 220,
+                                height: 220,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         );
