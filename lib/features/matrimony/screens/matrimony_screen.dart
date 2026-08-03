@@ -534,12 +534,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
 
   Widget _buildLandingUI() {
     return Container(
-      color: const Color(0xFF1A0A2E), // Ensure container background is same as theme
+      color: Colors.white, // Ensure container background is same as theme
       child: Stack(
         children: [
           // Full-screen background color
           Positioned.fill(
-            child: Container(color: const Color(0xFF1A0A2E)),
+            child: Container(color: Colors.white),
           ),
           
           // Background Floral Pattern
@@ -549,7 +549,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             child: Icon(
               Icons.filter_vintage,
               size: 300,
-              color: Colors.purple.withOpacity(0.05),
+              color: Colors.purple.withOpacity(0.08),
             ),
           ),
           Positioned(
@@ -558,7 +558,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             child: Icon(
               Icons.filter_vintage,
               size: 200,
-              color: Colors.pink.withOpacity(0.05),
+              color: Colors.pink.withOpacity(0.08),
             ),
           ),
           

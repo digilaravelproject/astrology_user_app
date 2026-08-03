@@ -159,9 +159,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           child: _BioText(bio: _astrologer!.bio),
                         ),
                       const SizedBox(height: 16),
-                      // Gallery Section - commented out
-                      // _buildGallerySection(),
-                      // const SizedBox(height: 16),
+                      // Gallery Section
+                      _buildGallerySection(),
+                      const SizedBox(height: 16),
                       // Reviews Section
                       Obx(() => _buildReviewsSection()),
                       const SizedBox(height: 16),
@@ -860,39 +860,83 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.bolt, color: Colors.amber, size: 16),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: AppText(
-                          '₹ 30/session for 30 minute complete guide',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // const SizedBox(height: 12),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: Container(
+          //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          //         decoration: BoxDecoration(
+          //           color: Colors.transparent,
+          //           borderRadius: BorderRadius.circular(20),
+          //           border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          //         ),
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: [
+          //             const Icon(Icons.bolt, color: Colors.amber, size: 16),
+          //             const SizedBox(width: 6),
+          //             Flexible(
+          //               child: AppText(
+          //                 '₹ 30/session for 30 minute complete guide',
+          //                 fontSize: 12,
+          //                 fontWeight: FontWeight.w600,
+          //                 color: Colors.black87,
+          //                 maxLines: 1,
+          //                 overflow: TextOverflow.ellipsis,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGallerySection() {
+    // Static images for now as requested
+    final List<String> staticImages = [
+      'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+    ];
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      height: 140, // Height of the gallery row
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: staticImages.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              _showFullScreenGallery(context, staticImages, index);
+            },
+            child: Container(
+              width: 110,
+              margin: EdgeInsets.only(right: index == staticImages.length - 1 ? 0 : 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: NetworkImage(staticImages[index]),
+                  fit: BoxFit.cover,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
