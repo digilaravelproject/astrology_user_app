@@ -91,6 +91,7 @@ class AstrologyApiClient {
     final body = Map<String, dynamic>.from(payload);
     body['chartType'] = chartType;
     body['image_type'] = 'svg';
+    body['theme_name'] = 'detailed';
     return _dio.post('${AstrologyApiConstants.horoChartImageEndpoint}/${chartId.toLowerCase()}', data: body);
   }
 

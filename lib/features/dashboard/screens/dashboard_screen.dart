@@ -341,8 +341,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final isRegistered = _matrimonyController.isRegistered.value;
 
       if (_selectedIndex == 1) {
-        // Matrimony - Use dark color for landing page, white for registered section
-        navGradientColor = isRegistered ? Colors.white : const Color(0xFF1A0A2E);
+        navGradientColor = Colors.white;
       }
 
       return PopScope(
