@@ -51,7 +51,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     
     if (user?.dateOfBirth != null && user!.dateOfBirth!.isNotEmpty) {
       try {
-        _selectedDate = DateTime.parse(user.dateOfBirth!);
+        _selectedDate = DateTime.parse(user.dateOfBirth!).toLocal();
       } catch (_) {
         _selectedDate = DateTime(1995, 8, 15);
       }
@@ -89,7 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             
             if (freshUser.dateOfBirth != null && freshUser.dateOfBirth!.isNotEmpty) {
               try {
-                _selectedDate = DateTime.parse(freshUser.dateOfBirth!);
+                _selectedDate = DateTime.parse(freshUser.dateOfBirth!).toLocal();
               } catch (_) {}
             }
             if (freshUser.timeOfBirth != null && freshUser.timeOfBirth!.isNotEmpty) {

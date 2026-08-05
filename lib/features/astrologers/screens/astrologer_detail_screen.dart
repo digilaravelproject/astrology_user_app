@@ -1203,14 +1203,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     ? const SizedBox(
                         height: 20, 
                         width: 20, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.pink)
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor)
                       )
                     : CustomImageWidget(
                         imagePath: gift.iconUrl,
                         height: 35,
                         width: 35,
                         fit: BoxFit.contain,
-                        fallbackWidget: const Icon(Icons.card_giftcard, color: Colors.pink, size: 24),
+                        fallbackWidget: const Icon(Icons.card_giftcard, color: AppColors.primaryColor, size: 24),
                       ),
                   ),
                 ),
@@ -1219,7 +1219,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   gift.title,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF880E4F),
+                  color: AppColors.primaryColor,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -1229,7 +1229,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   '₹ ${gift.price}',
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF880E4F),
+                  color: AppColors.primaryColor,
                 ),
               ],
             ),
@@ -1475,7 +1475,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           border: Border.all(color: const Color(0xFFFFCDD2)),
           boxShadow: [
             BoxShadow(
-              color: Colors.pink.withOpacity(0.05),
+              color: AppColors.primaryColor.withOpacity(0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -1483,11 +1483,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.support_agent, color: Color(0xFFE91E63), size: 24),
+            const Icon(Icons.support_agent, color: AppColors.primaryColor, size: 24),
             const SizedBox(width: 8),
-            const AppText('Assistance Chat', fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFFC2185B)),
+            const AppText('Assistance Chat', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
             const Spacer(),
-            const Icon(Icons.chevron_right, color: Color(0xFFE91E63)),
+            const Icon(Icons.chevron_right, color: AppColors.primaryColor),
           ],
         ),
       ),
@@ -1502,10 +1502,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.card_giftcard, color: Color(0xFFE91E63), size: 20),
+              const Icon(Icons.card_giftcard, color: AppColors.primaryColor, size: 20),
               const SizedBox(width: 8),
               Expanded(
-                child: AppText('Send Gifts', fontSize: 16, fontWeight: FontWeight.w500, color: const Color(0xFFC2185B), maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: AppText('Send Gifts', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor, maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
               const SizedBox(width: 4),
               GestureDetector(
@@ -1526,7 +1526,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               const Spacer(),
               Obx(() {
                 final walletController = Get.find<WalletController>();
-                return AppText('₹ ${walletController.balance}', fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFFC2185B));
+                return AppText('₹ ${walletController.balance}', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primaryColor);
               }),
             ],
           ),

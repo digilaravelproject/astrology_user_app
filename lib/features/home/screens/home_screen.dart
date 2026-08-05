@@ -370,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     gradient: isFilter || isSelected
                         ? const LinearGradient(
-                            colors: [AppColors.deepPink, Color(0xFFD81B60)],
+                            colors: [AppColors.primaryColor, AppColors.deepPink],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           )

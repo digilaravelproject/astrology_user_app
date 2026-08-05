@@ -2,7 +2,15 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../constants/app_constants.dart';
 
 class TokenManager {
-  static const _secureStorage = FlutterSecureStorage();
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+      resetOnError: true,
+    ),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock,
+    ),
+  );
 
   static Future<String> getToken() async {
     return await _secureStorage.read(key: AppConstants.token) ?? '';

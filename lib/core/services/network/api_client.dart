@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart' as dio;
+import 'package:dio/io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:flutter/foundation.dart';
@@ -32,8 +33,18 @@ class ApiClient {
       contentType: 'application/json',
       headers: {
         'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
       },
       validateStatus: (status) => status! < 500,
+    );
+
+    _dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      },
     );
 
     _dio.interceptors.add(InterceptorsWrapper(
@@ -147,7 +158,7 @@ class ApiClient {
 
         if (isLastAttempt) {
           Logger.e('|❌ Max retries reached for GET: $path. Error: $e');
-          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
         }
 
         int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
@@ -226,7 +237,7 @@ class ApiClient {
 
         if (isLastAttempt) {
           Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
-          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
         }
 
         int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
@@ -343,7 +354,7 @@ class ApiClient {
       }
     } catch (e) {
       Logger.e('ApiClient() => POST Multipart error: $e');
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
     }
   }
 
@@ -475,7 +486,7 @@ class ApiClient {
 
     } catch (e) {
       Logger.e('ApiClient() => PUT Multipart error: $e');
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
     }
   }
 
@@ -517,7 +528,7 @@ class ApiClient {
       }
     } catch (e) {
       Logger.e('ApiClient() => PUT error: $e');
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
     }
   }
 
@@ -555,7 +566,7 @@ class ApiClient {
       }
     } catch (e) {
       Logger.e('ApiClient() => DELETE error: $e');
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen, showToaster: showToaster);
     }
   }
 }
