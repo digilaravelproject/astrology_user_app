@@ -86,7 +86,7 @@ class ApiChecker {
     }
   }
 
-  static ResponseModel handleError(dynamic error, {bool showErrorScreen = false}) {
+  static ResponseModel handleError(dynamic error, {bool showErrorScreen = false, bool showToaster = true}) {
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
@@ -96,7 +96,7 @@ class ApiChecker {
               message: 'The connection has timed out. Please try again.',
             );
           } else {
-            CustomSnackbar.showError('Connection timeout');
+            if (showToaster) CustomSnackbar.showError('Connection timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -111,7 +111,7 @@ class ApiChecker {
               message: 'Request sending timed out. Please try again.',
             );
           } else {
-            CustomSnackbar.showError('Send timeout');
+            if (showToaster) CustomSnackbar.showError('Send timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -126,7 +126,7 @@ class ApiChecker {
               message: 'Server response timed out. Please try again.',
             );
           } else {
-            CustomSnackbar.showError('Receive timeout');
+            if (showToaster) CustomSnackbar.showError('Receive timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -141,7 +141,7 @@ class ApiChecker {
               message: 'There was a security certificate error. Please try again.',
             );
           } else {
-            CustomSnackbar.showError('Bad certificate');
+            if (showToaster) CustomSnackbar.showError('Bad certificate');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -151,7 +151,7 @@ class ApiChecker {
 
         case DioExceptionType.badResponse:
           if (error.response?.statusCode == 401) {
-            CustomSnackbar.showError('Session expired. Please login again.');
+            if (showToaster) CustomSnackbar.showError('Session expired. Please login again.');
             _logout();
             return const ResponseModel(
               isSuccess: false,
@@ -181,11 +181,11 @@ class ApiChecker {
               } else {
                 if (error.response?.statusCode != 422) {
                   if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-                    CustomSnackbar.showError(
+                    if (showToaster) CustomSnackbar.showError(
                       responseModel.errors!.first.message ?? 'Something went wrong',
                     );
                   } else {
-                    CustomSnackbar.showError(responseModel.message);
+                    if (showToaster) CustomSnackbar.showError(responseModel.message);
                   }
                 }
               }
@@ -198,7 +198,7 @@ class ApiChecker {
                   message: 'Something went wrong. Please try again.',
                 );
               } else {
-                CustomSnackbar.showError('Something went wrong');
+                if (showToaster) CustomSnackbar.showError('Something went wrong');
               }
               return ResponseModel(
                 isSuccess: false,
@@ -213,7 +213,7 @@ class ApiChecker {
                 message: 'Received an invalid response from server.',
               );
             } else {
-              CustomSnackbar.showError('Bad response');
+              if (showToaster) CustomSnackbar.showError('Bad response');
             }
             return ResponseModel(
               isSuccess: false,
@@ -229,7 +229,7 @@ class ApiChecker {
               message: 'The request was cancelled.',
             );
           } else {
-            CustomSnackbar.showError('Request cancelled');
+            if (showToaster) CustomSnackbar.showError('Request cancelled');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -240,7 +240,7 @@ class ApiChecker {
         case DioExceptionType.connectionError:
         // Don't show error screen for connection errors,
         // NoInternetScreen handles this
-          CustomSnackbar.showError('No internet connection');
+          if (showToaster) CustomSnackbar.showError('No internet connection');
           return const ResponseModel(
             isSuccess: false,
             message: 'No internet connection',
@@ -253,7 +253,7 @@ class ApiChecker {
               message: 'An unexpected error occurred. Please try again.',
             );
           } else {
-            CustomSnackbar.showError('Something went wrong');
+            if (showToaster) CustomSnackbar.showError('Something went wrong');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -271,7 +271,7 @@ class ApiChecker {
           message: 'Something went wrong. Please try again.',
         );
       } else {
-        CustomSnackbar.showError('Something went wrong');
+        if (showToaster) CustomSnackbar.showError('Something went wrong');
       }
     }
 

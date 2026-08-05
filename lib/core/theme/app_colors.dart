@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Light theme colors - Updated to Peach/Coral/Burgundy Theme from image
-  static const Color primaryColor = Color(0xFFB51F49); // Deep Burgundy/Magenta
+  //static const Color primaryColor = Color(0xFFB51F49); // Deep Burgundy/Magenta
+  static const Color primaryColor = Color(0xFF8B0D31); // Deep Burgundy/Magenta
   static const Color secondaryColor = Color(0xFFEF6A55); // Coral/Peach
   static const Color accentColor = Color(0xFFF78B75); // Lighter Coral/Peach
   static const Color lightPink = Color(0xFFFFEAE6); // Very Light Peach/Pink
   static const Color softPink = Color(0xFFFCD2C8); // Soft Peach/Pink
-  static const Color deepPink = Color(0xFFB51F49); // Deep Burgundy/Magenta
+  static const Color deepPink = Color(0xFF8B0D31); // Deep Burgundy/Magenta
   static const Color goldAccent = Color(0xFFFFD700); // Gold for premium feel
   static const Color fieldBackground = Color(0xFFFFF9F9); // Warm light input background
 

@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import '../../constants/astrology_api_constants.dart';
 import '../../utils/logger.dart';
 
@@ -10,6 +12,16 @@ class AstrologyApiClient {
     _dio.options.connectTimeout = const Duration(seconds: 30);
     _dio.options.receiveTimeout = const Duration(seconds: 30);
     _dio.options.headers = AstrologyApiConstants.authHeaders;
+    _dio.options.headers['User-Agent'] = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36';
+
+    _dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      },
+    );
 
     _dio.interceptors.add(
       InterceptorsWrapper(
