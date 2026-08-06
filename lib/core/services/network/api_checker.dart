@@ -96,7 +96,7 @@ class ApiChecker {
               message: 'The connection has timed out. Please try again.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Connection timeout');
+            if (showToaster) CustomSnackbar.showApiError('Connection timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -111,7 +111,7 @@ class ApiChecker {
               message: 'Request sending timed out. Please try again.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Send timeout');
+            if (showToaster) CustomSnackbar.showApiError('Send timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -126,7 +126,7 @@ class ApiChecker {
               message: 'Server response timed out. Please try again.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Receive timeout');
+            if (showToaster) CustomSnackbar.showApiError('Receive timeout');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -141,7 +141,7 @@ class ApiChecker {
               message: 'There was a security certificate error. Please try again.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Bad certificate');
+            if (showToaster) CustomSnackbar.showApiError('Bad certificate');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -151,7 +151,7 @@ class ApiChecker {
 
         case DioExceptionType.badResponse:
           if (error.response?.statusCode == 401) {
-            if (showToaster) CustomSnackbar.showError('Session expired. Please login again.');
+            if (showToaster) CustomSnackbar.showApiError('Session expired. Please login again.');
             _logout();
             return const ResponseModel(
               isSuccess: false,
@@ -181,11 +181,11 @@ class ApiChecker {
               } else {
                 if (error.response?.statusCode != 422) {
                   if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-                    if (showToaster) CustomSnackbar.showError(
+                    if (showToaster) CustomSnackbar.showApiError(
                       responseModel.errors!.first.message ?? 'Something went wrong',
                     );
                   } else {
-                    if (showToaster) CustomSnackbar.showError(responseModel.message);
+                    if (showToaster) CustomSnackbar.showApiError(responseModel.message);
                   }
                 }
               }
@@ -198,7 +198,7 @@ class ApiChecker {
                   message: 'Something went wrong. Please try again.',
                 );
               } else {
-                if (showToaster) CustomSnackbar.showError('Something went wrong');
+                if (showToaster) CustomSnackbar.showApiError('Something went wrong');
               }
               return ResponseModel(
                 isSuccess: false,
@@ -213,7 +213,7 @@ class ApiChecker {
                 message: 'Received an invalid response from server.',
               );
             } else {
-              if (showToaster) CustomSnackbar.showError('Bad response');
+              if (showToaster) CustomSnackbar.showApiError('Bad response');
             }
             return ResponseModel(
               isSuccess: false,
@@ -229,7 +229,7 @@ class ApiChecker {
               message: 'The request was cancelled.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Request cancelled');
+            if (showToaster) CustomSnackbar.showApiError('Request cancelled');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -240,7 +240,7 @@ class ApiChecker {
         case DioExceptionType.connectionError:
         // Don't show error screen for connection errors,
         // NoInternetScreen handles this
-          if (showToaster) CustomSnackbar.showError('No internet connection');
+          if (showToaster) CustomSnackbar.showApiError('No internet connection');
           return const ResponseModel(
             isSuccess: false,
             message: 'No internet connection',
@@ -253,7 +253,7 @@ class ApiChecker {
               message: 'An unexpected error occurred. Please try again.',
             );
           } else {
-            if (showToaster) CustomSnackbar.showError('Something went wrong');
+            if (showToaster) CustomSnackbar.showApiError('Something went wrong');
           }
           return const ResponseModel(
             isSuccess: false,
@@ -271,7 +271,7 @@ class ApiChecker {
           message: 'Something went wrong. Please try again.',
         );
       } else {
-        if (showToaster) CustomSnackbar.showError('Something went wrong');
+        if (showToaster) CustomSnackbar.showApiError('Something went wrong');
       }
     }
 
@@ -287,7 +287,7 @@ class ApiChecker {
 
     if (statusCode == 401) {
       if (showToaster) {
-        CustomSnackbar.showError('Session expired. Please login again.');
+        CustomSnackbar.showApiError('Session expired. Please login again.');
       }
       _logout();
       return const ResponseModel(
@@ -305,7 +305,7 @@ class ApiChecker {
           return responseModel;
         } catch (e) {
           if (showToaster) {
-            CustomSnackbar.showError('Something went wrong');
+            CustomSnackbar.showApiError('Something went wrong');
           }
           return ResponseModel(
             isSuccess: false,
@@ -315,7 +315,7 @@ class ApiChecker {
         }
       } else {
         if (showToaster) {
-          CustomSnackbar.showError('Something went wrong');
+          CustomSnackbar.showApiError('Something went wrong');
         }
         return ResponseModel(
           isSuccess: false,
@@ -332,18 +332,18 @@ class ApiChecker {
 
           if (showToaster) {
             if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-              CustomSnackbar.showError(
+              CustomSnackbar.showApiError(
                 responseModel.errors!.first.message ?? 'Something went wrong',
               );
             } else {
-              CustomSnackbar.showError(responseModel.message);
+              CustomSnackbar.showApiError(responseModel.message);
             }
           }
 
           return responseModel;
         } catch (e) {
           if (showToaster) {
-            CustomSnackbar.showError('Something went wrong');
+            CustomSnackbar.showApiError('Something went wrong');
           }
           return ResponseModel(
             isSuccess: false,
@@ -353,7 +353,7 @@ class ApiChecker {
         }
       } else {
         if (showToaster) {
-          CustomSnackbar.showError('Something went wrong');
+          CustomSnackbar.showApiError('Something went wrong');
         }
         return ResponseModel(
           isSuccess: false,
@@ -370,7 +370,7 @@ class ApiChecker {
       
       if (!isSuccess) {
         final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
-        if (showToaster) CustomSnackbar.showError(message);
+        if (showToaster) CustomSnackbar.showApiError(message);
 
         return ResponseModel(
           isSuccess: false,
@@ -398,7 +398,7 @@ class ApiChecker {
     if (response.data is Map) {
       message = response.data['msg'] ?? response.data['message'];
     }
-    CustomSnackbar.showError(message ?? defaultMessage ?? 'Something went wrong');
+    CustomSnackbar.showApiError(message ?? defaultMessage ?? 'Something went wrong');
   }
 
   static void _showValidationErrors(Response response) {
@@ -406,21 +406,21 @@ class ApiChecker {
       try {
         final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
         if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-          CustomSnackbar.showError(responseModel.errors!.first.message ?? 'Validation Error');
+          CustomSnackbar.showApiError(responseModel.errors!.first.message ?? 'Validation Error');
         } else if (response.data['msg'] != null) {
-          CustomSnackbar.showError(response.data['msg']);
+          CustomSnackbar.showApiError(response.data['msg']);
         } else {
-          CustomSnackbar.showError('Validation Error');
+          CustomSnackbar.showApiError('Validation Error');
         }
       } catch (e) {
         if (response.data['msg'] != null) {
-          CustomSnackbar.showError(response.data['msg']);
+          CustomSnackbar.showApiError(response.data['msg']);
         } else {
-          CustomSnackbar.showError('Validation Error');
+          CustomSnackbar.showApiError('Validation Error');
         }
       }
     } else {
-      CustomSnackbar.showError('Validation Error');
+      CustomSnackbar.showApiError('Validation Error');
     }
   }
 
