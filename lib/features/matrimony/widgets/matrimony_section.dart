@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_colors.dart';
 import '../screens/matrimony_profile_screen.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
@@ -30,7 +31,7 @@ class MatrimonySection extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(50.0),
-              child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
             ),
           );
         }
@@ -130,7 +131,7 @@ class MatrimonySection extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFE91E63),
+                            color: AppColors.primaryColor,
                             width: 2.0,
                           ),
                         ),
@@ -143,14 +144,14 @@ class MatrimonySection extends StatelessWidget {
                             height: 80,
                             width: 80,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE91E63).withOpacity(0.1),
+                              color: AppColors.primaryColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
                             child: Icon(
                               Icons.person_rounded,
                               size: 48,
-                              color: const Color(0xFFE91E63).withOpacity(0.5),
+                              color: AppColors.primaryColor.withOpacity(0.5),
                             ),
                           ),
                         ),
@@ -211,7 +212,7 @@ class MatrimonySection extends StatelessWidget {
                         // Location
                         Row(
                           children: [
-                            const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFFE91E63)),
+                            const Icon(Icons.location_on_outlined, size: 14, color: AppColors.primaryColor),
                             const SizedBox(width: 4),
                             Expanded(
                               child: AppText(
@@ -251,7 +252,7 @@ class MatrimonySection extends StatelessWidget {
                              fontWeight: FontWeight.w700,
                              icon: Icons.chevron_right,
                              gradient: const LinearGradient(
-                               colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+                               colors: [AppColors.primaryColor, AppColors.secondaryColor],
                                begin: Alignment.topLeft,
                                end: Alignment.bottomRight,
                              ),
@@ -288,10 +289,10 @@ class MatrimonySection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFFE91E63).withOpacity(0.05),
+            color: AppColors.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 12, color: const Color(0xFFE91E63).withOpacity(0.7)),
+          child: Icon(icon, size: 12, color: AppColors.primaryColor.withOpacity(0.7)),
         ),
         const SizedBox(width: 8),
         Expanded(

@@ -323,7 +323,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.darkPrimaryColor),
+          Icon(icon, size: 16, color: AppColors.primaryColor),
           const SizedBox(width: 4),
           AppText(
             text,
@@ -366,7 +366,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                   color: const Color(0xFFFFF0F5),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, size: 20, color: AppColors.darkPrimaryColor),
+                child: Icon(icon, size: 20, color: AppColors.primaryColor),
               ),
               const SizedBox(width: 12),
               AppText(

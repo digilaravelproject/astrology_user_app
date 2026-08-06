@@ -111,7 +111,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             'CLEAR ALL',
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFFE91E63),
+                            color: AppColors.primaryColor,
                           ),
                         ),
                         IconButton(
@@ -197,7 +197,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: Color(0xFFE91E63)),
+                          side: const BorderSide(color: AppColors.primaryColor),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -206,7 +206,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           'CLOSE',
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFFE91E63),
+                          color: AppColors.primaryColor,
                         ),
                       ),
                     ),
@@ -242,7 +242,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE91E63),
+                          backgroundColor: AppColors.primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
@@ -276,7 +276,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
           color: isSelected ? Colors.white : Colors.transparent,
           border: Border(
             left: BorderSide(
-              color: isSelected ? const Color(0xFFE91E63) : Colors.transparent,
+              color: isSelected ? AppColors.primaryColor : Colors.transparent,
               width: 3,
             ),
           ),
@@ -338,7 +338,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFFFFF0F5) : Colors.transparent,
               border: Border.all(
-                color: isSelected ? const Color(0xFFE91E63) : Colors.grey[300]!,
+                color: isSelected ? AppColors.primaryColor : Colors.grey[300]!,
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(4),
@@ -347,7 +347,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
               children: [
                 Icon(
                   isSelected ? Icons.check_circle : Icons.circle_outlined,
-                  color: isSelected ? const Color(0xFFE91E63) : Colors.grey[400],
+                  color: isSelected ? AppColors.primaryColor : Colors.grey[400],
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -432,7 +432,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                     decoration: InputDecoration(
                       hintText: AppStrings.findYourSoulmatch,
                       hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFFE91E63), size: 18),
+                      prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primaryColor, size: 18),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -460,12 +460,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+                          colors: [AppColors.primaryColor, AppColors.secondaryColor],
                         ),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFE91E63).withOpacity(0.2),
+                            color: AppColors.primaryColor.withOpacity(0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -498,7 +498,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
               child: IconButton(
                 icon: Icon(
                   Icons.tune_rounded,
-                  color: const Color(0xFFE91E63),
+                  color: AppColors.primaryColor,
                   size: 26,
                 ),
                 onPressed: () => _showFilterBottomSheet(context),
@@ -509,7 +509,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
               child: IconButton(
                 icon: Icon(
                   _isSearching.value ? Icons.close_rounded : Icons.search_rounded,
-                  color: const Color(0xFFE91E63),
+                  color: AppColors.primaryColor,
                   size: 26,
                 ),
                 onPressed: () {
@@ -549,7 +549,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             child: Icon(
               Icons.filter_vintage,
               size: 300,
-              color: Colors.purple.withOpacity(0.08),
+              color: AppColors.primaryColor.withOpacity(0.1),
             ),
           ),
           Positioned(
@@ -558,7 +558,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
             child: Icon(
               Icons.filter_vintage,
               size: 200,
-              color: Colors.pink.withOpacity(0.08),
+              color: AppColors.secondaryColor.withOpacity(0.1),
             ),
           ),
           
@@ -614,7 +614,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           AppStrings.soulMatesTitle,
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFFFF5E9D),
+                          color: AppColors.secondaryColor,
                           textAlign: TextAlign.center,
                         ),
                         
@@ -636,8 +636,10 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
                                 colors: [
-                                  Color(0xFFE940BE),
-                                  Color(0xFFFF5E5E),
+                                  AppColors.primaryColor,
+                                  AppColors.secondaryColor
+                                  // Color(0xFFE940BE),
+                                  // Color(0xFFFF5E5E),
                                 ],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,

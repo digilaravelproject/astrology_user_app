@@ -135,7 +135,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(0xFF880E4F)),
+              icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -156,7 +156,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(Icons.more_vert, color: Color(0xFF880E4F)),
+                icon: const Icon(Icons.more_vert, color: AppColors.primaryColor),
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
@@ -224,7 +224,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       body: Obx(() {
         if (_controller.isLoading.value && _controller.selectedProfile.value == null) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
           );
         }
 
@@ -368,7 +368,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   children: [
                     _buildActionButton(
                       icon: Icons.call,
-                      color: const Color(0xFFE91E63),
+                      color: AppColors.primaryColor,
                       onTap: () {},
                     ),
                     const SizedBox(height: 16),
@@ -394,7 +394,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF880E4F).withOpacity(0.06),
+                    color: AppColors.primaryColor.withOpacity(0.06),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
@@ -411,7 +411,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           '${profile.firstName} ${profile.lastName}',
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF880E4F),
+                          color: AppColors.primaryColor,
                           height: 1.3,
                         ),
 
@@ -420,7 +420,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                         'assets/icons/verify.png',
                         width: 24,
                         height: 24,
-                        color: const Color(0xFFE91E63), // Tinted verify icon
+                        color: AppColors.primaryColor, // Tinted verify icon
                       ),
                     ],
                   ),
@@ -430,14 +430,14 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                          decoration: BoxDecoration(
-                          color: const Color(0xFFE91E63).withOpacity(0.08),
+                          color: AppColors.primaryColor.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: AppText(
                           'ID: MT${profile.id ?? ""}',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFFE91E63),
+                          color: AppColors.primaryColor,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -515,10 +515,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
            Container(
              padding: const EdgeInsets.all(8),
              decoration: BoxDecoration(
-               color: const Color(0xFF880E4F).withOpacity(0.05),
+               color:  AppColors.primaryColor.withOpacity(0.05),
                shape: BoxShape.circle,
              ),
-             child: Icon(icon, size: 16, color: const Color(0xFF880E4F)),
+             child: Icon(icon, size: 16, color: AppColors.primaryColor),
            ),
            const SizedBox(width: 12),
            Expanded(
@@ -560,7 +560,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF880E4F),
+          color: AppColors.primaryColor,
         ),
         content: AppText(
           (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) 
@@ -641,7 +641,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               'Report Profile',
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF880E4F),
+              color: AppColors.primaryColor,
             ),
             const SizedBox(height: 8),
             const AppText(
@@ -721,7 +721,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF880E4F), size: 24),
+            Icon(icon, color: AppColors.primaryColor, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: AppText(
@@ -793,7 +793,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               value,
               fontSize: 13,
               fontWeight: isLink ? FontWeight.w600 : FontWeight.w500,
-              color: isLink ? const Color(0xFFE91E63) : const Color(0xFF263238),
+              color: isLink ? AppColors.primaryColor : const Color(0xFF263238),
               height: 1.4,
             ),
           ),
@@ -830,15 +830,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.stars_rounded, size: 16, color: Color(0xFFE91E63)),
+              const Icon(Icons.stars_rounded, size: 16, color: AppColors.primaryColor),
               const SizedBox(width: 6),
               AppText(
                 AppStrings.upgradeToView,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFFE91E63),
+                color: AppColors.primaryColor,
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFFE91E63)),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primaryColor),
             ],
           ),
         ),
@@ -892,7 +892,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF880E4F).withOpacity(0.04),
+            color: AppColors.primaryColor.withOpacity(0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -907,10 +907,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE91E63).withOpacity(0.08),
+                  color: AppColors.primaryColor.withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: const Color(0xFFE91E63), size: 20),
+                child: Icon(icon, color: AppColors.primaryColor, size: 20),
               ),
               const SizedBox(width: 12),
               AppText(
@@ -935,7 +935,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.star, color: Color(0xFFE1BEE7), size: 20), // Placeholder for sparkles
+          const Icon(Icons.star, color: AppColors.secondaryColor, size: 20), // Placeholder for sparkles
           const SizedBox(width: 8),
           AppText(
             profile.gender.toLowerCase() == 'male' 
@@ -943,10 +943,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 : AppStrings.herPartnerPreferences,
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF880E4F),
+            color: AppColors.primaryColor,
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.star, color: Color(0xFFE1BEE7), size: 20),
+          const Icon(Icons.star, color: AppColors.secondaryColor, size: 20),
         ],
       ),
     );
@@ -968,7 +968,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
             AppStrings.youIgnoredThisProfile,
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF880E4F),
+            color: AppColors.primaryColor,
           ),
           const SizedBox(height: 12),
           Container(
@@ -983,7 +983,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               AppStrings.removeFromIgnoredList,
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF880E4F),
+              color: AppColors.primaryColor,
             ),
           ),
         ],
