@@ -32,6 +32,9 @@ import '../../profile/controllers/profile_controller.dart';
 import '../../profile/bindings/profile_binding.dart';
 import '../widgets/astrologer_filter_bottom_sheet.dart';
 import '../../live/presentation/controllers/live_controller.dart';
+import '../controllers/blog_controller.dart';
+import '../controllers/remedy_controller.dart';
+import '../controllers/founder_controller.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -121,11 +124,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 25),
                   const FounderMessageBanner(),
-                  const SizedBox(height: 25),
-                  const RemedyGrid(),
-                  const SizedBox(height: 15),
-                  const AstrologyBlogsSection(),
-                  const SizedBox(height: 25),
+                  Obx(() {
+                    try {
+                      final remedyController = Get.find<RemedyController>();
+                      if (remedyController.remedies.isEmpty && !remedyController.isLoading.value) {
+                        return const SizedBox.shrink();
+                      }
+                    } catch (_) {}
+                    return const Column(
+                      children: [
+                        SizedBox(height: 25),
+                        RemedyGrid(),
+                      ],
+                    );
+                  }),
+                  Obx(() {
+                    try {
+                      final blogController = Get.find<BlogController>();
+                      if (blogController.blogs.isEmpty && !blogController.isLoading.value) {
+                        return const SizedBox.shrink();
+                      }
+                    } catch (_) {}
+                    return const Column(
+                      children: [
+                        SizedBox(height: 15),
+                        AstrologyBlogsSection(),
+                        SizedBox(height: 25),
+                      ],
+                    );
+                  }),
                   
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -134,12 +161,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF9C27B0).withOpacity(0.1), // Purple tint
+                            color: AppColors.primaryColor.withOpacity(0.1), // Purple tint
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.chat_bubble_outline_rounded,
-                            color: Color(0xFF9C27B0),
+                            color: AppColors.primaryColor,
                             size: 20,
                           ),
                         ),
@@ -153,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                 // const SizedBox(height: 8),
 /*                  // Search Bar
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -233,12 +260,34 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
   Future<void> _onRefresh() async {
-    await Future.wait([
+    final List<Future> refreshTasks = [
       Get.find<AuthController>().checkLoginStatus(),
       Get.find<WalletController>().fetchWallet(),
       Get.find<NotificationController>().fetchNotificationCount(),
       Get.find<AstrologerController>().fetchAstrologers(),
-    ]);
+    ];
+    
+    try {
+      refreshTasks.add(Get.find<ProfileController>().refreshProfile());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<BlogController>().fetchBlogs());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<RemedyController>().fetchRemedies());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<FounderController>().fetchFounderWords());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<LiveController>().fetchActiveSessions());
+    } catch (_) {}
+
+    await Future.wait(refreshTasks);
   }
 
 

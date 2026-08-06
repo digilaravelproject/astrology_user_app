@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../routes/route_helper.dart';
 import '../domain/services/splash_service.dart';
 import '../../../core/services/network/websocket_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SplashController extends GetxController {
   final SplashService _splashService;
@@ -30,14 +31,24 @@ class SplashController extends GetxController {
         // Wait for 5 seconds to show splash screen
         await Future.delayed(const Duration(seconds: 5));
 
-        // Check if user is logged in
-        final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+        // Check permissions
+        bool cameraGranted = await Permission.camera.isGranted;
+        bool micGranted = await Permission.microphone.isGranted;
+        bool notifGranted = await Permission.notification.isGranted;
 
-        if (isLoggedIn) {
-          Get.find<WebSocketService>().connect();
-          Get.offAllNamed(RouteHelper.getDashboardRoute());
+        if (cameraGranted && micGranted && notifGranted) {
+          // Check if user is logged in
+          final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+
+          if (isLoggedIn) {
+            Get.find<WebSocketService>().connect();
+            Get.offAllNamed(RouteHelper.getDashboardRoute());
+          } else {
+            Get.offAllNamed(RouteHelper.getLoginRoute());
+          }
         } else {
-          Get.offAllNamed(RouteHelper.getLoginRoute());
+          // Go to permission screen
+          Get.offAllNamed(RouteHelper.getPermissionRoute());
         }
       } else {
         // Handle maintenance or version issues

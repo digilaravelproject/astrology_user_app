@@ -45,6 +45,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchAstrologer();
       _controller.fetchReviews(widget.astrologerId);
+      _controller.fetchAstrologerGallery(widget.astrologerId);
     });
   }
 
@@ -54,6 +55,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
     if (oldWidget.astrologerId != widget.astrologerId) {
       _fetchAstrologer();
       _controller.fetchReviews(widget.astrologerId);
+      _controller.fetchAstrologerGallery(widget.astrologerId);
     }
   }
 
@@ -123,7 +125,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         return { 
                           _astrologer?.isBlocked == true ? 'Unblock' : 'Block', 
                           'Report', 
-                          'Review' 
+                          if (_astrologer?.isReviewEligible == true) 'Review' 
                         }.map((String choice) {
                           return PopupMenuItem<String>(
                             value: choice,
@@ -160,7 +162,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         ),
                       const SizedBox(height: 16),
                       // Gallery Section
-                      _buildGallerySection(),
+                      Obx(() => _buildGallerySection()),
                       const SizedBox(height: 16),
                       // Reviews Section
                       Obx(() => _buildReviewsSection()),
@@ -898,32 +900,34 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
   }
 
   Widget _buildGallerySection() {
-    // Static images for now as requested
-    final List<String> staticImages = [
-      'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    ];
+    if (_controller.isGalleryLoading.value) {
+      return const SizedBox.shrink(); // or you can show a loader if needed, but the request says if it's there show it, else don't.
+    }
+    
+    final gallery = _controller.gallery;
+    if (gallery.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       height: 140, // Height of the gallery row
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: staticImages.length,
+        itemCount: gallery.length,
         itemBuilder: (context, index) {
+          final imageUrl = gallery[index].image;
           return GestureDetector(
             onTap: () {
-              _showFullScreenGallery(context, staticImages, index);
+              _showFullScreenGallery(context, gallery.map((e) => e.image).toList(), index);
             },
             child: Container(
               width: 110,
-              margin: EdgeInsets.only(right: index == staticImages.length - 1 ? 0 : 6),
+              margin: EdgeInsets.only(right: index == gallery.length - 1 ? 0 : 6),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: NetworkImage(staticImages[index]),
+                  image: NetworkImage(imageUrl),
                   fit: BoxFit.cover,
                 ),
                 boxShadow: [
@@ -968,29 +972,30 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => _showReviewBottomSheet(context, _astrologer!.name),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.deepPink.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
-                      const SizedBox(width: 4),
-                      AppText(
-                        'Write',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.deepPink,
-                      ),
-                    ],
+              if (_astrologer?.isReviewEligible == true)
+                GestureDetector(
+                  onTap: () => _showReviewBottomSheet(context, _astrologer!.name),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.deepPink.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
+                        const SizedBox(width: 4),
+                        AppText(
+                          'Write',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepPink,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           if (reviews.isNotEmpty) ...[

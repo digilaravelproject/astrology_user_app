@@ -21,6 +21,7 @@ class AstrologerModel {
   final bool isOnline;
   final bool isFollowed;
   final bool isBlocked;
+  final bool isReviewEligible;
   final int totalOrders;
   final String? originalChatRatePerMinute;
   final String? originalCallRatePerMinute;
@@ -53,6 +54,7 @@ class AstrologerModel {
     this.totalOrders = 0,
     this.isFollowed = false,
     this.isBlocked = false,
+    this.isReviewEligible = false,
     this.originalChatRatePerMinute,
     this.originalCallRatePerMinute,
     this.hasOffer = false,
@@ -88,6 +90,7 @@ class AstrologerModel {
       totalOrders: json['total_orders'] ?? 0,
       isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
       isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
+      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true,
       originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
       originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
       hasOffer: json['has_offer'] == true,

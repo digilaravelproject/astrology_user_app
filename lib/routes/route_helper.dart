@@ -20,6 +20,7 @@ import '../features/auth/screens/gender_screen.dart';
 import '../features/auth/screens/birth_details_screen.dart';
 import '../features/matching/screens/kundali_matching_screen.dart';
 import '../features/splash/screens/splash_screen.dart';
+import '../features/splash/screens/permission_screen.dart';
 import '../features/auth/screens/complete_profile_screen.dart';
 import '../features/auth/screens/registration_success_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
@@ -48,6 +49,7 @@ import 'app_routes.dart';
 
 class RouteHelper {
   static String getSplashRoute() => AppRoutes.splash;
+  static String getPermissionRoute() => AppRoutes.permission;
   static String getLoginRoute() => AppRoutes.login;
   static String getOtpRoute() => AppRoutes.otp;
   static String getIntroRoute() => AppRoutes.intro;
@@ -85,6 +87,11 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.splash,
       page: () => const SplashScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.permission,
+      page: () => const PermissionScreen(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: AppRoutes.intro,

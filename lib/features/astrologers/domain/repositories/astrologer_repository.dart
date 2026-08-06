@@ -15,6 +15,10 @@ class AstrologerRepository {
     return await apiClient.get('${AppUrls.astrologers}/$id');
   }
 
+  Future<ResponseModel> getAstrologerGallery(int id) async {
+    return await apiClient.get('${AppUrls.astrologers}/$id/gallery');
+  }
+
   Future<ResponseModel> blockAstrologer(int id) async {
     return await apiClient.post(AppUrls.blockAstrologer(id));
   }

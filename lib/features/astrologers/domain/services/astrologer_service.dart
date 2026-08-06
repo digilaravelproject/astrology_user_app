@@ -14,6 +14,10 @@ class AstrologerService {
     return await repository.getAstrologerById(id);
   }
 
+  Future<ResponseModel> getAstrologerGallery(int id) async {
+    return await repository.getAstrologerGallery(id);
+  }
+
   Future<ResponseModel> blockAstrologer(int id) async {
     return await repository.blockAstrologer(id);
   }

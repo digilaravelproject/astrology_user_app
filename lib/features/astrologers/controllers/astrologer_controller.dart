@@ -13,6 +13,8 @@ import '../domain/models/review_model.dart';
 import '../domain/models/gift_model.dart';
 import '../domain/models/gift_history_model.dart';
 import '../domain/usecases/get_gift_history_usecase.dart';
+import '../domain/usecases/get_astrologer_gallery_usecase.dart';
+import '../domain/models/astrologer_gallery_model.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../wallet/widgets/recharge_bottom_sheet.dart';
 import '../../../../core/services/network/response_model.dart';
@@ -30,6 +32,7 @@ class AstrologerController extends GetxController {
   final GetGiftsUseCase _getGiftsUseCase;
   final SendGiftUseCase _sendGiftUseCase;
   final GetGiftHistoryUseCase _getGiftHistoryUseCase;
+  final GetAstrologerGalleryUseCase _getAstrologerGalleryUseCase;
 
   AstrologerController({
     required GetAstrologersUseCase getAstrologersUseCase,
@@ -42,6 +45,7 @@ class AstrologerController extends GetxController {
     required GetGiftsUseCase getGiftsUseCase,
     required SendGiftUseCase sendGiftUseCase,
     required GetGiftHistoryUseCase getGiftHistoryUseCase,
+    required GetAstrologerGalleryUseCase getAstrologerGalleryUseCase,
   })  : _getAstrologersUseCase = getAstrologersUseCase,
         _getAstrologerByIdUseCase = getAstrologerByIdUseCase,
         _blockAstrologerUseCase = blockAstrologerUseCase,
@@ -51,7 +55,8 @@ class AstrologerController extends GetxController {
         _followAstrologerUseCase = followAstrologerUseCase,
         _getGiftsUseCase = getGiftsUseCase,
         _sendGiftUseCase = sendGiftUseCase,
-        _getGiftHistoryUseCase = getGiftHistoryUseCase;
+        _getGiftHistoryUseCase = getGiftHistoryUseCase,
+        _getAstrologerGalleryUseCase = getAstrologerGalleryUseCase;
 
   final RxList<AstrologerModel> astrologers = <AstrologerModel>[].obs;
   final RxBool isLoading = false.obs;
@@ -64,6 +69,9 @@ class AstrologerController extends GetxController {
   final RxList<GiftHistoryItem> giftHistory = <GiftHistoryItem>[].obs;
   final RxBool isHistoryLoading = false.obs;
   final RxnInt sendingGiftId = RxnInt();
+  
+  final RxList<AstrologerGalleryModel> gallery = <AstrologerGalleryModel>[].obs;
+  final RxBool isGalleryLoading = false.obs;
   
   // Isolated lists for Listing Screens to avoid affecting Home
   final RxList<AstrologerModel> filteredAstrologers = <AstrologerModel>[].obs;
@@ -417,6 +425,19 @@ class AstrologerController extends GetxController {
       print('Error fetching gift history: $e');
     } finally {
       isHistoryLoading.value = false;
+    }
+  }
+
+  Future<void> fetchAstrologerGallery(int astrologerId) async {
+    try {
+      isGalleryLoading.value = true;
+      gallery.clear();
+      final result = await _getAstrologerGalleryUseCase.execute(astrologerId);
+      gallery.assignAll(result);
+    } catch (e) {
+      print('Error fetching astrologer gallery: $e');
+    } finally {
+      isGalleryLoading.value = false;
     }
   }
 

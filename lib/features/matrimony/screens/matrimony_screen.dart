@@ -696,16 +696,16 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFE91E63).withOpacity(0.15),
+                      color: AppColors.primaryColor.withOpacity(0.15),
                       blurRadius: 30,
                       spreadRadius: 10,
                     ),
                   ],
                 ),
-                child: const Icon(
+                child:  Icon(
                   Icons.stars_rounded,
                   size: 80,
-                  color: Color(0xFFE91E63),
+                  color: AppColors.primaryColor,
                 ),
               ),
               const SizedBox(height: 40),
@@ -734,14 +734,14 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                   height: 56,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+                      colors: [AppColors.primaryColor, AppColors.secondaryColor],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFE91E63).withOpacity(0.35),
+                        color: AppColors.primaryColor.withOpacity(0.35),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -771,7 +771,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 },
                 child: AppText(
                   'Already purchased? Refresh',
-                  color: const Color(0xFFE91E63).withOpacity(0.8),
+                  color: AppColors.primaryColor.withOpacity(0.8),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),

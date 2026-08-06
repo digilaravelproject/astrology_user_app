@@ -31,6 +31,7 @@ class FollowingScreen extends StatelessWidget {
       getGiftsUseCase: Get.find(),
       sendGiftUseCase: Get.find(),
       getGiftHistoryUseCase: Get.find(),
+      getAstrologerGalleryUseCase: Get.find(),
     ));
     
     // Fetch following list when screen is accessed
