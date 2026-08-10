@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "397276146259",
+    "firebase_url": "https://suryapath-kundli-default-rtdb.firebaseio.com",
+    "project_id": "suryapath-kundli",
+    "storage_bucket": "suryapath-kundli.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397276146259:android:c229db75ff2980046c34a6",
+        "android_client_info": {
+          "package_name": "com.suryapath.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397276146259-h2hel5je3rk08dmmii5031j2a11vaidr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDY6n5avyx8Eg0QRNjQljmCZcaj3UmuVNs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397276146259-h2hel5je3rk08dmmii5031j2a11vaidr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

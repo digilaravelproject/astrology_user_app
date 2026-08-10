@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../../../core/widgets/app_text.dart';
+import '../../../../core/widgets/cosmic_background.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_rating_bar.dart';
 import '../../../../core/widgets/custom_app_bar.dart';
+import '../../../../core/constants/app_urls.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -17,6 +21,7 @@ import '../../../astrologers/bindings/astrologers_binding.dart';
 import '../../../astrologers/screens/astrologer_search_screen.dart';
 import 'package:astro_user/routes/route_helper.dart';
 import '../../../notification/controllers/notification_controller.dart';
+import 'chat_screen.dart';
 import '../../../../core/utils/wallet_helper.dart';
 import '../../../wallet/controllers/wallet_controller.dart';
 
@@ -35,29 +40,16 @@ class ChatListScreen extends StatelessWidget {
     
     final TextEditingController searchController = TextEditingController();
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primaryColor.withOpacity(0.12),
-            Colors.white,
-          ],
-          stops: const [0.0, 0.45],
-        ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: CustomAppBar(
+        title: 'Chat',
+        showLeading: false,
+        actions: [
+          _buildActionItem(Icons.notifications_outlined, () {}),
+          const SizedBox(width: 12),
+        ],
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: CustomAppBar(
-          title: 'Chat',
-          showLeading: false,
-          backgroundColor: Colors.transparent,
-          actions: [
-            _buildActionItem(Icons.notifications_outlined, () {}),
-            const SizedBox(width: 12),
-          ],
-        ),
       body: RefreshIndicator(
         onRefresh: () async {
           await astrologerController.fetchTopAstrologers(serviceType: 'chat');
@@ -68,7 +60,7 @@ class ChatListScreen extends StatelessWidget {
               // Search Bar
               SliverToBoxAdapter(
                 child: Container(
-                  color: Colors.transparent,
+                  color: Colors.white,
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                   child: GestureDetector(
                     onTap: () => Get.to(() => const AstrologerSearchScreen(serviceType: 'chat')),
@@ -101,7 +93,7 @@ class ChatListScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Colors.transparent,
+                    color: Colors.white,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                   ),
                   child: Column(
@@ -233,7 +225,6 @@ class ChatListScreen extends StatelessWidget {
             ],
           ),
         ),
-      )
     );
   }
 
@@ -612,14 +603,14 @@ class ChatListScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              CustomButton(
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            CustomButton(
                               text: astro.packageSessionText,
                               icon: Icons.timer,
-                              fontSize: 11.5,
-                              height: 34,
+                              fontSize: 11,
+                              height: 32,
                               borderRadius: 8,
                                backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                               textColor: Colors.white,
@@ -633,8 +624,8 @@ class ChatListScreen extends StatelessWidget {
                               CustomButton(
                                 text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
                                 icon: Icons.chat,
-                                fontSize: 11.5,
-                                height: 34,
+                                fontSize: 11,
+                                height: 32,
                                 borderRadius: 8,
                                 backgroundColor: Colors.transparent,
                                 textColor: const Color(0xFF4CAF50),
