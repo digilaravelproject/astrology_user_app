@@ -41,16 +41,29 @@ class CallListScreen extends StatelessWidget {
 
     final TextEditingController searchController = TextEditingController();
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: 'Call',
-        showLeading: false,
-        actions: [
-          _buildActionItem(Icons.notifications_outlined, () {}),
-          const SizedBox(width: 12),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.primaryColor.withOpacity(0.12),
+            Colors.white,
+          ],
+          stops: const [0.0, 0.45],
+        ),
       ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: CustomAppBar(
+          title: 'Call',
+          showLeading: false,
+          backgroundColor: Colors.transparent,
+          actions: [
+            _buildActionItem(Icons.notifications_outlined, () {}),
+            const SizedBox(width: 12),
+          ],
+        ),
       body: RefreshIndicator(
         onRefresh: () async {
           await astrologerController.fetchTopAstrologers(serviceType: 'call');
@@ -61,7 +74,7 @@ class CallListScreen extends StatelessWidget {
               // Search Bar
               SliverToBoxAdapter(
                 child: Container(
-                  color: Colors.white,
+                  color: Colors.transparent,
                   padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                   child: GestureDetector(
                     onTap: () => Get.to(() => const AstrologerSearchScreen(serviceType: 'call')),
@@ -94,7 +107,7 @@ class CallListScreen extends StatelessWidget {
               SliverToBoxAdapter(
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                   ),
                   child: Column(
@@ -226,6 +239,7 @@ class CallListScreen extends StatelessWidget {
           ],
         ),
       ),
+      )
     );
   }
 
@@ -610,8 +624,8 @@ class CallListScreen extends StatelessWidget {
                             CustomButton(
                               text: astro.packageSessionText,
                               icon: Icons.timer,
-                              fontSize: 11,
-                              height: 32,
+                              fontSize: 11.5,
+                              height: 34,
                               borderRadius: 8,
                                backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
                               textColor: Colors.white,
@@ -625,8 +639,8 @@ class CallListScreen extends StatelessWidget {
                               CustomButton(
                                 text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
                                 icon: Icons.call,
-                                fontSize: 11,
-                                height: 32,
+                                fontSize: 11.5,
+                                height: 34,
                                 borderRadius: 8,
                                 backgroundColor: Colors.transparent,
                                 textColor: const Color(0xFF4CAF50),
@@ -720,4 +734,5 @@ class CallListScreen extends StatelessWidget {
       ),
     );
   }
+
 }

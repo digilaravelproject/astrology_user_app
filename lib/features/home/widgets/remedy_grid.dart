@@ -7,19 +7,10 @@ import '../../../../core/widgets/custom_image_widget.dart';
 import '../../remedy/screens/remedy_detail_screen.dart';
 import '../../home/controllers/remedy_controller.dart';
 import '../../home/domain/models/remedy_model.dart';
+import '../../remedy/screens/remedy_list_screen.dart';
 
 class RemedyGrid extends StatelessWidget {
   const RemedyGrid({Key? key}) : super(key: key);
-
-  // Cycle through these colors to give each remedy card a distinct look
-  static const List<Color> _cardColors = [
-    Color(0xFFD32F2F),
-    Color(0xFF5D4037),
-    Color(0xFFE65100),
-    Color(0xFFC2185B),
-    Color(0xFFFF6347),
-    Color(0xFFFF6F00),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +22,7 @@ class RemedyGrid extends StatelessWidget {
           height: 150,
           child: Center(
             child: CircularProgressIndicator(
-              color: AppColors.deepPink,
+              color: AppColors.primaryColor,
               strokeWidth: 2,
             ),
           ),
@@ -39,134 +30,136 @@ class RemedyGrid extends StatelessWidget {
       }
 
       if (remedyController.remedies.isEmpty) {
-        return const SizedBox(
-          height: 150,
-          child: Center(
-            child: AppText(
-              'No remedies found',
-              fontSize: 14,
-              color: Colors.black45,
-            ),
-          ),
-        );
+        return const SizedBox.shrink();
       }
 
-      return SizedBox(
-        height: 150,
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          scrollDirection: Axis.horizontal,
-          itemCount: remedyController.remedies.length,
-          itemBuilder: (context, index) {
-            final remedy = remedyController.remedies[index];
-            final color = _cardColors[index % _cardColors.length];
-            final imageUrl = remedy.image ?? remedyController.getRemedyImage(index);
-            return GestureDetector(
-              onTap: () {
-                Get.to(() => RemedyDetailScreen(
-                  remedyId: remedy.id,
-                  accentColor: color,
-                  imageUrl: imageUrl,
-                ));
-              },
-              child: Container(
-                width: 200,
-                margin: EdgeInsets.only(
-                  right: index < remedyController.remedies.length - 1 ? 12 : 0,
-                ),
-                child: _buildRemedyCard(remedy, color),
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF7F2), // Light peach background
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primaryColor.withOpacity(0.15)),
+        ),
+        child: Column(
+          children: [
+            // Header Section
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.spa, color: Color(0xFFB57E2F), size: 20), // Golden lotus-like icon
+                      const SizedBox(width: 8),
+                      AppText(
+                        'Remedies',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF5D1E2D), // Deep burgundy color
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => const RemedyListScreen());
+                    },
+                    child: Row(
+                      children: [
+                        AppText(
+                          'View All',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF5D1E2D),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_forward_ios, size: 10, color: Color(0xFF5D1E2D)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
+            ),
+            
+            // Grid
+            SizedBox(
+              height: 155,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                scrollDirection: Axis.horizontal,
+                itemCount: remedyController.remedies.length,
+                itemBuilder: (context, index) {
+                  final remedy = remedyController.remedies[index];
+                  final imageUrl = remedy.image ?? remedyController.getRemedyImage(index);
+                  
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => RemedyDetailScreen(
+                        remedyId: remedy.id,
+                        accentColor: AppColors.primaryColor,
+                        imageUrl: imageUrl,
+                      ));
+                    },
+                    child: Container(
+                      width: 115,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: CustomImageWidget(
+                              imagePath: imageUrl,
+                              height: 95,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const Spacer(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: AppText(
+                              remedy.title,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF5D1E2D),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: 2,
+                            width: 24,
+                            color: const Color(0xFFB57E2F), // Golden underline
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
         ),
       );
     });
-  }
-
-  Widget _buildRemedyCard(RemedyModel remedy, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 0.9,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon and title row
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: CustomImageWidget(
-                    imagePath: remedy.image,
-                    width: 32,
-                    height: 32,
-                    radius: BorderRadius.circular(16),
-                    fit: BoxFit.cover,
-                    fallbackWidget: Icon(Icons.auto_fix_high_rounded, color: color, size: 18),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: AppText(
-                    remedy.title,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Description
-            Expanded(
-              child: AppText(
-                remedy.description,
-                fontSize: 10,
-                fontWeight: FontWeight.w400,
-                color: Colors.black54,
-                height: 1.35,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(Icons.arrow_forward_ios_rounded, size: 10, color: color.withOpacity(0.8)),
-                const SizedBox(width: 4),
-                AppText(
-                  AppStrings.viewMore,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: color.withOpacity(0.8),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

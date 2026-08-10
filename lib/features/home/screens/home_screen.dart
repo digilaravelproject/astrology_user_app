@@ -87,11 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
-            pinned: true,
+            pinned: false,
             floating: false,
             elevation: 0,
             backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
+            toolbarHeight: 110,
 
             titleSpacing: 0,
 
@@ -107,8 +108,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // Scrollable Content (Scrolls behind pinned headers)
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
-              background: Container(
-                color: Colors.white,
+              background: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    color: const Color(0xFFFFF7F2), // Light peach background
+                  ),
+                  const AnimatedZodiacWheel(),
+                ],
               ),
             ),
           ),
@@ -118,11 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _buildScrollableGreeting(authController),
-                  ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 15),
                   const FounderMessageBanner(),
                   Obx(() {
                     try {
@@ -153,56 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     );
                   }),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1), // Purple tint
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.chat_bubble_outline_rounded,
-                            color: AppColors.primaryColor,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        AppText(
-                          AppStrings.talkToAstrologer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2E1A47),
-                        ),
-                      ],
-                    ),
-                  ),
-                 // const SizedBox(height: 8),
-/*                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) => Get.find<AstrologerController>().updateSearch(value),
-                        decoration: InputDecoration(
-                          hintText: AppStrings.search,
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-                          prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),*/
+                  // Old Search Bar and chat row removed
                 ],
               )
             ),
@@ -233,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Column(
                 children: [
                   if (hasActiveSessions) const SizedBox(height: 35),
-                  const LiveSessionSection(),
+               //   const LiveSessionSection(),
                   const SizedBox(height: 130),
                 ],
               );
@@ -293,59 +247,42 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   Widget _buildStickyTopBar(AuthController authController, WalletController walletController) {
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GestureDetector(
-          onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
-            child: Obx(() {
-              final user = authController.currentUser.value;
-              return Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primaryColor,
-                    width: 2.5,
-                  ),
-                ),
-                child: CustomImageWidget(
-                  imagePath: (() {
-                    final photo = user?.profilePhoto;
-                    if (photo == null || photo.isEmpty) return null;
-                    if (photo.startsWith('http')) return photo;
-                    final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
-                    return '${AppUrls.baseImageUrl}$cleanPhoto';
-                  })(),
-                  height: 48,
-                  width: 48,
-                  radius: BorderRadius.circular(24),
-                  fallbackWidget: Container(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        user?.name.isNotEmpty == true
-                            ? user!.name[0].toUpperCase()
-                            : 'U',
-                        style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
+          // LEFT SIDE: Greeting
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      AppText(
+                        'Hello',
+                        fontSize: 14,
+                        color: Colors.grey[600],
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      const WavingEmoji(),
+                    ],
                   ),
-                ),
-              );
-            }),
+                  Obx(() => AppText(
+                    authController.currentUser.value?.name ?? AppStrings.guest,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF8B0000), // Dark red as in image
+                    letterSpacing: -0.5,
+                  )),
+                ],
+              ),
+            ],
           ),
+          
+          // RIGHT SIDE: Wallet, Notification, Profile
           Row(
             children: [
               GestureDetector(
@@ -367,12 +304,66 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: AppColors.deepPink,
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
+                      padding: const EdgeInsets.all(6),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                        ],
                       ),
-                      child: const Icon(Icons.notifications_outlined, size: 22, color: Color(0xFF2E1A47)),
+                      child: const Icon(Icons.notifications_none_rounded, size: 20, color: Color(0xFF2E1A47)),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
+                child: Obx(() {
+                  final user = authController.currentUser.value;
+                  return Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                      ],
+                    ),
+                    child: CustomImageWidget(
+                      imagePath: (() {
+                        final photo = user?.profilePhoto;
+                        if (photo == null || photo.isEmpty) return null;
+                        if (photo.startsWith('http')) return photo;
+                        final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
+                        return '${AppUrls.baseImageUrl}$cleanPhoto';
+                      })(),
+                      height: 40,
+                      width: 40,
+                      radius: BorderRadius.circular(20),
+                      fallbackWidget: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            user?.name.isNotEmpty == true
+                                ? user!.name[0].toUpperCase()
+                                : 'U',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   );
                 }),
@@ -509,35 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildScrollableGreeting(AuthController authController) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            AppText(
-              AppStrings.hello,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-            const SizedBox(width: 8),
-            Obx(() => AppText(
-              authController.currentUser.value?.name ?? AppStrings.guest,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.deepPink,
-              height: 1.1,
-              letterSpacing: -0.5,
-            )),
-            const SizedBox(width: 4),
-            const WavingEmoji(),
-          ],
-        ),
 
-      ],
-    );
-  }
 
   Widget _buildCoinWalletChip(String balance) {
     return Container(

@@ -30,15 +30,15 @@ class _AnimatedZodiacWheelState extends State<AnimatedZodiacWheel> with SingleTi
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      bottom: -100,
-      right: -120,
+      top: -30,
+      right: -50,
       child: RotationTransition(
         turns: _controller,
         child: Opacity(
           opacity: 0.1,
           child: CustomImageWidget(
             imagePath: 'assets/images/zodiac_wheel.png',
-            width: 420,
+            width: 250,
             color: AppColors.primaryColor,
           ),
         ),

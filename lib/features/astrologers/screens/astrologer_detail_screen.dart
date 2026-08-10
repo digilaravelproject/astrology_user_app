@@ -25,10 +25,8 @@ import '../../chat_assistance/presentation/controllers/chat_assistance_controlle
 class AstrologerDetailScreen extends StatefulWidget {
   final int astrologerId;
 
-  const AstrologerDetailScreen({
-    Key? key,
-    required this.astrologerId,
-  }) : super(key: key);
+  const AstrologerDetailScreen({Key? key, required this.astrologerId})
+    : super(key: key);
 
   @override
   State<AstrologerDetailScreen> createState() => _AstrologerDetailScreenState();
@@ -64,7 +62,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       _isLoading = true;
       _astrologer = null;
     });
-    
+
     try {
       final result = await _controller.fetchAstrologerById(widget.astrologerId);
       if (mounted && result != null) {
@@ -88,102 +86,127 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              slivers: [
-                // AppBar
-                SliverAppBar(
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  pinned: true,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  actions: [
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D)),
-                      onSelected: (value) {
-                        // Handle menu selection
-                        if (value == 'Block' || value == 'Unblock') {
-                          if (_astrologer!.isBlocked) {
-                            _showUnblockBottomSheet(context, _astrologer!.name);
-                          } else {
-                            _showBlockBottomSheet(context, _astrologer!.name);
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.primaryColor.withOpacity(0.12),
+            Colors.white,
+          ],
+          stops: const [0.0, 0.45],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body:
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : CustomScrollView(
+                  slivers: [
+                    // AppBar
+                    SliverAppBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      pinned: true,
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                      actions: [
+                        PopupMenuButton<String>(
+                          icon: const Icon(Icons.more_vert, color: Colors.black87),
+                        onSelected: (value) {
+                          // Handle menu selection
+                          if (value == 'Block' || value == 'Unblock') {
+                            if (_astrologer!.isBlocked) {
+                              _showUnblockBottomSheet(
+                                context,
+                                _astrologer!.name,
+                              );
+                            } else {
+                              _showBlockBottomSheet(context, _astrologer!.name);
+                            }
+                          } else if (value == 'Report') {
+                            _showReportBottomSheet(context, _astrologer!.name);
+                          } else if (value == 'Review') {
+                            _showReviewBottomSheet(context, _astrologer!.name);
                           }
-                        } else if (value == 'Report') {
-                          _showReportBottomSheet(context, _astrologer!.name);
-                        }
-                        else if (value == 'Review') {
-                          _showReviewBottomSheet(context, _astrologer!.name);
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return { 
-                          _astrologer?.isBlocked == true ? 'Unblock' : 'Block', 
-                          'Report', 
-                          if (_astrologer?.isReviewEligible == true) 'Review' 
-                        }.map((String choice) {
-                          return PopupMenuItem<String>(
-                            value: choice,
-                            child: AppText(
-                              choice,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColorPrimary,
-                            ),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ],
-                ),
-                // Content
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Header Card
-                      if (_astrologer != null) _buildProfileHeaderCard(_astrologer!),
-                      if (_astrologer == null && !_isLoading) 
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 100),
-                            child: AppText('Astrologer data not found', color: Colors.grey),
-                          ),
-                        ),
-                      if (_astrologer != null && _astrologer!.bio.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: _BioText(bio: _astrologer!.bio),
-                        ),
-                      const SizedBox(height: 16),
-                      // Gallery Section
-                      Obx(() => _buildGallerySection()),
-                      const SizedBox(height: 16),
-                      // Reviews Section
-                      Obx(() => _buildReviewsSection()),
-                      const SizedBox(height: 16),
-                      // Chat with Assistant
-                      _buildChatAssistantSection(),
-                      const SizedBox(height: 16),
-                      // Send Gift
-                      _buildGiftSection(),
-                      const SizedBox(height: 100),
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return {
+                            _astrologer?.isBlocked == true
+                                ? 'Unblock'
+                                : 'Block',
+                            'Report',
+                            if (_astrologer?.isReviewEligible == true) 'Review',
+                          }.map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: AppText(
+                                choice,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textColorPrimary,
+                              ),
+                            );
+                          }).toList();
+                        },
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
-      bottomNavigationBar: (_astrologer?.isAvailableOnline ?? false)
-          ? _buildBottomActions(context)
-          : null,
+                  // Content
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Header Card
+                        if (_astrologer != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: _buildProfileHeaderCard(_astrologer!),
+                          ),
+                        if (_astrologer == null && !_isLoading)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 100),
+                              child: AppText(
+                                'Astrologer data not found',
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        if (_astrologer != null && _astrologer!.bio.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: _BioText(bio: _astrologer!.bio),
+                          ),
+                        const SizedBox(height: 16),
+                        // Gallery Section
+                        Obx(() => _buildGallerySection()),
+                        const SizedBox(height: 16),
+                        // Reviews Section
+                        Obx(() => _buildReviewsSection()),
+                        const SizedBox(height: 16),
+                        // Chat with Assistant
+                        _buildChatAssistantSection(),
+                        const SizedBox(height: 16),
+                        // Send Gift
+                        _buildGiftSection(),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+      bottomNavigationBar:
+          (_astrologer?.isAvailableOnline ?? false)
+              ? _buildBottomActions(context)
+              : null,
 
-     // bottomNavigationBar: _buildBottomActions(context),
-
+      // bottomNavigationBar: _buildBottomActions(context),
+      ),
     );
   }
 
@@ -208,7 +231,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Icon(Icons.check_circle_outline_rounded, size: 48, color: Colors.green),
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                size: 48,
+                color: Colors.green,
+              ),
               const SizedBox(height: 16),
               AppText(
                 "Unblock $name?",
@@ -242,7 +269,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       onTap: () async {
                         Get.back(); // Close bottom sheet
                         try {
-                          final result = await _controller.unblockAstrologer(widget.astrologerId);
+                          final result = await _controller.unblockAstrologer(
+                            widget.astrologerId,
+                          );
                           if (result.isSuccess) {
                             CustomSnackbar.showSuccess(result.message);
                             _fetchAstrologer(); // Refresh local state
@@ -250,7 +279,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                             CustomSnackbar.showError(result.message);
                           }
                         } catch (e) {
-                          CustomSnackbar.showError("Failed to unblock astrologer: $e");
+                          CustomSnackbar.showError(
+                            "Failed to unblock astrologer: $e",
+                          );
                         }
                       },
                     ),
@@ -320,7 +351,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       onTap: () async {
                         Get.back(); // Close bottom sheet
                         try {
-                          final result = await _controller.blockAstrologer(widget.astrologerId);
+                          final result = await _controller.blockAstrologer(
+                            widget.astrologerId,
+                          );
                           if (result.isSuccess) {
                             CustomSnackbar.showSuccess(result.message);
                             // Navigate back to listing after blocking
@@ -329,7 +362,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                             CustomSnackbar.showError(result.message);
                           }
                         } catch (e) {
-                          CustomSnackbar.showError("Failed to block astrologer: $e");
+                          CustomSnackbar.showError(
+                            "Failed to block astrologer: $e",
+                          );
                         }
                       },
                     ),
@@ -358,7 +393,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -396,7 +433,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     // Text field for custom reason
                     Container(
                       width: double.infinity,
-                     // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(12),
@@ -468,7 +505,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
                           Get.back(); // Close bottom sheet
                           try {
-                            final result = await _controller.reportAstrologer(widget.astrologerId, reason);
+                            final result = await _controller.reportAstrologer(
+                              widget.astrologerId,
+                              reason,
+                            );
                             if (result.isSuccess) {
                               CustomSnackbar.showSuccess(result.message);
 
@@ -477,7 +517,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               CustomSnackbar.showError(result.message);
                             }
                           } catch (e) {
-                            CustomSnackbar.showError("Failed to report astrologer: $e");
+                            CustomSnackbar.showError(
+                              "Failed to report astrologer: $e",
+                            );
                           }
                         },
                       ),
@@ -507,7 +549,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 child: Column(
@@ -545,7 +589,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               });
                             },
                             icon: Icon(
-                              index < _selectedRating ? Icons.star_rounded : Icons.star_border_rounded,
+                              index < _selectedRating
+                                  ? Icons.star_rounded
+                                  : Icons.star_border_rounded,
                               color: Colors.amber,
                               size: 32,
                             ),
@@ -563,7 +609,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     const SizedBox(height: 8),
                     Container(
                       width: double.infinity,
-                    //  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      //  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade100,
                         borderRadius: BorderRadius.circular(12),
@@ -583,7 +629,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       width: double.infinity,
                       child: CustomButton(
                         text: "Post Review",
-                        backgroundColor: AppColors.deepPink,
+                        backgroundColor: AppColors.primaryColor,
                         textColor: Colors.white,
                         onTap: () async {
                           if (_selectedRating == 0) {
@@ -608,11 +654,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               CustomSnackbar.showSuccess(result.message);
                               _controller.fetchReviews(widget.astrologerId);
                             } else {
-
                               CustomSnackbar.showError(result.message);
                             }
                           } catch (e) {
-                           // CustomSnackbar.showError("Failed to post review");
+                            // CustomSnackbar.showError("Failed to post review");
                           }
                         },
                       ),
@@ -683,7 +728,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           width: 16,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                            color:
+                                astro.isAvailableOnline
+                                    ? Colors.green
+                                    : Colors.grey,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -693,27 +741,46 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.1),
+                      color: (astro.isAvailableOnline
+                              ? Colors.green
+                              : Colors.grey)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.5), width: 0.5),
+                      border: Border.all(
+                        color: (astro.isAvailableOnline
+                                ? Colors.green
+                                : Colors.grey)
+                            .withOpacity(0.5),
+                        width: 0.5,
+                      ),
                     ),
                     child: AppText(
                       astro.isAvailableOnline ? 'Online' : 'Offline',
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                      color:
+                          astro.isAvailableOnline ? Colors.green : Colors.grey,
                     ),
                   ),
                   if (astro.isBlocked)
                     Container(
                       margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.red.withOpacity(0.5), width: 0.5),
+                        border: Border.all(
+                          color: Colors.red.withOpacity(0.5),
+                          width: 0.5,
+                        ),
                       ),
                       child: const AppText(
                         'Blocked',
@@ -753,7 +820,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.verified, color: Color(0xFF4CAF50), size: 16),
+                                  const Icon(
+                                    Icons.verified,
+                                    color: Color(0xFF4CAF50),
+                                    size: 16,
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 4),
@@ -773,26 +844,50 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Obx(() => Container(
-                              width: 70,
-                              height: 28,
-                              child: CustomButton(
-                                text: _controller.isFollowing.value ? 'Following' : 'Follow',
-                                fontSize: 10,
+                            Obx(
+                              () => Container(
+                                width: 70,
                                 height: 28,
-                                borderRadius: 14,
-                                backgroundColor: astro.isBlocked ? Colors.grey.shade300 : (_controller.isFollowing.value ? Colors.grey : AppColors.deepPink),
-                                textColor: astro.isBlocked ? Colors.grey : Colors.white,
-                                onTap: astro.isBlocked ? null : () async {
-                                  final result = await _controller.followAstrologer(widget.astrologerId);
-                                  if (result.isSuccess) {
-                                    _controller.isFollowing.value = !_controller.isFollowing.value;
-                                  } else {
-                                    CustomSnackbar.showError(result.message);
-                                  }
-                                },
+                                child: CustomButton(
+                                  text:
+                                      _controller.isFollowing.value
+                                          ? 'Following'
+                                          : 'Follow',
+                                  fontSize: 10,
+                                  height: 28,
+                                  borderRadius: 14,
+                                  backgroundColor:
+                                      astro.isBlocked
+                                          ? Colors.grey.shade300
+                                          : (_controller.isFollowing.value
+                                              ? Colors.grey
+                                              : AppColors.primaryColor),
+                                  textColor:
+                                      astro.isBlocked
+                                          ? Colors.grey
+                                          : Colors.white,
+                                  onTap:
+                                      astro.isBlocked
+                                          ? null
+                                          : () async {
+                                            final result = await _controller
+                                                .followAstrologer(
+                                                  widget.astrologerId,
+                                                );
+                                            if (result.isSuccess) {
+                                              _controller.isFollowing.value =
+                                                  !_controller
+                                                      .isFollowing
+                                                      .value;
+                                            } else {
+                                              CustomSnackbar.showError(
+                                                result.message,
+                                              );
+                                            }
+                                          },
+                                ),
                               ),
-                            )),
+                            ),
                           ],
                         ),
                       ],
@@ -820,27 +915,39 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (astro.hasOffer && astro.originalChatRatePerMinute != null)
+                            if (astro.hasOffer &&
+                                astro.originalChatRatePerMinute != null)
                               AppText(
                                 '₹ ${double.tryParse(astro.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? astro.originalChatRatePerMinute!}',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textColorSecondary,
-                                style: GoogleFonts.inter(decoration: TextDecoration.lineThrough),
+                                style: GoogleFonts.inter(
+                                  decoration: TextDecoration.lineThrough,
+                                ),
                               ),
-                            if (astro.hasOffer && astro.originalChatRatePerMinute != null)
+                            if (astro.hasOffer &&
+                                astro.originalChatRatePerMinute != null)
                               const SizedBox(width: 6),
                             AppText(
                               '₹ ${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}',
                               fontSize: 18,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.deepPink,
+                              color: AppColors.primaryColor,
                             ),
-                            AppText('/min', fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+                            AppText(
+                              '/min',
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textColorPrimary,
+                            ),
                             if (astro.hasOffer) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.green.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(4),
@@ -903,7 +1010,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
     if (_controller.isGalleryLoading.value) {
       return const SizedBox.shrink(); // or you can show a loader if needed, but the request says if it's there show it, else don't.
     }
-    
+
     final gallery = _controller.gallery;
     if (gallery.isEmpty) {
       return const SizedBox.shrink();
@@ -919,11 +1026,17 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           final imageUrl = gallery[index].image;
           return GestureDetector(
             onTap: () {
-              _showFullScreenGallery(context, gallery.map((e) => e.image).toList(), index);
+              _showFullScreenGallery(
+                context,
+                gallery.map((e) => e.image).toList(),
+                index,
+              );
             },
             child: Container(
               width: 110,
-              margin: EdgeInsets.only(right: index == gallery.length - 1 ? 0 : 6),
+              margin: EdgeInsets.only(
+                right: index == gallery.length - 1 ? 0 : 6,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
@@ -962,35 +1075,49 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             children: [
               Row(
                 children: [
-                   Icon(Icons.star_rate_rounded, color: AppColors.deepPink, size: 24),
+                  Icon(
+                    Icons.star_rate_rounded,
+                    color: AppColors.primaryColor,
+                    size: 24,
+                  ),
                   const SizedBox(width: 8),
                   AppText(
                     'User Reviews',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.deepPink,
+                    color: AppColors.primaryColor,
                   ),
                 ],
               ),
               if (_astrologer?.isReviewEligible == true)
                 GestureDetector(
-                  onTap: () => _showReviewBottomSheet(context, _astrologer!.name),
+                  onTap:
+                      () => _showReviewBottomSheet(context, _astrologer!.name),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.deepPink.withOpacity(0.1),
+                      color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                      border: Border.all(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
+                        Icon(
+                          Icons.add_comment_rounded,
+                          size: 14,
+                          color: AppColors.primaryColor,
+                        ),
                         const SizedBox(width: 4),
                         AppText(
                           'Write',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.deepPink,
+                          color: AppColors.primaryColor,
                         ),
                       ],
                     ),
@@ -1000,7 +1127,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           ),
           if (reviews.isNotEmpty) ...[
             const SizedBox(height: 16),
-            ...displayReviews.map((review) => _buildReviewCard(review)).toList(),
+            ...displayReviews
+                .map((review) => _buildReviewCard(review))
+                .toList(),
           ],
           if (reviews.isEmpty) ...[
             const SizedBox(height: 16),
@@ -1022,7 +1151,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   'See all',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.deepPink,
+                  color: AppColors.primaryColor,
                 ),
               ),
             ),
@@ -1063,21 +1192,23 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   final String? photo = review.user?.profilePhoto;
                   final String name = review.user?.name ?? 'U';
                   final bool hasImage = photo != null && photo.isNotEmpty;
-                  
+
                   return CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppColors.deepPink.withOpacity(0.1),
-                    backgroundImage: hasImage 
-                        ? NetworkImage(AppUrls.baseImageUrl + photo) 
-                        : null,
-                    child: hasImage 
-                        ? null 
-                        : AppText(
-                            name[0].toUpperCase(),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.deepPink,
-                          ),
+                    backgroundColor: AppColors.primaryColor.withOpacity(0.1),
+                    backgroundImage:
+                        hasImage
+                            ? NetworkImage(AppUrls.baseImageUrl + photo)
+                            : null,
+                    child:
+                        hasImage
+                            ? null
+                            : AppText(
+                              name[0].toUpperCase(),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryColor,
+                            ),
                   );
                 },
               ),
@@ -1090,7 +1221,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   color: Colors.black87,
                 ),
               ),
-             // const Icon(Icons.more_vert, size: 20, color: Colors.grey),
+              // const Icon(Icons.more_vert, size: 20, color: Colors.grey),
             ],
           ),
           const SizedBox(height: 8),
@@ -1109,7 +1240,9 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
               margin: const EdgeInsets.only(left: 4, top: 4),
               decoration: BoxDecoration(
-                border: Border(left: BorderSide(color: Colors.grey.shade300, width: 2)),
+                border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 2),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1147,7 +1280,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           ),
         );
       }
-      
+
       if (_controller.gifts.isEmpty) {
         return const Center(
           child: Padding(
@@ -1156,7 +1289,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           ),
         );
       }
-      
+
       return GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -1174,18 +1307,21 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             onTap: () {
               if (_astrologer != null) {
                 final walletController = Get.find<WalletController>();
-                final double currentBalance = double.tryParse(walletController.balance) ?? 0.0;
-                final double giftPrice = double.tryParse(gift.price.toString()) ?? 0.0;
+                final double currentBalance =
+                    double.tryParse(walletController.balance) ?? 0.0;
+                final double giftPrice =
+                    double.tryParse(gift.price.toString()) ?? 0.0;
 
                 if (currentBalance < giftPrice) {
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => RechargeBottomSheet(
-                      neededAmount: giftPrice,
-                      serviceType: 'gift',
-                    ),
+                    builder:
+                        (context) => RechargeBottomSheet(
+                          neededAmount: giftPrice,
+                          serviceType: 'gift',
+                        ),
                   );
                 } else {
                   _controller.sendGift(gift, _astrologer!.id);
@@ -1201,22 +1337,31 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   width: 50,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: AppColors.deepPink.withOpacity(0.05),
+                    color: AppColors.primaryColor.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Obx(() => _controller.sendingGiftId.value == gift.id
-                    ? const SizedBox(
-                        height: 20, 
-                        width: 20, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryColor)
-                      )
-                    : CustomImageWidget(
-                        imagePath: gift.iconUrl,
-                        height: 35,
-                        width: 35,
-                        fit: BoxFit.contain,
-                        fallbackWidget: const Icon(Icons.card_giftcard, color: AppColors.primaryColor, size: 24),
-                      ),
+                  child: Obx(
+                    () =>
+                        _controller.sendingGiftId.value == gift.id
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primaryColor,
+                              ),
+                            )
+                            : CustomImageWidget(
+                              imagePath: gift.iconUrl,
+                              height: 35,
+                              width: 35,
+                              fit: BoxFit.contain,
+                              fallbackWidget: const Icon(
+                                Icons.card_giftcard,
+                                color: AppColors.primaryColor,
+                                size: 24,
+                              ),
+                            ),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1267,9 +1412,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             height: 48,
             width: double.infinity,
             borderRadius: 12,
-            backgroundColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
+            backgroundColor:
+                _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
             textColor: Colors.white,
-            borderColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
+            borderColor:
+                _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
             onTap: () {
               if (_astrologer != null) {
                 SessionBottomSheetHelper.show(context, _astrologer!);
@@ -1279,179 +1426,307 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-          if (_astrologer?.isChatEnabled == true) ...[
-            Expanded(
-              child: GestureDetector(
-                onTap: _astrologer?.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : () {
-                      final walletController = Get.find<WalletController>();
-                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                      WalletHelper.checkBalanceAndProceed(
-                        context: context,
-                        type: 'chat',
-                        name: _astrologer?.name ?? 'Astrologer',
-                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                        price: _astrologer?.chatRate ?? '0',
-                        providerId: _astrologer?.userId ?? widget.astrologerId,
-                        simulatedBalance: balance,
-                      );
-                    },
-                child: Opacity(
-                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: _astrologer?.isBlocked == true 
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.message_rounded, color: Colors.white, size: 18),
-                        const SizedBox(width: 8),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                                if (_astrologer?.hasOffer == true)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
-                                    ),
+              if (_astrologer?.isChatEnabled == true) ...[
+                Expanded(
+                  child: GestureDetector(
+                    onTap:
+                        _astrologer?.isBlocked == true
+                            ? () => CustomSnackbar.showError(
+                              "This astrologer is blocked",
+                            )
+                            : () {
+                              final walletController =
+                                  Get.find<WalletController>();
+                              final double balance =
+                                  double.tryParse(walletController.balance) ??
+                                  0.0;
+                              WalletHelper.checkBalanceAndProceed(
+                                context: context,
+                                type: 'chat',
+                                name: _astrologer?.name ?? 'Astrologer',
+                                imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                                price: _astrologer?.chatRate ?? '0',
+                                providerId:
+                                    _astrologer?.userId ?? widget.astrologerId,
+                                simulatedBalance: balance,
+                              );
+                            },
+                    child: Opacity(
+                      opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient:
+                              _astrologer?.isBlocked == true
+                                  ? LinearGradient(
+                                    colors: [
+                                      Colors.grey.shade400,
+                                      Colors.grey.shade600,
+                                    ],
+                                  )
+                                  : LinearGradient(
+                                    colors: [
+                                      AppColors.primaryColor.withOpacity(0.7),
+                                      AppColors.primaryColor.withOpacity(0.9),
+                                    ],
                                   ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_astrologer?.hasOffer == true && _astrologer?.originalChatRatePerMinute != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: Text(
-                                      '₹ ${double.tryParse(_astrologer!.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalChatRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9), decoration: TextDecoration.lineThrough,decorationColor: Colors.white,),
-                                    ),
-                                  ),
-                                Text('₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
-                              ],
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_astrologer?.isBlocked == true
+                                      ? Colors.grey
+                                      : AppColors.primaryColor)
+                                  .withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            if (_astrologer?.isCallEnabled == true) const SizedBox(width: 10),
-          ],
-          if (_astrologer?.isCallEnabled == true)
-            Expanded(
-              child: GestureDetector(
-                onTap: _astrologer?.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : () {
-                      final walletController = Get.find<WalletController>();
-                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                      WalletHelper.checkBalanceAndProceed(
-                        context: context,
-                        type: 'call',
-                        name: _astrologer?.name ?? 'Astrologer',
-                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                        price: _astrologer?.callRate ?? '0',
-                        providerId: _astrologer?.userId ?? widget.astrologerId,
-                        simulatedBalance: balance,
-                      );
-                    },
-                child: Opacity(
-                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: _astrologer?.isBlocked == true 
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.call, color: Colors.white, size: 18),
-                        const SizedBox(width: 8),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              children: [
-                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                                if (_astrologer?.hasOffer == true)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
-                                    ),
-                                  ),
-                              ],
+                            const Icon(
+                              Icons.message_rounded,
+                              color: Colors.white,
+                              size: 18,
                             ),
-                            Row(
+                            const SizedBox(width: 8),
+                            Column(
                               mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (_astrologer?.hasOffer == true && _astrologer?.originalCallRatePerMinute != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: Text(
-                                      '₹ ${double.tryParse(_astrologer!.originalCallRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalCallRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9),
-                                          decoration: TextDecoration.lineThrough,
-                                        decorationColor: Colors.white, // Strike-through line color
+                                Row(
+                                  children: [
+                                    Text(
+                                      _astrologer?.isBlocked == true
+                                          ? 'Blocked'
+                                          : 'Chat',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (_astrologer?.hasOffer == true)
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 1,
                                         ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.yellow.withOpacity(0.3),
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${_astrologer?.discountPercentage ?? ''}% OFF',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 7,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.yellow,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_astrologer?.hasOffer == true &&
+                                        _astrologer
+                                                ?.originalChatRatePerMinute !=
+                                            null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 4,
+                                        ),
+                                        child: Text(
+                                          '₹ ${double.tryParse(_astrologer!.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalChatRatePerMinute!}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withOpacity(
+                                              0.9,
+                                            ),
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            decorationColor: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    Text(
+                                      '₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}/min',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.9),
+                                      ),
                                     ),
-                                  ),
-                                Text('₹ ${double.tryParse(_astrologer?.callRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                                  ],
+                                ),
                               ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-            ),
-            )
+                if (_astrologer?.isCallEnabled == true)
+                  const SizedBox(width: 10),
+              ],
+              if (_astrologer?.isCallEnabled == true)
+                Expanded(
+                  child: GestureDetector(
+                    onTap:
+                        _astrologer?.isBlocked == true
+                            ? () => CustomSnackbar.showError(
+                              "This astrologer is blocked",
+                            )
+                            : () {
+                              final walletController =
+                                  Get.find<WalletController>();
+                              final double balance =
+                                  double.tryParse(walletController.balance) ??
+                                  0.0;
+                              WalletHelper.checkBalanceAndProceed(
+                                context: context,
+                                type: 'call',
+                                name: _astrologer?.name ?? 'Astrologer',
+                                imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                                price: _astrologer?.callRate ?? '0',
+                                providerId:
+                                    _astrologer?.userId ?? widget.astrologerId,
+                                simulatedBalance: balance,
+                              );
+                            },
+                    child: Opacity(
+                      opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient:
+                              _astrologer?.isBlocked == true
+                                  ? LinearGradient(
+                                    colors: [
+                                      Colors.grey.shade400,
+                                      Colors.grey.shade600,
+                                    ],
+                                  )
+                                  : LinearGradient(
+                                    colors: [
+                                      AppColors.primaryColor,
+                                      AppColors.primaryColor.withOpacity(0.8),
+                                    ],
+                                  ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_astrologer?.isBlocked == true
+                                      ? Colors.grey
+                                      : AppColors.primaryColor)
+                                  .withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.call,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      _astrologer?.isBlocked == true
+                                          ? 'Blocked'
+                                          : 'Call',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (_astrologer?.hasOffer == true)
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.yellow.withOpacity(0.3),
+                                          borderRadius: BorderRadius.circular(
+                                            3,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${_astrologer?.discountPercentage ?? ''}% OFF',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 7,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.yellow,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (_astrologer?.hasOffer == true &&
+                                        _astrologer
+                                                ?.originalCallRatePerMinute !=
+                                            null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 4,
+                                        ),
+                                        child: Text(
+                                          '₹ ${double.tryParse(_astrologer!.originalCallRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalCallRatePerMinute!}',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white.withOpacity(
+                                              0.9,
+                                            ),
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            decorationColor:
+                                                Colors
+                                                    .white, // Strike-through line color
+                                          ),
+                                        ),
+                                      ),
+                                    Text(
+                                      '₹ ${double.tryParse(_astrologer?.callRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.callRate ?? '0'}/min',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.9),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ],
@@ -1488,9 +1763,18 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.support_agent, color: AppColors.primaryColor, size: 24),
+            const Icon(
+              Icons.support_agent,
+              color: AppColors.primaryColor,
+              size: 24,
+            ),
             const SizedBox(width: 8),
-            const AppText('Assistance Chat', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
+            const AppText(
+              'Assistance Chat',
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primaryColor,
+            ),
             const Spacer(),
             const Icon(Icons.chevron_right, color: AppColors.primaryColor),
           ],
@@ -1507,10 +1791,21 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.card_giftcard, color: AppColors.primaryColor, size: 20),
+              const Icon(
+                Icons.card_giftcard,
+                color: AppColors.primaryColor,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Expanded(
-                child: AppText('Send Gifts', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor, maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: AppText(
+                  'Send Gifts',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryColor,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               const SizedBox(width: 4),
               GestureDetector(
@@ -1526,12 +1821,21 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     );
                   }
                 },
-                child: const Icon(Icons.info_outline, size: 16, color: Colors.grey),
+                child: const Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: Colors.grey,
+                ),
               ),
               const Spacer(),
               Obx(() {
                 final walletController = Get.find<WalletController>();
-                return AppText('₹ ${walletController.balance}', fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primaryColor);
+                return AppText(
+                  '₹ ${walletController.balance}',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryColor,
+                );
               }),
             ],
           ),
@@ -1542,21 +1846,38 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
     );
   }
 
-  void _showFullScreenGallery(BuildContext context, List<String> images, int initialIndex) {
+  void _showFullScreenGallery(
+    BuildContext context,
+    List<String> images,
+    int initialIndex,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(backgroundColor: Colors.black, leading: IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context))),
-          body: PageView.builder(
-            itemCount: images.length,
-            controller: PageController(initialPage: initialIndex),
-            itemBuilder: (context, index) {
-              return InteractiveViewer(minScale: 0.5, maxScale: 4.0, child: Center(child: Image.network(images[index], fit: BoxFit.contain)));
-            },
-          ),
-        ),
+        builder:
+            (context) => Scaffold(
+              backgroundColor: Colors.black,
+              appBar: AppBar(
+                backgroundColor: Colors.black,
+                leading: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              body: PageView.builder(
+                itemCount: images.length,
+                controller: PageController(initialPage: initialIndex),
+                itemBuilder: (context, index) {
+                  return InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: Center(
+                      child: Image.network(images[index], fit: BoxFit.contain),
+                    ),
+                  );
+                },
+              ),
+            ),
       ),
     );
   }
@@ -1624,7 +1945,7 @@ class _BioTextState extends State<_BioText> {
                   isExpanded ? 'Show less' : 'Show more',
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.deepPink,
+                  color: AppColors.primaryColor,
                 ),
               ),
             ),

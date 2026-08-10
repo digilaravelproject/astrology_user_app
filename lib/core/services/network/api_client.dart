@@ -50,8 +50,9 @@ class ApiClient {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         String token = await TokenManager.getToken() ?? "";
-        options.headers["Authorization"] = "Bearer $token";
+        options.headers["Authorization"] = "Bearer ${token.trim()}";
         options.headers["Accept"] = "application/json";
+        options.headers["Connection"] = "close";
 
         if (options.path.contains('/user/live/')) {
           options.receiveTimeout = const Duration(seconds: 60);
