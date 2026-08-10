@@ -87,16 +87,8 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primaryColor.withOpacity(0.12),
-            Colors.white,
-          ],
-          stops: const [0.0, 0.45],
-        ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -107,11 +99,20 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   slivers: [
                     // AppBar
                     SliverAppBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
+                      backgroundColor: Colors.white,
+                      surfaceTintColor: Colors.white,
+                      elevation: 0.5,
+                      shadowColor: Colors.black12,
                       pinned: true,
+                      centerTitle: true,
+                      title: AppText(
+                        _astrologer?.name ?? 'Details',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
                       leading: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
                         onPressed: () => Navigator.pop(context),
                       ),
                       actions: [
