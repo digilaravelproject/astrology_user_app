@@ -9,4 +9,5 @@ class DefaultRes {
   static const  PROJECT_NAME = 'astro_user';
   static const  PROJECT_VERSION = '1.0.2+3';
   static const String = '.env';
+
 }
