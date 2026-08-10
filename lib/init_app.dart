@@ -11,9 +11,28 @@ import 'core/services/local_notification_service.dart';
 import 'core/services/keep_alive_service.dart';
 import 'core/services/foreground_task_service.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'firebase_options.dart';
+
+import 'core/services/fcm_notification_service.dart';
+
 Future<void> initApp() async {
   // Set environment configuration
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Initialize Firestore settings
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
+
   await EnvConfig.load();
   // EnvConfig.setEnvironment(Environment.development); // Change as needed
 
@@ -49,4 +68,7 @@ Future<void> initApp() async {
 
   // Initialize local notifications service
   await LocalNotificationService.initialize();
+
+  // Initialize FCM Notification service (Foreground + Background + Terminated)
+  await FCMNotificationService.initialize();
 }

@@ -93,6 +93,7 @@ dependencies:
   flutter_foreground_task: ^9.2.2
   pdf: ^3.12.0
   printing: ^5.14.3
+  cloud_firestore: ^6.8.0
 
 dev_dependencies:
   flutter_test:
