@@ -6,6 +6,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/widgets/location_search_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/route_helper.dart';
 import '../../kundli/screens/kundli_matching_screen.dart';
@@ -97,17 +98,66 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFCECF1),
-      appBar: CustomAppBar(
-        title: 'Match Making',
-        showLeading: false,
-        backgroundColor: Colors.white,
-        titleColor: AppColors.textColorPrimary,
-        iconColor: AppColors.textColorPrimary,
-      ),
-      body: Column(
-        children: [
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor.withOpacity(0.12),
+                  Colors.white,
+                ],
+                stops: const [0.0, 0.45],
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0.25,
+            child: Image.asset(
+              ImageConstants.loginBackground,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: CustomAppBar(
+            title: 'Match Making',
+            showLeading: false,
+            backgroundColor: Colors.transparent,
+            titleColor: AppColors.textColorPrimary,
+            iconColor: AppColors.textColorPrimary,
+            /*actions: [
+              GestureDetector(
+                onTap: () {
+                  // Action for searchl
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.search, color: Color(0xFF2E1A47), size: 22),
+                ),
+              ),
+            ],*/
+          ),
+          body: Column(
+            children: [
           // Custom Circular Tab Bar
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -194,8 +244,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
           ),
         ],
       ),
-    );
-  }
+    ),
+  ],
+);
+}
+
 
   Widget _buildOpenKundliTab() {
     final kundliController = Get.find<KundliController>();
@@ -208,48 +261,60 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         Column(
           children: [
             // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {}); // Trigger rebuild to filter list
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search Kundli...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 14,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    textAlignVertical: TextAlignVertical.center,
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search Kundli...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppColors.primaryColor,
+                        size: 22,
+                      ),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: Colors.grey.shade500,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey.shade500,
-                      size: 22,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: Colors.grey.shade500,
-                              size: 20,
-                            ),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),
-            ),
 
             // Saved Kundlis List
             Expanded(

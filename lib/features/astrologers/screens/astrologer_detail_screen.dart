@@ -21,6 +21,7 @@ import '../../wallet/controllers/wallet_controller.dart';
 import '../../wallet/widgets/recharge_bottom_sheet.dart';
 import '../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../chat_assistance/presentation/controllers/chat_assistance_controller.dart';
+import '../../../core/constants/image_constants.dart';
 
 class AstrologerDetailScreen extends StatefulWidget {
   final int astrologerId;
@@ -86,15 +87,41 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor.withOpacity(0.12),
+                  Colors.white,
+                ],
+                stops: const [0.0, 0.45],
+              ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0.25,
+            child: Image.asset(
+              ImageConstants.loginBackground,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : CustomScrollView(
               slivers: [
                 // AppBar
                 SliverAppBar(
-                  backgroundColor: Colors.white,
+                  backgroundColor: Colors.transparent,
                   elevation: 0,
                   pinned: true,
                   leading: IconButton(
@@ -182,6 +209,8 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
      // bottomNavigationBar: _buildBottomActions(context),
 
+    ),
+      ],
     );
   }
 

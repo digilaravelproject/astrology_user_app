@@ -125,15 +125,15 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
         children: [
           Icon(
             item.icon,
-            color: Colors.grey.shade400,
+            color: const Color(0xFF4A4A4A), // Darker grey like the image
             size: 24,
           ),
           const SizedBox(height: 4),
           AppText(
             item.label,
-            fontSize: 8,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade400,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF4A4A4A),
           ),
         ],
       ),
@@ -154,15 +154,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
               height: 50,
               width: 50,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primaryColor,
-                    AppColors.accentColor,
-                  ],
-                  stops: [0.0, 1.0],
-                ),
+                color: AppColors.primaryColor,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -183,9 +175,9 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
             const SizedBox(height: 4),
             AppText(
               item.label,
-              fontSize: 8,
+              fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: AppColors.accentColor,
+              color: AppColors.primaryColor,
             ),
           ],
         ),

@@ -5,6 +5,7 @@ import '../widgets/matrimony_section.dart';
 import '../../matrimony/screens/matrimony_registration_screen.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
@@ -386,37 +387,46 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
 
 
       // If both plan and matrimony registration are complete, show data screen
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          toolbarHeight: 70, // Slightly taller for better spacing
-          automaticallyImplyLeading: false,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(25),
-            ),
-          ),
-          flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(25),
-              ),
-              gradient: LinearGradient(
-                colors: [Color(0xFFFFF0F5), Colors.white], // Soft Pink to White
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.primaryColor.withOpacity(0.12),
+                    Colors.white,
+                  ],
+                  stops: const [0.0, 0.45],
+                ),
               ),
             ),
           ),
-          title: _isSearching.value
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.25,
+              child: Image.asset(
+                ImageConstants.loginBackground,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              toolbarHeight: 70, // Slightly taller for better spacing
+              automaticallyImplyLeading: false,
+              title: _isSearching.value
               ? Container(
-                  height: 45,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
-                    border: Border.all(color: const Color(0xFFFFD1DC).withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(30),
+                    
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.03),
@@ -426,6 +436,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                     ],
                   ),
                   child: TextField(
+                    textAlignVertical: TextAlignVertical.center,
                     controller: _searchController,
                     autofocus: true,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
@@ -434,7 +445,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                       prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primaryColor, size: 18),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
                     onChanged: (value) {
                       _controller.updateSearchQuery(value);
@@ -528,6 +541,8 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
         body: const SingleChildScrollView(
           child: MatrimonySection(),
         ),
+      ),
+        ],
       );
     });
   }

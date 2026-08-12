@@ -155,6 +155,22 @@ class AstrologerModel {
     
     return 'Session ($durationStr) @ ₹$packagePrice';
   }
+
+  String get packageSessionTimeOnly {
+    final text = packageSessionText;
+    if (text.contains(' @ ')) {
+      return text.split(' @ ')[0];
+    }
+    return text;
+  }
+  
+  String? get packageSessionPriceOnly {
+    final text = packageSessionText;
+    if (text.contains(' @ ')) {
+      return text.split(' @ ')[1];
+    }
+    return null;
+  }
 }
 
 class PackageSubSession {

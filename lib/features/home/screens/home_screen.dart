@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 0,
             backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
-            toolbarHeight: 110,
+            toolbarHeight: 145,
 
             titleSpacing: 0,
 
@@ -248,128 +248,141 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildStickyTopBar(AuthController authController, WalletController walletController) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // LEFT SIDE: Greeting
+          // TOP ROW: Wallet, Notification, Profile
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      AppText(
-                        'Hello',
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      const WavingEmoji(),
-                    ],
+                  GestureDetector(
+                    onTap: () => Get.toNamed(AppRoutes.wallet),
+                    child: Obx(() {
+                      final bal = walletController.wallet.value?.balance ?? '0.00';
+                      return _buildCoinWalletChip(bal);
+                    }),
                   ),
-                  Obx(() => AppText(
-                    authController.currentUser.value?.name ?? AppStrings.guest,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: const Color(0xFF8B0000), // Dark red as in image
-                    letterSpacing: -0.5,
-                  )),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Get.to(() => const NotificationScreen()),
+                    child: Obx(() {
+                      final notificationController = Get.find<NotificationController>();
+                      final count = notificationController.unreadCount.value;
+                      return Badge(
+                        label: Text(count.toString()),
+                        isLabelVisible: count > 0,
+                        backgroundColor: AppColors.deepPink,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                            ],
+                          ),
+                          child: const Icon(Icons.notifications_none_rounded, size: 20, color: Color(0xFF2E1A47)),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
+                    child: Obx(() {
+                      final user = authController.currentUser.value;
+                      return Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                          ],
+                        ),
+                        child: CustomImageWidget(
+                          imagePath: (() {
+                            final photo = user?.profilePhoto;
+                            if (photo == null || photo.isEmpty) return null;
+                            if (photo.startsWith('http')) return photo;
+                            final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
+                            return '${AppUrls.baseImageUrl}$cleanPhoto';
+                          })(),
+                          height: 40,
+                          width: 40,
+                          radius: BorderRadius.circular(20),
+                          fallbackWidget: Container(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                user?.name.isNotEmpty == true
+                                    ? user!.name[0].toUpperCase()
+                                    : 'U',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
                 ],
               ),
             ],
           ),
-          
-          // RIGHT SIDE: Wallet, Notification, Profile
+         // const SizedBox(height: 12),
+          // Greeting and Name
           Row(
             children: [
-              GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.wallet),
-                child: Obx(() {
-                  final bal = walletController.wallet.value?.balance ?? '0.00';
-                  return _buildCoinWalletChip(bal);
-                }),
+              AppText(
+                'Hello',
+                fontSize: 16,
+                color: Colors.grey[700],
               ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => Get.to(() => const NotificationScreen()),
-                child: Obx(() {
-                  final notificationController = Get.find<NotificationController>();
-                  final count = notificationController.unreadCount.value;
-                  return Badge(
-                    label: Text(count.toString()),
-                    isLabelVisible: count > 0,
-                    backgroundColor: AppColors.deepPink,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
-                        ],
-                      ),
-                      child: const Icon(Icons.notifications_none_rounded, size: 20, color: Color(0xFF2E1A47)),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
-                child: Obx(() {
-                  final user = authController.currentUser.value;
-                  return Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 2,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
-                      ],
-                    ),
-                    child: CustomImageWidget(
-                      imagePath: (() {
-                        final photo = user?.profilePhoto;
-                        if (photo == null || photo.isEmpty) return null;
-                        if (photo.startsWith('http')) return photo;
-                        final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
-                        return '${AppUrls.baseImageUrl}$cleanPhoto';
-                      })(),
-                      height: 40,
-                      width: 40,
-                      radius: BorderRadius.circular(20),
-                      fallbackWidget: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: Text(
-                            user?.name.isNotEmpty == true
-                                ? user!.name[0].toUpperCase()
-                                : 'U',
-                            style: GoogleFonts.poppins(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
-              ),
+              const SizedBox(width: 4),
+              const WavingEmoji(),
             ],
           ),
+          const SizedBox(height: 8),
+          // Expanded(
+          //   child:
+            Obx(() => Text(
+              authController.currentUser.value?.name ?? AppStrings.guest,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF6A0C22), // Dark burgundy color
+                letterSpacing: -0.5,
+              ),
+            )
+            ),
+         // ),
+          // Obx(() => AppText(
+          //   authController.currentUser.value?.name ?? AppStrings.guest,
+          //   fontSize: 22,
+          //   fontWeight: FontWeight.w900,
+          //   color: const Color(0xFF8B0000), // Dark red as in image
+          //   letterSpacing: -0.5,
+          // )),
         ],
       ),
     );

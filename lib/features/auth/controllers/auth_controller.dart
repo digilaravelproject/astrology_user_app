@@ -97,7 +97,8 @@ class AuthController extends GetxController {
         CustomSnackbar.showError('Signup failed. Please try again.');
       }
     } catch (e) {
-      CustomSnackbar.showError(e.toString());
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Signup failed. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -125,7 +126,8 @@ class AuthController extends GetxController {
       
     } catch (e) {
       print('Login error: $e');
-      CustomSnackbar.showError('An error occurred. Please try again.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -147,7 +149,8 @@ class AuthController extends GetxController {
       
     } catch (e) {
       print('Resend OTP error: $e');
-      CustomSnackbar.showError('An error occurred. Please try again.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -187,7 +190,8 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       print('OTP Verification error: $e');
-      CustomSnackbar.showError('An error occurred during verification.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred during verification.');
     } finally {
       isLoading.value = false;
     }
@@ -236,7 +240,8 @@ class AuthController extends GetxController {
         CustomSnackbar.showError('Failed to update profile');
       }
     } catch (e) {
-       CustomSnackbar.showError(e.toString());
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Failed to update profile');
     } finally {
        isLoading.value = false;
     }
@@ -407,8 +412,9 @@ class LoginUseCase {
     final response = await _authService.login(mobile);
     if (response.isSuccess && response.body != null) {
       return UserModel.fromJson(response.body);
+    } else {
+      throw Exception(response.message);
     }
-    return null;
   }
 }
 
@@ -439,9 +445,11 @@ class VerifyOtpUseCase {
         return userModel;
       } catch (e) {
         print('Error parsing VerifyOtpResponse: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-    return null;
   }
 }
 
@@ -494,10 +502,11 @@ class RegisterUseCase {
         return UserModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing user data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -516,10 +525,11 @@ class SendOtpUseCase {
         return SendOtpModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing SendOtpModel data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -538,10 +548,11 @@ class ResendOtpUseCase {
         return SendOtpModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing SendOtpModel data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -560,10 +571,11 @@ class UpdateProfileUseCase {
         return UserModel.fromJson(userJson);
       } catch (e) {
         print('Error parsing UpdateProfile data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 

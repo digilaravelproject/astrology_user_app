@@ -10,6 +10,7 @@ import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/constants/app_urls.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/constants/app_constants.dart';
@@ -41,67 +42,47 @@ class CallListScreen extends StatelessWidget {
 
     final TextEditingController searchController = TextEditingController();
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primaryColor.withOpacity(0.12),
-            Colors.white,
-          ],
-          stops: const [0.0, 0.45],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: CustomAppBar(
-          title: 'Call',
-          showLeading: false,
-          backgroundColor: Colors.transparent,
-          actions: [
-            _buildActionItem(Icons.notifications_outlined, () {}),
-            const SizedBox(width: 12),
-          ],
-        ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await astrologerController.fetchTopAstrologers(serviceType: 'call');
-          await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call');
-        },
-        child: CustomScrollView(
-            slivers: [
-              // Search Bar
-              SliverToBoxAdapter(
-                child: Container(
-                  color: Colors.transparent,
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: GestureDetector(
-                    onTap: () => Get.to(() => const AstrologerSearchScreen(serviceType: 'call')),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(25),
-                        border: Border.all(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.grey.shade600, size: 22),
-                          const SizedBox(width: 12),
-                          AppText(
-                            'Search astrologers...',
-                            color: Colors.grey.shade400,
-                            fontSize: 14,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.primaryColor.withOpacity(0.12),
+                  Colors.white,
+                ],
+                stops: const [0.0, 0.45],
               ),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0.25,
+            child: Image.asset(
+              ImageConstants.loginBackground,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(context, serviceType: 'call'),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      await astrologerController.fetchTopAstrologers(serviceType: 'call');
+                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call');
+                    },
+                    child: CustomScrollView(
+                      slivers: [
+
 
               // White Container with Content
               SliverToBoxAdapter(
@@ -120,7 +101,7 @@ class CallListScreen extends StatelessWidget {
                           children: [
                             const Icon(
                               Icons.star_rounded,
-                              color: Color(0xFFFFB74D),
+                              color: AppColors.primaryColor,
                               size: 22,
                             ),
                             const SizedBox(width: 8),
@@ -128,7 +109,7 @@ class CallListScreen extends StatelessWidget {
                               'Top Astrologers',
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF2D2D2D),
+                              color: AppColors.primaryColor,
                             ),
                           ],
                         ),
@@ -239,7 +220,11 @@ class CallListScreen extends StatelessWidget {
           ],
         ),
       ),
-      )
+        )
+      ],)
+          )
+        )
+      ]
     );
   }
 
@@ -426,14 +411,7 @@ class CallListScreen extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              gradient: isSelected
-                  ? const LinearGradient(
-                colors: [AppColors.primaryColor, AppColors.accentColor],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              )
-                  : null,
-              color: isSelected ? null : Colors.grey.shade100,
+              color: isSelected ? AppColors.primaryColor : Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isSelected ? Colors.transparent : Colors.grey.shade300,
@@ -470,201 +448,243 @@ class CallListScreen extends StatelessWidget {
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: AppColors.deepPink.withOpacity(0.2),
+            color: Colors.grey.shade200,
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepPink.withOpacity(0.08),
-              blurRadius: 15,
-              spreadRadius: 0,
-              offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 8,
-              spreadRadius: 0,
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              spreadRadius: 1,
               offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Image
-                Stack(
+                // Left Column (Profile & Rating)
+                Column(
                   children: [
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.goldAccent,
-                          width: 3,
-                        ),
-                      ),
-                      child: ClipOval(
-                        child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
-                            ? CustomImageWidget(
-                                imagePath: astro.fullProfilePhoto,
-                                fit: BoxFit.cover,
-                              )
-                            : _buildPlaceholderLarge(),
-                      ),
-                    ),
-                    Positioned(
-                      right: 4,
-                      bottom: 4,
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: BoxDecoration(
-                          color: astro.isAvailableOnline ? Colors.green : Colors.red,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
+                    Stack(
+                      children: [
+                        Container(
+                          width: 65,
+                          height: 65,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: astro.isAvailableOnline ? Colors.green : Colors.grey.shade300,
+                              width: 2,
+                            ),
+                          ),
+                          child: ClipOval(
+                            child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
+                                ? CustomImageWidget(
+                                    imagePath: astro.fullProfilePhoto,
+                                    fit: BoxFit.cover,
+                                  )
+                                : _buildPlaceholderLarge(),
                           ),
                         ),
+                        Positioned(
+                          right: 2,
+                          bottom: 2,
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF7E6),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFFFB74D).withOpacity(0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star, color: Color(0xFFFFB74D), size: 12),
+                          const SizedBox(width: 2),
+                          AppText(
+                            astro.rating.toStringAsFixed(1),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black87,
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                // Static Rating as requested
-                CustomRatingBar(
-                  rating: astro.rating,
-                  size: 15,
-                ),
-                const SizedBox(width: 12),
-                AppText(
-                  '${astro.totalOrders > 0 ? astro.totalOrders : (astro.id * 15 + 100)}k+ ${AppStrings.ordersLabel}',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.deepPink.withOpacity(0.7),
-                ),
-              ],
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  // Name
-                  Row(
+                const SizedBox(width: 16),
+                // Middle Column (Details)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText(
-                        astro.name,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                      Row(
+                        children: [
+                          AppText(
+                            astro.name,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF2E1A47),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.verified, color: Colors.blue, size: 14),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      // Static verified icon as requested
-                      const Icon(
-                        Icons.verified,
-                        color: Colors.green,
-                        size: 16,
+                      const SizedBox(height: 4),
+                      AppText(
+                        astro.areasOfExpertise.join(', '),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade600,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.schedule, color: Colors.grey, size: 12),
+                          const SizedBox(width: 2),
+                          AppText(
+                            '${astro.yearsOfExperience} Years',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.language, color: Colors.grey, size: 12),
+                          const SizedBox(width: 2),
+                          Expanded(
+                            child: AppText(
+                              astro.languages.join(', '),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade600,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          AppText(
+                            '₹${astro.callRate ?? '0'}',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primaryColor,
+                          ),
+                          AppText(
+                            '/min',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade500,
+                          ),
+                          if (astro.packageSessionPriceOnly != null) ...[
+                            const SizedBox(width: 12),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: AppText(
+                                'Session ${astro.packageSessionPriceOnly}',
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  // Skills
-                  AppText(
-                    astro.areasOfExpertise.join(', '),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // Languages
-                  AppText(
-                    astro.languages.join(', '),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  // Experience
-                  AppText(
-                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(height: 8),
-                  // Call Button
-                  !astro.isAvailableOnline
-                      ? Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "Astrologer is offline.",
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            CustomButton(
-                              text: astro.packageSessionText,
-                              icon: Icons.timer,
-                              fontSize: 11.5,
-                              height: 34,
-                              borderRadius: 8,
-                               backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
-                              textColor: Colors.white,
-                              borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
-                              onTap: () {
-                                SessionBottomSheetHelper.show(context, astro);
-                              },
-                            ),
-                            if (astro.isCallEnabled) ...[
-                              const SizedBox(height: 8),
-                              CustomButton(
-                                text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
-                                icon: Icons.call,
-                                fontSize: 11.5,
-                                height: 34,
-                                borderRadius: 8,
-                                backgroundColor: Colors.transparent,
-                                textColor: const Color(0xFF4CAF50),
-                                borderColor: const Color(0xFF4CAF50),
-                                onTap: () {
-                                        final walletController = Get.find<WalletController>();
-                                        final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                                        WalletHelper.checkBalanceAndProceed(
-                                        context: context,
-                                        type: 'call',
-                                        name: astro.name,
-                                        imageUrl: astro.fullProfilePhoto,
-                                        price: astro.callRate ?? '0',
-                                        providerId: astro.userId,
-                                        simulatedBalance: balance,
-                                      );
-                                },
-                              ),
-                            ],
-                          ],
-                        ),
-                ],
-              ),
+                ),
+              ],
             ),
+            const SizedBox(height: 12),
+            !astro.isAvailableOnline
+                ? Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "Astrologer is offline.",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: astro.packageSessionTimeOnly,
+                          icon: Icons.timer,
+                          fontSize: 11,
+                          height: 32,
+                          borderRadius: 8,
+                          backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
+                          textColor: Colors.white,
+                          borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
+                          onTap: () {
+                            SessionBottomSheetHelper.show(context, astro);
+                          },
+                        ),
+                      ),
+                      if (astro.isCallEnabled) ...[
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: CustomButton(
+                            text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
+                            icon: Icons.call,
+                            fontSize: 11,
+                            height: 32,
+                            borderRadius: 8,
+                            backgroundColor: Colors.transparent,
+                            textColor: const Color(0xFF4CAF50),
+                            borderColor: const Color(0xFF4CAF50),
+                            onTap: () {
+                              final walletController = Get.find<WalletController>();
+                              final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                              WalletHelper.checkBalanceAndProceed(
+                                context: context,
+                                type: 'call',
+                                name: astro.name,
+                                imageUrl: astro.fullProfilePhoto,
+                                price: astro.callRate ?? '0',
+                                providerId: astro.userId,
+                                simulatedBalance: balance,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
           ],
         ),
       ),
@@ -735,4 +755,64 @@ class CallListScreen extends StatelessWidget {
     );
   }
 
+
+  Widget _buildHeader(BuildContext context, {required String serviceType}) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left Side: Talk to Experts
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AppText(
+                'Talk to',
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.black54,
+              ),
+              AppText(
+                'Experts',
+                fontSize: 28,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF2E1A47),
+              ),
+            ],
+          ),
+          // Right Side: Action Icons
+          Row(
+            children: [
+              _buildHeaderIcon(Icons.search, () {
+                Get.to(() => AstrologerSearchScreen(serviceType: serviceType));
+              }),
+
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderIcon(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: const Color(0xFF2E1A47), size: 22),
+      ),
+    );
+  }
 }

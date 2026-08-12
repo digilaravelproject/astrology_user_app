@@ -378,7 +378,8 @@ class ChatAssistanceController extends GetxController {
     _msgSub = WebSocketService.incomingMessages.listen((list) {
       if (list.isNotEmpty) {
         final lastMsg = list.last;
-        final msgSessionId = int.tryParse(lastMsg['chat_assistance_session_id']?.toString() ?? '') ?? 0;
+        final msgSessionId = int.tryParse(lastMsg['chat_assistance_session_id']?.toString() ?? '') ?? 
+                             int.tryParse(lastMsg['chat_session_id']?.toString() ?? '') ?? 0;
         if (msgSessionId == _sessionId) {
           final int senderId = int.tryParse(lastMsg['sender_id']?.toString() ?? '') ?? 0;
           final bool isMe = senderId == _currentUserId;
@@ -396,6 +397,7 @@ class ChatAssistanceController extends GetxController {
               attachmentUrl: lastMsg['attachment_url']?.toString(),
               image: lastMsg['type'] == 'image' ? lastMsg['attachment_url']?.toString() : null,
             ));
+            messages.refresh();
             _scrollToBottom();
             syncReadStatus();
           }
