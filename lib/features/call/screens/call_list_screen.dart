@@ -45,21 +45,6 @@ class CallListScreen extends StatelessWidget {
     return Stack(
       children: [
         Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primaryColor.withOpacity(0.12),
-                  Colors.white,
-                ],
-                stops: const [0.0, 0.45],
-              ),
-            ),
-          ),
-        ),
-        Positioned.fill(
           child: Opacity(
             opacity: 0.25,
             child: Image.asset(
@@ -71,6 +56,7 @@ class CallListScreen extends StatelessWidget {
         Scaffold(
           backgroundColor: Colors.transparent,
           body: SafeArea(
+            bottom: false,
             child: Column(
               children: [
                 _buildHeader(context, serviceType: 'call'),
@@ -216,7 +202,7 @@ class CallListScreen extends StatelessWidget {
               );
             }),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            const SliverToBoxAdapter(child: SizedBox(height: 150)),
           ],
         ),
       ),

@@ -101,21 +101,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return Stack(
       children: [
         Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.primaryColor.withOpacity(0.12),
-                  Colors.white,
-                ],
-                stops: const [0.0, 0.45],
-              ),
-            ),
-          ),
-        ),
-        Positioned.fill(
           child: Opacity(
             opacity: 0.25,
             child: Image.asset(

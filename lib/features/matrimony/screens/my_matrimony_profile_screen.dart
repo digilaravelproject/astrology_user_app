@@ -2,7 +2,6 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 import '../controllers/matrimony_controller.dart';
@@ -23,7 +22,6 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Use WidgetsBinding to call API after build is complete
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadMyProfile();
     });
@@ -32,113 +30,58 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
   void _loadMyProfile() {
     final userId = _authController.currentUser.value?.id;
 
-    print("userId : ${userId.toString()}");
     if (userId == null) {
-      print('User ID is null, cannot load profile');
       return;
     }
-
-    print('Loading my matrimony profile for userId: $userId');
-    // Use the new API that fetches profile by user ID directly
     _controller.getMyMatrimonyProfileDetails(userId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: AppColors.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: AppColors.primaryGradient,
+          ),
+        ),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF2D3142), size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Get.back(),
         ),
         title: const AppText(
           'My Profile',
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF2D3142),
+          color: Colors.white,
         ),
+        centerTitle: true,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: TextButton.icon(
-              onPressed: () {
-                final profile = _controller.selectedProfile.value;
-                if (profile != null) {
-                  Get.to(
-                    () => MatrimonyRegistrationScreen(
-                      existingProfile: profile,
-                      isEditMode: true,
-                      onComplete: () {
-                        Get.back(); // Go back to my profile screen
-                        _loadMyProfile(); // Reload the profile
-                      },
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.edit_rounded, color: AppColors.primaryColor, size: 18),
-              label: const AppText(
-                'Edit',
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryColor,
-              ),
-            ),
+          IconButton(
+            onPressed: () {
+              final profile = _controller.selectedProfile.value;
+              if (profile != null) {
+                Get.to(
+                  () => MatrimonyRegistrationScreen(
+                    existingProfile: profile,
+                    isEditMode: true,
+                    onComplete: () {
+                      Get.back();
+                      _loadMyProfile();
+                    },
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.edit_rounded, color: Colors.white, size: 20),
           ),
         ],
       ),
       body: Obx(() {
         if (_controller.isLoading.value) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                // Profile Header Shimmer
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-                      // Profile Photo Shimmer
-                      _buildShimmerCircle(120),
-                      const SizedBox(height: 16),
-                      // Name Shimmer
-                      _buildShimmerBox(200, 24),
-                      const SizedBox(height: 8),
-                      // Info Chips Shimmer
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildShimmerBox(80, 30, borderRadius: 20),
-                          const SizedBox(width: 12),
-                          _buildShimmerBox(80, 30, borderRadius: 20),
-                          const SizedBox(width: 12),
-                          _buildShimmerBox(80, 30, borderRadius: 20),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Section Cards Shimmer
-                _buildShimmerSectionCard(),
-                _buildShimmerSectionCard(),
-                _buildShimmerSectionCard(),
-                _buildShimmerSectionCard(),
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
+          return _buildShimmerLoading();
         }
 
         final profile = _controller.selectedProfile.value;
@@ -148,13 +91,13 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.person_off_rounded, size: 80, color: Colors.grey[400]),
+                Icon(Icons.person_off_rounded, size: 80, color: AppColors.textColorHint),
                 const SizedBox(height: 16),
                 AppText(
                   'Profile not found',
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[600],
+                  color: AppColors.textColorSecondary,
                 ),
               ],
             ),
@@ -162,13 +105,15 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
         }
 
         return SingleChildScrollView(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               // Profile Header Card
               Container(
                 width: double.infinity,
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
@@ -176,135 +121,149 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                 ),
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
                     // Profile Photo
                     Container(
+                      padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors.primaryColor,
-                          width: 4,
-                        ),
+                        color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryColor.withOpacity(0.2),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
                       child: CustomImageWidget(
-                        imagePath: AppUrls.baseImageUrl+profile.profilePhoto.toString() ?? '',
-                        height: 120,
-                        width: 120,
-                        radius: BorderRadius.circular(60),
+                        imagePath: AppUrls.baseImageUrl + (profile.profilePhoto ?? ''),
+                        height: 100,
+                        width: 100,
+                        radius: BorderRadius.circular(50),
                         fit: BoxFit.cover,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     // Name
                     AppText(
                       '${profile.firstName} ${profile.lastName}',
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: const Color(0xFF2D3142),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     // Age, Gender, Location
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        _buildInfoChip(Icons.cake_rounded, '${profile.age} years'),
-                        const SizedBox(width: 12),
-                        _buildInfoChip(
+                        _buildHeaderChip(Icons.cake_rounded, '${profile.age} Yrs'),
+                        _buildHeaderChip(
                           profile.gender.toLowerCase() == 'male' 
                             ? Icons.male_rounded 
                             : Icons.female_rounded,
                           profile.gender,
                         ),
-                        const SizedBox(width: 12),
-                        _buildInfoChip(Icons.location_on_rounded, profile.location),
+                        _buildHeaderChip(Icons.location_on_rounded, profile.location),
                       ],
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // About Section
-              _buildSectionCard(
-                title: 'About Me',
-                icon: Icons.info_rounded,
-                child: AppText(
-                  profile.about.isNotEmpty ? profile.about : 'No description available',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
-                  textAlign: TextAlign.start,
-                ),
-              ),
-
-              // Personal Details
-              _buildSectionCard(
-                title: 'Personal Details',
-                icon: Icons.person_rounded,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   children: [
-                    _buildDetailRow('Created For', profile.createdFor),
-                    _buildDetailRow('Date of Birth', profile.dateOfBirth),
-                    _buildDetailRow('Height', profile.height),
-                    _buildDetailRow('Marital Status', profile.maritalStatus),
+                    _buildSectionCard(
+                      title: 'About Me',
+                      icon: Icons.auto_awesome_rounded,
+                      child: AppText(
+                        profile.about.isNotEmpty ? profile.about : 'No description available',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textColorSecondary,
+                        textAlign: TextAlign.start,
+                        height: 1.5,
+                      ),
+                    ),
+
+                    // Personal Details
+                    _buildSectionCard(
+                      title: 'Personal Details',
+                      icon: Icons.person_rounded,
+                      child: Column(
+                        children: [
+                          _buildDetailRow('Created For', profile.createdFor),
+                          _buildDivider(),
+                          _buildDetailRow('Date of Birth', _formatDate(profile.dateOfBirth)),
+                          _buildDivider(),
+                          _buildDetailRow('Height', profile.height),
+                          _buildDivider(),
+                          _buildDetailRow('Marital Status', profile.maritalStatus),
+                        ],
+                      ),
+                    ),
+
+                    // Contact Information
+                    _buildSectionCard(
+                      title: 'Contact Information',
+                      icon: Icons.contact_phone_rounded,
+                      child: Column(
+                        children: [
+                          _buildDetailRow('Email', profile.email),
+                          _buildDivider(),
+                          _buildDetailRow('Phone', profile.phone),
+                        ],
+                      ),
+                    ),
+
+                    // Professional Details
+                    _buildSectionCard(
+                      title: 'Professional Details',
+                      icon: Icons.work_rounded,
+                      child: Column(
+                        children: [
+                          _buildDetailRow('Education', profile.education),
+                          _buildDivider(),
+                          _buildDetailRow('Job Title', profile.jobTitle),
+                          _buildDivider(),
+                          _buildDetailRow('Annual Income', profile.annualIncome),
+                        ],
+                      ),
+                    ),
+
+                    // Document Details (if available)
+                    if (profile.panCardNumber != null || 
+                        profile.drivingLicenceNumber != null || 
+                        profile.aadhaarCardNumber != null)
+                      _buildSectionCard(
+                        title: 'Document Details',
+                        icon: Icons.description_rounded,
+                        child: Column(
+                          children: [
+                            if (profile.panCardNumber != null) ...[
+                              _buildDetailRow('PAN Card', profile.panCardNumber!),
+                              if (profile.drivingLicenceNumber != null || profile.aadhaarCardNumber != null) _buildDivider(),
+                            ],
+                            if (profile.drivingLicenceNumber != null) ...[
+                              _buildDetailRow('Driving Licence', profile.drivingLicenceNumber!),
+                              if (profile.aadhaarCardNumber != null) _buildDivider(),
+                            ],
+                            if (profile.aadhaarCardNumber != null)
+                              _buildDetailRow('Aadhaar Card', profile.aadhaarCardNumber!),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
 
-              // Contact Information
-              _buildSectionCard(
-                title: 'Contact Information',
-                icon: Icons.contact_phone_rounded,
-                child: Column(
-                  children: [
-                    _buildDetailRow('Email', profile.email),
-                    _buildDetailRow('Phone', profile.phone),
-                  ],
-                ),
-              ),
-
-              // Professional Details
-              _buildSectionCard(
-                title: 'Professional Details',
-                icon: Icons.work_rounded,
-                child: Column(
-                  children: [
-                    _buildDetailRow('Education', profile.education),
-                    _buildDetailRow('Job Title', profile.jobTitle),
-                    _buildDetailRow('Annual Income', profile.annualIncome),
-                  ],
-                ),
-              ),
-
-              // Document Details (if available)
-              if (profile.panCardNumber != null || 
-                  profile.drivingLicenceNumber != null || 
-                  profile.aadhaarCardNumber != null)
-                _buildSectionCard(
-                  title: 'Document Details',
-                  icon: Icons.description_rounded,
-                  child: Column(
-                    children: [
-                      if (profile.panCardNumber != null)
-                        _buildDetailRow('PAN Card', profile.panCardNumber!),
-                      if (profile.drivingLicenceNumber != null)
-                        _buildDetailRow('Driving Licence', profile.drivingLicenceNumber!),
-                      if (profile.aadhaarCardNumber != null)
-                        _buildDetailRow('Aadhaar Card', profile.aadhaarCardNumber!),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 24),
+              const SizedBox(height: 30),
             ],
           ),
         );
@@ -312,24 +271,24 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text) {
+  Widget _buildHeaderChip(IconData icon, String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF0F5),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primaryColor.withOpacity(0.2)),
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.primaryColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 6),
           AppText(
             text,
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF2D3142),
+            color: Colors.white,
           ),
         ],
       ),
@@ -342,16 +301,17 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
     required Widget child,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: AppColors.primaryColor.withOpacity(0.05),
+            blurRadius: 15,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -361,23 +321,23 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFF0F5),
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, size: 20, color: AppColors.primaryColor),
+                child: Icon(icon, size: 20, color: Colors.white),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               AppText(
                 title,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF2D3142),
+                color: AppColors.textColorPrimary,
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           child,
         ],
       ),
@@ -386,7 +346,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -394,19 +354,19 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
             flex: 2,
             child: AppText(
               label,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textColorSecondary,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Expanded(
             flex: 3,
             child: AppText(
               value.isNotEmpty ? value : 'Not provided',
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: const Color(0xFF2D3142),
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textColorPrimary,
               textAlign: TextAlign.end,
             ),
           ),
@@ -415,14 +375,84 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
     );
   }
 
-  // Shimmer effect widgets
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Divider(color: AppColors.dividerColor.withOpacity(0.5), height: 1),
+    );
+  }
+
+  String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return 'Not provided';
+    try {
+      final date = DateTime.parse(dateStr);
+      return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
+  // Shimmer loading
+  Widget _buildShimmerLoading() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 350,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildShimmerCircle(130),
+                  const SizedBox(height: 16),
+                  _buildShimmerBox(200, 28),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildShimmerBox(80, 36, borderRadius: 24),
+                      const SizedBox(width: 12),
+                      _buildShimmerBox(80, 36, borderRadius: 24),
+                      const SizedBox(width: 12),
+                      _buildShimmerBox(80, 36, borderRadius: 24),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              children: [
+                _buildShimmerSectionCard(),
+                _buildShimmerSectionCard(),
+                _buildShimmerSectionCard(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildShimmerCircle(double size) {
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.grey[300],
+        color: AppColors.lightPink,
       ),
       child: ClipOval(
         child: _buildShimmerGradient(),
@@ -435,7 +465,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: AppColors.lightPink,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: ClipRRect(
@@ -447,34 +477,27 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
 
   Widget _buildShimmerSectionCard() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              _buildShimmerCircle(40),
-              const SizedBox(width: 12),
-              _buildShimmerBox(120, 20),
+              _buildShimmerBox(40, 40, borderRadius: 12),
+              const SizedBox(width: 16),
+              _buildShimmerBox(150, 24),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildShimmerBox(double.infinity, 16),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildShimmerBox(double.infinity, 16),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildShimmerBox(200, 16),
         ],
       ),
@@ -495,9 +518,9 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                 begin: Alignment(value - 1, 0),
                 end: Alignment(value, 0),
                 colors: [
-                  Colors.grey[300]!,
-                  Colors.grey[100]!,
-                  Colors.grey[300]!,
+                  AppColors.lightPink.withOpacity(0.5),
+                  Colors.white.withOpacity(0.8),
+                  AppColors.lightPink.withOpacity(0.5),
                 ],
                 stops: const [0.0, 0.5, 1.0],
               ),
@@ -506,7 +529,6 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
         );
       },
       onEnd: () {
-        // Restart animation
         if (mounted) {
           setState(() {});
         }

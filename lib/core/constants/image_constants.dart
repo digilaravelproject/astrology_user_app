@@ -14,7 +14,8 @@ class ImageConstants {
   static const String astroMatrimony = '${imagePath}astro_matrimony_premium.png';
 
   // Auth Images
-  static const String loginBackground = '${imagePath}bg_login.jpeg';
+ // static const String loginBackground = '${imagePath}bg_login.jpeg';
+  static const String loginBackground = '${imagePath}background.png';
   static const String otpVerification = '${imagePath}otp_verification.png';
 
   // Language Images

@@ -157,12 +157,7 @@ class CustomImageWidget extends StatelessWidget {
               height: height ?? double.infinity,
               width: width ?? double.infinity,
             ),
-            errorWidget: (context, url, error) => fallbackWidget ?? Image.asset(
-              placeHolder,
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.cover,
-            ),
+            errorWidget: (context, url, error) => fallbackWidget ?? _buildDefaultFallback(),
           );
         case ImageType.png:
           return Image.asset(
@@ -219,14 +214,23 @@ class CustomImageWidget extends StatelessWidget {
             );
           }
         case ImageType.unknown:
-          return fallbackWidget ?? Image.asset(
-            placeHolder,
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-          );
+          return fallbackWidget ?? _buildDefaultFallback();
       }
     }
-    return fallbackWidget ?? const SizedBox();
+    return fallbackWidget ?? _buildDefaultFallback();
+  }
+
+  Widget _buildDefaultFallback() {
+    return Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: radius,
+      ),
+      child: Center(
+        child: Icon(Icons.person, color: Colors.grey.shade400, size: (height != null ? height! * 0.5 : 24)),
+      ),
+    );
   }
 }

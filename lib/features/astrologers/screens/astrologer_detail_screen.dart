@@ -96,7 +96,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.primaryColor.withOpacity(0.12),
+                  AppColors.primaryColor.withOpacity(0.3),
                   Colors.white,
                 ],
                 stops: const [0.0, 0.45],
@@ -123,14 +123,51 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 SliverAppBar(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  pinned: true,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
-                    onPressed: () => Navigator.pop(context),
+                  pinned: false,
+                  title: _astrologer != null 
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
+                            ),
+                          ),
+                          child: AppText(
+                            _astrologer!.name,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textColorPrimary,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                  centerTitle: true,
+                  leading: Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D), size: 20),
+                      padding: EdgeInsets.zero,
+                      onPressed: () => Navigator.pop(context),
+                    ),
                   ),
                   actions: [
-                    PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D)),
+                    Container(
+                      margin: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
+                        ),
+                      ),
+                      child: PopupMenuButton<String>(
+                        icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D), size: 20),
+                        padding: EdgeInsets.zero,
                       onSelected: (value) {
                         // Handle menu selection
                         if (value == 'Block' || value == 'Unblock') {
@@ -147,11 +184,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         }
                       },
                       itemBuilder: (BuildContext context) {
-                        return { 
-                          _astrologer?.isBlocked == true ? 'Unblock' : 'Block', 
-                          'Report', 
-                          'Review' 
-                        }.map((String choice) {
+                        final Set<String> choices = {
+                          _astrologer?.isBlocked == true ? 'Unblock' : 'Block',
+                          'Report',
+                        };
+                        if (_astrologer?.isReviewEligible == true) {
+                          choices.add('Review');
+                        }
+                        return choices.map((String choice) {
                           return PopupMenuItem<String>(
                             value: choice,
                             child: AppText(
@@ -164,41 +204,45 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         }).toList();
                       },
                     ),
+    ),
                   ],
                 ),
                 // Content
                 SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Profile Header Card
-                      if (_astrologer != null) _buildProfileHeaderCard(_astrologer!),
-                      if (_astrologer == null && !_isLoading) 
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 100),
-                            child: AppText('Astrologer data not found', color: Colors.grey),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Header Card
+                        if (_astrologer != null) _buildProfileHeaderCard(_astrologer!),
+                        if (_astrologer == null && !_isLoading) 
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 100),
+                              child: AppText('Astrologer data not found', color: Colors.grey),
+                            ),
                           ),
-                        ),
-                      if (_astrologer != null && _astrologer!.bio.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: _BioText(bio: _astrologer!.bio),
-                        ),
-                      const SizedBox(height: 16),
-                      // Gallery Section - commented out
-                      // _buildGallerySection(),
-                      // const SizedBox(height: 16),
-                      // Reviews Section
-                      Obx(() => _buildReviewsSection()),
-                      const SizedBox(height: 16),
-                      // Chat with Assistant
-                      _buildChatAssistantSection(),
-                      const SizedBox(height: 16),
-                      // Send Gift
-                      _buildGiftSection(),
-                      const SizedBox(height: 100),
-                    ],
+                        if (_astrologer != null && _astrologer!.bio.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: _BioText(bio: _astrologer!.bio),
+                          ),
+                        const SizedBox(height: 16),
+                        // Gallery Section - commented out
+                        // _buildGallerySection(),
+                        // const SizedBox(height: 16),
+                        // Reviews Section
+                        Obx(() => _buildReviewsSection()),
+                        const SizedBox(height: 16),
+                        // Chat with Assistant
+                        _buildChatAssistantSection(),
+                        const SizedBox(height: 16),
+                        // Send Gift
+                        _buildGiftSection(),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -209,7 +253,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
 
      // bottomNavigationBar: _buildBottomActions(context),
 
-    ),
+        ),
       ],
     );
   }
@@ -695,10 +739,11 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
-                            image: DecorationImage(
-                              image: NetworkImage(astro.fullProfilePhoto),
-                              fit: BoxFit.cover,
-                            ),
+                          ),
+                          child: CustomImageWidget(
+                            imagePath: astro.fullProfilePhoto,
+                            fit: BoxFit.cover,
+                            radius: BorderRadius.circular(37.5),
                           ),
                         ),
                       ),
@@ -733,22 +778,22 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       color: astro.isAvailableOnline ? Colors.green : Colors.grey,
                     ),
                   ),
-                  if (astro.isBlocked)
-                    Container(
-                      margin: const EdgeInsets.only(top: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.red.withOpacity(0.5), width: 0.5),
-                      ),
-                      child: const AppText(
-                        'Blocked',
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.red,
-                      ),
-                    ),
+                  // if (astro.isBlocked)
+                  //   Container(
+                  //     margin: const EdgeInsets.only(top: 4),
+                  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.red.withOpacity(0.1),
+                  //       borderRadius: BorderRadius.circular(10),
+                  //       border: Border.all(color: Colors.red.withOpacity(0.5), width: 0.5),
+                  //     ),
+                  //     child: const AppText(
+                  //       'Blocked',
+                  //       fontSize: 10,
+                  //       fontWeight: FontWeight.w700,
+                  //       color: Colors.red,
+                  //     ),
+                  //   ),
                   const SizedBox(height: 4),
                   if (astro.rating > 0)
                     CustomRatingBar(rating: astro.rating, size: 14),
@@ -889,38 +934,38 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.bolt, color: Colors.amber, size: 16),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: AppText(
-                          '₹ 30/session for 30 minute complete guide',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // const SizedBox(height: 12),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: Container(
+          //         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          //         decoration: BoxDecoration(
+          //           color: Colors.transparent,
+          //           borderRadius: BorderRadius.circular(20),
+          //           border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          //         ),
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: [
+          //             const Icon(Icons.bolt, color: Colors.amber, size: 16),
+          //             const SizedBox(width: 6),
+          //             Flexible(
+          //               child: AppText(
+          //                 '₹ 30/session for 30 minute complete guide',
+          //                 fontSize: 12,
+          //                 fontWeight: FontWeight.w600,
+          //                 color: Colors.black87,
+          //                 maxLines: 1,
+          //                 overflow: TextOverflow.ellipsis,
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -1041,23 +1086,13 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               Builder(
                 builder: (context) {
                   final String? photo = review.user?.profilePhoto;
-                  final String name = review.user?.name ?? 'U';
                   final bool hasImage = photo != null && photo.isNotEmpty;
                   
-                  return CircleAvatar(
-                    radius: 18,
-                    backgroundColor: AppColors.deepPink.withOpacity(0.1),
-                    backgroundImage: hasImage 
-                        ? NetworkImage(AppUrls.baseImageUrl + photo) 
-                        : null,
-                    child: hasImage 
-                        ? null 
-                        : AppText(
-                            name[0].toUpperCase(),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.deepPink,
-                          ),
+                  return CustomImageWidget(
+                    imagePath: hasImage ? AppUrls.baseImageUrl + photo : null,
+                    height: 36,
+                    width: 36,
+                    radius: BorderRadius.circular(18),
                   );
                 },
               ),

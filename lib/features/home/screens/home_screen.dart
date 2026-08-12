@@ -292,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     }),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 16),
                   GestureDetector(
                     onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
                     child: Obx(() {
