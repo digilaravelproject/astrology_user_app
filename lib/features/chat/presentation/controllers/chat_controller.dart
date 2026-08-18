@@ -516,13 +516,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       FloatingChatBubble.dismiss();
       if (session != null) {
         WebSocketService.activeSessionId = null;
-        if (!skipSummary) {
-          ChatSummaryDialog.show(
-            sessionId: session.id,
-            durationSeconds: session.durationSeconds,
-            totalCost: session.totalCost,
-          );
-        }
       }
     } catch (e) {
       CustomSnackbar.showError(e.toString());

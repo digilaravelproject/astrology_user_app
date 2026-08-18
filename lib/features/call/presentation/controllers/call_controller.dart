@@ -262,14 +262,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
         
         final sId = sessionId ?? 0;
         cleanUp();
-        
-        Future.delayed(const Duration(milliseconds: 300), () {
-          CallSummaryDialog.show(
-            sessionId: sId,
-            durationSeconds: duration,
-            totalCost: cost,
-          );
-        });
+        if (isCallScreenVisible) {
+          Get.back();
+        }
       }
     } catch (e) {
       Logger.e('CallController: Error ending call -> $e');
@@ -293,9 +288,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
     status.value = 'ongoing';
     durationSeconds.value = 0;
 
-    await webrtcService.setRemoteAnswer(answerSdp);
+    LocalNotificationService.cancelIncomingCallNotification(sessionId!);
     _startCallTimer();
     _showOngoingNotification();
+
+    try {
+      await webrtcService.setRemoteAnswer(answerSdp);
+    } catch (e) {
+      Logger.e('CallController: Error setting remote answer -> $e');
+    }
   }
 
   void _handleCallDismissed(String reason) {
@@ -337,13 +338,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (wasCallScreenVisible) {
         Get.back();
       }
-      Future.delayed(const Duration(milliseconds: 300), () {
-        CallSummaryDialog.show(
-          sessionId: sId,
-          durationSeconds: duration,
-          totalCost: cost,
-        );
-      });
     });
   }
 
