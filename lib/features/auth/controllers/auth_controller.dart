@@ -8,6 +8,7 @@ import '../../language/controllers/localization_controller.dart';
 import '../domain/services/auth_service.dart';
 import '../../../core/services/network/response_model.dart';
 import '../../../core/services/network/websocket_service.dart';
+import '../../../core/services/fcm_notification_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 
@@ -251,6 +252,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       print('AuthController.logout() called');
+      await FCMNotificationService.removeDeviceToken();
       final response = await _logoutUseCase.execute();
       
       if (response.isSuccess) {

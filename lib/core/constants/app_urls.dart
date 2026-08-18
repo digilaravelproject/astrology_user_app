@@ -49,7 +49,9 @@ class AppUrls {
   static const String termsAndConditions = '/api/v1/terms-and-conditions';
   static const String paymentSuccess = '/payment-success';
 
-  // Notifications
+  // Notifications & Device Tokens
+  static const String registerDeviceToken = '/api/v1/user/device-token';
+  static const String removeDeviceToken = '/api/v1/user/remove-token';
   static String getNotificationCount(int userId) => '/api/v1/user/notifications/count?user_id=$userId';
   static String getNotifications(int userId) => '/api/v1/user/notifications?user_id=$userId';
   static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id?user_id=$userId';
