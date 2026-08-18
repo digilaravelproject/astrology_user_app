@@ -327,9 +327,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
         child: Scaffold(
           extendBody: true,
-          body: IndexedStack(
-            index: _selectedIndex,
-            children: _screens,
+          body: Stack(
+            children: [
+              IndexedStack(
+                index: _selectedIndex,
+                children: _screens,
+              ),
+              Obx(() {
+                if (FloatingChatBubble.isActive &&
+                    FloatingChatBubble.sessionId != null &&
+                    FloatingChatBubble.name != null) {
+                  return FloatingChatBubbleWidget(
+                    sessionId: FloatingChatBubble.sessionId!,
+                    name: FloatingChatBubble.name!,
+                    imageUrl: '',
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+            ],
           ),
           bottomNavigationBar: CustomBottomNavBar(
             selectedIndex: _selectedIndex,
