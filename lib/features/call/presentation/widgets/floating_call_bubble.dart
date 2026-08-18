@@ -61,7 +61,6 @@ class FloatingCallBubble {
     
     if (_isActive && FloatingCallBubble.sessionId == sessionId) {
       callStatus.value = status;
-      _syncData();
       return;
     }
     FloatingCallBubble.sessionId = sessionId;
@@ -69,71 +68,6 @@ class FloatingCallBubble {
     onTapCallback = onTap;
     callStatus.value = status;
     _isActive = true;
-
-    try {
-      final bool isGranted = await FlutterOverlayWindow.isPermissionGranted();
-      if (!isGranted) {
-        await FlutterOverlayWindow.requestPermission();
-      }
-
-      if (await FlutterOverlayWindow.isActive()) {
-        await FlutterOverlayWindow.shareData({
-          'type': 'update',
-          'sessionId': sessionId,
-          'name': name,
-          'imageUrl': imageUrl,
-          'status': status,
-          'isCall': true,
-          'unreadCount': 0,
-        });
-      } else {
-        await FlutterOverlayWindow.showOverlay(
-          enableDrag: true,
-          overlayTitle: "Call in progress",
-          overlayContent: "Active call with $name",
-          flag: OverlayFlag.defaultFlag,
-          visibility: NotificationVisibility.visibilitySecret,
-          positionGravity: PositionGravity.none,
-          height: 260,
-          width: 260,
-        );
-        
-        await FlutterOverlayWindow.shareData({
-          'type': 'init',
-          'sessionId': sessionId,
-          'name': name,
-          'imageUrl': imageUrl,
-          'status': status,
-          'startedAt': startedAt,
-          'isCall': true,
-          'unreadCount': 0,
-        });
-      }
-      
-      // Listen for tap events from overlay ALWAYS
-      _overlaySub?.cancel();
-      _overlaySub = FlutterOverlayWindow.overlayListener.listen((event) async {
-        if (event != null && event is Map && event['action'] == 'tap') {
-          debugPrint("==== CALL OVERLAY TAPPED ====");
-          try {
-            await _appRetainChannel.invokeMethod('bringToForeground');
-          } catch (e) {
-            debugPrint("==== Error bringing app to foreground: $e ====");
-          }
-          Future.delayed(const Duration(milliseconds: 500), () {
-            if (onTapCallback != null) {
-              onTapCallback?.call();
-            } else {
-              FloatingCallBubble.dismiss();
-              Get.to(() => const CallScreen());
-            }
-          });
-        }
-      });
-
-    } catch (e) {
-      debugPrint("FloatingCallBubble show error: $e");
-    }
   }
 
   static Future<void> dismiss() async {
