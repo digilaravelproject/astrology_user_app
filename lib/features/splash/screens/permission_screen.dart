@@ -52,6 +52,9 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
   }
 
   bool get _allPermissionsGranted {
+    if (GetPlatform.isIOS) {
+      return isCameraGranted && isMicrophoneGranted && isNotificationGranted;
+    }
     return isCameraGranted && isMicrophoneGranted && isNotificationGranted && isOverlayGranted;
   }
 
@@ -66,12 +69,17 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
   }
 
   Future<void> _requestPermissions() async {
-    await [
+    List<Permission> permissions = [
       Permission.camera,
       Permission.microphone,
       Permission.notification,
-      Permission.systemAlertWindow,
-    ].request();
+    ];
+    
+    if (GetPlatform.isAndroid) {
+      permissions.add(Permission.systemAlertWindow);
+    }
+    
+    await permissions.request();
 
     await _checkPermissions();
     
@@ -183,7 +191,7 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _allPermissionsGranted ? _navigateToNext : null,
+                  onPressed: _navigateToNext,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     disabledBackgroundColor: Colors.grey.shade300,
@@ -194,7 +202,7 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
                   ),
                   child: AppText(
                     'Go to Dashboard',
-                    color: _allPermissionsGranted ? Colors.white : Colors.grey.shade500,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
