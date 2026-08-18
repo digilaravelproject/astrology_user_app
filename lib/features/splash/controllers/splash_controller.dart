@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../routes/route_helper.dart';
 import '../domain/services/splash_service.dart';
 import '../../../core/services/network/websocket_service.dart';
+import '../../../core/services/fcm_notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SplashController extends GetxController {
@@ -42,6 +43,7 @@ class SplashController extends GetxController {
 
           if (isLoggedIn) {
             Get.find<WebSocketService>().connect();
+            FCMNotificationService.registerDeviceToken(null);
             Get.offAllNamed(RouteHelper.getDashboardRoute());
           } else {
             Get.offAllNamed(RouteHelper.getLoginRoute());
