@@ -14,7 +14,7 @@ import '../../matrimony/controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
@@ -79,20 +79,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // if (!skipPromo) {
       //   _showPromotionalSheet();
       // }
-      _checkOverlayPermission();
       _checkCurrentActiveSession();
       Get.find<CallController>().checkCurrentActiveCallSession();
     });
   }
 
-  Future<void> _checkOverlayPermission() async {
-    // Overlay permission popup disabled - system notifications used instead
-  }
-
   Future<void> _checkCurrentActiveSession() async {
     try {
-      if (await FlutterOverlayWindow.isActive()) return;
-
       final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
       if (response.isSuccess && response.body != null) {
         final data = response.body;

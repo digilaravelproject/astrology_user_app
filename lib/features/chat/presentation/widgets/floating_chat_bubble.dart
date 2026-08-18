@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+
 
 class FloatingChatBubble {
   static final RxInt unreadCount = 0.obs;
@@ -95,35 +95,14 @@ class FloatingChatBubble {
     unreadCount.value = 0;
     _overlaySub?.cancel();
     _overlaySub = null;
-    try {
-      if (await FlutterOverlayWindow.isActive()) {
-        await FlutterOverlayWindow.closeOverlay();
-      }
-    } catch (_) {}
   }
 
   static void incrementUnreadCount() {
     unreadCount.value++;
-    _syncData();
   }
 
   static void updateStatus(String status) {
     chatStatus.value = status;
-    _syncData();
-  }
-
-  static Future<void> _syncData() async {
-    if (_isActive) {
-      try {
-        if (await FlutterOverlayWindow.isActive()) {
-          await FlutterOverlayWindow.shareData({
-            'type': 'update',
-            'status': chatStatus.value,
-            'unreadCount': unreadCount.value,
-          });
-        }
-      } catch (_) {}
-    }
   }
 }
 
