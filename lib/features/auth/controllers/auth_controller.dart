@@ -180,10 +180,12 @@ class AuthController extends GetxController {
         
         if (user.profileCompleted == true) {
           Get.find<WebSocketService>().connect();
+          FCMNotificationService.registerDeviceToken(null);
           Get.offAllNamed(RouteHelper.getDashboardRoute());
         } else {
           // Still connect if they successfully logged in, even if profile is pending
           Get.find<WebSocketService>().connect();
+          FCMNotificationService.registerDeviceToken(null);
           Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
         }
       } else {
