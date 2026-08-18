@@ -8,6 +8,7 @@ import '../../../core/widgets/custom_image_widget.dart';
 import '../../../features/auth/controllers/auth_controller.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/constants/app_urls.dart';
+import '../../../core/services/fcm_notification_service.dart';
 import '../widgets/animated_zodiac_wheel.dart';
 import '../widgets/home_greeting.dart';
 import '../widgets/horoscope_pill.dart';
@@ -56,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Refresh profile to get latest photo/data
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      FCMNotificationService.registerDeviceToken(null);
       if (Get.isRegistered<ProfileController>()) {
         Get.find<ProfileController>().refreshProfile();
       }
