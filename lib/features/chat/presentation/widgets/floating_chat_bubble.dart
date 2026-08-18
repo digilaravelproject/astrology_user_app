@@ -16,8 +16,8 @@ class FloatingChatBubble {
   static VoidCallback? onTapCallback;
   static final RxString chatStatus = 'initiated'.obs;
 
-  static bool _isActive = false;
-  static bool get isActive => _isActive;
+  static final RxBool _isActive = false.obs;
+  static bool get isActive => _isActive.value;
 
   static StreamSubscription? _overlaySub;
   static const MethodChannel _appRetainChannel = MethodChannel('com.suryapath.user/app_retain');
@@ -58,7 +58,7 @@ class FloatingChatBubble {
   }) async {
     _setupIsolatePort();
 
-    if (_isActive && FloatingChatBubble.sessionId == sessionId) {
+    if (_isActive.value && FloatingChatBubble.sessionId == sessionId) {
       // Just update status if already active
       chatStatus.value = status;
       return;
@@ -68,7 +68,7 @@ class FloatingChatBubble {
     unreadCount.value = 0;
     onTapCallback = onTap;
     chatStatus.value = status;
-    _isActive = true;
+    _isActive.value = true;
 
     try {
       // Show system notification banner instead of FlutterOverlayWindow
@@ -83,7 +83,7 @@ class FloatingChatBubble {
   }
 
   static Future<void> dismiss() async {
-    _isActive = false;
+    _isActive.value = false;
     if (sessionId != null) {
       try {
         LocalNotificationService.cancelOngoingChatNotification(sessionId!);
