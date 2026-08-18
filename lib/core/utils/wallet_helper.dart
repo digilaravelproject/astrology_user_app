@@ -25,17 +25,7 @@ class WalletHelper {
     required int providerId,
     double? simulatedBalance,
   }) async {
-    try {
-      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-      if (!isOverlayGranted) {
-        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
-        await FlutterOverlayWindow.requestPermission();
-        return;
-      }
-    } catch (e) {
-      debugPrint('Error checking overlay permission: $e');
-    }
-
+    // Overlay permission check removed to rely on system notifications
     // Simulated wallet balance
     final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
     final double requiredAmount = double.tryParse(price) ?? 0.0;

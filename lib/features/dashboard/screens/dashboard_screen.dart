@@ -86,35 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _checkOverlayPermission() async {
-    if (Platform.isAndroid) {
-      try {
-        final bool isGranted = await FlutterOverlayWindow.isPermissionGranted();
-        if (!isGranted) {
-          Get.dialog(
-            CupertinoAlertDialog(
-              title: const Text('Overlay Permission'),
-              content: const Text('To show the floating chat bubble when the app is in the background, please allow "Display over other apps" permission.'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('Cancel'),
-                  onPressed: () => Get.back(),
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: const Text('Allow'),
-                  onPressed: () {
-                    Get.back();
-                    FlutterOverlayWindow.requestPermission();
-                  },
-                ),
-              ],
-            ),
-          );
-        }
-      } catch (e) {
-        debugPrint('Error checking overlay permission: $e');
-      }
-    }
+    // Overlay permission popup disabled - system notifications used instead
   }
 
   Future<void> _checkCurrentActiveSession() async {
