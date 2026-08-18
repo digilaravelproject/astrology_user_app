@@ -191,10 +191,13 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
     if (yPosition < 40) yPosition = 40;
     if (yPosition > size.height - 100) yPosition = size.height - 100;
 
-    return Positioned(
-      top: MediaQuery.of(context).padding.top + 8,
-      left: 12,
-      right: 12,
+    return Padding(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 8,
+        left: 12,
+        right: 12,
+        bottom: 4,
+      ),
       child: GestureDetector(
         onTap: () {
           FloatingChatBubble.onTapCallback?.call();
