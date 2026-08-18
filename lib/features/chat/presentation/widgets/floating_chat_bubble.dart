@@ -61,7 +61,6 @@ class FloatingChatBubble {
     if (_isActive && FloatingChatBubble.sessionId == sessionId) {
       // Just update status if already active
       chatStatus.value = status;
-      _syncData();
       return;
     }
     FloatingChatBubble.sessionId = sessionId;
@@ -193,122 +192,69 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
     if (yPosition > size.height - 100) yPosition = size.height - 100;
 
     return Positioned(
-      left: xPosition,
-      top: yPosition,
+      top: MediaQuery.of(context).padding.top + 8,
+      left: 12,
+      right: 12,
       child: GestureDetector(
-        onPanUpdate: (details) {
-          setState(() {
-            xPosition += details.delta.dx;
-            yPosition += details.delta.dy;
-          });
-        },
         onTap: () {
           FloatingChatBubble.onTapCallback?.call();
         },
         child: Material(
-          type: MaterialType.transparency,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 65,
-                height: 65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: const Color(0xFFFF6F00), // Saffron border
-                    width: 2.5,
-                  ),
-                ),
-                child: ClipOval(
-                  child: widget.imageUrl.isNotEmpty
-                      ? Image.network(
-                    widget.imageUrl.startsWith('http')
-                        ? widget.imageUrl
-                        : '${AppUrls.baseImageUrl}${widget.imageUrl}',
-                    fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => _buildInitials(),
-                  )
-                      : _buildInitials(),
-                ),
-              ),
-
-              // Timing overlay
-              Positioned(
-                bottom: -4,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E1A47), // Deep Violet
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Obx(() {
-                      final currentStatus = FloatingChatBubble.chatStatus.value;
-                      if (currentStatus == 'initiated' || currentStatus == 'ringing') {
-                        return const Text(
-                          'Waiting',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                      return Text(
+          elevation: 6,
+          borderRadius: BorderRadius.circular(30),
+          color: const Color(0xFF1E1E2C),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E2C),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: const Color(0xFFFF6F00).withValues(alpha: 0.5), width: 1),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.call, color: Colors.greenAccent, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Obx(() => Text(
                         _formatDuration(_elapsedSeconds.value),
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
+                          color: Colors.white70,
+                          fontSize: 12,
                         ),
-                      );
-                    }),
+                      )),
+                    ],
                   ),
                 ),
-              ),
-
-              // Unread count badge
-              Obx(() {
-                final count = FloatingChatBubble.unreadCount.value;
-                if (count <= 0) return const SizedBox.shrink();
-                return Positioned(
-                  top: -2,
-                  right: -2,
+                GestureDetector(
+                  onTap: () {
+                    FloatingChatBubble.dismiss();
+                  },
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(
-                      color: Colors.red,
+                      color: Colors.redAccent,
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$count',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                    child: const Icon(Icons.call_end, color: Colors.white, size: 18),
                   ),
-                );
-              }),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -316,17 +262,13 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
   }
 
   Widget _buildInitials() {
-    final String initial = widget.name.isNotEmpty ? widget.name[0].toUpperCase() : 'C';
+    final String initial = widget.name.isNotEmpty ? widget.name[0].toUpperCase() : 'U';
     return Container(
-      color: const Color(0xFF2E1A47),
+      color: const Color(0xFFFF6F00),
       child: Center(
         child: Text(
           initial,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
