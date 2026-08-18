@@ -487,7 +487,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     child: (isCameraOn && _remoteVideoTrack != null)
                         ? VideoTrackRenderer(
                             _remoteVideoTrack!,
-                            fit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                            fit: VideoViewFit.cover,
                           )
                         : Container(
                             color: Colors.black,
