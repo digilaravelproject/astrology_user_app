@@ -2,6 +2,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 
 class LocalNotificationService {
@@ -48,6 +49,8 @@ class LocalNotificationService {
           'Incoming Calls',
           description: 'Incoming Call Ringing (User & Astrologer)',
           importance: Importance.max,
+          sound: RawResourceAndroidNotificationSound(AppConstants.callNotificationSound),
+          playSound: true,
         ),
       );
       await androidPlugin.createNotificationChannel(
@@ -56,6 +59,8 @@ class LocalNotificationService {
           'Chat Messages & Requests',
           description: 'New Chat Requests and Chat Room messages',
           importance: Importance.high,
+          sound: RawResourceAndroidNotificationSound(AppConstants.chatNotificationSound),
+          playSound: true,
         ),
       );
       await androidPlugin.createNotificationChannel(
@@ -64,6 +69,8 @@ class LocalNotificationService {
           'Consultations & Billing',
           description: 'Session Lifecycle, Acceptance, Ending & Billing Notifications',
           importance: Importance.high,
+          sound: RawResourceAndroidNotificationSound(AppConstants.generalNotificationSound),
+          playSound: true,
         ),
       );
       await androidPlugin.createNotificationChannel(
@@ -222,22 +229,39 @@ class LocalNotificationService {
     required String title,
     required String body,
     String? payload,
+    String? notificationType,
   }) async {
+    String channelId = 'session_channel';
+    String soundName = AppConstants.generalNotificationSound;
+
+    if (notificationType == 'call' || notificationType == 'CALL_ACCEPTED' || notificationType == 'CALL_REQUEST') {
+      channelId = 'calls_channel';
+      soundName = AppConstants.callNotificationSound;
+    } else if (notificationType == 'chat' || notificationType == 'CHAT_REQUEST' || notificationType == 'MessageSent') {
+      channelId = 'chats_channel';
+      soundName = AppConstants.chatNotificationSound;
+    }
+
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'astology_notifications',
-      'System & General Notifications',
-      channelDescription: 'General updates and system notifications',
+      channelId,
+      channelId == 'calls_channel'
+          ? 'Incoming Calls'
+          : (channelId == 'chats_channel' ? 'Chat Messages & Requests' : 'Consultations & Billing'),
+      channelDescription: 'System and real-time notifications',
       importance: Importance.max,
       priority: Priority.high,
+      sound: RawResourceAndroidNotificationSound(soundName),
+      playSound: true,
       showWhen: true,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: const DarwinNotificationDetails(
+      iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
+        sound: '$soundName.caf',
       ),
     );
 

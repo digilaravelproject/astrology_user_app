@@ -47,11 +47,13 @@ class FCMNotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground Message Received: ${message.notification?.title}');
       if (message.notification != null) {
+        final type = message.data['type']?.toString();
         LocalNotificationService.showNotification(
           id: message.hashCode,
           title: message.notification?.title ?? 'Notification',
           body: message.notification?.body ?? '',
           payload: message.data.toString(),
+          notificationType: type,
         );
       }
     });
