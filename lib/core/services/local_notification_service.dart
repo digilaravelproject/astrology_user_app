@@ -107,6 +107,7 @@ class LocalNotificationService {
     required String body,
     int? startedAtMillis,
   }) async {
+    final int startTime = startedAtMillis ?? DateTime.now().millisecondsSinceEpoch;
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'active_chat_channel_v1',
       'Active Chats',
@@ -117,13 +118,15 @@ class LocalNotificationService {
       autoCancel: false,
       onlyAlertOnce: true,
       showWhen: true,
-      usesChronometer: startedAtMillis != null,
-      when: startedAtMillis,
+      usesChronometer: true,
+      when: startTime,
+      category: AndroidNotificationCategory.call,
+      visibility: NotificationVisibility.public,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
@@ -162,7 +165,7 @@ class LocalNotificationService {
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
@@ -188,6 +191,7 @@ class LocalNotificationService {
     required String body,
     int? startedAtMillis,
   }) async {
+    final int startTime = startedAtMillis ?? DateTime.now().millisecondsSinceEpoch;
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'active_call_channel_v1',
       'Active Calls',
@@ -198,8 +202,10 @@ class LocalNotificationService {
       autoCancel: false,
       onlyAlertOnce: true,
       showWhen: true,
-      usesChronometer: startedAtMillis != null,
-      when: startedAtMillis,
+      usesChronometer: true,
+      when: startTime,
+      category: AndroidNotificationCategory.call,
+      visibility: NotificationVisibility.public,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
