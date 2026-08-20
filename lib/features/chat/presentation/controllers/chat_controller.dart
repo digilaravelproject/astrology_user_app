@@ -352,12 +352,17 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     final currentSt = status.value.toLowerCase();
     if (currentSt == 'ended' || currentSt == 'completed' || currentSt == 'cancelled' || currentSt == 'rejected') return;
 
-    final startedAtStr = startedAtString ?? _startedAt ?? WebSocketService.sessionStartTimes[_sessionId];
+    if (startedAtString != null && _sessionId != null) {
+      _startedAt = startedAtString;
+      WebSocketService.sessionStartTimes[_sessionId!] = startedAtString;
+    }
+
+    final startedAtStr = startedAtString ?? _startedAt ?? (_sessionId != null ? WebSocketService.sessionStartTimes[_sessionId] : null);
     final startedAt = _parseSmartDate(startedAtStr);
 
     if (startedAt != null) {
       final diff = DateTime.now().difference(startedAt).inSeconds;
-      elapsedSeconds.value = diff > 0 ? diff : 0;
+      elapsedSeconds.value = diff >= 0 ? diff : 0;
 
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         final st = status.value.toLowerCase();
@@ -366,14 +371,14 @@ class ChatController extends GetxController with WidgetsBindingObserver {
           return;
         }
         final nowDiff = DateTime.now().difference(startedAt).inSeconds;
-        if (nowDiff > 0) {
+        if (nowDiff >= 0) {
           elapsedSeconds.value = nowDiff;
         } else {
           elapsedSeconds.value++;
         }
         ForegroundTaskService.startService(
-          title: 'Active Chat with ${_astrologerName ?? 'Astrologer'}',
-          text: 'Tap to return • ${_formatDuration(elapsedSeconds.value)}',
+          title: '${_astrologerName ?? 'Astrologer'} • Chat • ${_formatDuration(elapsedSeconds.value)}',
+          text: 'Ongoing chat session',
         );
       });
     } else {
@@ -385,9 +390,14 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         }
         if (st == 'ongoing' || st == 'accepted') {
           elapsedSeconds.value++;
+          if (_sessionId != null) {
+            final genStart = DateTime.now().subtract(Duration(seconds: elapsedSeconds.value)).toIso8601String();
+            _startedAt = genStart;
+            WebSocketService.sessionStartTimes[_sessionId!] = genStart;
+          }
           ForegroundTaskService.startService(
-            title: 'Active Chat with ${_astrologerName ?? 'Astrologer'}',
-            text: 'Tap to return • ${_formatDuration(elapsedSeconds.value)}',
+            title: '${_astrologerName ?? 'Astrologer'} • Chat • ${_formatDuration(elapsedSeconds.value)}',
+            text: 'Ongoing chat session',
           );
         }
       });
