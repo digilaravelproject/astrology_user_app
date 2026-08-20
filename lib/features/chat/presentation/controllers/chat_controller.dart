@@ -21,6 +21,7 @@ import 'package:astro_user/features/auth/domain/models/user_model.dart';
 
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
@@ -82,6 +83,13 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     scrollController.addListener(_scrollListener);
+    ForegroundTaskService.listenTaskData((data) {
+      if (data is Map && data['action'] == 'hangup') {
+        if (_sessionId != null) {
+          endChatSession();
+        }
+      }
+    });
   }
 
   @override
@@ -333,6 +341,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     return parsed;
   }
 
+  String _formatDuration(int totalSeconds) {
+    final int minutes = totalSeconds ~/ 60;
+    final int seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
   void _setupTimer(String? startedAtString) {
     _timer?.cancel();
     final currentSt = status.value.toLowerCase();
@@ -357,6 +371,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         } else {
           elapsedSeconds.value++;
         }
+        ForegroundTaskService.startService(
+          title: 'Active Chat with ${_astrologerName ?? 'Astrologer'}',
+          text: 'Tap to return • ${_formatDuration(elapsedSeconds.value)}',
+        );
       });
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -367,6 +385,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         }
         if (st == 'ongoing' || st == 'accepted') {
           elapsedSeconds.value++;
+          ForegroundTaskService.startService(
+            title: 'Active Chat with ${_astrologerName ?? 'Astrologer'}',
+            text: 'Tap to return • ${_formatDuration(elapsedSeconds.value)}',
+          );
         }
       });
     }
