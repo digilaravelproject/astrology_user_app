@@ -21,6 +21,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import '../../live/presentation/controllers/live_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -330,7 +331,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           body: Column(
             children: [
               Obx(() {
-                if (FloatingChatBubble.isActive &&
+                if (FloatingCallBubble.isActive &&
+                    FloatingCallBubble.sessionId != null &&
+                    FloatingCallBubble.name != null) {
+                  return FloatingCallBubbleWidget(
+                    sessionId: FloatingCallBubble.sessionId!,
+                    name: FloatingCallBubble.name!,
+                    imageUrl: '',
+                  );
+                } else if (FloatingChatBubble.isActive &&
                     FloatingChatBubble.sessionId != null &&
                     FloatingChatBubble.name != null) {
                   return FloatingChatBubbleWidget(
