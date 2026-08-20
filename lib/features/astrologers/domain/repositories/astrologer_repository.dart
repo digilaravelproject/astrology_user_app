@@ -19,8 +19,16 @@ class AstrologerRepository {
     return await apiClient.get('${AppUrls.astrologers}/$id/gallery');
   }
 
-  Future<ResponseModel> blockAstrologer(int id) async {
-    return await apiClient.post(AppUrls.blockAstrologer(id));
+  Future<ResponseModel> blockAstrologer(int id, {String? reason}) async {
+    return await apiClient.post(AppUrls.blockAstrologer(id), data: reason != null ? {'reason': reason} : null);
+  }
+
+  Future<ResponseModel> unblockAstrologer(int id) async {
+    return await apiClient.post(AppUrls.unblockAstrologer(id));
+  }
+
+  Future<ResponseModel> getBlockedAstrologers({Map<String, dynamic>? queryParameters}) async {
+    return await apiClient.get(AppUrls.blockedAstrologers, queryParameters: queryParameters);
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {

@@ -17,6 +17,8 @@ class AppUrls {
   static const String astrologers = '/api/v1/user/astrologers';
   static String getAstrologerDetails(int id) => '/api/v1/user/astrologers/$id';
   static String blockAstrologer(int id) => '/api/v1/user/astrologers/$id/block';
+  static String unblockAstrologer(int id) => '/api/v1/user/astrologers/$id/unblock';
+  static const String blockedAstrologers = '/api/v1/user/blocked-astrologers';
   static const String wallet = '/api/v1/user/wallet';
   static const String walletTopup = '/api/v1/user/wallet/topup';
   static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
