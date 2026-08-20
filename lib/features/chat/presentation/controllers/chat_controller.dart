@@ -631,24 +631,26 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
     if (_sessionId == null || (status.value != 'ongoing' && status.value != 'initiated')) return;
     WebSocketService.activeSessionId = null;
+    final startStr = _startedAt ?? WebSocketService.sessionStartTimes[_sessionId!] ?? DateTime.now().subtract(Duration(seconds: elapsedSeconds.value)).toIso8601String();
+    WebSocketService.sessionStartTimes[_sessionId!] = startStr;
+
     FloatingChatBubble.show(
       context: context,
       sessionId: _sessionId!,
       name: name,
       imageUrl: image,
-      startedAt: _startedAt ?? WebSocketService.sessionStartTimes[_sessionId],
+      startedAt: startStr,
       status: status.value,
       onTap: () {
         final currentStatus = FloatingChatBubble.chatStatus.value;
-        final startedAtStr = WebSocketService.sessionStartTimes[_sessionId!];
-        FloatingChatBubble.dismiss();
+        FloatingChatBubble.dismiss(stopForegroundService: false);
         Get.to(
           () => ChatScreen(
             astrologerName: name,
             astrologerImage: image,
             sessionId: _sessionId!,
             initialStatus: currentStatus,
-            startedAtString: startedAtStr,
+            startedAtString: startStr,
           ),
           binding: ChatBinding(),
         );
