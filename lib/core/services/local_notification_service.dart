@@ -7,6 +7,7 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -36,6 +37,24 @@ class LocalNotificationService {
             }
           } else if (FloatingChatBubble.onTapCallback != null) {
             FloatingChatBubble.onTapCallback?.call();
+          } else {
+            final int? sId = int.tryParse(response.payload!);
+            if (sId != null) {
+              String astroName = FloatingChatBubble.name?.isNotEmpty == true
+                  ? FloatingChatBubble.name!
+                  : 'Astrologer';
+              String astroStatus = FloatingChatBubble.chatStatus.value.isNotEmpty
+                  ? FloatingChatBubble.chatStatus.value
+                  : 'ongoing';
+
+              FloatingChatBubble.dismiss(stopForegroundService: false);
+              Get.to(() => ChatScreen(
+                    astrologerName: astroName,
+                    astrologerImage: '',
+                    sessionId: sId,
+                    initialStatus: astroStatus,
+                  ));
+            }
           }
         }
       },
