@@ -105,12 +105,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           WebSocketService.sessionStartTimes[sessionId] = startedAt.toString();
         }
 
+        DateTime? parsedStart;
+        if (startedAt != null) {
+          String isoUtc = startedAt.toString().replaceAll(' ', 'T');
+          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+            isoUtc += 'Z';
+          }
+          parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
+        }
+        final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
+
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           if (sessionId != null) {
             LocalNotificationService.showOngoingChatNotification(
               sessionId: sessionId,
               title: '$name • Chat',
               body: 'Ongoing chat session',
+              startedAtMillis: startedAtMillis,
             );
           }
           FloatingChatBubble.show(
