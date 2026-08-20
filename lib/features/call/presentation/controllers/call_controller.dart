@@ -369,6 +369,10 @@ class CallController extends GetxController with WidgetsBindingObserver {
         title: 'Active Call in Progress',
         body: 'Talking with $providerName - $minutes:$seconds',
       );
+      ForegroundTaskService.startService(
+        title: 'Active Call in Progress',
+        text: 'Talking with $providerName - $minutes:$seconds',
+      );
     }
   }
 
@@ -401,6 +405,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
     if (sessionId != null) {
       LocalNotificationService.cancelOngoingCallNotification(sessionId!);
     }
+    try {
+      ForegroundTaskService.stopService();
+    } catch (_) {}
     FloatingCallBubble.dismiss();
     webrtcService.dispose();
     status.value = 'idle';

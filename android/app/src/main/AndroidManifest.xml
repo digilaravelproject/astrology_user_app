@@ -40,6 +40,13 @@
             android:name="id.flutter.flutter_background_service.BackgroundService"
             android:foregroundServiceType="dataSync" />
 
+        <!-- Foreground Task Service -->
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="phoneCall|microphone|dataSync"
+            android:stopWithTask="false"
+            android:exported="false" />
+
 
 
         <!-- Activity aliases for alternate icons -->
