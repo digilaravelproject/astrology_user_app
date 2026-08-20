@@ -376,10 +376,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         } else {
           elapsedSeconds.value++;
         }
-        ForegroundTaskService.startService(
-          title: '${_astrologerName ?? 'Astrologer'} • Chat • ${_formatDuration(elapsedSeconds.value)}',
-          text: 'Ongoing chat session',
-        );
       });
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -395,10 +391,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             _startedAt = genStart;
             WebSocketService.sessionStartTimes[_sessionId!] = genStart;
           }
-          ForegroundTaskService.startService(
-            title: '${_astrologerName ?? 'Astrologer'} • Chat • ${_formatDuration(elapsedSeconds.value)}',
-            text: 'Ongoing chat session',
-          );
         }
       });
     }
