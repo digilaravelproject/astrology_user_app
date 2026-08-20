@@ -154,12 +154,20 @@ class LocalNotificationService {
     }
   }
 
+  static const int ACTIVE_CHAT_NOTIFICATION_ID = 777777;
+  static const int ACTIVE_CALL_NOTIFICATION_ID = 888888;
+
   static Future<void> showOngoingChatNotification({
     required int sessionId,
     required String title,
     required String body,
     int? startedAtMillis,
   }) async {
+    await _notificationsPlugin.cancel(ACTIVE_CHAT_NOTIFICATION_ID);
+    await _notificationsPlugin.cancel(sessionId);
+    await _notificationsPlugin.cancel(sessionId + 100);
+    await _notificationsPlugin.cancel(sessionId + 50000);
+
     final int startTime = startedAtMillis ?? DateTime.now().millisecondsSinceEpoch;
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'active_consultation_foreground_channel_v3',
@@ -188,7 +196,7 @@ class LocalNotificationService {
     );
 
     await _notificationsPlugin.show(
-      sessionId,
+      ACTIVE_CHAT_NOTIFICATION_ID,
       title,
       body,
       notificationDetails,
@@ -196,10 +204,13 @@ class LocalNotificationService {
     );
   }
 
-  static Future<void> cancelOngoingChatNotification(int sessionId) async {
-    await _notificationsPlugin.cancel(sessionId);
-    await _notificationsPlugin.cancel(sessionId + 100);
-    await _notificationsPlugin.cancel(sessionId + 50000);
+  static Future<void> cancelOngoingChatNotification(int? sessionId) async {
+    await _notificationsPlugin.cancel(ACTIVE_CHAT_NOTIFICATION_ID);
+    if (sessionId != null) {
+      await _notificationsPlugin.cancel(sessionId);
+      await _notificationsPlugin.cancel(sessionId + 100);
+      await _notificationsPlugin.cancel(sessionId + 50000);
+    }
     try {
       await ForegroundTaskService.stopService();
     } catch (_) {}
@@ -250,6 +261,9 @@ class LocalNotificationService {
     required String body,
     int? startedAtMillis,
   }) async {
+    await _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
+    await _notificationsPlugin.cancel(sessionId + 100000);
+
     final int startTime = startedAtMillis ?? DateTime.now().millisecondsSinceEpoch;
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'active_consultation_foreground_channel_v3',
@@ -278,7 +292,7 @@ class LocalNotificationService {
     );
 
     await _notificationsPlugin.show(
-      sessionId + 100000,
+      ACTIVE_CALL_NOTIFICATION_ID,
       title,
       body,
       notificationDetails,
@@ -286,10 +300,13 @@ class LocalNotificationService {
     );
   }
 
-  static Future<void> cancelOngoingCallNotification(int sessionId) async {
-    await _notificationsPlugin.cancel(sessionId);
-    await _notificationsPlugin.cancel(sessionId + 100000);
-    await _notificationsPlugin.cancel(sessionId + 200000);
+  static Future<void> cancelOngoingCallNotification(int? sessionId) async {
+    await _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
+    if (sessionId != null) {
+      await _notificationsPlugin.cancel(sessionId);
+      await _notificationsPlugin.cancel(sessionId + 100000);
+      await _notificationsPlugin.cancel(sessionId + 200000);
+    }
     try {
       await ForegroundTaskService.stopService();
     } catch (_) {}
