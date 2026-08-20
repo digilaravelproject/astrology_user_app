@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 
+import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
@@ -105,6 +106,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
 
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
+          if (sessionId != null) {
+            LocalNotificationService.showOngoingChatNotification(
+              sessionId: sessionId,
+              title: '$name • Chat',
+              body: 'Ongoing chat session',
+            );
+          }
           FloatingChatBubble.show(
               context: Get.context!,
               sessionId: sessionId,
