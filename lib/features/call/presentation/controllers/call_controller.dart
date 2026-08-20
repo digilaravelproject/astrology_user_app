@@ -369,10 +369,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
         title: 'Active Call in Progress',
         body: 'Talking with $providerName - $minutes:$seconds',
       );
-      ForegroundTaskService.startService(
-        title: 'Active Call in Progress',
-        text: 'Talking with $providerName - $minutes:$seconds',
-      );
     }
   }
 

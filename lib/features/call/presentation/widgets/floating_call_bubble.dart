@@ -74,17 +74,13 @@ class FloatingCallBubble {
 
     try {
       final String statusText = (status == 'ongoing') 
-          ? 'Active Call with $name' 
+          ? '$name • Call' 
           : 'Calling $name ($status)...';
 
       LocalNotificationService.showOngoingCallNotification(
         sessionId: sessionId,
         title: statusText,
         body: 'Tap to return to call session',
-      );
-      ForegroundTaskService.startService(
-        title: statusText,
-        text: 'Tap to return to call session',
       );
     } catch (e) {
       debugPrint("FloatingCallBubble show notification error: $e");
@@ -226,10 +222,6 @@ class _FloatingCallBubbleWidgetState extends State<FloatingCallBubbleWidget> {
       final currentStatus = FloatingCallBubble.callStatus.value.toLowerCase();
       if (currentStatus == 'ongoing' || currentStatus == 'accepted') {
         updateDuration();
-        ForegroundTaskService.startService(
-          title: '${widget.name} • Call • ${_formatDuration(_elapsedSeconds.value)}',
-          text: 'Ongoing voice call',
-        );
       }
     });
   }
