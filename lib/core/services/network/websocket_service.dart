@@ -807,8 +807,8 @@ class WebSocketService extends GetxService {
         }
         LocalNotificationService.showOngoingChatNotification(
           sessionId: sessionId,
-          title: 'Chat in progress',
-          body: 'Active chat with ${FloatingChatBubble.name ?? "Astrologer"}',
+          title: '${FloatingChatBubble.name ?? "Astrologer"} • Chat',
+          body: 'Ongoing chat session',
           startedAtMillis: startedAtMillis,
         );
       }

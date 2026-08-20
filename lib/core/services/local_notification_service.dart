@@ -198,6 +198,11 @@ class LocalNotificationService {
 
   static Future<void> cancelOngoingChatNotification(int sessionId) async {
     await _notificationsPlugin.cancel(sessionId);
+    await _notificationsPlugin.cancel(sessionId + 100);
+    await _notificationsPlugin.cancel(sessionId + 50000);
+    try {
+      await ForegroundTaskService.stopService();
+    } catch (_) {}
   }
 
   static Future<void> showIncomingCallNotification({
@@ -282,7 +287,12 @@ class LocalNotificationService {
   }
 
   static Future<void> cancelOngoingCallNotification(int sessionId) async {
+    await _notificationsPlugin.cancel(sessionId);
     await _notificationsPlugin.cancel(sessionId + 100000);
+    await _notificationsPlugin.cancel(sessionId + 200000);
+    try {
+      await ForegroundTaskService.stopService();
+    } catch (_) {}
   }
 
   static Future<void> showNotification({
