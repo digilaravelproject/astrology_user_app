@@ -498,11 +498,18 @@ class CallController extends GetxController with WidgetsBindingObserver {
             final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
             LocalNotificationService.showOngoingCallNotification(
               sessionId: sessionId!,
-              title: 'Active Call in Progress',
-              body: 'Talking with $providerName - $minutes:$seconds',
-              startedAtMillis: sessionStatus == 'ongoing' && session['started_at'] != null 
-                  ? DateTime.tryParse(session['started_at'].toString())?.millisecondsSinceEpoch
-                  : null,
+              title: '$providerName • Call',
+              body: 'Tap to return to call session',
+              startedAtMillis: () {
+                if (sessionStatus == 'ongoing' && session['started_at'] != null) {
+                  String isoUtc = session['started_at'].toString().trim().replaceAll(' ', 'T');
+                  if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+                    isoUtc += 'Z';
+                  }
+                  return DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
+                }
+                return null;
+              }(),
             );
 
             // Show Floating Bubble
