@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 
+import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
@@ -98,6 +99,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
         // For user app, other person is provider (astrologer)
         final name = session?['provider']?['name'] ?? 'Astrologer';
+
+        if (sessionId != null && startedAt != null) {
+          WebSocketService.sessionStartTimes[sessionId] = startedAt.toString();
+        }
 
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           FloatingChatBubble.show(
