@@ -99,7 +99,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         minimizeToBubble(Get.context!, _astrologerName!, "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
-      FloatingChatBubble.dismiss();
+      FloatingChatBubble.dismiss(stopForegroundService: false);
     }
   }
 
