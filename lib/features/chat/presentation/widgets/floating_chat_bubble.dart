@@ -91,7 +91,7 @@ class FloatingChatBubble {
         sessionId: sessionId,
         title: status == 'ongoing' ? '$name • Chat' : 'Waiting for acceptance with $name...',
         body: 'Tap to return to chat session',
-        startedAtMillis: startedAtMillis,
+        startedAtMillis: status == 'ongoing' ? startedAtMillis : null,
       );
     } catch (e) {
       debugPrint("FloatingChatBubble show notification error: $e");

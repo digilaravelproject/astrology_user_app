@@ -160,7 +160,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         sessionId: sessionId,
         title: status.value == 'ongoing' ? 'Chat in progress' : 'Waiting for acceptance...',
         body: 'Active chat with $astrologerName',
-        startedAtMillis: startedAtMillis,
+        startedAtMillis: status.value == 'ongoing' ? startedAtMillis : null,
       );
     }
 
