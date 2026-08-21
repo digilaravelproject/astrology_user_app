@@ -74,8 +74,9 @@ class FloatingChatBubble {
     debugPrint("==== [DEBUG LOG] FloatingChatBubble set _isActive = true for sessionId=$sessionId ====");
 
     try {
-      // Kill any old foreground task service to prevent 2 notifications
-      ForegroundTaskService.stopService();
+      try {
+        await ForegroundTaskService.stopService();
+      } catch (_) {}
 
       int? startedAtMillis;
       if (startedAt != null && startedAt.isNotEmpty) {
