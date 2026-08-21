@@ -155,7 +155,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       }
     }
     _astrologerName = astrologerName;
-    status.value = initialStatus;
+    if (status.value != 'ongoing' && status.value != 'accepted') {
+      status.value = initialStatus;
+    }
     _startedAt = startedAtString;
 
     WebSocketService.activeSessionId = sessionId;
