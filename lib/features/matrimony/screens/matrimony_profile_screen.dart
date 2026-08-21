@@ -360,26 +360,26 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   ),
                 ),
 
-              // Action buttons overlay - Redesigned
-              Positioned(
-                bottom: 40,
-                right: 20,
-                child: Column(
-                  children: [
-                    _buildActionButton(
-                      icon: Icons.call,
-                      color: AppColors.primaryColor,
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 16),
-                    _buildActionButton(
-                      icon: Icons.chat_bubble_rounded,
-                      color: const Color(0xFF4CAF50),
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
+              // Action buttons overlay - Redesigned (Commented out as per request)
+              // Positioned(
+              //   bottom: 40,
+              //   right: 20,
+              //   child: Column(
+              //     children: [
+              //       _buildActionButton(
+              //         icon: Icons.call,
+              //         color: AppColors.primaryColor,
+              //         onTap: () {},
+              //       ),
+              //       const SizedBox(height: 16),
+              //       _buildActionButton(
+              //         icon: Icons.chat_bubble_rounded,
+              //         color: const Color(0xFF4CAF50),
+              //         onTap: () {},
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
           
