@@ -21,7 +21,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFFF4E6),
       appBar: CustomAppBar(
-        title: 'Match Making',
+        title: 'Match Making'.tr,
         showLeading: true,
         backgroundColor: const Color(0xFFFFF4E6),
       ),

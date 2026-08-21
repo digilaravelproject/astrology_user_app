@@ -113,7 +113,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: CustomAppBar(
-            title: 'Match Making',
+            title: 'Match Making'.tr,
             showLeading: false,
             backgroundColor: Colors.transparent,
             titleColor: AppColors.textColorPrimary,

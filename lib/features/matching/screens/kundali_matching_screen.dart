@@ -18,18 +18,18 @@ class KundliMatchScreen extends GetView<MatchingController> {
   @override
   Widget build(BuildContext context) {
     final List<String> tabs = [
-      'RESULTS',
-      'DETAILS',
-      'VARNA',
-      'VASYA',
-      'TARA',
-      'YONI',
-      'MAITRI',
-      'GANA',
-      'BHAKOOT',
-      'NADI',
-      'DOWNLOAD PDF',
-      'BIRTH DETAILS',
+      'RESULTS'.tr,
+      'DETAILS'.tr,
+      'VARNA'.tr,
+      'VASYA'.tr,
+      'TARA'.tr,
+      'YONI'.tr,
+      'MAITRI'.tr,
+      'GANA'.tr,
+      'BHAKOOT'.tr,
+      'NADI'.tr,
+      'DOWNLOAD PDF'.tr,
+      'BIRTH DETAILS'.tr,
     ];
 
     return DefaultTabController(
