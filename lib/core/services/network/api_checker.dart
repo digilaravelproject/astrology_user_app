@@ -17,10 +17,25 @@ class ApiChecker {
       case 200:
       case 201:
         if (response.data is Map) {
-          if (response.data.containsKey('auth')) return response;
+          if (response.data.containsKey('auth') ||
+              response.data.containsKey('data') ||
+              response.data.containsKey('astrologers') ||
+              response.data.containsKey('wallet') ||
+              response.data.containsKey('user')) {
+            return response;
+          }
           final res = response.data['res']?.toString().toLowerCase();
           final status = response.data['status']?.toString().toLowerCase();
-          if (res == 'success' || status == 'success' || response.data['success'] == true) {
+          final isSuccess = res == 'success' ||
+              status == 'success' ||
+              status == 'true' ||
+              response.data['status'] == true ||
+              response.data['status'] == 1 ||
+              response.data['status'] == 200 ||
+              response.data['success'] == true ||
+              response.data['success'] == 1;
+
+          if (isSuccess) {
             return response;
           } else {
             if (showToaster) _showErrorMessage(response);

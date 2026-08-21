@@ -19,7 +19,21 @@ class ResponseModel {
   factory ResponseModel.fromJson(Map<String, dynamic> json, {int? statusCode}) {
     final res = json['res']?.toString().toLowerCase();
     final status = json['status']?.toString().toLowerCase();
-    final success = res == 'success' || status == 'success' || (json['success'] == true) || json.containsKey('auth');
+    final success = (statusCode == 200 || statusCode == 201 || statusCode == null) &&
+        (res == 'success' ||
+         status == 'success' ||
+         status == 'true' ||
+         json['status'] == true ||
+         json['status'] == 1 ||
+         json['status'] == 200 ||
+         json['success'] == true ||
+         json['success'] == 1 ||
+         json.containsKey('auth') ||
+         json.containsKey('astrologers') ||
+         json.containsKey('data') ||
+         json.containsKey('wallet') ||
+         json.containsKey('user') ||
+         json.containsKey('token'));
 
     List<ErrorDetail>? errors;
     if (json['errors'] is Map) {
