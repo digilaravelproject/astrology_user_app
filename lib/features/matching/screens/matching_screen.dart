@@ -566,8 +566,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                         color: AppColors.textColorPrimary,
                                       ),
                                       const SizedBox(width: 12),
-                                      const AppText(
-                                        'View',
+                                      AppText(
+                                        'View'.tr,
                                         fontSize: 14,
                                         color: AppColors.textColorPrimary,
                                       ),
@@ -584,8 +584,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                         color: AppColors.primaryColor,
                                       ),
                                       const SizedBox(width: 12),
-                                      const AppText(
-                                        'Edit',
+                                      AppText(
+                                        'Edit'.tr,
                                         fontSize: 14,
                                         color: AppColors.textColorPrimary,
                                       ),
@@ -603,7 +603,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                       ),
                                       const SizedBox(width: 12),
                                       AppText(
-                                        'Delete',
+                                        'Delete'.tr,
                                         fontSize: 14,
                                         color: Colors.red.shade400,
                                       ),
