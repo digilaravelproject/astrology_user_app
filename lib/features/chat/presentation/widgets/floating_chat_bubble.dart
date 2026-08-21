@@ -99,7 +99,6 @@ class FloatingChatBubble {
   }
 
   static Future<void> dismiss({bool stopForegroundService = true}) async {
-    debugPrint("==== [DEBUG LOG] FloatingChatBubble.dismiss called! stopForegroundService=$stopForegroundService, currentSessionId=$sessionId, caller trace: ${StackTrace.current} ====");
     _isActive.value = false;
     final int? idToCancel = sessionId;
     sessionId = null;
