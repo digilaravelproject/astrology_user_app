@@ -336,8 +336,8 @@ class AstrologersPreviewSection extends StatelessWidget {
                               ),
                             ],
                           )
-                        : const Text(
-                            "Astrologer is offline.",
+                        : Text(
+                            "Astrologer is offline.".tr,
                             style: TextStyle(
                               color: Colors.red,
                               fontSize: 13,

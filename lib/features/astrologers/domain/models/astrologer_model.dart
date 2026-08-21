@@ -1,4 +1,5 @@
 import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:get/get.dart';
 
 class AstrologerModel {
   final int id;
@@ -107,7 +108,7 @@ class AstrologerModel {
 
   String get packageSessionText {
     if (packagePrice == null || packageDuration == null) {
-      return 'Session (1 hr) @ ₹500';
+      return '${'Session'.tr} (1 hr) @ ₹500';
     }
     if (isPurchase == true && remainingTime != null) {
       final int remainingSeconds = remainingTime!;
@@ -137,7 +138,7 @@ class AstrologerModel {
           }
         }
       }
-      return 'Session ($remainingTimeStr)';
+      return '${'Session'.tr} ($remainingTimeStr)';
     }
     final int seconds = packageDuration!;
     final int hours = seconds ~/ 3600;
@@ -152,7 +153,7 @@ class AstrologerModel {
       durationStr = '$minutes min';
     }
     
-    return 'Session ($durationStr) @ ₹$packagePrice';
+    return '${'Session'.tr} ($durationStr) @ ₹$packagePrice';
   }
 
   String get packageSessionTimeOnly {

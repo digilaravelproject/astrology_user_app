@@ -139,27 +139,27 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                         padding: EdgeInsets.zero,
                         children: [
                           _buildCategoryItem(
-                            'Age Range',
+                            'Age Range'.tr,
                             selectedCategory,
                             () => setModalState(() => selectedCategory = 'Age Range'),
                           ),
                           _buildCategoryItem(
-                            'Religion',
+                            'Religion'.tr,
                             selectedCategory,
                             () => setModalState(() => selectedCategory = 'Religion'),
                           ),
                           _buildCategoryItem(
-                            'Education',
+                            'Education'.tr,
                             selectedCategory,
                             () => setModalState(() => selectedCategory = 'Education'),
                           ),
                           _buildCategoryItem(
-                            'Marital Status',
+                            'Marital Status'.tr,
                             selectedCategory,
                             () => setModalState(() => selectedCategory = 'Marital Status'),
                           ),
                           _buildCategoryItem(
-                            'Location',
+                            'Location'.tr,
                             selectedCategory,
                             () => setModalState(() => selectedCategory = 'Location'),
                           ),

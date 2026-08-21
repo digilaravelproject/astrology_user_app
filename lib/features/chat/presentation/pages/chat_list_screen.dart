@@ -615,7 +615,7 @@ class ChatListScreen extends StatelessWidget {
                 ? Align(
               alignment: Alignment.centerRight,
               child: Text(
-                "Astrologer is offline.",
+                "Astrologer is offline.".tr,
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 13,
