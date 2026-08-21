@@ -18,7 +18,7 @@ class BlogListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText('All Blogs', color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        title: AppText('All Blogs'.tr, color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         backgroundColor: AppColors.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -28,7 +28,7 @@ class BlogListScreen extends StatelessWidget {
         }
 
         if (blogController.blogs.isEmpty) {
-          return Center(child: AppText('No blogs available.'));
+          return Center(child: AppText('No blogs available.'.tr));
         }
 
         return ListView.builder(
@@ -107,7 +107,7 @@ class BlogListScreen extends StatelessWidget {
                               Row(
                                 children: [
                                   AppText(
-                                    'Read more',
+                                    'Read more'.tr,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primaryColor,
