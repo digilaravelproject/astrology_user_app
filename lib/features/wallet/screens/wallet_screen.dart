@@ -340,11 +340,11 @@ class WalletScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const AppText(
-                        "Transaction Details",
+                      AppText(
+                        "Transaction Details".tr,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2E1A47),
+                        color: const Color(0xFF2E1A47),
                       ),
                       if (tx.invoiceNumber != null && tx.invoiceNumber.toString().isNotEmpty)
                         AppText(
@@ -373,7 +373,7 @@ class WalletScreen extends StatelessWidget {
                   children: [
                     _buildBreakdownRow("Recharge Base Amount (Credited)", "₹${baseAmount.toStringAsFixed(2)}", isBold: true),
                     const SizedBox(height: 10),
-                    _buildBreakdownRow("GST Applied (${gstPercent.toStringAsFixed(0)}%)", "₹${gstAmount.toStringAsFixed(2)}", color: AppColors.deepPink),
+                    _buildBreakdownRow("${"GST Applied".tr} (${gstPercent.toStringAsFixed(0)}%)", "₹${gstAmount.toStringAsFixed(2)}", color: AppColors.deepPink),
                     const Divider(height: 24),
                     _buildBreakdownRow("Total Amount Paid via Gateway", "₹${totalAmount.toStringAsFixed(2)}", isTotal: true),
                   ],
@@ -402,8 +402,8 @@ class WalletScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () => Navigator.pop(context),
-                  child: const AppText(
-                    "Close",
+                  child: AppText(
+                    "Close".tr,
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -421,16 +421,20 @@ class WalletScreen extends StatelessWidget {
   Widget _buildBreakdownRow(String title, String value, {bool isBold = false, bool isTotal = false, Color? color}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        AppText(
-          title,
-          fontSize: isTotal ? 14 : 13,
-          fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.w500,
-          color: isTotal ? const Color(0xFF2E1A47) : Colors.grey.shade700,
+        Expanded(
+          child: AppText(
+            title.tr,
+            fontSize: isTotal ? 13 : 13,
+            fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.w500,
+            color: isTotal ? const Color(0xFF2E1A47) : Colors.grey.shade700,
+          ),
         ),
+        const SizedBox(width: 8),
         AppText(
           value,
-          fontSize: isTotal ? 16 : 14,
+          fontSize: isTotal ? 15 : 14,
           fontWeight: isTotal || isBold ? FontWeight.w900 : FontWeight.w700,
           color: color ?? (isTotal ? AppColors.primaryColor : const Color(0xFF2E1A47)),
         ),
@@ -445,16 +449,21 @@ class WalletScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AppText(
-            label,
+            label.tr,
             fontSize: 12,
             color: Colors.grey.shade500,
             fontWeight: FontWeight.w500,
           ),
-          AppText(
-            value,
-            fontSize: 12,
-            color: statusColor ?? Colors.black87,
-            fontWeight: FontWeight.w600,
+          const SizedBox(width: 8),
+          Flexible(
+            child: AppText(
+              value.tr,
+              fontSize: 12,
+              color: statusColor ?? Colors.black87,
+              fontWeight: FontWeight.w600,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
           ),
         ],
       ),
