@@ -481,7 +481,7 @@ class ProfileScreen extends StatelessWidget {
 
   void _shareApp() {
     Share.share(
-      'Download ${AppConstants.appName} app for accurate astrology predictions and consultations: https://play.google.com/store/apps/details?id=com.suryapath.user',
+      '${"Download Astro User app for accurate astrology predictions and consultations:".tr} https://play.google.com/store/apps/details?id=com.suryapath.user',
     );
   }
 }
