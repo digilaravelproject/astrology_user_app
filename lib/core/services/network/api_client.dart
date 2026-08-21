@@ -28,14 +28,14 @@ class ApiClient {
   void _initializeDio() {
     _dio.options = BaseOptions(
       baseUrl: AppConstants.baseUrl,
-      connectTimeout: const Duration(milliseconds: 30000),
-      receiveTimeout: const Duration(milliseconds: 30000),
+      connectTimeout: const Duration(seconds: 60),
+      receiveTimeout: const Duration(seconds: 60),
       contentType: 'application/json',
       headers: {
         'Accept': 'application/json',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
       },
-      validateStatus: (status) => status! < 500,
+      validateStatus: (status) => status == null ? false : status < 500,
     );
 
     _dio.httpClientAdapter = IOHttpClientAdapter(
@@ -50,13 +50,15 @@ class ApiClient {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         String token = await TokenManager.getToken() ?? "";
-        options.headers["Authorization"] = "Bearer ${token.trim()}";
+        if (token.isNotEmpty) {
+          options.headers["Authorization"] = "Bearer ${token.trim()}";
+        }
         options.headers["Accept"] = "application/json";
-        options.headers["Connection"] = "close";
 
-        if (options.path.contains('/user/live/')) {
-          options.receiveTimeout = const Duration(seconds: 60);
-          Logger.d('|⏱️ ReceiveTimeout increased to 60s for live session endpoint: ${options.path}');
+        if (options.path.contains('/live/')) {
+          options.connectTimeout = const Duration(seconds: 60);
+          options.receiveTimeout = const Duration(seconds: 90);
+          Logger.d('|⏱️ Timeouts increased to 60s/90s for live session endpoint: ${options.path}');
         }
 
         // Detailed request logging
@@ -85,7 +87,7 @@ class ApiClient {
 
         return handler.next(response);
       },
-      onError: (error, handler) {
+      onError: (error, handler) async {
         // Detailed error logging
         Logger.e('|❌ API ERROR');
         Logger.e('|📍 URL: ${error.requestOptions.baseUrl}${error.requestOptions.path}');
@@ -98,6 +100,25 @@ class ApiClient {
           Logger.e('|📨 Response: ${error.response?.data}');
         }
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+        // Retry logic for connection timeout or transient network error (up to 2 retries)
+        final opts = error.requestOptions;
+        final currentRetry = (opts.extra['retry_count'] as int?) ?? 0;
+        if ((error.type == DioExceptionType.connectionTimeout ||
+                error.type == DioExceptionType.sendTimeout ||
+                error.type == DioExceptionType.connectionError) &&
+            currentRetry < 2) {
+          opts.extra['retry_count'] = currentRetry + 1;
+          Logger.d('🔄 Retrying API Request (${currentRetry + 1}/2): ${opts.path}');
+          try {
+            final response = await _dio.fetch(opts);
+            return handler.resolve(response);
+          } catch (retryError) {
+            if (retryError is DioException) {
+              return handler.next(retryError);
+            }
+          }
+        }
 
         return handler.next(error);
       },
