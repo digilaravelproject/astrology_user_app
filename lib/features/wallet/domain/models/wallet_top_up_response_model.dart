@@ -53,9 +53,15 @@ class TransactionModel {
   final int walletId;
   final String transactionType;
   final String amount;
+  final String baseAmount;
+  final String gstPercent;
+  final String gstAmount;
+  final String totalAmount;
+  final String invoiceNumber;
   final String status;
   final String paymentProvider;
   final String providerOrderId;
+  final String providerPaymentId;
   final String description;
   final String updatedAt;
   final String createdAt;
@@ -65,9 +71,15 @@ class TransactionModel {
     required this.walletId,
     required this.transactionType,
     required this.amount,
+    required this.baseAmount,
+    required this.gstPercent,
+    required this.gstAmount,
+    required this.totalAmount,
+    required this.invoiceNumber,
     required this.status,
     required this.paymentProvider,
     required this.providerOrderId,
+    required this.providerPaymentId,
     required this.description,
     required this.updatedAt,
     required this.createdAt,
@@ -79,9 +91,15 @@ class TransactionModel {
       walletId: json['wallet_id'] ?? 0,
       transactionType: json['transaction_type'] ?? '',
       amount: json['amount']?.toString() ?? '0.00',
+      baseAmount: json['base_amount']?.toString() ?? json['amount']?.toString() ?? '0.00',
+      gstPercent: json['gst_percent']?.toString() ?? '18.00',
+      gstAmount: json['gst_amount']?.toString() ?? '0.00',
+      totalAmount: json['total_amount']?.toString() ?? json['amount']?.toString() ?? '0.00',
+      invoiceNumber: json['invoice_number']?.toString() ?? '',
       status: json['status'] ?? '',
       paymentProvider: json['payment_provider'] ?? '',
       providerOrderId: json['provider_order_id'] ?? json['razorpay_order_id'] ?? json['order_id'] ?? '',
+      providerPaymentId: json['provider_payment_id']?.toString() ?? '',
       description: json['description'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       createdAt: json['createdAt'] ?? json['created_at'] ?? '',
