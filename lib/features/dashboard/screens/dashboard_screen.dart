@@ -133,7 +133,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               startedAt: startedAt,
               onTap: () {
                 final currentStatus = FloatingChatBubble.chatStatus.value;
-                FloatingChatBubble.dismiss();
                 Get.to(
                       () => ChatScreen(
                     astrologerName: name,
