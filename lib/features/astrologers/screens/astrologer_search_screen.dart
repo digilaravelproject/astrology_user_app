@@ -227,7 +227,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 ),
                 const SizedBox(width: 12),
                 AppText(
-                  '${astro.totalOrders > 0 ? astro.totalOrders : (astro.id * 15 + 100)}k+ ${AppStrings.ordersLabel}',
+                  _formatOrdersCount(astro.totalOrders),
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
@@ -319,5 +319,15 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
         size: 50,
       ),
     );
+  }
+  String _formatOrdersCount(int count) {
+    if (count >= 1000) {
+      final double inK = count / 1000.0;
+      return '${inK.toStringAsFixed(inK.truncateToDouble() == inK ? 0 : 1)}k+ ${AppStrings.ordersLabel}';
+    } else if (count > 0) {
+      return '$count+ ${AppStrings.ordersLabel}';
+    } else {
+      return '0 ${AppStrings.ordersLabel}';
+    }
   }
 }
