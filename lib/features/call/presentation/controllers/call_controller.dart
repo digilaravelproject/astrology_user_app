@@ -288,9 +288,10 @@ class CallController extends GetxController with WidgetsBindingObserver {
     status.value = 'ongoing';
     durationSeconds.value = 0;
 
+    final acceptedMillis = DateTime.now().millisecondsSinceEpoch;
     LocalNotificationService.cancelIncomingCallNotification(sessionId!);
     _startCallTimer();
-    _showOngoingNotification();
+    _showOngoingNotification(startedAtMillis: acceptedMillis);
 
     try {
       await webrtcService.setRemoteAnswer(answerSdp);
@@ -356,18 +357,16 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _callTimer?.cancel();
     _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       durationSeconds.value++;
-      _showOngoingNotification();
     });
   }
 
-  void _showOngoingNotification() {
+  void _showOngoingNotification({int? startedAtMillis}) {
     if (sessionId != null) {
-      final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
-      final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
       LocalNotificationService.showOngoingCallNotification(
         sessionId: sessionId!,
         title: 'Active Call in Progress',
-        body: 'Talking with $providerName - $minutes:$seconds',
+        body: 'Talking with $providerName',
+        startedAtMillis: startedAtMillis,
       );
     }
   }
