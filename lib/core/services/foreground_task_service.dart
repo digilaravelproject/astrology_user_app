@@ -76,18 +76,22 @@ class ForegroundTaskService {
         text: 'Hang up',
       ),
     ];
-    if (await FlutterForegroundTask.isRunningService) {
-      FlutterForegroundTask.updateService(
-        notificationTitle: title,
-        notificationText: text,
-      );
-    } else {
-      await FlutterForegroundTask.startService(
-        notificationTitle: title,
-        notificationText: text,
-        callback: startCallback,
-        notificationButtons: buttons,
-      );
+    try {
+      if (await FlutterForegroundTask.isRunningService) {
+        FlutterForegroundTask.updateService(
+          notificationTitle: title,
+          notificationText: text,
+        );
+      } else {
+        await FlutterForegroundTask.startService(
+          notificationTitle: title,
+          notificationText: text,
+          callback: startCallback,
+          notificationButtons: buttons,
+        );
+      }
+    } catch (e) {
+      Logger.d("ForegroundTaskService startService failed/ignored: $e");
     }
   }
 
