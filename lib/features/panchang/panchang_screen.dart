@@ -21,8 +21,8 @@ class PanchangScreen extends GetView<PanchangController> {
     print('[PCB_APP] [DEBUG] PanchangScreen build called');
     return Scaffold(
       backgroundColor: const Color(0xFFFDF9F5),
-      appBar: const CustomAppBar(
-        title: 'Panchang',
+      appBar: CustomAppBar(
+        title: 'Panchang'.tr,
       ),
       body: Column(
         children: [
