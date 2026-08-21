@@ -58,9 +58,6 @@ class ForegroundTaskService {
 
   static Future<void> requestPermissions() async {
     if (Platform.isAndroid) {
-      if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-        await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-      }
       final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
       if (notificationPermissionStatus != NotificationPermission.granted) {
         await FlutterForegroundTask.requestNotificationPermission();
