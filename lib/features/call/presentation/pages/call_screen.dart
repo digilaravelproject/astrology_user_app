@@ -81,34 +81,48 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Bar: Title/Status
+                  // Top Bar: Title/Status & Switch to Chat action
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 32),
-                          Text(
-                            status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          if (status == 'ongoing')
-                            Text(
-                              '$minutes:$seconds',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
+                    child: Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 16),
+                              Text(
+                                status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.5,
+                                ),
                               ),
-                            ),
-                        ],
-                      ),
+                              const SizedBox(height: 8),
+                              if (status == 'ongoing')
+                                Text(
+                                  '$minutes:$seconds',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 12,
+                          child: IconButton(
+                            icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 26),
+                            tooltip: "Switch to Chat",
+                            onPressed: () => _showSwitchToChatDialog(context),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
