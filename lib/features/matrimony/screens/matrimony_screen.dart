@@ -283,7 +283,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
           ),
         ),
         child: AppText(
-          title,
+          title.tr,
           fontSize: 13,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected ? Colors.black87 : Colors.grey[700],
@@ -354,7 +354,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppText(
-                    option,
+                    option.tr,
                     fontSize: 14,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? Colors.black87 : Colors.grey[700],

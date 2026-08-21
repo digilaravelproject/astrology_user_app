@@ -287,7 +287,7 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
             value: isChecked,
             activeColor: AppColors.deepPink,
             dense: true,
-            title: AppText(displayText, fontSize: 14, color: Colors.black87),
+            title: AppText(displayText.tr, fontSize: 14, color: Colors.black87),
             controlAffinity: ListTileControlAffinity.leading,
             onChanged: (val) {
               setState(() {
@@ -313,7 +313,7 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
             groupValue: isSelected ? option : null,
             activeColor: AppColors.deepPink,
             dense: true,
-            title: AppText(displayText, fontSize: 14, color: Colors.black87),
+            title: AppText(displayText.tr, fontSize: 14, color: Colors.black87),
             onChanged: (val) {
               setState(() {
                 if (cat['title'] == AppStrings.sortBy) {
