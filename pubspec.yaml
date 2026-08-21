@@ -131,9 +131,11 @@ flutter:
     - assets/icons/bubble_img.png
     - assets/icons/verify.png
     - assets/images/
+    - assets/images/SURYAPATH.jpeg
     - assets/images/app_icon.png
     - assets/images/app_logo.png
     - assets/images/astro.jpg
+    - assets/images/background.png
     - assets/images/bg_join_session_home.jpeg
     - assets/images/bg_login.jpeg
     - assets/images/bubble_img.png
