@@ -7,6 +7,8 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 
 class LocalNotificationService {
