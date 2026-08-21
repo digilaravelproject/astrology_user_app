@@ -647,7 +647,11 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   }
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
-    if (_sessionId == null || (status.value != 'ongoing' && status.value != 'initiated')) return;
+    debugPrint("==== [FLOATING_CHAT_DEBUG] ChatController.minimizeToBubble called! sessionId=$_sessionId, status=${status.value}, shouldPop=$shouldPop ====");
+    if (_sessionId == null || (status.value != 'ongoing' && status.value != 'initiated')) {
+      debugPrint("==== [FLOATING_CHAT_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====");
+      return;
+    }
     WebSocketService.activeSessionId = null;
     final startStr = _startedAt ?? WebSocketService.sessionStartTimes[_sessionId!] ?? DateTime.now().subtract(Duration(seconds: elapsedSeconds.value)).toIso8601String();
     WebSocketService.sessionStartTimes[_sessionId!] = startStr;
@@ -661,6 +665,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       status: status.value,
       onTap: () {
         final currentStatus = FloatingChatBubble.chatStatus.value;
+        debugPrint("==== [FLOATING_CHAT_DEBUG] FloatingChatBubble tapped! Navigating back to ChatScreen for sessionId=$_sessionId ====");
         FloatingChatBubble.dismiss(stopForegroundService: false);
         Get.to(
           () => ChatScreen(
