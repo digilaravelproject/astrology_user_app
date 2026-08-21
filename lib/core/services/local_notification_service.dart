@@ -248,6 +248,7 @@ class LocalNotificationService {
       'incoming_call_channel_v1',
       'Incoming Calls',
       channelDescription: 'Alert for incoming calls',
+      icon: '@mipmap/ic_launcher',
       importance: Importance.max,
       priority: Priority.high,
       ongoing: false,
@@ -289,6 +290,7 @@ class LocalNotificationService {
       'active_consultation_foreground_channel_v3',
       'Active Consultation Service',
       channelDescription: 'Ongoing active call and chat consultation status',
+      icon: '@mipmap/ic_launcher',
       importance: Importance.low,
       priority: Priority.low,
       ongoing: true,
@@ -358,6 +360,7 @@ class LocalNotificationService {
           ? 'Incoming Calls'
           : (channelId == 'chats_channel' ? 'Chat Messages & Requests' : 'Consultations & Billing'),
       channelDescription: 'System and real-time notifications',
+      icon: '@mipmap/ic_launcher',
       importance: Importance.max,
       priority: Priority.high,
       sound: RawResourceAndroidNotificationSound(soundName),
