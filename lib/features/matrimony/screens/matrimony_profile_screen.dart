@@ -185,7 +185,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             Icons.bookmark_border,
-                            'Save Profile',
+                            'Save Profile'.tr,
                             () {
                               Navigator.pop(context);
                               _saveProfile();
@@ -194,7 +194,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Icons.check_circle_outline : Icons.block_outlined,
-                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
+                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User'.tr : 'Block User'.tr,
                             () {
                               Navigator.pop(context);
                               _blockUser(context);
@@ -203,7 +203,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             Icons.report_outlined,
-                            'Report Profile',
+                            'Report Profile'.tr,
                             () {
                               Navigator.pop(context);
                               _reportProfile(context);

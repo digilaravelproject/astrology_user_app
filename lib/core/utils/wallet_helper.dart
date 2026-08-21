@@ -80,7 +80,7 @@ class WalletHelper {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText(
-                          "Wallet Balance",
+                          "Wallet Balance".tr,
                           fontSize: 14,
                           color: Colors.grey.shade700,
                         ),
@@ -110,14 +110,14 @@ class WalletHelper {
               const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 32),
               const SizedBox(height: 8),
               AppText(
-                "Ready to Connect",
+                "Ready to Connect".tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: Colors.black87,
               ),
               const SizedBox(height: 8),
               AppText(
-                "You have sufficient balance to start the $type.",
+                "${"You have sufficient balance to start the".tr} ${type.tr}.",
                 fontSize: 14,
                 color: Colors.grey.shade600,
                 textAlign: TextAlign.center,
@@ -126,7 +126,7 @@ class WalletHelper {
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  text: "Start ${type.capitalizeFirst}",
+                  text: type == 'chat' ? "Start Chat".tr : "Start Call".tr,
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
                   onTap: () async {

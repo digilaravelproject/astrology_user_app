@@ -127,13 +127,13 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText(
-                      'Insufficient Balance',
+                      'Insufficient Balance'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.deepPink,
                     ),
                     AppText(
-                      'You need at least ₹${widget.neededAmount?.toStringAsFixed(2)} for this ${widget.serviceType ?? 'session'}.',
+                      '${"You need at least".tr} ₹${widget.neededAmount?.toStringAsFixed(2)} ${"for this package.".tr}',
                       fontSize: 11,
                       color: Colors.grey.shade600,
                     ),
