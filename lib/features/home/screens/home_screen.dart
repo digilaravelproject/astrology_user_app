@@ -23,6 +23,13 @@ import '../../matrimony/widgets/matrimony_section.dart';
 import '../widgets/remedy_services_section.dart';
 import '../../wallet/screens/wallet_screen.dart';
 import '../../notification/screens/notification_screen.dart';
+import '../../call/presentation/controllers/call_controller.dart';
+import '../../../core/services/network/api_client.dart';
+import '../../../core/services/network/websocket_service.dart';
+import '../../../core/services/local_notification_service.dart';
+import '../../chat/presentation/widgets/floating_chat_bubble.dart';
+import '../../chat/presentation/pages/chat_screen.dart';
+import '../../chat/presentation/bindings/chat_binding.dart';
 import '../../notification/controllers/notification_controller.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../../core/widgets/custom_drawer.dart';
@@ -240,10 +247,79 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {}
     
     try {
-      refreshTasks.add(Get.find<LiveController>().fetchActiveSessions());
+      refreshTasks.add(_checkCurrentActiveSession());
+    } catch (_) {}
+
+    try {
+      if (Get.isRegistered<CallController>()) {
+        refreshTasks.add(Get.find<CallController>().checkCurrentActiveCallSession());
+      }
     } catch (_) {}
 
     await Future.wait(refreshTasks);
+  }
+
+  Future<void> _checkCurrentActiveSession() async {
+    try {
+      final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
+      if (response.isSuccess && response.body != null) {
+        final data = response.body;
+        final session = (data is Map)
+            ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
+            : null;
+        final sessionId = session?['id'];
+        final status = session?['status'];
+        final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
+        final name = session?['provider']?['name'] ?? 'Astrologer';
+
+        if (sessionId != null && startedAt != null) {
+          WebSocketService.sessionStartTimes[sessionId] = startedAt.toString();
+        }
+
+        DateTime? parsedStart;
+        if (startedAt != null) {
+          String isoUtc = startedAt.toString().replaceAll(' ', 'T');
+          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+            isoUtc += 'Z';
+          }
+          parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
+        }
+        final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
+
+        if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
+          if (sessionId != null) {
+            LocalNotificationService.showOngoingChatNotification(
+              sessionId: sessionId,
+              title: '$name • Chat',
+              body: 'Ongoing chat session',
+              startedAtMillis: startedAtMillis,
+            );
+          }
+          FloatingChatBubble.show(
+            context: Get.context!,
+            sessionId: sessionId,
+            name: name,
+            imageUrl: '',
+            status: status,
+            startedAt: startedAt,
+            onTap: () {
+              final currentStatus = FloatingChatBubble.chatStatus.value;
+              Get.to(
+                () => ChatScreen(
+                  astrologerName: name,
+                  astrologerImage: '',
+                  sessionId: sessionId,
+                  initialStatus: currentStatus,
+                ),
+                binding: ChatBinding(),
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking active chat session on refresh: $e');
+    }
   }
 
 
