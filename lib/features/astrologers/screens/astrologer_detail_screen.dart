@@ -91,22 +91,21 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       children: [
         Positioned.fill(
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.primaryColor.withOpacity(0.3),
-                  Colors.white,
+                  Color(0xFFFAF5EF),
+                  Color(0xFFFDF9F5),
                 ],
-                stops: const [0.0, 0.45],
               ),
             ),
           ),
         ),
         Positioned.fill(
           child: Opacity(
-            opacity: 0.25,
+            opacity: 0.08,
             child: Image.asset(
               ImageConstants.loginBackground,
               fit: BoxFit.cover,
@@ -129,13 +128,18 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            gradient: LinearGradient(
-                              colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
-                            ),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: AppText(
                             _astrologer!.name,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textColorPrimary,
                           ),
@@ -146,9 +150,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
-                      ),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D), size: 20),
@@ -161,9 +170,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       margin: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.5)],
-                        ),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: PopupMenuButton<String>(
                         icon: const Icon(Icons.more_vert, color: Color(0xFF2D2D2D), size: 20),
@@ -817,10 +831,10 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                                   Flexible(
                                     child: AppText(
                                       astro.name,
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.w900,
                                       color: AppColors.textColorPrimary,
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
