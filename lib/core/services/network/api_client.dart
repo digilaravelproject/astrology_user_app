@@ -33,6 +33,7 @@ class ApiClient {
       contentType: 'application/json',
       headers: {
         'Accept': 'application/json',
+        'Accept-Encoding': 'gzip, deflate, br',
         'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36',
       },
       validateStatus: (status) => status == null ? false : status < 500,
