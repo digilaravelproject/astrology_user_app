@@ -246,11 +246,6 @@ class ProfileScreen extends StatelessWidget {
           title: AppStrings.following,
           onTap: () => Get.toNamed(AppRoutes.followingScreen),
         ),
-        _buildMenuItem(
-          icon: Iconsax.user_add_copy,
-          title: AppStrings.astrologerRegistration,
-          onTap: () => Get.to(() => AstrologerRegistrationScreen()),
-        ),
 
         const SizedBox(height: 10),
         _buildSectionHeader(AppStrings.supportLegal),
