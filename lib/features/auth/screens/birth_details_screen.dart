@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../routes/route_helper.dart';
@@ -28,45 +29,243 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   final TextEditingController _placeController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime now = DateTime.now();
+    DateTime tempDate = selectedDate ?? now.subtract(const Duration(days: 365 * 20));
+    if (tempDate.isAfter(now)) {
+      tempDate = now;
+    }
+    final result = await showDialog<DateTime>(
       context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 20)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.deepPink,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textColorPrimary,
-            ),
-          ),
-          child: child!,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final formattedHeader = "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                width: 320,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F7F7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                      ),
+                      child: Text(
+                        formattedHeader,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4FC3F7),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1, color: Color(0xFF4FC3F7), thickness: 1.5),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 180,
+                      child: Theme(
+                        data: ThemeData.light().copyWith(
+                          cupertinoOverrideTheme: const CupertinoThemeData(
+                            textTheme: CupertinoTextThemeData(
+                              dateTimePickerTextStyle: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.date,
+                          initialDateTime: tempDate,
+                          minimumDate: DateTime(1900),
+                          maximumDate: DateTime.now(),
+                          onDateTimeChanged: (DateTime newDate) {
+                            setModalState(() {
+                              tempDate = newDate;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1, color: Colors.black12),
+                    InkWell(
+                      onTap: () {
+                        if (tempDate.isAfter(DateTime.now())) {
+                          tempDate = DateTime.now();
+                        }
+                        Navigator.of(context).pop(tempDate);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: const Text(
+                          'Done',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) setState(() => selectedDate = picked);
+    if (result != null) {
+      setState(() => selectedDate = result);
+    }
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final now = DateTime.now();
+    final bool isSelectedDateToday = selectedDate != null &&
+        selectedDate!.year == now.year &&
+        selectedDate!.month == now.month &&
+        selectedDate!.day == now.day;
+
+    DateTime tempTime = DateTime(
+      selectedDate?.year ?? now.year,
+      selectedDate?.month ?? now.month,
+      selectedDate?.day ?? now.day,
+      selectedTime?.hour ?? now.hour,
+      selectedTime?.minute ?? now.minute,
+    );
+
+    if (isSelectedDateToday && tempTime.isAfter(now)) {
+      tempTime = now;
+    }
+
+    final result = await showDialog<DateTime>(
       context: context,
-      initialTime: TimeOfDay.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.deepPink,
-              onPrimary: Colors.white,
-              onSurface: AppColors.textColorPrimary,
-            ),
-          ),
-          child: child!,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final hour = tempTime.hour == 0 ? 12 : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
+            final minute = tempTime.minute.toString().padLeft(2, '0');
+            final period = tempTime.hour >= 12 ? 'PM' : 'AM';
+            final formattedHeader = "$hour:$minute $period";
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                width: 320,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F7F7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                      ),
+                      child: Text(
+                        formattedHeader,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4FC3F7),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1, color: Color(0xFF4FC3F7), thickness: 1.5),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 180,
+                      child: Theme(
+                        data: ThemeData.light().copyWith(
+                          cupertinoOverrideTheme: const CupertinoThemeData(
+                            textTheme: CupertinoTextThemeData(
+                              dateTimePickerTextStyle: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: CupertinoDatePicker(
+                          mode: CupertinoDatePickerMode.time,
+                          initialDateTime: tempTime,
+                          maximumDate: isSelectedDateToday ? DateTime.now() : null,
+                          onDateTimeChanged: (DateTime newTime) {
+                            setModalState(() {
+                              if (isSelectedDateToday && newTime.isAfter(DateTime.now())) {
+                                tempTime = DateTime.now();
+                              } else {
+                                tempTime = newTime;
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1, color: Colors.black12),
+                    InkWell(
+                      onTap: () {
+                        final currentNow = DateTime.now();
+                        if (isSelectedDateToday && tempTime.isAfter(currentNow)) {
+                          tempTime = currentNow;
+                        }
+                        Navigator.of(context).pop(tempTime);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: const Text(
+                          'Done',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) setState(() => selectedTime = picked);
+    if (result != null) {
+      setState(() => selectedTime = TimeOfDay(hour: result.hour, minute: result.minute));
+    }
+  }
+
+  String _getDayName(int weekday) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days[(weekday - 1) % 7];
+  }
+
+  String _getMonthShort(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[(month - 1) % 12];
   }
 
   @override
