@@ -220,7 +220,7 @@ class MatrimonySection extends StatelessWidget {
                         const SizedBox(height: 4),
                         
                         AppText(
-                          data.maritalStatus,
+                          data.maritalStatus.tr,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF7F8487),
@@ -236,6 +236,7 @@ class MatrimonySection extends StatelessWidget {
                         _buildDetailItem(Icons.school_outlined, 'Education', data.education),
                         const SizedBox(height: 6),
                         _buildDetailItem(Icons.work_outline, 'Profession', data.jobTitle),
+
 
                         const SizedBox(height: 4),
                        Row(
@@ -303,9 +304,9 @@ class MatrimonySection extends StatelessWidget {
                 color: const Color(0xFF2D3142).withOpacity(0.6),
               ),
               children: [
-                TextSpan(text: '$label: '),
+                TextSpan(text: '${label.tr}: '),
                 TextSpan(
-                  text: displayValue,
+                  text: displayValue.tr,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2D3142),

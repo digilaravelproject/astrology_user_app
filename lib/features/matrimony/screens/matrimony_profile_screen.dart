@@ -447,17 +447,17 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   const SizedBox(height: 16),
                   Divider(color: Colors.grey[200], thickness: 1),
                   const SizedBox(height: 16),
-                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus),
+                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus.tr),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} Years  • ${profile.height} Feet'),
+                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} ${"Years".tr}  • ${profile.height} ${"Feet".tr}'),
 
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.school_outlined, profile.education),
+                  _buildQuickInfo(Icons.school_outlined, profile.education.tr),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.work_outline, profile.jobTitle),
+                  _buildQuickInfo(Icons.work_outline, profile.jobTitle.tr),
 
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.location_on_outlined, profile.location),
+                  _buildQuickInfo(Icons.location_on_outlined, profile.location.tr),
 
 
                    const SizedBox(height: 24),
