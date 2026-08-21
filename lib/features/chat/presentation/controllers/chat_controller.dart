@@ -630,21 +630,29 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> rejectChatSession() async {
-    if (_sessionId == null) return;
-    isLoading.value = true;
+    if (_sessionId == null) {
+      Get.back();
+      return;
+    }
+    final targetId = _sessionId!;
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    LocalNotificationService.cancelOngoingChatNotification(targetId);
+    FloatingChatBubble.dismiss();
+    
+    // Immediately close screen for smooth UX
+    if (Get.isRegistered<ChatController>()) {
+      Get.back();
+    }
+
     try {
-      await _rejectChatSessionUseCase.execute(_sessionId!);
-      status.value = 'ended';
-      _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
-      FloatingChatBubble.dismiss();
-      Get.back(); // close chat screen
+      await _rejectChatSessionUseCase.execute(targetId);
     } catch (e) {
-      debugPrint("Error rejecting chat session: $e");
-      CustomSnackbar.showError(e.toString());
+      debugPrint("Error rejecting/cancelling chat session: $e");
     } finally {
-      isLoading.value = false;
+      LocalNotificationService.cancelOngoingChatNotification(targetId);
+      FloatingChatBubble.dismiss();
     }
   }
 
