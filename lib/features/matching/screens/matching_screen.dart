@@ -1436,7 +1436,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   Icon(titleIcon, size: 20, color: AppColors.primaryColor),
                   const SizedBox(width: 8),
                 ],
-                Text(title, style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8))),
+                AppText(title, fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8)),
               ],
             ),
             const SizedBox(height: 8),
@@ -1487,7 +1487,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
                     onTap: isPicker ? (onTap ?? () {}) : null,
                     decoration: InputDecoration(
-                      hintText: hint,
+                      hintText: hint.tr,
                       hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
                       filled: false,
                       fillColor: Colors.transparent,
