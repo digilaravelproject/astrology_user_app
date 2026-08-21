@@ -258,7 +258,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   ),
                   const SizedBox(height: 6),
                   AppText(
-                    astro.areasOfExpertise.join(', '),
+                    astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -266,7 +266,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   AppText(
-                    astro.languages.join(', '),
+                    astro.languages.map((l) => l.trim().tr).join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -274,7 +274,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   AppText(
-                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
+                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${"Years".tr}',
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,

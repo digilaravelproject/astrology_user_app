@@ -1381,7 +1381,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                                       style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9), decoration: TextDecoration.lineThrough,decorationColor: Colors.white,),
                                     ),
                                   ),
-                                Text('₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                                Text('₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}${"/min".tr}', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
                               ],
                             ),
                           ],

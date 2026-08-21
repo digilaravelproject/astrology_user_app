@@ -537,7 +537,7 @@ class ChatListScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       AppText(
-                        astro.areasOfExpertise.join(', '),
+                        astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade600,
@@ -550,7 +550,7 @@ class ChatListScreen extends StatelessWidget {
                           const Icon(Icons.schedule, color: Colors.grey, size: 12),
                           const SizedBox(width: 2),
                           AppText(
-                            '${astro.yearsOfExperience} Years',
+                            '${astro.yearsOfExperience} ${"Years".tr}',
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: Colors.grey.shade600,
@@ -560,7 +560,7 @@ class ChatListScreen extends StatelessWidget {
                           const SizedBox(width: 2),
                           Expanded(
                             child: AppText(
-                              astro.languages.join(', '),
+                              astro.languages.map((l) => l.trim().tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey.shade600,
@@ -582,7 +582,7 @@ class ChatListScreen extends StatelessWidget {
                             color: AppColors.primaryColor,
                           ),
                           AppText(
-                            '/min',
+                            '/min'.tr,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey.shade500,
@@ -596,10 +596,10 @@ class ChatListScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: AppText(
-                                'Session ${astro.packageSessionPriceOnly}',
+                                '${"Session".tr} ${astro.packageSessionPriceOnly}',
                                 fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.orange,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.orange.shade800,
                               ),
                             ),
                           ],
@@ -644,7 +644,7 @@ class ChatListScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: CustomButton(
-                            text: '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
+                            text: '${AppStrings.chat.tr} - ₹${astro.chatRate ?? '0'}${"/min".tr}',
                             icon: Icons.chat,
                             fontSize: 11,
                             height: 32,
