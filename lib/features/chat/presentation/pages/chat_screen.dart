@@ -143,6 +143,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 context,
                 widget.astrologerName,
                 widget.astrologerImage,
+                shouldPop: true,
               );
             } else {
               Navigator.of(context).pop();
