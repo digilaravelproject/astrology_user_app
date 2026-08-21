@@ -198,7 +198,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Skills
                             AppText(
-                              astro.areasOfExpertise.join(', '),
+                              astro.areasOfExpertise.map((e) => e.tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -208,7 +208,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Languages
                             AppText(
-                              astro.languages.join(', '),
+                              astro.languages.map((l) => l.tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -218,7 +218,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Experience
                             AppText(
-                              '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
+                              '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years.tr}',
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -229,26 +229,6 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                     ],
                   ),
-                  /*
-                  if (astro.hasOffer)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: AppText(
-                          '${astro.discountPercentage ?? ''}% OFF',
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: astro.hasOffer ? 8 : 12),
-                  */
                   const SizedBox(height: 12),
 
                   // Buttons Row
@@ -280,11 +260,11 @@ class AstrologersPreviewSection extends StatelessWidget {
                                 children: [
                                   if (astro.isChatEnabled)
                                     CustomButton(
-                                      text: '${AppStrings.chat} ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
+                                      text: '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min',
                                       icon: Icons.chat_bubble_outline_rounded,
                                       fontSize: 10,
                                       height: 32,
-                                      width: 95,
+                                      width: 110,
                                       borderRadius: 8,
                                       backgroundColor: Colors.transparent,
                                       textColor: const Color(0xFF4CAF50),
@@ -308,11 +288,11 @@ class AstrologersPreviewSection extends StatelessWidget {
                                     const SizedBox(width: 8),
                                   if (astro.isCallEnabled)
                                     CustomButton(
-                                      text: '${AppStrings.call} ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(0) ?? '0'}',
+                                      text: '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
                                       icon: Icons.call_outlined,
                                       fontSize: 10,
                                       height: 32,
-                                      width: 95,
+                                      width: 110,
                                       borderRadius: 8,
                                       backgroundColor: Colors.transparent,
                                       textColor: const Color(0xFF4CAF50),

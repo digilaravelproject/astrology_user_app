@@ -146,14 +146,14 @@ class AstrologerModel {
     
     String durationStr;
     if (hours > 0 && minutes > 0) {
-      durationStr = '$hours hr $minutes min';
+      durationStr = '$hours ${"hr".tr} $minutes ${"min".tr}';
     } else if (hours > 0) {
-      durationStr = '$hours hr';
+      durationStr = '$hours ${"hr".tr}';
     } else {
-      durationStr = '$minutes min';
+      durationStr = '$minutes ${"min".tr}';
     }
     
-    return '${'Session'.tr} ($durationStr) @ ₹$packagePrice';
+    return '${'Session'.tr} ($durationStr)';
   }
 
   String get packageSessionTimeOnly {
