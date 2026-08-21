@@ -49,7 +49,6 @@ class LocalNotificationService {
                   ? FloatingChatBubble.chatStatus.value
                   : 'ongoing';
 
-              FloatingChatBubble.dismiss(stopForegroundService: false);
               if (!Get.isRegistered<ChatController>()) {
                 ChatBinding().dependencies();
               }
