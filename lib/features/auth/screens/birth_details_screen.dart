@@ -110,9 +110,9 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         width: double.infinity,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: const Text(
-                          'Done',
-                          style: TextStyle(
+                        child: Text(
+                          'Done'.tr,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
@@ -235,9 +235,9 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         width: double.infinity,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: const Text(
-                          'Done',
-                          style: TextStyle(
+                        child: Text(
+                          'Done'.tr,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,

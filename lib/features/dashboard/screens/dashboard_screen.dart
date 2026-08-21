@@ -48,13 +48,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const MatchingScreen(),
   ];
 
-  final List<NavItem> _navItems = [
-    NavItem(icon: Iconsax.home_2_copy, label: AppStrings.navHome),
-    NavItem(icon: Iconsax.lovely_copy, label: AppStrings.navMatrimony),
-    NavItem(icon: Iconsax.message_copy, label: 'Chat'),
-    NavItem(icon: Iconsax.call_copy, label: 'Call'),
-    NavItem(icon: Iconsax.play_circle_copy, label: AppStrings.navLive),
-    NavItem(icon: Iconsax.heart_copy, label: 'Matching'),
+  List<NavItem> get _navItems => [
+    NavItem(icon: Iconsax.home_2_copy, label: 'home'.tr),
+    NavItem(icon: Iconsax.lovely_copy, label: 'matrimony'.tr),
+    NavItem(icon: Iconsax.message_copy, label: 'chat'.tr),
+    NavItem(icon: Iconsax.call_copy, label: 'call'.tr),
+    NavItem(icon: Iconsax.play_circle_copy, label: 'live'.tr),
+    NavItem(icon: Iconsax.heart_copy, label: 'matching'.tr),
   ];
 
   void _onItemTapped(int index) {

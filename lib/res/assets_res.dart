@@ -17,6 +17,6 @@ class AssetsRes {
   static const String BACKGROUND = 'assets/images/background.png';
   static const String BG_JOIN_SESSION_HOME = 'assets/images/bg_join_session_home.jpeg';
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
-  static const String BUBBLE_IMG = 'assets/images/bubble_img.png';
+  static const String BUBBLE_IMG_BG = 'assets/images/bubble_img.png';
   static const String LIVE_SESSION_BG = 'assets/images/live_session_bg.png';
 }
