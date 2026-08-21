@@ -64,11 +64,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF4FC3F7),
+                          color: AppColors.deepPink,
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: Color(0xFF4FC3F7), thickness: 1.5),
+                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -185,11 +185,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF4FC3F7),
+                          color: AppColors.deepPink,
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: Color(0xFF4FC3F7), thickness: 1.5),
+                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
