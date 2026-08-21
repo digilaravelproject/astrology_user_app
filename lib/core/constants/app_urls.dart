@@ -45,6 +45,10 @@ class AppUrls {
   static const String packageActiveStatus = '/api/v1/user/packages/active-status';
   static const String packageSessionStart = '/api/v1/user/packages/session/start';
   static const String packageSessionEnd = '/api/v1/user/packages/session/end';
+  static const String packageSpawnChannel = '/api/v1/user/packages/session/spawn-channel';
+  static const String packageTerminateChannel = '/api/v1/user/packages/session/terminate-channel';
+  static const String packageHeartbeat = '/api/v1/user/packages/session/heartbeat';
+  static const String packageActiveBanner = '/api/v1/user/packages/active-banner';
 
   static const String faqs = '/api/v1/faqs';
   static const String privacyPolicy = '/api/v1/privacy-policy';
