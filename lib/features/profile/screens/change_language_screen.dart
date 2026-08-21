@@ -14,6 +14,9 @@ class ChangeLanguageScreen extends StatefulWidget {
   const ChangeLanguageScreen({super.key});
 
   @override
+  State<ChangeLanguageScreen> createState() => _ChangeLanguageScreenState();
+}
+
 class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
   final LocalizationController _localizationController = Get.find<LocalizationController>();
   int _selectedIndex = 0;

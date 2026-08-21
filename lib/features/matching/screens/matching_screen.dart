@@ -1627,7 +1627,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text(
+                      child: Text(
                         'Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
                       ),
@@ -1710,7 +1710,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text(
+                      child: Text(
                         'Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
                       ),

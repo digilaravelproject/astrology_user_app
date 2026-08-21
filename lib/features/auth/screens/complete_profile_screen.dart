@@ -117,7 +117,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         width: double.infinity,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: const Text(
+                        child: Text(
                           'Done'.tr,
                           style: TextStyle(
                             fontSize: 16,
@@ -242,7 +242,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         width: double.infinity,
                         alignment: Alignment.center,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: const Text(
+                        child: Text(
                           'Done'.tr,
                           style: TextStyle(
                             fontSize: 16,
