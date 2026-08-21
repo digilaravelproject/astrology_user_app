@@ -51,6 +51,15 @@ class FCMNotificationService {
         final type = message.data['type']?.toString();
         final title = message.notification?.title ?? '';
 
+        // If chat accepted notification arrives while user is on waiting screen, update status to ongoing
+        if (title.contains('Accepted') || type == 'chat_accepted' || type == 'CHAT_ACCEPTED' || type == 'chat') {
+          final int sessionId = int.tryParse(message.data['session_id']?.toString() ?? message.data['id']?.toString() ?? '') ?? 0;
+          if (sessionId > 0) {
+            WebSocketService.sessionStatusUpdates[sessionId] = 'ongoing';
+            WebSocketService.sessionStatusUpdates.refresh();
+          }
+        }
+
         // If chat/call ended message arrives, immediately cancel ongoing timer notification & floating bubble
         if (title.contains('Chat Ended') ||
             type == 'chat_ended' ||

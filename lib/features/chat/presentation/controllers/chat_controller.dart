@@ -204,6 +204,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
           final int senderId = int.tryParse(lastMsg['sender_id']?.toString() ?? '') ?? 0;
           final bool isMe = senderId == _currentUserId;
 
+          if (status.value == 'initiated' || status.value == 'ringing') {
+            status.value = 'ongoing';
+            _stopRingtone();
+            _setupTimer(null);
+          }
+
           // Don't add if it's sent by me since we already added local/sending state or handle duplicates
           final int msgId = int.tryParse(lastMsg['id']?.toString() ?? '') ?? 0;
           final alreadyExists = messages.any((m) => m.id == msgId);
