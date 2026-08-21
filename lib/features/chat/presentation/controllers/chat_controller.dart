@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -52,6 +53,26 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         _markMessagesReadUseCase = markMessagesReadUseCase,
         _endChatSessionUseCase = endChatSessionUseCase,
         _rejectChatSessionUseCase = rejectChatSessionUseCase;
+
+  AudioPlayer? _audioPlayer;
+
+  Future<void> _startRingtone() async {
+    try {
+      _audioPlayer = AudioPlayer();
+      await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer?.play(AssetSource(AppConstants.outgoingRingPath));
+    } catch (e) {
+      debugPrint("Error starting user chat outgoing ringtone: $e");
+    }
+  }
+
+  void _stopRingtone() {
+    try {
+      _audioPlayer?.stop();
+      _audioPlayer?.dispose();
+      _audioPlayer = null;
+    } catch (_) {}
+  }
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
   final RxBool isLoading = false.obs;
@@ -156,6 +177,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
     // Show ongoing local notification
     if (status.value == 'ongoing' || status.value == 'initiated' || status.value == 'ringing') {
+      if (status.value == 'initiated' || status.value == 'ringing') {
+        _startRingtone();
+      }
       LocalNotificationService.showOngoingChatNotification(
         sessionId: sessionId,
         title: status.value == 'ongoing' ? 'Chat in progress' : 'Waiting for acceptance...',
@@ -264,6 +288,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         if (newStatus != null && status.value != newStatus) {
           status.value = newStatus;
           if (newStatus == 'ongoing') {
+            _stopRingtone();
             final startedAtStr = WebSocketService.sessionStartTimes[_sessionId];
             DateTime? serverStartTime;
             if (startedAtStr != null && startedAtStr.isNotEmpty) {
@@ -317,6 +342,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   }
 
   void _handleDismissed() {
+    _stopRingtone();
     status.value = 'ended';
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
@@ -630,6 +656,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       return;
     }
     final targetId = _sessionId!;
+    _stopRingtone();
     status.value = 'ended';
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
@@ -732,6 +759,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    _stopRingtone();
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _msgSub?.cancel();
