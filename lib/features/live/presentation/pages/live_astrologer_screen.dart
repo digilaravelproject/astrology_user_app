@@ -27,12 +27,13 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppText(
-            'Join ',
+            'Join'.tr,
             fontSize: 22,
             fontWeight: FontWeight.w400,
             color: const Color(0xFF2D3142),
             letterSpacing: -0.5,
           ),
+          const SizedBox(width: 4),
           AppText(
             'Live Sessions',
             fontSize: 22,

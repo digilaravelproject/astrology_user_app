@@ -270,7 +270,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       setState(() {});
                     },
                     decoration: InputDecoration(
-                      hintText: 'Search Kundli...',
+                      hintText: 'Search Kundli...'.tr,
                       hintStyle: TextStyle(
                         color: Colors.grey.shade500,
                         fontSize: 14,
