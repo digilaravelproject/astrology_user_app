@@ -246,13 +246,14 @@ class _HomeScreenState extends State<HomeScreen> {
       refreshTasks.add(Get.find<FounderController>().fetchFounderWords());
     } catch (_) {}
     
+    // Trigger session checks in background so UI refresh isn't blocked by timeout
     try {
-      refreshTasks.add(_checkCurrentActiveSession());
+      _checkCurrentActiveSession();
     } catch (_) {}
 
     try {
       if (Get.isRegistered<CallController>()) {
-        refreshTasks.add(Get.find<CallController>().checkCurrentActiveCallSession());
+        Get.find<CallController>().checkCurrentActiveCallSession();
       }
     } catch (_) {}
 
