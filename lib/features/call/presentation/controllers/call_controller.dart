@@ -395,6 +395,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void cleanUp() {
+    if (status.value == 'idle' && sessionId == null) return;
     _stopRingtone();
     _callTimer?.cancel();
     _ringingTimer?.cancel();
