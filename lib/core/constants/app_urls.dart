@@ -21,7 +21,8 @@ class AppUrls {
   static const String blockedAstrologers = '/api/v1/user/blocked-astrologers';
   static const String wallet = '/api/v1/user/wallet';
   static const String walletTopup = '/api/v1/user/wallet/topup';
-  static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
+  static const String walletTopupVerify = '/api/v1/user/wallet/verify-topup';
+  static String walletInvoice(int transactionId) => '/api/v1/user/wallet/transactions/$transactionId/invoice';
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
   static const String updateMatrimonyProfile = '/api/v1/user/matrimony/update_profile';
