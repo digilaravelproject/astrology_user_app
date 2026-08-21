@@ -134,7 +134,7 @@ class CallListScreen extends StatelessWidget {
                                 const SizedBox(width: 18),
                                 // All Chip
                                 _buildInteractiveChip(
-                                  label: 'All', 
+                                  label: 'All'.tr, 
                                   isSelected: astrologerController.selectedSkills.isEmpty && !isOnlineOnly,
                                   onTap: () => astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call'),
                                 ),
@@ -144,7 +144,7 @@ class CallListScreen extends StatelessWidget {
                                 ...AppConstants.skillList.map((skill) => Padding(
                                   padding: const EdgeInsets.only(right: 8),
                                   child: _buildInteractiveChip(
-                                    label: skill, 
+                                    label: skill.tr, 
                                     isSelected: astrologerController.selectedSkills.contains(skill),
                                     onTap: () => astrologerController.toggleSkill(skill, serviceType: 'call'),
                                   ),
@@ -152,7 +152,7 @@ class CallListScreen extends StatelessWidget {
 
                                 // Online Chip
                                 _buildInteractiveChip(
-                                  label: 'Online', 
+                                  label: 'Online'.tr, 
                                   isSelected: isOnlineOnly,
                                   onTap: () => astrologerController.fetchFilteredAstrologers(serviceType: 'call', online: !isOnlineOnly),
                                 ),
@@ -538,7 +538,7 @@ class CallListScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       AppText(
-                        astro.areasOfExpertise.join(', '),
+                        astro.areasOfExpertise.map((e) => e.tr).join(', '),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade600,
@@ -551,7 +551,7 @@ class CallListScreen extends StatelessWidget {
                           const Icon(Icons.schedule, color: Colors.grey, size: 12),
                           const SizedBox(width: 2),
                           AppText(
-                            '${astro.yearsOfExperience} Years',
+                            '${astro.yearsOfExperience} ${"Years".tr}',
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
                             color: Colors.grey.shade600,
@@ -561,7 +561,7 @@ class CallListScreen extends StatelessWidget {
                           const SizedBox(width: 2),
                           Expanded(
                             child: AppText(
-                              astro.languages.join(', '),
+                              astro.languages.map((l) => l.tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey.shade600,
@@ -583,7 +583,7 @@ class CallListScreen extends StatelessWidget {
                             color: AppColors.primaryColor,
                           ),
                           AppText(
-                            '/min',
+                            '/${"min".tr}',
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey.shade500,
@@ -597,7 +597,7 @@ class CallListScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: AppText(
-                                'Session ${astro.packageSessionPriceOnly}',
+                                '${"Session".tr} ${astro.packageSessionPriceOnly}',
                                 fontSize: 10,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.orange,
@@ -645,7 +645,7 @@ class CallListScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: CustomButton(
-                            text: '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min',
+                            text: '${AppStrings.call.tr} - ₹${astro.callRate ?? '0'}/${"min".tr}',
                             icon: Icons.call,
                             fontSize: 11,
                             height: 32,
