@@ -431,7 +431,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
-    if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) return;
+    debugPrint("==== [CALL_DEBUG] CallController.minimizeToBubble called! sessionId=$sessionId, status=${status.value}, shouldPop=$shouldPop ====");
+    if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) {
+      debugPrint("==== [CALL_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====");
+      return;
+    }
     final startStr = WebSocketService.sessionStartTimes[sessionId!] ?? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toIso8601String();
     WebSocketService.sessionStartTimes[sessionId!] = startStr;
 
@@ -443,6 +447,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
       startedAt: status.value == 'ongoing' ? startStr : null,
       status: status.value,
       onTap: () {
+        debugPrint("==== [CALL_DEBUG] FloatingCallBubble tapped! Returning to CallScreen ====");
         FloatingCallBubble.dismiss(stopForegroundService: false);
         Get.to(() => const CallScreen());
       },
@@ -564,6 +569,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    debugPrint("==== [CALL_DEBUG] CallController.onClose invoked! sessionId=$sessionId, status=${status.value} ====");
     WidgetsBinding.instance.removeObserver(this);
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();
