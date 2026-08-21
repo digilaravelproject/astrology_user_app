@@ -19,7 +19,6 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
   bool isCameraGranted = false;
   bool isMicrophoneGranted = false;
   bool isNotificationGranted = false;
-  bool isOverlayGranted = false;
 
   @override
   void initState() {
@@ -45,17 +44,13 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
     isCameraGranted = await Permission.camera.isGranted;
     isMicrophoneGranted = await Permission.microphone.isGranted;
     isNotificationGranted = await Permission.notification.isGranted;
-    isOverlayGranted = await Permission.systemAlertWindow.isGranted;
     if (mounted) {
       setState(() {});
     }
   }
 
   bool get _allPermissionsGranted {
-    if (GetPlatform.isIOS) {
-      return isCameraGranted && isMicrophoneGranted && isNotificationGranted;
-    }
-    return isCameraGranted && isMicrophoneGranted && isNotificationGranted && isOverlayGranted;
+    return isCameraGranted && isMicrophoneGranted && isNotificationGranted;
   }
 
   void _navigateToNext() {
@@ -75,12 +70,7 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
       Permission.notification,
     ];
     
-    if (GetPlatform.isAndroid) {
-      permissions.add(Permission.systemAlertWindow);
-    }
-    
     await permissions.request();
-
     await _checkPermissions();
     
     // Check if any permanently denied
@@ -88,9 +78,8 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
       bool cameraPermanentlyDenied = await Permission.camera.isPermanentlyDenied;
       bool micPermanentlyDenied = await Permission.microphone.isPermanentlyDenied;
       bool notifPermanentlyDenied = await Permission.notification.isPermanentlyDenied;
-      bool overlayPermanentlyDenied = await Permission.systemAlertWindow.isPermanentlyDenied;
       
-      if (cameraPermanentlyDenied || micPermanentlyDenied || notifPermanentlyDenied || overlayPermanentlyDenied) {
+      if (cameraPermanentlyDenied || micPermanentlyDenied || notifPermanentlyDenied) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -158,13 +147,6 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
                 title: 'Notifications',
                 description: 'To notify you about upcoming sessions and messages.',
                 isGranted: isNotificationGranted,
-              ),
-              const SizedBox(height: 20),
-              _buildPermissionItem(
-                icon: Icons.layers_outlined,
-                title: 'Display over other apps',
-                description: 'Required to show floating chat bubble in background.',
-                isGranted: isOverlayGranted,
               ),
               const Spacer(),
               if (!_allPermissionsGranted)
