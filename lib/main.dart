@@ -1,8 +1,10 @@
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/theme/dark_theme.dart';
 import 'package:astro_user/core/theme/light_theme.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'core/services/notification/notification_service.dart';
 import 'core/theme/theme_controller.dart';
 import 'features/language/controllers/localization_controller.dart';
 import 'init_app.dart';
@@ -11,6 +13,7 @@ import 'core/bindings/initial_bindings.dart';
 
 void main() async {
   await initApp();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 

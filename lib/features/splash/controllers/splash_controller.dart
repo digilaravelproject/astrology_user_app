@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import '../../../core/services/storage/shared_prefs.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/notification/notification_service.dart';
 import '../../../routes/route_helper.dart';
 import '../domain/services/splash_service.dart';
 
@@ -33,10 +34,12 @@ class SplashController extends GetxController {
         final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
 
         if (isLoggedIn) {
-          Get.offAllNamed(RouteHelper.getHomeRoute());
+          await Get.offAllNamed(RouteHelper.getHomeRoute());
         } else {
-          Get.offAllNamed(RouteHelper.getLoginRoute());
+          await Get.offAllNamed(RouteHelper.getLoginRoute());
         }
+        // Check if app was opened via notification from terminated state
+        await NotificationService.instance.handleTerminatedMessage();
       } else {
         // Handle maintenance or version issues
         // For now, just navigate to login
