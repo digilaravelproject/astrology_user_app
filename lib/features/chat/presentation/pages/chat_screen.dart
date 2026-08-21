@@ -151,12 +151,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Call switch icon for active consultations
-                    IconButton(
-                      icon: const Icon(Icons.call, color: Colors.green),
-                      tooltip: "Switch to Call",
-                      onPressed: () => _showSwitchToCallConfirmation(context),
-                    ),
+                    // Call switch icon ONLY for package/session chats
+                    if (widget.isPackageChat)
+                      IconButton(
+                        icon: const Icon(Icons.call, color: Colors.green),
+                        tooltip: "Switch to Call",
+                        onPressed: () => _showSwitchToCallConfirmation(context),
+                      ),
                     TextButton(
                       onPressed: () => _showEndChatConfirmation(context),
                       child: const AppText(
@@ -602,6 +603,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               );
 
               try {
+                int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
+                
+                if (subSessionId > 0) {
+                  await PackageSessionService.spawnChannel(
+                    subSessionId: subSessionId,
+                    channelType: 'call',
+                    callType: 'audio',
+                  );
+                }
+
                 int providerId = _controller.peerId ?? 0;
 
                 if (providerId <= 0) {
@@ -616,8 +627,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 }
                 
                 if (providerId > 0) {
-                  // End chat session (skip summary so loader can close cleanly)
-                  await _controller.endChatSession(skipSummary: true);
+                  // If not package session, end chat session cleanly
+                  if (subSessionId <= 0) {
+                    await _controller.endChatSession(skipSummary: true);
+                  }
                   
                   // Close loader dialog
                   if (Get.isDialogOpen ?? false) Get.back();

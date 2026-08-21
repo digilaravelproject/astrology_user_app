@@ -473,6 +473,52 @@ class PackageSessionService {
     }
   }
 
+  static int? activeSubSessionId;
+
+  /// Spawn Dual-Subchannel (WhatsApp-Style Switch)
+  static Future<Map<String, dynamic>> spawnChannel({
+    required int subSessionId,
+    required String channelType,
+    String? callType,
+    String? question,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageSpawnChannel,
+      data: {
+        'sub_session_id': subSessionId,
+        'channel_type': channelType,
+        if (callType != null) 'call_type': callType,
+        if (question != null) 'question': question,
+      },
+    );
+    if (response.isSuccess) {
+      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
+  /// Terminate channel
+  static Future<Map<String, dynamic>> terminateChannel({
+    required int subSessionId,
+    required String channelType,
+    required String action,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageTerminateChannel,
+      data: {
+        'sub_session_id': subSessionId,
+        'channel_type': channelType,
+        'action': action,
+      },
+    );
+    if (response.isSuccess) {
+      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
   /// End sub-session
   static Future<EndSubSessionResult> endSubSession(int subSessionId) async {
     final response = await _apiClient.post(

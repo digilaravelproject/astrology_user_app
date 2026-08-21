@@ -113,15 +113,16 @@ class _CallScreenState extends State<CallScreen> {
                             ],
                           ),
                         ),
-                        Positioned(
-                          right: 0,
-                          top: 12,
-                          child: IconButton(
-                            icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 26),
-                            tooltip: "Switch to Chat",
-                            onPressed: () => _showSwitchToChatDialog(context),
+                        if (controller.isPackageSession)
+                          Positioned(
+                            right: 0,
+                            top: 12,
+                            child: IconButton(
+                              icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 26),
+                              tooltip: "Switch to Chat",
+                              onPressed: () => _showSwitchToChatDialog(context),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -260,48 +261,68 @@ class _CallScreenState extends State<CallScreen> {
     final providerId = controller.providerId;
     final providerName = controller.providerName ?? 'Astrologer';
     final providerImage = controller.providerImage ?? '';
+    final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
 
-    // End call first
-    if (controller.status.value == 'ongoing') {
-      await controller.endCall();
+    if (subSessionId > 0 && controller.isPackageSession) {
+      try {
+        await PackageSessionService.spawnChannel(
+          subSessionId: subSessionId,
+          channelType: 'chat',
+        );
+      } catch (e) {
+        debugPrint("Error spawning chat channel: $e");
+      }
     } else {
-      await controller.cancelCall();
+      // End call first for normal non-package calls
+      if (controller.status.value == 'ongoing') {
+        await controller.endCall();
+      } else {
+        await controller.cancelCall();
+      }
     }
+
     Get.back(); // Pop CallScreen
 
-    // Show loading and call chat initiate
-    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
-    try {
-      final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.post(
-        AppUrls.initiateChat,
-        data: {'provider_id': providerId},
-      );
-      Get.back(); // close loader
-
-      if (response.isSuccess) {
-        CustomSnackbar.showSuccess(response.message);
-        
-        int sessionId = 0;
-        if (response.body != null && response.body is Map) {
-          final sessionData = response.body['session'];
-          if (sessionData != null && sessionData is Map) {
-            sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
-          }
+    if (subSessionId <= 0) {
+      // Show loading and call chat initiate for normal non-package sessions
+      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+      try {
+        final apiClient = Get.find<ApiClient>();
+        final response = await apiClient.post(
+          AppUrls.initiateChat,
+          data: {'provider_id': providerId},
+        );
+        Get.back(); // close loader
+        if (response.isSuccess && response.body['data'] != null) {
+          final sessionId = response.body['data']['id'];
+          Get.to(
+            () => ChatScreen(
+              astrologerName: providerName,
+              astrologerImage: providerImage,
+              sessionId: sessionId,
+              initialStatus: 'initiated',
+            ),
+            binding: ChatBinding(),
+          );
+        } else {
+          CustomSnackbar.showError(response.message);
         }
-        
-        Get.to(() => ChatScreen(
+      } catch (e) {
+        Get.back(); // close loader
+        CustomSnackbar.showError("Failed to initiate chat: $e");
+      }
+    } else {
+      // Directly navigate to ChatScreen for active package sub-session
+      Get.to(
+        () => ChatScreen(
           astrologerName: providerName,
           astrologerImage: providerImage,
-          sessionId: sessionId,
-          initialStatus: 'initiated',
-        ), binding: ChatBinding());
-      } else {
-        CustomSnackbar.showError(response.message);
-      }
-    } catch (e) {
-      Get.back(); // close loader
-      CustomSnackbar.showError(e.toString());
+          sessionId: controller.sessionId ?? 0,
+          initialStatus: 'ongoing',
+          isPackageChat: true,
+        ),
+        binding: ChatBinding(),
+      );
     }
   }
 
