@@ -16,7 +16,7 @@ class RemedyListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText('All Remedies', color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        title: AppText('All Remedies'.tr, color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         backgroundColor: AppColors.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -26,7 +26,7 @@ class RemedyListScreen extends StatelessWidget {
         }
 
         if (remedyController.remedies.isEmpty) {
-          return Center(child: AppText('No remedies available.'));
+          return Center(child: AppText('No remedies available.'.tr));
         }
 
         return GridView.builder(

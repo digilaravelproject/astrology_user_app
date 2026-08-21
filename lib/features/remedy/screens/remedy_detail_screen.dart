@@ -49,7 +49,7 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: "Remedy Details",
+        title: "Remedy Details".tr,
         backgroundColor: Colors.white,
         iconColor: Colors.black,
         elevation: 0.5,

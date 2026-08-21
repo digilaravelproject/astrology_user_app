@@ -73,7 +73,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     }
                   },
                   decoration: InputDecoration(
-                    hintText: 'Search by name...',
+                    hintText: 'Search by name...'.tr,
                     hintStyle: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 14,
@@ -110,7 +110,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 Icon(Iconsax.search_status_copy,
                     size: 64, color: Colors.grey.shade300),
                 const SizedBox(height: 16),
-                AppText('No astrologers found',
+                AppText('No astrologers found'.tr,
                     color: Colors.grey.shade500, fontSize: 16),
               ],
             ),
@@ -125,7 +125,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 Icon(Iconsax.message_search_copy,
                     size: 64, color: Colors.grey.shade200),
                 const SizedBox(height: 16),
-                AppText('Start typing to search...',
+                AppText('Start typing to search...'.tr,
                     color: Colors.grey.shade400, fontSize: 14),
               ],
             ),

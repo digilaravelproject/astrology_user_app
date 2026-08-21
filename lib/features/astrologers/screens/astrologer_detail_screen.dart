@@ -830,7 +830,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               AppText(
-                                astro.areasOfExpertise.join(', '),
+                                astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textColorSecondary,
@@ -871,7 +871,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     ),
                     const SizedBox(height: 4),
                     AppText(
-                      astro.languages.join(', '),
+                      astro.languages.map((l) => l.trim().tr).join(', '),
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textColorHint,
@@ -1340,7 +1340,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           children: [
                             Row(
                               children: [
-                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Chat', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text((_astrologer?.isBlocked == true ? 'Blocked' : 'Chat').tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
                                 if (_astrologer?.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),
@@ -1426,7 +1426,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           children: [
                             Row(
                               children: [
-                                Text(_astrologer?.isBlocked == true ? 'Blocked' : 'Call', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text((_astrologer?.isBlocked == true ? 'Blocked' : 'Call').tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
                                 if (_astrologer?.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),
