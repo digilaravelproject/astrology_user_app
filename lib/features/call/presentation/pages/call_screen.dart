@@ -81,52 +81,34 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Bar: Title/Status + Switch to Chat icon
+                  // Top Bar: Title/Status
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const SizedBox(width: 48), // Spacer to balance
-                        Column(
-                          children: [
-                            const SizedBox(height: 32),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 32),
+                          Text(
+                            status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          if (status == 'ongoing')
                             Text(
-                              status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                              '$minutes:$seconds',
                               style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            if (status == 'ongoing')
-                              Text(
-                                '$minutes:$seconds',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                          ],
-                        ),
-                        if (status == 'ongoing')
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32.0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.chat_bubble_outline_rounded,
                                 color: Colors.white,
-                                size: 24,
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
                               ),
-                              onPressed: () => _showSwitchToChatDialog(context),
                             ),
-                          )
-                        else
-                          const SizedBox(width: 48),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
 
