@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:get/get.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -18,13 +19,29 @@ class RemedyGrid extends StatelessWidget {
 
     return Obx(() {
       if (remedyController.isLoading.value) {
-        return const SizedBox(
-          height: 150,
-          child: Center(
-            child: CircularProgressIndicator(
-              color: AppColors.primaryColor,
-              strokeWidth: 2,
-            ),
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          height: 155,
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            scrollDirection: Axis.horizontal,
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              return Container(
+                width: 115,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                child: Shimmer.fromColors(
+                  baseColor: Colors.grey[300]!,
+                  highlightColor: Colors.grey[100]!,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         );
       }
