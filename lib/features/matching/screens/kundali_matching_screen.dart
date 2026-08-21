@@ -43,9 +43,9 @@ class KundliMatchScreen extends GetView<MatchingController> {
             icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textColorPrimary),
             onPressed: () => Navigator.maybePop(context),
           ),
-          title: const Text(
-            'Match Result',
-            style: TextStyle(
+          title: Text(
+            'Match Result'.tr,
+            style: const TextStyle(
               color: AppColors.textColorPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -67,19 +67,19 @@ class KundliMatchScreen extends GetView<MatchingController> {
               fontWeight: FontWeight.normal,
               fontSize: 13,
             ),
-            tabs: tabs.map((t) => Tab(text: t)).toList(),
+            tabs: tabs.map((t) => Tab(text: t.tr)).toList(),
           ),
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.primaryColor),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: AppColors.primaryColor),
+                  const SizedBox(height: 16),
                   Text(
-                    'Fetching Kundli Matching Details...',
+                    'Fetching Kundli Matching Details...'.tr,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

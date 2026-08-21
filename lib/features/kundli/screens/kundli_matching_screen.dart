@@ -74,9 +74,9 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
-              tabs: const [
-                Tab(text: 'OPEN KUNDLI'),
-                Tab(text: 'NEW MATCHING'),
+              tabs: [
+                Tab(text: 'OPEN KUNDLI'.tr),
+                Tab(text: 'NEW MATCHING'.tr),
               ],
             ),
           ),
@@ -98,16 +98,16 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppText(
-            "BOY'S DETAILS",
+          AppText(
+            "BOY'S DETAILS".tr,
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFFD81B60),
+            color: const Color(0xFFD81B60),
           ),
           const SizedBox(height: 20),
           _buildInputField(
             icon: Icons.person_outline,
-            hint: "Boy's Name",
+            hint: "Boy's Name".tr,
             controller: _boyNameController,
           ),
           const SizedBox(height: 15),
@@ -141,8 +141,8 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
           ),
           const SizedBox(height: 30),
           
-          const AppText(
-            "GIRL'S DETAILS",
+          AppText(
+            "GIRL'S DETAILS".tr,
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Color(0xFFD81B60),
