@@ -849,7 +849,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               width: 70,
                               height: 28,
                               child: CustomButton(
-                                text: _controller.isFollowing.value ? 'Following' : 'Follow',
+                                text: _controller.isFollowing.value ? 'Following'.tr : 'Follow'.tr,
                                 fontSize: 10,
                                 height: 28,
                                 borderRadius: 14,
@@ -881,7 +881,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText(
-                          'Exp: ${astro.yearsOfExperience} Years',
+                          '${"Exp".tr}: ${astro.yearsOfExperience} ${"Years".tr}',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textColorPrimary,
