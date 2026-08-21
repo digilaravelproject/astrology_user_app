@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
@@ -35,6 +36,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+  DateTime? _lastBackPressTime;
   final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
 
   final List<Widget> _screens = [
@@ -345,9 +347,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
             } catch (e) {
               debugPrint("Error sending to background: $e");
             }
-          } else {
-            SystemNavigator.pop();
+            return;
           }
+
+          // If user is not on Home tab (index 0), navigate to Home tab first
+          if (_selectedIndex != 0) {
+            setState(() {
+              _selectedIndex = 0;
+            });
+            return;
+          }
+
+          // Double tap to exit logic on Home tab
+          final now = DateTime.now();
+          if (_lastBackPressTime == null || now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+            _lastBackPressTime = now;
+            CustomSnackbar.showInfo('Press back again to exit app');
+            return;
+          }
+
+          SystemNavigator.pop();
         },
         child: Scaffold(
           extendBody: true,
