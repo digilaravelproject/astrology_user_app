@@ -9,6 +9,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 
 class CallScreen extends StatefulWidget {
@@ -113,7 +114,7 @@ class _CallScreenState extends State<CallScreen> {
                             ],
                           ),
                         ),
-                        if (controller.isPackageSession)
+                        if (controller.isPackageCall)
                           Positioned(
                             right: 0,
                             top: 12,
@@ -263,7 +264,7 @@ class _CallScreenState extends State<CallScreen> {
     final providerImage = controller.providerImage ?? '';
     final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
 
-    if (subSessionId > 0 && controller.isPackageSession) {
+    if (subSessionId > 0 && controller.isPackageCall) {
       try {
         await PackageSessionService.spawnChannel(
           subSessionId: subSessionId,
