@@ -215,7 +215,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             // Messages List
             Expanded(
               child: Obx(() {
-                final isInitiated = _controller.status.value == 'initiated';
+                final st = _controller.status.value.toLowerCase();
+                final isInitiated = (st == 'initiated' || st == 'ringing') && st != 'ongoing' && st != 'accepted';
                 if (isInitiated) {
                   return _buildRingingScreen();
                 }
