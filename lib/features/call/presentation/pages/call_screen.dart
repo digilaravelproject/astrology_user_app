@@ -291,10 +291,13 @@ class _CallScreenState extends State<CallScreen> {
     
     try {
       final apiClient = Get.find<ApiClient>();
-      int activeChatSessionId = controller.sessionId ?? 0;
+      int activeChatSessionId = 0;
+      String chatInitialStatus = 'ongoing';
 
-      // If activeChatSessionId is valid and > 0, open directly
-      if (activeChatSessionId <= 0) {
+      if (subSessionId > 0 && controller.isPackageCall) {
+        activeChatSessionId = controller.sessionId ?? 0;
+        chatInitialStatus = 'ongoing';
+      } else {
         final response = await apiClient.post(
           AppUrls.initiateChat,
           data: {'provider_id': providerId},
@@ -302,6 +305,7 @@ class _CallScreenState extends State<CallScreen> {
         if (response.isSuccess && response.body != null) {
           final data = response.body['data'] ?? response.body;
           activeChatSessionId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
+          chatInitialStatus = data['status']?.toString() ?? 'initiated';
         }
       }
 
@@ -312,7 +316,7 @@ class _CallScreenState extends State<CallScreen> {
           astrologerName: providerName,
           astrologerImage: providerImage,
           sessionId: activeChatSessionId,
-          initialStatus: 'ongoing',
+          initialStatus: chatInitialStatus,
           isPackageChat: controller.isPackageCall || subSessionId > 0,
         ),
         binding: ChatBinding(),
