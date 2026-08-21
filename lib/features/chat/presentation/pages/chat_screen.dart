@@ -16,6 +16,7 @@ import 'package:astro_user/features/call/presentation/controllers/call_controlle
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 
 class ChatScreen extends StatefulWidget {
   final String astrologerName;
@@ -55,7 +56,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (FloatingChatBubble.isActive) {
       FloatingChatBubble.dismiss();
     }
-    // Retrieve or instantiate controller
+    // Retrieve or instantiate controller safely
+    if (!Get.isRegistered<ChatController>()) {
+      ChatBinding().dependencies();
+    }
     _controller = Get.find<ChatController>();
     _controller.isPackageChat = widget.isPackageChat;
     WidgetsBinding.instance.addPostFrameCallback((_) {

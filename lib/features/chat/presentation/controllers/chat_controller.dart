@@ -232,17 +232,15 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
     // Listen to WebSocket Chat Ended Event
     _endSub?.cancel();
+
+    // Check if already ended before we started listening
+    if (WebSocketService.chatEndedSessionId.value == _sessionId) {
+      _handleChatEndedByPeer();
+    }
+
     _endSub = WebSocketService.chatEndedSessionId.listen((endedSessionId) {
       if (endedSessionId == _sessionId) {
-        status.value = 'ended';
-        _timer?.cancel();
-        FlutterBackgroundService().invoke('stopService');
-        if (_sessionId != null) {
-          LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
-        }
-        if (Get.isRegistered<AuthController>()) {
-          Get.find<AuthController>().checkLoginStatus();
-        }
+        _handleChatEndedByPeer();
       }
     });
 
@@ -287,6 +285,24 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             );
           }
         }
+      }
+    });
+  }
+
+  void _handleChatEndedByPeer() {
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    if (_sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    }
+    FloatingChatBubble.dismiss();
+    if (Get.isRegistered<AuthController>()) {
+      Get.find<AuthController>().checkLoginStatus();
+    }
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (Get.isRegistered<ChatController>()) {
+        Get.back();
       }
     });
   }

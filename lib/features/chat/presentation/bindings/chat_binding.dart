@@ -35,6 +35,7 @@ class ChatBinding extends Bindings {
         endChatSessionUseCase: Get.find<EndChatSessionUseCase>(),
         rejectChatSessionUseCase: Get.find<RejectChatSessionUseCase>(),
       ),
+      fenix: true,
     );
   }
 }

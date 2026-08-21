@@ -48,12 +48,18 @@ class LocalNotificationService {
                   : 'ongoing';
 
               FloatingChatBubble.dismiss(stopForegroundService: false);
-              Get.to(() => ChatScreen(
-                    astrologerName: astroName,
-                    astrologerImage: '',
-                    sessionId: sId,
-                    initialStatus: astroStatus,
-                  ));
+              if (!Get.isRegistered<ChatController>()) {
+                ChatBinding().dependencies();
+              }
+              Get.to(
+                () => ChatScreen(
+                  astrologerName: astroName,
+                  astrologerImage: '',
+                  sessionId: sId,
+                  initialStatus: astroStatus,
+                ),
+                binding: ChatBinding(),
+              );
             }
           }
         }

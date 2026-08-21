@@ -130,16 +130,6 @@ class WalletHelper {
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
                   onTap: () async {
-                    try {
-                      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-                      if (!isOverlayGranted) {
-                        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
-                        await FlutterOverlayWindow.requestPermission();
-                        return;
-                      }
-                    } catch (e) {
-                      debugPrint('Error checking overlay permission: $e');
-                    }
 
                     if (type == 'chat') {
                       Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
