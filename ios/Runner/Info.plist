@@ -23,7 +23,7 @@
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
     <key>LSRequiresIPhoneOS</key>
-    <true/>
+    <true />
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
     <key>UIMainStoryboardFile</key>
@@ -42,22 +42,15 @@
       <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
     <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
+    <true />
     <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
+    <true />
     <key>NSCameraUsageDescription</key>
     <string>This app requires access to the camera to take photos for profile and chat.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>This app requires access to the photo library to pick images for profile and chat.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>This app requires access to the microphone for audio calls.</string>
-    <key>UIBackgroundModes</key>
-    <array>
-      <string>fetch</string>
-      <string>remote-notification</string>
-    </array>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
     <!-- App Icon Setup -->
     <key>CFBundleIcons</key>
     <dict>
@@ -69,7 +62,7 @@
           <!-- default icon name -->
         </array>
         <key>UIPrerenderedIcon</key>
-        <false/>
+        <false />
       </dict>
       <key>CFBundleAlternateIcons</key>
       <dict>
@@ -80,7 +73,7 @@
             <string>teamfortress</string>
           </array>
           <key>UIPrerenderedIcon</key>
-          <false/>
+          <false />
         </dict>
         <key>iconPhotos</key>
         <dict>
@@ -89,7 +82,7 @@
             <string>photos</string>
           </array>
           <key>UIPrerenderedIcon</key>
-          <false/>
+          <false />
         </dict>
         <key>iconChills</key>
         <dict>
@@ -98,7 +91,7 @@
             <string>chills</string>
           </array>
           <key>UIPrerenderedIcon</key>
-          <false/>
+          <false />
         </dict>
       </dict>
     </dict>

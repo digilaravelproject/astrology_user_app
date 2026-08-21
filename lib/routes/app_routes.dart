@@ -12,5 +12,4 @@ class AppRoutes {
   static const String languageSelection = '/language-selection';
   static const String dashboard = '/dashboard';
   static const String home = '/home';
-  static const String notification = '/notification';
 }

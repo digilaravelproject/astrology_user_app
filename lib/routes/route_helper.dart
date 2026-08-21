@@ -12,7 +12,6 @@ import '../features/auth/screens/registration_success_screen.dart';
 import '../features/dashboard/screens/dashboard_screen.dart';
 import '../features/language/screens/language_selection_screen.dart';
 import '../features/home/screens/home_screen.dart';
-import '../features/notification/screens/notification_screen.dart';
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -29,7 +28,6 @@ class RouteHelper {
   static String getHomeRoute() => AppRoutes.home;
   static String getLanguageSelectionRoute() => AppRoutes.languageSelection;
   static String getDashboardRoute() => AppRoutes.dashboard;
-  static String getNotificationRoute() => AppRoutes.notification;
 
   static List<GetPage> routes = [
     GetPage(
@@ -95,11 +93,6 @@ class RouteHelper {
       name: AppRoutes.dashboard,
       page: () => const DashboardScreen(),
       transition: Transition.fadeIn,
-    ),
-    GetPage(
-      name: AppRoutes.notification,
-      page: () => const NotificationScreen(),
-      transition: Transition.rightToLeft,
     ),
   ];
 }
