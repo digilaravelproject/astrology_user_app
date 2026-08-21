@@ -16,11 +16,10 @@ class ChatRepositoryImpl implements IChatRepository {
         _localDataSource = localDataSource;
 
   @override
-  Future<({List<ChatMessage> messages, String? startedAt, int? peerId})> getChatHistory({
+  Future<({List<ChatMessage> messages, String? startedAt, int? peerId, String? sessionStatus})> getChatHistory({
     required int sessionId,
     required int currentUserId,
   }) async {
-
     final response = await _remoteDataSource.getChatHistory(sessionId);
     if (response.isSuccess && response.body != null) {
       final body = response.body;
@@ -75,12 +74,13 @@ class ChatRepositoryImpl implements IChatRepository {
         }
       }
 
-      final String? startedAt = body['started_at']?.toString();
+      final String? startedAt = sessionData['started_at']?.toString() ?? body['started_at']?.toString();
+      final String? sessionStatus = sessionData['status']?.toString() ?? body['status']?.toString();
       _localDataSource.cacheMessages(sessionId, messagesList);
-      return (messages: messagesList, startedAt: startedAt, peerId: peerId);
+      return (messages: messagesList, startedAt: startedAt, peerId: peerId, sessionStatus: sessionStatus);
     }
 
-    return (messages: <ChatMessage>[], startedAt: null, peerId: null);
+    return (messages: <ChatMessage>[], startedAt: null, peerId: null, sessionStatus: null);
   }
 
   @override

@@ -288,6 +288,14 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
     // Listen to WebSocket Session Status Updates (e.g. ChatAccepted)
     _statusSub?.cancel();
+    if (_sessionId != null && WebSocketService.sessionStatusUpdates.containsKey(_sessionId)) {
+      final cachedStatus = WebSocketService.sessionStatusUpdates[_sessionId!];
+      if (cachedStatus != null && cachedStatus == 'ongoing' && status.value != 'ongoing') {
+        status.value = 'ongoing';
+        _stopRingtone();
+        _setupTimer(_startedAt);
+      }
+    }
     _statusSub = WebSocketService.sessionStatusUpdates.listen((updates) {
       if (_sessionId != null && updates.containsKey(_sessionId)) {
         final newStatus = updates[_sessionId!];
@@ -451,6 +459,10 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       );
       messages.assignAll(result.messages);
       _peerId = result.peerId;
+      if (result.sessionStatus != null && (result.sessionStatus == 'ongoing' || result.sessionStatus == 'accepted')) {
+        status.value = 'ongoing';
+        _stopRingtone();
+      }
       if (result.startedAt != null && (status.value == 'ongoing' || status.value == 'accepted')) {
         _startedAt = result.startedAt;
         _setupTimer(result.startedAt);
