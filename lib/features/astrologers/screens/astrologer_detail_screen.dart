@@ -644,7 +644,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         controller: _reviewController,
                         maxLines: 4,
                         decoration: InputDecoration(
-                          hintText: "How was your session with $name?",
+                          hintText: "How was your session?".tr,
                           border: InputBorder.none,
                         ),
                       ),
@@ -653,7 +653,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: CustomButton(
-                        text: "Post Review",
+                        text: "Post Review".tr,
                         backgroundColor: AppColors.deepPink,
                         textColor: Colors.white,
                         onTap: () async {
