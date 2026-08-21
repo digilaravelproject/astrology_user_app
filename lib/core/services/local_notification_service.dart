@@ -175,7 +175,7 @@ class LocalNotificationService {
     await _notificationsPlugin.cancel(sessionId + 100);
     await _notificationsPlugin.cancel(sessionId + 50000);
 
-    final int startTime = startedAtMillis ?? DateTime.now().millisecondsSinceEpoch;
+    final bool isAccepted = startedAtMillis != null;
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'active_consultation_foreground_channel_v4',
       'Active Consultation Service',
@@ -186,10 +186,10 @@ class LocalNotificationService {
       ongoing: true,
       autoCancel: false,
       onlyAlertOnce: true,
-      showWhen: true,
-      usesChronometer: true,
-      when: startTime,
-      subText: 'Ongoing Session',
+      showWhen: isAccepted,
+      usesChronometer: isAccepted,
+      when: isAccepted ? startedAtMillis : null,
+      subText: isAccepted ? 'Ongoing Session' : 'Ringing...',
       category: AndroidNotificationCategory.service,
       visibility: NotificationVisibility.public,
       audioAttributesUsage: AudioAttributesUsage.notification,
