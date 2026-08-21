@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart' as sax;
 import '../../../core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
@@ -1560,48 +1561,174 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    final initial = _parseDateString(controller.text) ?? DateTime.now();
-    final DateTime? picked = await showDatePicker(
+    DateTime tempDate = _parseDateString(controller.text) ?? DateTime.now();
+    final result = await showModalBottomSheet<DateTime>(
       context: context,
-      initialDate: initial,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryColor,
-            ),
-          ),
-          child: child!,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: 320,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Select Birth Date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoTheme(
+                      data: const CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: TextStyle(
+                            color: AppColors.deepPink,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.date,
+                        initialDateTime: tempDate,
+                        minimumDate: DateTime(1900),
+                        maximumDate: DateTime.now(),
+                        onDateTimeChanged: (DateTime newDate) {
+                          setModalState(() {
+                            tempDate = newDate;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: Colors.black12),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(tempDate),
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) {
-      controller.text = "${picked.day}-${_getMonthName(picked.month)}-${picked.year}";
+    if (result != null) {
+      controller.text = "${result.day}-${_getMonthName(result.month)}-${result.year}";
     }
   }
 
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
-    final initial = _parseTimeString(controller.text) ?? TimeOfDay.now();
-    final TimeOfDay? picked = await showTimePicker(
+    DateTime tempTime = DateTime.now();
+    final result = await showModalBottomSheet<DateTime>(
       context: context,
-      initialTime: initial,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryColor,
-            ),
-          ),
-          child: child!,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: 320,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Select Birth Time',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoTheme(
+                      data: const CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: TextStyle(
+                            color: AppColors.deepPink,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.time,
+                        initialDateTime: tempTime,
+                        onDateTimeChanged: (DateTime newTime) {
+                          setModalState(() {
+                            tempTime = newTime;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: Colors.black12),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(tempTime),
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: const Text(
+                        'Done',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) {
-      final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
-      final period = picked.period == DayPeriod.am ? 'AM' : 'PM';
-      controller.text = "${hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')} $period";
+    if (result != null) {
+      final hour = result.hour;
+      final minute = result.minute.toString().padLeft(2, '0');
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+      controller.text = "$formattedHour:$minute $period";
     }
   }
 
@@ -1974,14 +2101,74 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               controller: _dobController,
               readOnly: true,
               onTap: () async {
-                final date = await showDatePicker(
+                DateTime tempDate = DateTime.now();
+                final result = await showModalBottomSheet<DateTime>(
                   context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
+                  backgroundColor: Colors.transparent,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return Container(
+                          height: 320,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'Select Birth Date',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoTheme(
+                                  data: const CupertinoThemeData(
+                                    textTheme: CupertinoTextThemeData(
+                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    initialDateTime: tempDate,
+                                    minimumDate: DateTime(1900),
+                                    maximumDate: DateTime.now(),
+                                    onDateTimeChanged: (DateTime newDate) {
+                                      setModalState(() => tempDate = newDate);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1, color: Colors.black12),
+                              InkWell(
+                                onTap: () => Navigator.of(context).pop(tempDate),
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  child: const Text('Done', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 );
-                if (date != null) {
-                  _dobController.text = "${date.day}-${date.month}-${date.year}";
+                if (result != null) {
+                  _dobController.text = "${result.day}-${result.month}-${result.year}";
                 }
               },
               decoration: InputDecoration(
@@ -2005,12 +2192,76 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               controller: _tobController,
               readOnly: true,
               onTap: () async {
-                final time = await showTimePicker(
+                DateTime tempTime = DateTime.now();
+                final result = await showModalBottomSheet<DateTime>(
                   context: context,
-                  initialTime: TimeOfDay.now(),
+                  backgroundColor: Colors.transparent,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return Container(
+                          height: 320,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'Select Birth Time',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoTheme(
+                                  data: const CupertinoThemeData(
+                                    textTheme: CupertinoTextThemeData(
+                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.time,
+                                    initialDateTime: tempTime,
+                                    onDateTimeChanged: (DateTime newTime) {
+                                      setModalState(() => tempTime = newTime);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1, color: Colors.black12),
+                              InkWell(
+                                onTap: () => Navigator.of(context).pop(tempTime),
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  child: const Text('Done', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 );
-                if (time != null) {
-                  _tobController.text = time.format(context);
+                if (result != null) {
+                  final hour = result.hour;
+                  final minute = result.minute.toString().padLeft(2, '0');
+                  final period = hour >= 12 ? 'PM' : 'AM';
+                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+                  _tobController.text = "$formattedHour:$minute $period";
                 }
               },
               decoration: InputDecoration(
