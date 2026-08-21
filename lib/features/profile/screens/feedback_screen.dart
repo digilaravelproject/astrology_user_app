@@ -79,7 +79,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     controller: _feedbackController,
                     maxLines: 6,
                     decoration: InputDecoration(
-                      hintText: "Tell us what you liked or how we can improve...",
+                      hintText: "Tell us what you liked or how we can improve...".tr,
                       hintStyle: TextStyle(color: Colors.grey.shade400),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(20),
@@ -88,7 +88,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ),
                 const SizedBox(height: 40),
                 CustomButton(
-                  text: "Submit Feedback",
+                  text: "Submit Feedback".tr,
                   onTap: () {
                     if (_rating == 0) {
                       Get.snackbar("Error", "Please provide a rating", backgroundColor: Colors.redAccent, colorText: Colors.white);
