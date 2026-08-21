@@ -465,7 +465,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     fontSize: 15,
                     height: 50,
                     borderRadius: 25,
-                    text: _showDetails ? 'Collapse Details' : 'Show Full Profile',
+                    text: (_showDetails ? 'Collapse Details' : 'Show Full Profile').tr,
                     onTap: () {
                       setState(() {
                         _showDetails = !_showDetails;
@@ -756,17 +756,17 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       icon: Icons.person_outline_rounded,
       title: AppStrings.personalInformation,
       children: [
-        _buildDetailRow(AppStrings.age, '${profile.age} Years'),
-        _buildDetailRow(AppStrings.height, '${profile.height} Feet'),
-        _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'),
-        _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor),
-        _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus),
-        _buildDetailRow(AppStrings.livesIn, profile.location),
-        _buildDetailRow(AppStrings.eatingHabits, 'Not specified'),
-        _buildDetailRow(AppStrings.religion, 'Not specified'),
-        _buildDetailRow(AppStrings.subcaste, 'Not specified'),
-        _buildDetailRow(AppStrings.manglik, 'Not specified'),
-        _buildDetailRow(AppStrings.employment, profile.jobTitle, isLink: true),
+        _buildDetailRow(AppStrings.age, '${profile.age} ${"Years".tr}'),
+        _buildDetailRow(AppStrings.height, '${profile.height} ${"Feet".tr}'),
+        _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor.tr),
+        _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus.tr),
+        _buildDetailRow(AppStrings.livesIn, profile.location.tr),
+        _buildDetailRow(AppStrings.eatingHabits, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.religion, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.subcaste, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.manglik, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.employment, profile.jobTitle.tr, isLink: true),
       ],
     );
   }

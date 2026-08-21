@@ -538,7 +538,7 @@ class CallListScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       AppText(
-                        astro.areasOfExpertise.map((e) => e.tr).join(', '),
+                        astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade600,
@@ -561,7 +561,7 @@ class CallListScreen extends StatelessWidget {
                           const SizedBox(width: 2),
                           Expanded(
                             child: AppText(
-                              astro.languages.map((l) => l.tr).join(', '),
+                              astro.languages.map((l) => l.trim().tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey.shade600,

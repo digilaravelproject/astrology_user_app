@@ -198,7 +198,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Skills
                             AppText(
-                              astro.areasOfExpertise.map((e) => e.tr).join(', '),
+                              astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -208,7 +208,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Languages
                             AppText(
-                              astro.languages.map((l) => l.tr).join(', '),
+                              astro.languages.map((l) => l.trim().tr).join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -218,7 +218,7 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Experience
                             AppText(
-                              '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years.tr}',
+                              '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${"Years".tr}',
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
