@@ -1146,7 +1146,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppText(
-                    isEdit ? 'Edit Kundli' : 'Add New Kundli',
+                    isEdit ? 'Edit Kundli'.tr : 'Add New Kundli'.tr,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textColorPrimary,
@@ -1389,7 +1389,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     elevation: 2,
                   ),
                   child: AppText(
-                    isEdit ? 'Update Kundli' : 'Save & View Kundli',
+                    isEdit ? 'Update Kundli'.tr : 'Save & View Kundli'.tr,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -1455,7 +1455,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 4, top: 8),
-          child: AppText(label, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
+          child: AppText(label.tr, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
         ),
         GestureDetector(
           onTap: isPicker ? (onTap ?? () {}) : null,
@@ -1479,28 +1479,41 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 Icon(icon, size: 16, color: AppColors.primaryColor.withOpacity(0.6)),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: TextField(
-                    controller: controller,
-                    cursorColor: AppColors.primaryColor,
-                    readOnly: isPicker,
-                    enabled: !isPicker,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
-                    onTap: isPicker ? (onTap ?? () {}) : null,
-                    decoration: InputDecoration(
-                      hintText: hint.tr,
-                      hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
-                      filled: false,
-                      fillColor: Colors.transparent,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
+                  child: isPicker
+                      ? ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: controller,
+                          builder: (context, value, _) {
+                            final textVal = value.text;
+                            return AppText(
+                              textVal.isEmpty ? hint.tr : textVal.tr,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: textVal.isEmpty ? AppColors.textColorHint.withOpacity(0.6) : AppColors.textColorPrimary,
+                            );
+                          },
+                        )
+                      : TextField(
+                          controller: controller,
+                          cursorColor: AppColors.primaryColor,
+                          readOnly: isPicker,
+                          enabled: !isPicker,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
+                          onTap: isPicker ? (onTap ?? () {}) : null,
+                          decoration: InputDecoration(
+                            hintText: hint.tr,
+                            hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
+                            filled: false,
+                            fillColor: Colors.transparent,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
                 ),
               ],
             ),
