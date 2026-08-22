@@ -320,16 +320,32 @@ class WebSocketService extends GetxService {
           _handleUserLeftLiveSession(data['data']);
         } else if (event == AppUrls.eventPackageSubSessionStarted || event == 'App\\Events\\${AppUrls.eventPackageSubSessionStarted}') {
           Logger.d('Prepaid Package session started: ${data['data']}');
-          final eventData = data['data'];
-          if (eventData != null && eventData is Map) {
-            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+          try {
+            Map<String, dynamic> eventData = {};
+            if (data['data'] is String) {
+              eventData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              eventData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final secs = eventData['remainingDuration'] ?? eventData['remaining_duration'] ?? eventData['subSession']?['purchase']?['remaining_duration'];
+            packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
             isPackageSessionTerminated.value = false;
+          } catch (e) {
+            Logger.e('Error handling PackageSubSessionStarted -> $e');
           }
         } else if (event == AppUrls.eventPackageSubSessionEnded || event == 'App\\Events\\${AppUrls.eventPackageSubSessionEnded}') {
           Logger.d('Prepaid Package session ended: ${data['data']}');
-          final eventData = data['data'];
-          if (eventData != null && eventData is Map) {
-            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+          try {
+            Map<String, dynamic> eventData = {};
+            if (data['data'] is String) {
+              eventData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              eventData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final secs = eventData['remainingDuration'] ?? eventData['remaining_duration'] ?? eventData['subSession']?['purchase']?['remaining_duration'];
+            packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
+          } catch (e) {
+            Logger.e('Error handling PackageSubSessionEnded -> $e');
           }
         } else if (event == AppUrls.eventPackageSessionTerminated || event == 'App\\Events\\${AppUrls.eventPackageSessionTerminated}') {
           Logger.d('Prepaid Package session terminated!');

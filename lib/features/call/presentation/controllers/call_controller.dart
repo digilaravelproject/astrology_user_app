@@ -196,6 +196,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
           if (subSessionData != null) {
             SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
           }
+          // Immediately sync the master countdown from REST API response
+          final remainingSecs = bodyMap is Map
+              ? (bodyMap['remaining_duration'] ?? bodyMap['data']?['remaining_duration'])
+              : null;
+          if (remainingSecs != null) {
+            WebSocketService.packageRemainingSeconds.value = int.tryParse(remainingSecs.toString()) ?? 0;
+          }
         }
         if (sessionData != null) {
           sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
