@@ -310,14 +310,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   void _handleCallDismissed(String reason) {
     status.value = reason; // rejected, cancelled, timeout
+    final wasCallScreenVisible = isCallScreenVisible;
+    cleanUp();
+    if (wasCallScreenVisible) {
+      Get.back(); // Close CallScreen safely
+    }
     if (reason == 'cancelled') {
       CustomSnackbar.showInfo('Call cancelled.');
     } else {
       CustomSnackbar.showError('Call dismissed: $reason');
-    }
-    cleanUp();
-    if (isCallScreenVisible) {
-      Get.back(); // Close CallScreen safely
     }
   }
 
