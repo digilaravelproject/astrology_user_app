@@ -146,7 +146,7 @@ class _CallScreenState extends State<CallScreen> {
                             ],
                           ),
                         ),
-                        if (controller.isPackageCall)
+                        if (controller.isPackageCall && status == 'ongoing')
                           Positioned(
                             right: 0,
                             top: 12,
