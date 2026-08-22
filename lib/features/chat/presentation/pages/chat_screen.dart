@@ -18,6 +18,8 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/features/kundli/kundli_screen.dart';
+import 'package:astro_user/features/auth/controllers/auth_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   final String astrologerName;
@@ -384,6 +386,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
                         onPressed: _showAttachmentBottomSheet,
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.auto_awesome, color: AppColors.deepPink),
+                        onPressed: _openKundli,
+                      ),
                       Expanded(
                         child: TextField(
                           controller: _controller.messageController,
@@ -690,6 +696,73 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.single.path != null) {
       _controller.sendDocumentAttachment(result.files.single);
+    }
+  }
+
+  Future<void> _openKundli() async {
+    String name = '';
+    String gender = '';
+    String dob = '';
+    String tob = '';
+    String place = '';
+    double lat = 0.0;
+    double lng = 0.0;
+
+    // 1. Check messages loaded in ChatController for system message with birth details
+    for (final msg in _controller.messages) {
+      final content = msg.text;
+      if (content.contains('Birth Details:') || content.contains('Date of Birth:')) {
+        final lines = content.split('\n');
+        for (final line in lines) {
+          final trimmed = line.trim().replaceAll(RegExp(r'^-\s*'), '');
+          final lower = trimmed.toLowerCase();
+          if (lower.startsWith('name:')) {
+            name = trimmed.substring(5).trim();
+          } else if (lower.startsWith('date of birth:')) {
+            dob = trimmed.substring(14).trim();
+          } else if (lower.startsWith('time of birth:')) {
+            tob = trimmed.substring(14).trim();
+          } else if (lower.startsWith('place of birth:')) {
+            place = trimmed.substring(15).trim();
+          } else if (lower.startsWith('latitude:')) {
+            lat = double.tryParse(trimmed.substring(9).trim()) ?? 0.0;
+          } else if (lower.startsWith('longitude:')) {
+            lng = double.tryParse(trimmed.substring(10).trim()) ?? 0.0;
+          } else if (lower.startsWith('gender:')) {
+            gender = trimmed.substring(7).trim();
+          }
+        }
+        if (dob.isNotEmpty) break;
+      }
+    }
+
+    // 2. Fetch logged-in user profile if still empty
+    if (dob.isEmpty) {
+      if (Get.isRegistered<AuthController>()) {
+        final currentUser = Get.find<AuthController>().currentUser.value;
+        if (currentUser != null) {
+          name = currentUser.name;
+          gender = currentUser.gender ?? '';
+          dob = currentUser.dateOfBirth ?? '';
+          tob = currentUser.timeOfBirth ?? '';
+          place = currentUser.placeOfBirth ?? '';
+        }
+      }
+    }
+
+    if (dob.isNotEmpty) {
+      if (tob.length == 5) tob += ":00";
+      Get.to(() => KundliScreen(
+        fullName: name,
+        gender: gender.isEmpty ? 'Male' : gender,
+        dob: dob,
+        tob: tob.isNotEmpty ? tob : '00:00:00',
+        place: place.isEmpty ? 'India' : place,
+        latitude: lat,
+        longitude: lng,
+      ));
+    } else {
+      CustomSnackbar.showError("Birth details not found. Please complete profile.");
     }
   }
 
