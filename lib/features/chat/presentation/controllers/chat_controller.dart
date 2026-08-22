@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -54,30 +53,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         _endChatSessionUseCase = endChatSessionUseCase,
         _rejectChatSessionUseCase = rejectChatSessionUseCase;
 
-  AudioPlayer? _audioPlayer;
-
-  Future<void> _startRingtone() async {
+  void _startRingtone() {
     // Sound play disabled
-    /*
-    try {
-      _audioPlayer = AudioPlayer();
-      await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer?.play(AssetSource(AppConstants.outgoingRingPath));
-    } catch (e) {
-      debugPrint("Error starting user chat outgoing ringtone: $e");
-    }
-    */
   }
 
   void _stopRingtone() {
     // Sound stop disabled
-    /*
-    try {
-      _audioPlayer?.stop();
-      _audioPlayer?.dispose();
-      _audioPlayer = null;
-    } catch (_) {}
-    */
   }
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;

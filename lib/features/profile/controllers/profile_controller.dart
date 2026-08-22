@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:astro_user/features/astrologers/domain/services/astrologer_service.dart';
 import '../../../../core/utils/custom_snackbar.dart';
 import '../../../core/services/network/response_model.dart';
 import '../../../core/services/storage/shared_prefs.dart';
@@ -59,6 +60,7 @@ class ProfileController extends GetxController {
 
   final isLoading = false.obs;
   final RxList<dynamic> followingList = <dynamic>[].obs;
+  final RxList<dynamic> blockedList = <dynamic>[].obs;
   final RxList<PlanModel> plans = <PlanModel>[].obs;
   final Rx<PlanModel?> selectedPlan = Rx<PlanModel?>(null);
   PlanModel? activePlan;
@@ -150,6 +152,23 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error fetching following: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchBlocked({bool showLoader = true}) async {
+    try {
+      if (showLoader) isLoading.value = true;
+      final astrologerService = Get.find<AstrologerService>();
+      final result = await astrologerService.getBlockedAstrologers();
+      if (result.isSuccess && result.body != null) {
+        final data = result.body as Map<String, dynamic>;
+        final blocked = data['blocked_astrologers'] as List? ?? data['data'] as List? ?? [];
+        blockedList.assignAll(blocked);
+      }
+    } catch (e) {
+      print('Error fetching blocked: $e');
     } finally {
       isLoading.value = false;
     }

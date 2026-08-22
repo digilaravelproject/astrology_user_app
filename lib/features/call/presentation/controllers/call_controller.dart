@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:vibration/vibration.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
@@ -34,7 +32,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
   String? providerName;
   String? providerImage;
 
-  AudioPlayer? _audioPlayer;
   Timer? _callTimer;
   Timer? _ringingTimer;
   bool _isSummaryShown = false;
@@ -371,32 +368,12 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _startRingtone({required bool isIncoming}) async {
-    // Sound & vibration play disabled
-    /*
-    try {
-      _audioPlayer = AudioPlayer();
-      final path = isIncoming ? AppConstants.incomingRingPath : AppConstants.outgoingRingPath;
-      await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer?.play(AssetSource(path));
-
-      if (isIncoming && (await Vibration.hasVibrator() ?? false)) {
-        Vibration.vibrate(pattern: [500, 1000, 500, 1000], repeat: 0);
-      }
-    } catch (e) {
-      Logger.e('CallController: Error playing ringtone -> $e');
-    }
-    */
+  void _startRingtone({required bool isIncoming}) {
+    // Sound play disabled
   }
 
   void _stopRingtone() {
-    // Sound & vibration stop disabled
-    /*
-    _audioPlayer?.stop();
-    _audioPlayer?.dispose();
-    _audioPlayer = null;
-    Vibration.cancel();
-    */
+    // Sound stop disabled
   }
 
   void cleanUp() {

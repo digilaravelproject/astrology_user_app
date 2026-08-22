@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:astro_user/features/astrologers/domain/services/astrologer_service.dart';
 import '../domain/models/astrologer_model.dart';
 import '../domain/usecases/get_astrologers_usecase.dart';
 import '../domain/usecases/get_astrologer_by_id_usecase.dart';
@@ -192,9 +193,9 @@ class AstrologerController extends GetxController {
     }
   }
 
-  Future<void> fetchAstrologers() async {
+  Future<void> fetchAstrologers({bool showLoader = true}) async {
     try {
-      isLoading.value = true;
+      if (showLoader) isLoading.value = true;
 
       final Map<String, dynamic> params = {};
 
@@ -336,7 +337,7 @@ class AstrologerController extends GetxController {
   }
 
   Future<ResponseModel> unblockAstrologer(int id) async {
-    final result = await _blockAstrologerUseCase.execute(id);
+    final result = await Get.find<AstrologerService>().unblockAstrologer(id);
     if (result.isSuccess) {
       fetchAstrologerById(id);
     }

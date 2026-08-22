@@ -376,6 +376,13 @@ class ChatAssistanceController extends GetxController {
   }
 
   void _setupWebsocketListeners() {
+    if (_sessionId != null) {
+      try {
+        Get.find<WebSocketService>().subscribeToChannel('private-chat-assistance.$_sessionId');
+      } catch (e) {
+        debugPrint('Error subscribing to chat assistance channel: $e');
+      }
+    }
     _msgSub?.cancel();
     _msgSub = WebSocketService.incomingMessages.listen((list) {
       if (list.isNotEmpty) {
@@ -411,17 +418,20 @@ class ChatAssistanceController extends GetxController {
     _statusUpdateSub = WebSocketService.messageStatusUpdates.listen((list) {
       if (list.isNotEmpty) {
         final lastUpdate = list.last;
-        final updateSessionId = int.tryParse(lastUpdate['sessionId']?.toString() ?? '') ?? 0;
+        final updateSessionId = int.tryParse(lastUpdate['sessionId']?.toString() ?? 
+                                             lastUpdate['session_id']?.toString() ?? 
+                                             lastUpdate['chat_assistance_session_id']?.toString() ?? '') ?? 0;
         if (updateSessionId == _sessionId) {
           final newStatus = lastUpdate['status']?.toString();
-          final messageIdsList = lastUpdate['messageIds'] as List<dynamic>?;
-          if (newStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
+          final mappedStatus = newStatus == 'seen' ? 'seen' : (newStatus ?? 'sent');
+          final messageIdsList = (lastUpdate['messageIds'] ?? lastUpdate['message_ids']) as List<dynamic>?;
+          if (mappedStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
              final messageIds = messageIdsList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
              bool changed = false;
              for (int i = 0; i < messages.length; i++) {
                if (messageIds.contains(messages[i].id)) {
                  if (messages[i].status != 'seen') {
-                   messages[i] = messages[i].copyWith(status: newStatus);
+                   messages[i] = messages[i].copyWith(status: mappedStatus);
                    changed = true;
                  }
                }
@@ -452,6 +462,11 @@ class ChatAssistanceController extends GetxController {
     _limitReachedSub?.cancel();
     messageController.dispose();
     scrollController.dispose();
+    if (_sessionId != null) {
+      try {
+        Get.find<WebSocketService>().unsubscribeFromChannel('private-chat-assistance.$_sessionId');
+      } catch (_) {}
+    }
     super.onClose();
   }
 }

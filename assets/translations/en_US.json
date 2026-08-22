@@ -869,5 +869,17 @@
   "Save Sleep Schedule": "Save Sleep Schedule",
   "Choose your Sleep Time for up to 8 hours. Emergency sessions will be paused during your selected time.": "Choose your Sleep Time for up to 8 hours. Emergency sessions will be paused during your selected time.",
   "Select Gender": "Select Gender",
-  "Search...": "Search..."
+  "Search...": "Search...",
+  "Blocked Astrologers": "Blocked Astrologers",
+  "No Blocked Astrologers": "No Blocked Astrologers",
+  "You have not blocked any astrologer yet.": "You have not blocked any astrologer yet.",
+  "Block @name?": "Block @name?",
+  "Unblock @name?": "Unblock @name?",
+  "You won't be able to message or call this astrologer anymore.": "You won't be able to message or call this astrologer anymore.",
+  "You will be able to message and call this astrologer again.": "You will be able to message and call this astrologer again.",
+  "Blocked Users": "Blocked Users",
+  "No Blocked Users": "No Blocked Users",
+  "You have not blocked any user yet.": "You have not blocked any user yet.",
+  "You won't be able to message or call this user anymore.": "You won't be able to message or call this user anymore.",
+  "You will be able to message and call this user again.": "You will be able to message and call this user again."
 }

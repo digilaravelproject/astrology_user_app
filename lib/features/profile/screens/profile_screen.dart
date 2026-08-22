@@ -26,6 +26,7 @@ import 'about_us_screen.dart';
 import 'following_screen.dart';
 import 'feedback_screen.dart';
 import 'astrologer_registration_screen.dart';
+import 'blocked_astrologers_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -245,6 +246,11 @@ class ProfileScreen extends StatelessWidget {
           icon: Iconsax.people_copy,
           title: AppStrings.following,
           onTap: () => Get.toNamed(AppRoutes.followingScreen),
+        ),
+        _buildMenuItem(
+          icon: Iconsax.user_remove_copy,
+          title: 'Blocked Astrologers'.tr,
+          onTap: () => Get.to(() => const BlockedAstrologersScreen(), binding: ProfileBinding()),
         ),
 
         const SizedBox(height: 10),
