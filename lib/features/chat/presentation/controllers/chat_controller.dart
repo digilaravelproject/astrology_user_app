@@ -279,14 +279,18 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             final messageIdsList = (lastUpdate['message_ids'] ?? lastUpdate['messageIds']) as List<dynamic>?;
             if (newStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
               final messageIds = messageIdsList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+              debugPrint('[ChatController][STATUS_DEBUG] Event: newStatus=$newStatus, messageIds=$messageIds');
               for (int i = 0; i < messages.length; i++) {
                 if (messageIds.contains(messages[i].id)) {
+                  debugPrint('[ChatController][STATUS_DEBUG] Matching message found: id=${messages[i].id}, currentStatus=${messages[i].status}');
                   if (newStatus == 'seen' && messages[i].status != 'seen') {
                     messages[i] = messages[i].copyWith(status: 'seen');
                     changed = true;
+                    debugPrint('[ChatController][STATUS_DEBUG] Updated message ${messages[i].id} to seen');
                   } else if (newStatus == 'delivered' && messages[i].status == 'sent') {
                     messages[i] = messages[i].copyWith(status: 'delivered');
                     changed = true;
+                    debugPrint('[ChatController][STATUS_DEBUG] Updated message ${messages[i].id} to delivered');
                   }
                 }
               }
@@ -532,6 +536,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
           final messageIds = messageIdsList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
           if (messageIds.contains(messageId)) {
             final newStatus = event['status']?.toString();
+            debugPrint('[ChatController][STATUS_DEBUG] _getLatestStatus matching event found for messageId=$messageId: newStatus=$newStatus');
             if (newStatus == 'seen' || (newStatus == 'delivered' && currentStatus != 'seen')) {
               currentStatus = newStatus!;
             }
@@ -539,6 +544,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         }
       }
     }
+    debugPrint('[ChatController][STATUS_DEBUG] _getLatestStatus returning $currentStatus for messageId=$messageId');
     return currentStatus;
   }
 
