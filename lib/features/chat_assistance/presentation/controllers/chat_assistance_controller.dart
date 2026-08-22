@@ -79,6 +79,7 @@ class ChatAssistanceController extends GetxController {
     final cachedSessionId = SharedPrefs.getInt(cacheKey);
     if (cachedSessionId != null && cachedSessionId != 0) {
       _sessionId = cachedSessionId;
+      WebSocketService.activeSessionId = cachedSessionId;
       messages.clear();
       await fetchMessages();
       _setupWebsocketListeners();
@@ -117,6 +118,7 @@ class ChatAssistanceController extends GetxController {
           _sessionId = int.tryParse(session['id']?.toString() ?? '');
           if (_sessionId != null) {
             SharedPrefs.setInt(cacheKey, _sessionId!);
+            WebSocketService.activeSessionId = _sessionId;
           }
           
           // Clear previous messages and fetch history
@@ -218,7 +220,7 @@ class ChatAssistanceController extends GetxController {
       if (index != -1) {
         if (response.isSuccess) {
           final data = response.body['data']['message'];
-          final serverId = data['id'];
+          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
           messages[index] = messages[index].copyWith(id: serverId, status: 'sent');
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
@@ -499,6 +501,9 @@ class ChatAssistanceController extends GetxController {
     _limitReachedSub?.cancel();
     messageController.dispose();
     scrollController.dispose();
+    if (WebSocketService.activeSessionId == _sessionId) {
+      WebSocketService.activeSessionId = null;
+    }
     if (_sessionId != null) {
       try {
         Get.find<WebSocketService>().unsubscribeFromChannel('private-chat-assistance.$_sessionId');
