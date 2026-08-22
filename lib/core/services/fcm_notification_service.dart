@@ -94,7 +94,7 @@ class FCMNotificationService {
         // final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
         const bool playSound = false; // Audio disabled globally
 
-        debugPrint('[FCMNotificationService] type=$type play_sound=$playSoundRaw → playSound=$playSound');
+        debugPrint('[FCMNotificationService] type=$type playSound=$playSound');
 
         // Build a structured payload so onDidReceiveNotificationResponse can route correctly.
         // live_ prefix  → LiveRoomScreen
