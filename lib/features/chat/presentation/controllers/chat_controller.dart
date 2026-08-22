@@ -25,6 +25,7 @@ import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
