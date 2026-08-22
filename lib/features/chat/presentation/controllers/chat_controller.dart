@@ -57,6 +57,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   AudioPlayer? _audioPlayer;
 
   Future<void> _startRingtone() async {
+    // Sound play disabled
+    /*
     try {
       _audioPlayer = AudioPlayer();
       await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
@@ -64,14 +66,18 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       debugPrint("Error starting user chat outgoing ringtone: $e");
     }
+    */
   }
 
   void _stopRingtone() {
+    // Sound stop disabled
+    /*
     try {
       _audioPlayer?.stop();
       _audioPlayer?.dispose();
       _audioPlayer = null;
     } catch (_) {}
+    */
   }
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;

@@ -51,9 +51,16 @@ class BlogListScreen extends StatelessWidget {
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor.withOpacity(0.05),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primaryColor.withOpacity(0.15)),
+                  border: Border.all(color: Colors.grey.shade100, width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,12 +87,12 @@ class BlogListScreen extends StatelessWidget {
                         children: [
                           AppText(
                             blog.title,
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.primaryColor,
+                            color: Colors.black87,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            height: 1.3,
+                            height: 1.35,
                           ),
                           const SizedBox(height: 12),
                           Row(
@@ -109,7 +116,7 @@ class BlogListScreen extends StatelessWidget {
                                   AppText(
                                     'Read more'.tr,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.bold,
                                     color: AppColors.primaryColor,
                                   ),
                                   const SizedBox(width: 4),

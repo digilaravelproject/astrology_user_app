@@ -165,12 +165,14 @@ class ChatAssistanceController extends GetxController {
         messages.assignAll(dataList.map((msg) {
           final int senderId = int.tryParse(msg['sender_id']?.toString() ?? '') ?? 0;
           final bool isMe = senderId == _currentUserId;
+          final bool isRead = msg['is_read'] == true || msg['is_read'] == 1 || msg['is_read']?.toString() == '1' || msg['is_read']?.toString() == 'true';
+          final bool isDelivered = msg['is_delivered'] == true || msg['is_delivered'] == 1 || msg['is_delivered']?.toString() == '1' || msg['is_delivered']?.toString() == 'true';
           return ChatMessage(
             id: int.tryParse(msg['id']?.toString() ?? '') ?? 0,
             text: msg['message']?.toString() ?? '',
             isMe: isMe,
             time: DateTime.tryParse(msg['created_at']?.toString() ?? '') ?? DateTime.now(),
-            status: msg['is_read'] == true ? 'seen' : (msg['is_delivered'] == true ? 'delivered' : 'sent'),
+            status: isRead ? 'seen' : (isDelivered ? 'delivered' : 'sent'),
             type: msg['type']?.toString() ?? 'text',
             attachmentUrl: msg['attachment_url']?.toString(),
             image: msg['type'] == 'image' ? msg['attachment_url']?.toString() : null,

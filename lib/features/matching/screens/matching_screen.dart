@@ -1436,7 +1436,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   Icon(titleIcon, size: 20, color: AppColors.primaryColor),
                   const SizedBox(width: 8),
                 ],
-                AppText(title, fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8)),
+                AppText(title.tr, fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8)),
               ],
             ),
             const SizedBox(height: 8),

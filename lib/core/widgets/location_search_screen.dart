@@ -225,23 +225,21 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
               ),
             ),
 
-          if (!_isLoading && _searchController.text.trim().isNotEmpty && _searchResults.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(30),
+            Padding(
+              padding: const EdgeInsets.all(30),
               child: Text(
-                'No matching location found. Please try another search.',
+                'No matching location found. Please try another search.'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textColorSecondary, fontSize: 14),
+                style: const TextStyle(color: AppColors.textColorSecondary, fontSize: 14),
               ),
             ),
 
-          if (_searchController.text.trim().isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(30),
+            Padding(
+              padding: const EdgeInsets.all(30),
               child: Text(
-                'Type city or place name to search location via Google Maps API.',
+                'Type city or place name to search location via Google Maps API.'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: AppColors.textColorSecondary, fontSize: 14),
+                style: const TextStyle(color: AppColors.textColorSecondary, fontSize: 14),
               ),
             ),
 

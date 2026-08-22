@@ -17,7 +17,6 @@ class AstrologerModel {
   final String? email;
   final bool isChatEnabled;
   final bool isCallEnabled;
-  final bool isVideoCallEnabled;
   final double rating;
   final bool isOnline;
   final bool isFollowed;
@@ -49,7 +48,6 @@ class AstrologerModel {
     this.email,
     this.isChatEnabled = false,
     this.isCallEnabled = false,
-    this.isVideoCallEnabled = false,
     this.isOnline = false,
     this.rating = 0.0,
     this.totalOrders = 0,
@@ -85,7 +83,6 @@ class AstrologerModel {
       email: userData['email'],
       isChatEnabled: json['is_chat_enabled'] == true,
       isCallEnabled: json['is_call_enabled'] == true,
-      isVideoCallEnabled: json['is_video_call_enabled'] == true,
       isOnline: json['is_online'] == 1 || json['is_online'] == true,
       totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
       isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
@@ -104,7 +101,7 @@ class AstrologerModel {
 
   String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 
-  bool get isAvailableOnline => isChatEnabled || isCallEnabled || isVideoCallEnabled;
+  bool get isAvailableOnline => isChatEnabled || isCallEnabled;
 
   String get packageSessionText {
     if (packagePrice == null || packageDuration == null) {

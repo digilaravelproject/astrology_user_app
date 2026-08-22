@@ -372,6 +372,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> _startRingtone({required bool isIncoming}) async {
+    // Sound & vibration play disabled
+    /*
     try {
       _audioPlayer = AudioPlayer();
       final path = isIncoming ? AppConstants.incomingRingPath : AppConstants.outgoingRingPath;
@@ -384,13 +386,17 @@ class CallController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       Logger.e('CallController: Error playing ringtone -> $e');
     }
+    */
   }
 
   void _stopRingtone() {
+    // Sound & vibration stop disabled
+    /*
     _audioPlayer?.stop();
     _audioPlayer?.dispose();
     _audioPlayer = null;
     Vibration.cancel();
+    */
   }
 
   void cleanUp() {
