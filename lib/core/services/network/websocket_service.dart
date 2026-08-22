@@ -190,6 +190,36 @@ class WebSocketService extends GetxService {
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        } else if (event == 'ChatQueueUpdated' || event == 'App\\Events\\ChatQueueUpdated') {
+          // Server sends ChatQueueUpdated instead of ChatAccepted/ChatDismissed
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: ChatQueueUpdated');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          try {
+            Map<String, dynamic> queueData = {};
+            if (data['data'] is String) {
+              queueData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              queueData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final String action = queueData['action']?.toString() ?? '';
+            if (action == 'accepted') {
+              // Route to ChatAccepted handler using the session from payload
+              final session = queueData['session'];
+              if (session != null) {
+                _handleChatAccepted({'session': session});
+              }
+            } else if (action == 'ended' || action == 'cancelled') {
+              final session = queueData['session'];
+              if (session != null) {
+                _handleChatEnded({'session': session});
+              }
+            }
+            // 'initiated' action is informational only — no action needed for user side
+          } catch (e) {
+            Logger.e('WebSocketService: Error handling ChatQueueUpdated -> $e');
+          }
         } else if (event == AppUrls.eventMessageStatusUpdated || event == 'App\\Events\\MessageStatusUpdated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
