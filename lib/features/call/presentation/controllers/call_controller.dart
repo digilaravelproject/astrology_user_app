@@ -97,9 +97,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callDismissedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final reason = data['reason']?.toString() ?? 'dismissed';
-          _handleCallDismissed(reason);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          Logger.d('CallController: callDismissed match check: incoming=$incomingId, expected=$sessionId');
+          if (incomingId == sessionId) {
+            final reason = data['reason']?.toString() ?? 'dismissed';
+            _handleCallDismissed(reason);
+          }
         }
       }
     });
@@ -107,12 +111,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _iceSubscription = WebSocketService.iceCandidateData.listen((data) {
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final candidate = data['candidate']?.toString();
-          final receiverId = data['receiverId'];
-          // Only add candidate if it is meant for us (receiverId matches current user ID)
-          if (candidate != null && receiverId == WebSocketService.currentUserId) {
-            webrtcService.addRemoteCandidate(candidate);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            final candidate = data['candidate']?.toString();
+            final receiverId = data['receiverId'];
+            // Only add candidate if it is meant for us (receiverId matches current user ID)
+            if (candidate != null && receiverId == WebSocketService.currentUserId) {
+              webrtcService.addRemoteCandidate(candidate);
+            }
           }
         }
       }
@@ -122,8 +129,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callEndedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          _handleCallEnded(data);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            _handleCallEnded(data);
+          }
         }
       }
     });
