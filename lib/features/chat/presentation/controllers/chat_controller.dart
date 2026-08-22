@@ -445,7 +445,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             elapsedSeconds.value = diff >= 0 ? diff : 0;
 
             _setupTimer(_startedAt);
-            FlutterBackgroundService().startService();
+            // FlutterBackgroundService().startService(); // Disabled to prevent OOM crash on low-resource devices
             
             final startedAtMillis = effectiveStart.millisecondsSinceEpoch;
             LocalNotificationService.showOngoingChatNotification(
