@@ -14,6 +14,14 @@ import 'local_notification_service.dart';
 class FCMNotificationService {
   static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
+  // ── Pending navigation (Cold Start) ──────────────────────────────────────
+  // When the app is killed and user taps a notification, Flutter routes are not
+  // ready yet. We store the intent here and SplashController consumes it after
+  // navigating to the Dashboard.
+  static int? pendingLiveSessionId;
+  static Map<String, dynamic>? pendingNotificationData;
+  // ─────────────────────────────────────────────────────
+
   static Future<void> initialize() async {
     // 1. Request Notification Permission
     NotificationSettings settings = await _firebaseMessaging.requestPermission(
@@ -79,12 +87,36 @@ class FCMNotificationService {
           return;
         }
 
+        // Read play_sound from FCM data map ('1' or 'true' = audible, anything else = silent)
+        final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
+        final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
+
+        debugPrint('[FCMNotificationService] type=$type play_sound=$playSoundRaw → playSound=$playSound');
+
+        // Build a structured payload so onDidReceiveNotificationResponse can route correctly.
+        // live_ prefix  → LiveRoomScreen
+        // call_ prefix  → CallScreen
+        // bare int      → ChatScreen
+        final String rawSessionId = message.data['session_id']?.toString() ??
+            message.data['live_session_id']?.toString() ??
+            message.data['id']?.toString() ?? '';
+
+        String structuredPayload;
+        if (type == 'live_stream' || type == 'live' || type == 'live_session') {
+          structuredPayload = 'live_$rawSessionId';
+        } else if (type == 'call' || type == 'CALL_REQUEST' || type == 'CALL_ACCEPTED') {
+          structuredPayload = rawSessionId.isNotEmpty ? 'call_$rawSessionId' : message.data.toString();
+        } else {
+          structuredPayload = rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
+        }
+
         LocalNotificationService.showNotification(
           id: message.hashCode,
           title: message.notification?.title ?? 'Notification',
           body: message.notification?.body ?? '',
-          payload: message.data.toString(),
+          payload: structuredPayload,
           notificationType: type,
+          playSound: playSound,
         );
       }
     });
@@ -96,10 +128,33 @@ class FCMNotificationService {
     });
 
     // 6. Cold Start / Initial Message Handler
+    // When the app is KILLED and user taps the notification, GetX routes are not
+    // ready yet. We store the intent in a static field.
+    // SplashController reads it AFTER navigation to Dashboard and then opens
+    // the target screen.
     _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        debugPrint('Notification Opened App (Cold Start): ${message.data}');
-        _handleNotificationClick(message.data);
+        debugPrint('[FCMNotificationService] Cold-start notification detected: ${message.data}');
+        final data = message.data;
+        final type = data['type']?.toString();
+        final screen = data['screen']?.toString();
+        final notifType = data['notification_type']?.toString();
+
+        if (type == 'live_stream' || type == 'live' || type == 'live_session' ||
+            screen == 'LIVE_STREAM_SCREEN' || notifType == 'live_session') {
+          // Store the pending live session so SplashController can navigate after boot
+          final sessionIdStr = data['session_id']?.toString() ??
+              data['live_session_id']?.toString() ??
+              data['id']?.toString();
+          pendingLiveSessionId = int.tryParse(sessionIdStr ?? '');
+          pendingNotificationData = Map<String, dynamic>.from(data);
+          debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId');
+        } else {
+          // For other types try after a safe delay
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            _handleNotificationClick(data);
+          });
+        }
       }
     });
   }

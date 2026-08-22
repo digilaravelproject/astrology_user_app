@@ -5,11 +5,11 @@ import 'package:get/get.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
-import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -27,41 +27,61 @@ class LocalNotificationService {
     await _notificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        // Tap handler (navigates back or restores app state)
-        if (response.payload != null) {
-          if (response.payload!.startsWith('call_')) {
-            bool isVisible = false;
-            if (Get.isRegistered<CallController>()) {
-              isVisible = Get.find<CallController>().isCallScreenVisible;
-            }
-            if (!isVisible) {
-              Get.to(() => const CallScreen());
-            }
-          } else if (FloatingChatBubble.onTapCallback != null) {
-            FloatingChatBubble.onTapCallback?.call();
-          } else {
-            final int? sId = int.tryParse(response.payload!);
-            if (sId != null) {
-              String astroName = FloatingChatBubble.name?.isNotEmpty == true
-                  ? FloatingChatBubble.name!
-                  : 'Astrologer';
-              String astroStatus = FloatingChatBubble.chatStatus.value.isNotEmpty
-                  ? FloatingChatBubble.chatStatus.value
-                  : 'ongoing';
+        // Tap handler: routes to the correct screen based on payload prefix
+        final payload = response.payload;
+        if (payload == null) return;
 
-              if (!Get.isRegistered<ChatController>()) {
-                ChatBinding().dependencies();
-              }
-              Get.to(
-                () => ChatScreen(
-                  astrologerName: astroName,
-                  astrologerImage: '',
-                  sessionId: sId,
-                  initialStatus: astroStatus,
-                ),
-                binding: ChatBinding(),
-              );
+        debugPrint('[LocalNotificationService] Tapped notification payload: $payload');
+
+        if (payload.startsWith('live_')) {
+          // ── Live Stream notification ──
+          final sessionIdStr = payload.replaceFirst('live_', '');
+          final int? sessionId = int.tryParse(sessionIdStr);
+          if (sessionId != null) {
+            // Use addPostFrameCallback to ensure widget tree is ready
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.to(() => LiveRoomScreen(
+                sessionId: sessionId,
+                astrologerName: 'Astrologer',
+                astrologerImage: '',
+              ));
+            });
+          }
+        } else if (payload.startsWith('call_')) {
+          // ── Ongoing / Incoming Call notification ──
+          bool isVisible = false;
+          if (Get.isRegistered<CallController>()) {
+            isVisible = Get.find<CallController>().isCallScreenVisible;
+          }
+          if (!isVisible) {
+            Get.to(() => const CallScreen());
+          }
+        } else if (FloatingChatBubble.onTapCallback != null) {
+          // ── Active Chat bubble tap ──
+          FloatingChatBubble.onTapCallback?.call();
+        } else {
+          // ── Chat session notification (payload = sessionId as string) ──
+          final int? sId = int.tryParse(payload);
+          if (sId != null) {
+            String astroName = FloatingChatBubble.name?.isNotEmpty == true
+                ? FloatingChatBubble.name!
+                : 'Astrologer';
+            String astroStatus = FloatingChatBubble.chatStatus.value.isNotEmpty
+                ? FloatingChatBubble.chatStatus.value
+                : 'ongoing';
+
+            if (!Get.isRegistered<ChatController>()) {
+              ChatBinding().dependencies();
             }
+            Get.to(
+              () => ChatScreen(
+                astrologerName: astroName,
+                astrologerImage: '',
+                sessionId: sId,
+                initialStatus: astroStatus,
+              ),
+              binding: ChatBinding(),
+            );
           }
         }
       },
@@ -72,10 +92,53 @@ class LocalNotificationService {
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
     if (androidPlugin != null) {
+      // --- FCM Spec Channels ---
+      // call_channel: Incoming Calls (max importance, sound ON)
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'call_channel',
+          'Incoming Calls',
+          description: 'Incoming Audio/Video Call wake-up alert',
+          importance: Importance.max,
+          playSound: true,
+        ),
+      );
+      // chat_channel: Chat messages (sound controlled per message via play_sound)
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'chat_channel',
+          'Chat Messages & Requests',
+          description: 'Regular chat messages (silent) and new chat session requests (audible)',
+          importance: Importance.high,
+          playSound: true, // Channel allows sound; silenced per-message when play_sound==0
+        ),
+      );
+      // live_session_channel: Live stream broadcasts (sound ON)
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'live_session_channel',
+          'Live Session Alerts',
+          description: 'Astrologer live stream broadcast notifications',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      // astology_notifications: General / promo / system (default importance)
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'astology_notifications',
+          'General Announcements',
+          description: 'Promotional messages, wallet updates and system alerts',
+          importance: Importance.defaultImportance,
+          playSound: true,
+        ),
+      );
+
+      // --- Legacy / Ongoing Service Channels (kept for backward compat) ---
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
           'calls_channel',
-          'Incoming Calls',
+          'Incoming Calls (Legacy)',
           description: 'Incoming Call Ringing (User & Astrologer)',
           importance: Importance.max,
           playSound: false,
@@ -84,7 +147,7 @@ class LocalNotificationService {
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
           'chats_channel',
-          'Chat Messages & Requests',
+          'Chat Messages & Requests (Legacy)',
           description: 'New Chat Requests and Chat Room messages',
           importance: Importance.high,
           playSound: false,
@@ -333,47 +396,71 @@ class LocalNotificationService {
     } catch (_) {}
   }
 
+  /// Shows a general push notification.
+  /// [playSound] — read from FCM data['play_sound']: '1' = audible, '0' = silent.
+  /// Channel and sound behaviour are derived from [notificationType] per the FCM spec.
   static Future<void> showNotification({
     required int id,
     required String title,
     required String body,
     String? payload,
     String? notificationType,
+    bool playSound = false, // driven by FCM data['play_sound']
   }) async {
-    String channelId = 'session_channel';
-    String soundName = AppConstants.generalNotificationSound;
+    // ── Channel mapping (matches FCM spec) ──────────────────────────────────
+    // chat           → chat_channel   (silent by default)
+    // session_request / CHAT_REQUEST  → chat_channel   (audible)
+    // call / CALL_REQUEST             → call_channel   (audible)
+    // live_stream / live              → live_session_channel (audible)
+    // promo / system / default        → astology_notifications (audible)
+    String channelId;
+    String channelName;
 
-    if (notificationType == 'call' || notificationType == 'CALL_ACCEPTED' || notificationType == 'CALL_REQUEST') {
-      channelId = 'calls_channel';
-      soundName = AppConstants.callNotificationSound;
-    } else if (notificationType == 'chat' || notificationType == 'CHAT_REQUEST' || notificationType == 'MessageSent') {
-      channelId = 'chats_channel';
-      soundName = AppConstants.chatNotificationSound;
+    switch (notificationType) {
+      case 'call':
+      case 'CALL_REQUEST':
+      case 'CALL_ACCEPTED':
+        channelId = 'call_channel';
+        channelName = 'Incoming Calls';
+        break;
+      case 'chat':
+      case 'CHAT_REQUEST':
+      case 'session_request':
+      case 'MessageSent':
+        channelId = 'chat_channel';
+        channelName = 'Chat Messages & Requests';
+        break;
+      case 'live_stream':
+      case 'live':
+      case 'live_session':
+        channelId = 'live_session_channel';
+        channelName = 'Live Session Alerts';
+        break;
+      default:
+        channelId = 'astology_notifications';
+        channelName = 'General Announcements';
     }
 
-    bool shouldPlaySound = (notificationType == 'CALL_REQUEST' || 
-                            notificationType == 'CHAT_REQUEST' || 
-                            notificationType == 'initiated');
+    debugPrint('[LocalNotificationService] showNotification | type=$notificationType | channel=$channelId | playSound=$playSound');
 
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId,
-      channelId == 'calls_channel'
-          ? 'Incoming Calls'
-          : (channelId == 'chats_channel' ? 'Chat Messages & Requests' : 'Consultations & Billing'),
+      channelName,
       channelDescription: 'System and real-time notifications',
       icon: '@mipmap/ic_launcher',
-      importance: Importance.max,
-      priority: Priority.high,
-      playSound: false,
+      importance: playSound ? Importance.max : Importance.high,
+      priority: playSound ? Priority.high : Priority.defaultPriority,
+      playSound: playSound,
+      enableVibration: playSound,
       showWhen: true,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: const DarwinNotificationDetails(
+      iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
-        presentSound: false,
+        presentSound: playSound, // iOS: only plays sound when play_sound == '1'
       ),
     );
 

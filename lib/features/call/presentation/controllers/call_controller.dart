@@ -6,6 +6,7 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/webrtc/webrtc_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/call_summary_dialog.dart';
@@ -369,11 +370,16 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void _startRingtone({required bool isIncoming}) {
-    // Sound play disabled
+    // outgoing_ring.mp3 = user hears this while waiting for astrologer to accept
+    // incoming_ring.mp3 = would be for astrologer (not used on user side)
+    final sound = isIncoming ? 'audio/incoming_ring.mp3' : 'audio/outgoing_ring.mp3';
+    SoundVibrationService().startRingtone(sound, loop: true, vibrate: false);
+    Logger.d('[CallController] Ringtone started → $sound');
   }
 
   void _stopRingtone() {
-    // Sound stop disabled
+    SoundVibrationService().stopRingtone();
+    Logger.d('[CallController] Ringtone stopped');
   }
 
   void cleanUp() {

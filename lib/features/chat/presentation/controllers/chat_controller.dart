@@ -15,6 +15,7 @@ import 'package:astro_user/features/chat/domain/usecases/send_text_message_useca
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/auth/domain/models/user_model.dart';
@@ -54,11 +55,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         _rejectChatSessionUseCase = rejectChatSessionUseCase;
 
   void _startRingtone() {
-    // Sound play disabled
+    // User initiated chat → play outgoing ring so user knows request is sent
+    SoundVibrationService().startRingtone('audio/outgoing_ring.mp3', loop: true, vibrate: false);
   }
 
   void _stopRingtone() {
-    // Sound stop disabled
+    SoundVibrationService().stopRingtone();
   }
 
   final RxList<ChatMessage> messages = <ChatMessage>[].obs;
