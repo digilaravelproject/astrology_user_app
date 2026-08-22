@@ -16,6 +16,7 @@ import '../../features/call/presentation/pages/call_screen.dart';
 import '../../features/call/presentation/controllers/call_controller.dart';
 import '../../features/chat/presentation/pages/chat_screen.dart';
 import '../../features/chat/presentation/bindings/chat_binding.dart';
+import '../services/network/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SessionBottomSheetHelper {
