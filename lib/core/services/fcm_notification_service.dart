@@ -89,9 +89,10 @@ class FCMNotificationService {
           return;
         }
 
-        // Read play_sound from FCM data map ('1' or 'true' = audible, anything else = silent)
-        final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
-        final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
+        // Read play_sound from FCM data map (Force disabled per user request)
+        // final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
+        // final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
+        const bool playSound = false; // Audio disabled globally
 
         debugPrint('[FCMNotificationService] type=$type play_sound=$playSoundRaw → playSound=$playSound');
 

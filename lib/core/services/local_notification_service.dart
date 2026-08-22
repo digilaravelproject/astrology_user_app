@@ -99,14 +99,14 @@ class LocalNotificationService {
 
     if (androidPlugin != null) {
       // --- FCM Spec Channels ---
-      // call_channel: Incoming Calls (max importance, sound ON)
+      // call_channel: Incoming Calls (max importance, sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
           'call_channel',
           'Incoming Calls',
           description: 'Incoming Audio/Video Call wake-up alert',
           importance: Importance.max,
-          playSound: true,
+          playSound: false,
         ),
       );
       // chat_channel: Chat messages (sound controlled per message via play_sound)
@@ -116,17 +116,17 @@ class LocalNotificationService {
           'Chat Messages & Requests',
           description: 'Regular chat messages (silent) and new chat session requests (audible)',
           importance: Importance.high,
-          playSound: true, // Channel allows sound; silenced per-message when play_sound==0
+          playSound: false, // Channel allows sound; silenced per-message when play_sound==0
         ),
       );
-      // live_session_channel: Live stream broadcasts (sound ON)
+      // live_session_channel: Live stream broadcasts (sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
           'live_session_channel',
           'Live Session Alerts',
           description: 'Astrologer live stream broadcast notifications',
           importance: Importance.high,
-          playSound: true,
+          playSound: false,
         ),
       );
       // astology_notifications: General / promo / system (default importance)
@@ -136,7 +136,7 @@ class LocalNotificationService {
           'General Announcements',
           description: 'Promotional messages, wallet updates and system alerts',
           importance: Importance.defaultImportance,
-          playSound: true,
+          playSound: false,
         ),
       );
 
@@ -447,26 +447,29 @@ class LocalNotificationService {
         channelName = 'General Announcements';
     }
 
-    debugPrint('[LocalNotificationService] showNotification | type=$notificationType | channel=$channelId | playSound=$playSound');
+    // Force playSound to false globally per user request
+    const bool finalPlaySound = false;
+
+    debugPrint('[LocalNotificationService] showNotification | type=$notificationType | channel=$channelId | playSound=$finalPlaySound');
 
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: 'System and real-time notifications',
       icon: '@mipmap/ic_launcher',
-      importance: playSound ? Importance.max : Importance.high,
-      priority: playSound ? Priority.high : Priority.defaultPriority,
-      playSound: playSound,
-      enableVibration: playSound,
+      importance: finalPlaySound ? Importance.max : Importance.high,
+      priority: finalPlaySound ? Priority.high : Priority.defaultPriority,
+      playSound: finalPlaySound,
+      enableVibration: finalPlaySound,
       showWhen: true,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
-        presentSound: playSound, // iOS: only plays sound when play_sound == '1'
+        presentSound: finalPlaySound, // iOS: only plays sound when play_sound == '1'
       ),
     );
 
