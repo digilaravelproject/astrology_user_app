@@ -270,6 +270,7 @@ class _CallScreenState extends State<CallScreen> {
           subSessionId: subSessionId,
           channelType: 'chat',
         );
+        controller.cleanUp();
       } catch (e) {
         debugPrint("Error spawning chat channel: $e");
       }
