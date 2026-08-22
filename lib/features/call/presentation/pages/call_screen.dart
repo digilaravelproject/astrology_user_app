@@ -62,158 +62,184 @@ class _CallScreenState extends State<CallScreen> {
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Blurred profile background
+            // Blurred profile background image
             if (controller.providerImage != null && controller.providerImage!.isNotEmpty)
               CachedNetworkImage(
                 imageUrl: controller.providerImage!.startsWith('http')
                     ? controller.providerImage!
                     : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(color: AppColors.primaryColor.withValues(alpha: 0.8)),
+                errorWidget: (context, url, error) => Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF2E1A47), Color(0xFF1A0E2E)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
               )
             else
-              Container(color: AppColors.primaryColor.withValues(alpha: 0.8)),
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2E1A47), Color(0xFF1A0E2E)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+              ),
             
+            // Soft overlay blur mapping
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
               child: Container(
-                color: Colors.black.withValues(alpha: 0.4),
+                color: Colors.black.withValues(alpha: 0.55),
               ),
             ),
 
-            // Main UI content
+            // Top-down smooth dark shadow overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withValues(alpha: 0.6),
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.5),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+
+            // Main Content Layout
             SafeArea(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Bar: Title/Status & Switch to Chat action
+                  // Top Bar: Call Status / Sub-Title / Timer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
                     child: Stack(
+                      alignment: Alignment.center,
                       children: [
                         Align(
                           alignment: Alignment.center,
                           child: Column(
                             children: [
-                              const SizedBox(height: 8),
-                              Text(
-                                status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 1.5,
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                                ),
+                                child: Text(
+                                  status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.2,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 12),
                               if (status == 'ongoing') ...[
                                 Text(
                                   '$minutes:$seconds',
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
                                   ),
                                 ),
-                                if (controller.isPackageCall)
-                                  Obx(() {
-                                    final rem = WebSocketService.packageRemainingSeconds.value;
-                                    final m = (rem ~/ 60).toString().padLeft(2, '0');
-                                    final s = (rem % 60).toString().padLeft(2, '0');
-                                    return Container(
-                                      margin: const EdgeInsets.only(top: 6),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(Icons.timer_outlined, color: Colors.amberAccent, size: 14),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            'Package Left: $m:$s',
-                                            style: const TextStyle(
-                                              color: Colors.amberAccent,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              letterSpacing: 0.3,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }),
                               ],
                             ],
                           ),
                         ),
-                        if (controller.isPackageCall && status == 'ongoing')
-                          Positioned(
-                            right: 0,
-                            top: 12,
-                            child: IconButton(
-                              icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 26),
-                              tooltip: "Switch to Chat",
-                              onPressed: () => _showSwitchToChatDialog(context),
-                            ),
-                          ),
                       ],
                     ),
                   ),
 
-                  // Middle Profile Display
+                  // Middle Area: Pulsing profile image with premium borders
                   Column(
                     children: [
-                      // Pulsing avatar
                       Stack(
                         alignment: Alignment.center,
                         children: [
                           _buildPulseCircle(delay: 0),
                           _buildPulseCircle(delay: 1),
-                          CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Colors.white24,
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white.withValues(alpha: 0.4), Colors.white.withValues(alpha: 0.1)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
                             child: CircleAvatar(
-                              radius: 66,
-                              backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
-                                  ? CachedNetworkImageProvider(
-                                      controller.providerImage!.startsWith('http')
-                                          ? controller.providerImage!
-                                          : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
-                                    )
-                                  : null,
-                              child: controller.providerImage == null || controller.providerImage!.isEmpty
-                                  ? const Icon(Icons.person, size: 60, color: Colors.white)
-                                  : null,
+                              radius: 76,
+                              backgroundColor: Colors.black26,
+                              child: CircleAvatar(
+                                radius: 72,
+                                backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
+                                    ? CachedNetworkImageProvider(
+                                        controller.providerImage!.startsWith('http')
+                                            ? controller.providerImage!
+                                            : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
+                                      )
+                                    : null,
+                                child: controller.providerImage == null || controller.providerImage!.isEmpty
+                                    ? const Icon(Icons.person, size: 68, color: Colors.white70)
+                                    : null,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                       Text(
                         controller.providerName ?? 'Astrologer',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         status == 'ringing' ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
 
-                  // Bottom Controls
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 60.0),
+                  // Bottom Controls Panel: Translucent Glassmorphic Panel
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -224,6 +250,15 @@ class _CallScreenState extends State<CallScreen> {
                           isActive: controller.isMuted.value,
                           onPressed: () => controller.toggleMute(),
                         ),
+
+                        // Switch to Chat (visible during ongoing call)
+                        if (controller.isPackageCall && status == 'ongoing')
+                          _buildControlButton(
+                            icon: Icons.swap_calls_rounded,
+                            label: 'Chat',
+                            isActive: false,
+                            onPressed: () => _showSwitchToChatDialog(context),
+                          ),
 
                         _buildEndCallButton(onPressed: () => _onEndTapped()),
 

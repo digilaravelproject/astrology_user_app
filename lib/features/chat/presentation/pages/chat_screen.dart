@@ -156,25 +156,29 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     // Call switch icon ONLY for package/session chats
                     if (widget.isPackageChat)
                       IconButton(
-                        icon: const Icon(Icons.call, color: Colors.green),
+                        icon: const Icon(Icons.swap_calls_rounded, color: Colors.green, size: 26),
                         tooltip: "Switch to Call",
                         onPressed: () => _showSwitchToCallConfirmation(context),
                       ),
-                    InkWell(
-                      onTap: () => _showEndChatConfirmation(context),
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
-                        ),
-                        child: const AppText(
-                          "End Chat",
-                          color: Colors.red,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                    const SizedBox(width: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16), // Adjusted right margin to 16
+                      child: InkWell(
+                        onTap: () => _showEndChatConfirmation(context),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          ),
+                          child: const AppText(
+                            "End Chat",
+                            color: Colors.red,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
