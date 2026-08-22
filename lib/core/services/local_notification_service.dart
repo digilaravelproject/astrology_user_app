@@ -102,7 +102,7 @@ class LocalNotificationService {
       // call_channel: Incoming Calls (max importance, sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'call_channel',
+          'call_channel_v2',
           'Incoming Calls',
           description: 'Incoming Audio/Video Call wake-up alert',
           importance: Importance.max,
@@ -112,7 +112,7 @@ class LocalNotificationService {
       // chat_channel: Chat messages (sound controlled per message via play_sound)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'chat_channel',
+          'chat_channel_v2',
           'Chat Messages & Requests',
           description: 'Regular chat messages (silent) and new chat session requests (audible)',
           importance: Importance.high,
@@ -122,7 +122,7 @@ class LocalNotificationService {
       // live_session_channel: Live stream broadcasts (sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'live_session_channel',
+          'live_session_channel_v2',
           'Live Session Alerts',
           description: 'Astrologer live stream broadcast notifications',
           importance: Importance.high,
@@ -132,7 +132,7 @@ class LocalNotificationService {
       // astology_notifications: General / promo / system (default importance)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'astology_notifications',
+          'astology_notifications_v2',
           'General Announcements',
           description: 'Promotional messages, wallet updates and system alerts',
           importance: Importance.defaultImportance,
@@ -426,24 +426,24 @@ class LocalNotificationService {
       case 'call':
       case 'CALL_REQUEST':
       case 'CALL_ACCEPTED':
-        channelId = 'call_channel';
+        channelId = 'call_channel_v2';
         channelName = 'Incoming Calls';
         break;
       case 'chat':
       case 'CHAT_REQUEST':
       case 'session_request':
       case 'MessageSent':
-        channelId = 'chat_channel';
+        channelId = 'chat_channel_v2';
         channelName = 'Chat Messages & Requests';
         break;
       case 'live_stream':
       case 'live':
       case 'live_session':
-        channelId = 'live_session_channel';
+        channelId = 'live_session_channel_v2';
         channelName = 'Live Session Alerts';
         break;
       default:
-        channelId = 'astology_notifications';
+        channelId = 'astology_notifications_v2';
         channelName = 'General Announcements';
     }
 
