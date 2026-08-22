@@ -1,5 +1,7 @@
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
