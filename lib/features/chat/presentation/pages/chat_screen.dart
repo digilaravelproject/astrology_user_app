@@ -157,13 +157,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         tooltip: "Switch to Call",
                         onPressed: () => _showSwitchToCallConfirmation(context),
                       ),
-                    TextButton(
-                      onPressed: () => _showEndChatConfirmation(context),
-                      child: const AppText(
-                        "End Chat",
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                    InkWell(
+                      onTap: () => _showEndChatConfirmation(context),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.red.withOpacity(0.3)),
+                        ),
+                        child: const AppText(
+                          "End Chat",
+                          color: Colors.red,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
