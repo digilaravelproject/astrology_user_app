@@ -100,6 +100,8 @@ class FCMNotificationService {
         // call_ prefix  → CallScreen
         // bare int      → ChatScreen
         final String rawSessionId = message.data['session_id']?.toString() ??
+            message.data['chat_session_id']?.toString() ??
+            message.data['chat_assistance_session_id']?.toString() ??
             message.data['live_session_id']?.toString() ??
             message.data['id']?.toString() ?? '';
 
@@ -115,12 +117,10 @@ class FCMNotificationService {
         // ── Suppress notification if user is already viewing that chat session ──
         // Chat/message notifications are noisy when the user is actively in the
         // chat room — WebSocket already delivers the message to the UI.
-        final bool isChatType = type == 'chat' ||
-            type == 'MessageSent' ||
-            type == 'chat_message' ||
-            type == 'new_message' ||
-            type == 'chat_assistance' ||
-            type == 'chat_assistance_message';
+        final String lowerType = type?.toLowerCase() ?? '';
+        final bool isChatType = lowerType.contains('chat') ||
+            lowerType.contains('message') ||
+            lowerType.contains('messagesent');
         if (isChatType) {
           final int incomingSessionId = int.tryParse(rawSessionId) ?? 0;
           bool userIsOnChatScreen = false;
