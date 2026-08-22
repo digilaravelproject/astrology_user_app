@@ -11,6 +11,8 @@ import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/call_summary_dialog.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 
 import 'package:flutter/material.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
@@ -27,6 +29,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final RxBool isSpeakerOn = false.obs;
   bool isCallScreenVisible = false;
   bool isPackageCall = false;
+  /// True when the package sub-session also has an active chat channel (used for granular end modal)
+  bool isChatAlsoActive = false;
+  /// Active package chat session ID (used when switching back to chat after "End Call Only")
+  int? activeChatSessionId;
+
+  /// Master package countdown in seconds — server-driven via WebSocket
+  int get packageMasterSeconds => WebSocketService.packageRemainingSeconds.value;
 
   int? sessionId;
   int? providerId;
@@ -280,6 +289,82 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  // ─── Hybrid Package: Granular Channel Termination ───────────────────────
+
+  /// End Call Only — keeps chat alive, navigates back to chat screen
+  Future<void> terminateChannelOnly() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      Logger.e('CallController: terminateChannelOnly — no activeSubSessionId found');
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'channel_only',
+      );
+      Logger.d('CallController: terminateChannelOnly success. Returning to chat...');
+
+      final chatSessId = activeChatSessionId ?? 0;
+      final pName = providerName ?? 'Astrologer';
+      final pImage = providerImage ?? '';
+
+      // Reset call without ending the package sub-session
+      cleanUp();
+
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+
+      // Navigate back to chat screen
+      if (chatSessId > 0) {
+        Get.to(
+          () => ChatScreen(
+            astrologerName: pName,
+            astrologerImage: pImage,
+            sessionId: chatSessId,
+            initialStatus: 'ongoing',
+            isPackageChat: true,
+          ),
+          binding: ChatBinding(),
+        );
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateChannelOnly -> $e');
+      CustomSnackbar.showError('Failed to end call. Please try again.');
+    }
+  }
+
+  /// End Entire Session — terminates both call and chat, closes consultation
+  Future<void> terminateEntireSession() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      // Fallback to regular endCall
+      await endCall();
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'complete_session',
+      );
+      Logger.d('CallController: terminateEntireSession success.');
+      status.value = 'completed';
+      cleanUp();
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateEntireSession -> $e');
+      // Fallback
+      await endCall();
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+
   void toggleMute() {
     isMuted.value = !isMuted.value;
     webrtcService.toggleMute(isMuted.value);
@@ -413,6 +498,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
     providerId = null;
     providerName = null;
     providerImage = null;
+    isChatAlsoActive = false;
+    activeChatSessionId = null;
 
     if (isCallScreenVisible) {
       isCallScreenVisible = false;

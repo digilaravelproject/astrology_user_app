@@ -87,6 +87,83 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   int? get sessionId => _sessionId;
   int? get peerId => _peerId;
   bool isPackageChat = false;
+  /// True when the package sub-session also has an active call channel
+  bool isCallAlsoActive = false;
+
+  // ─── Hybrid Package: Granular Channel Termination (Chat Screen) ──────────
+
+  /// End Chat Only — terminates chat channel but keeps call active
+  Future<void> terminateChannelOnly() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      Logger.e('ChatController: terminateChannelOnly — no activeSubSessionId found');
+      return;
+    }
+    try {
+      isLoading.value = true;
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'chat',
+        action: 'channel_only',
+      );
+      Logger.d('ChatController: terminateChannelOnly success.');
+      
+      // Update local state to show chat is ended/completed
+      status.value = 'ended';
+      _timer?.cancel();
+      FlutterBackgroundService().invoke('stopService');
+      if (_sessionId != null) {
+        LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      }
+      FloatingChatBubble.dismiss();
+      WebSocketService.activeSessionId = null;
+      
+      // Navigate back
+      Get.back();
+    } catch (e) {
+      Logger.e('ChatController: Error in terminateChannelOnly -> $e');
+      CustomSnackbar.showError('Failed to end chat. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// End Entire Session — terminates both chat and call channels
+  Future<void> terminateEntireSession() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      // Fallback
+      await endChatSession();
+      return;
+    }
+    try {
+      isLoading.value = true;
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'chat',
+        action: 'complete_session',
+      );
+      Logger.d('ChatController: terminateEntireSession success.');
+      
+      status.value = 'ended';
+      _timer?.cancel();
+      FlutterBackgroundService().invoke('stopService');
+      if (_sessionId != null) {
+        LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      }
+      FloatingChatBubble.dismiss();
+      WebSocketService.activeSessionId = null;
+      
+      Get.back();
+    } catch (e) {
+      Logger.e('ChatController: Error in terminateEntireSession -> $e');
+      await endChatSession();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
 
   @override
   void onInit() {
