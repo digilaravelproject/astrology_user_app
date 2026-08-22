@@ -28,7 +28,10 @@ class _CallScreenState extends State<CallScreen> {
     super.initState();
     controller = Get.find<CallController>();
     controller.isCallScreenVisible = true;
-    FloatingCallBubble.dismiss();
+    // Defer dismiss to avoid setState() during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FloatingCallBubble.dismiss();
+    });
   }
 
   @override
@@ -518,9 +521,11 @@ class _CallScreenState extends State<CallScreen> {
           data: {'provider_id': providerId},
         );
         if (response.isSuccess && response.body != null) {
-          final data = response.body['data'] ?? response.body;
-          activeChatSessionId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
-          chatInitialStatus = data['status']?.toString() ?? 'initiated';
+          final body = response.body['data'] ?? response.body;
+          // API returns { data: { session: { id: 487, status: 'initiated' } } }
+          final session = body['session'] ?? body;
+          activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
+          chatInitialStatus = session['status']?.toString() ?? 'initiated';
         }
       }
 
