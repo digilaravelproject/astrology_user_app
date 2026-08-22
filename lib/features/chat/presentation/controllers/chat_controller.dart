@@ -210,11 +210,14 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
           if (isMe) {
             // ── My own message echoed back from WebSocket ──────────────────
-            // Find the optimistic placeholder (status='sending...', same text)
+            // Find the optimistic placeholder (status='sending...', same text, or same type if image/file)
             // and upgrade it in-place. This prevents the duplicate that occurs
             // when the echo arrives BEFORE the API response updates the tempId.
             final pendingIndex = messages.indexWhere(
-              (m) => m.isMe && m.status == 'sending...' && m.text == msgText,
+              (m) => m.isMe && m.status == 'sending...' && 
+                     (m.text == msgText || 
+                      (m.type == 'image' && msgType == 'image') || 
+                      (m.type == 'file' && msgType == 'file')),
             );
             if (pendingIndex != -1) {
               // Replace the placeholder with the confirmed server message
@@ -222,6 +225,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
                 id: msgId,
                 status: 'sent',
                 time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? messages[pendingIndex].time,
+                attachmentUrl: lastMsg['attachment_url']?.toString(),
+                image: msgType == 'image' ? lastMsg['attachment_url']?.toString() : null,
+                type: msgType,
               );
               messages.refresh();
             }

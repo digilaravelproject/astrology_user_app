@@ -401,16 +401,21 @@ class ChatAssistanceController extends GetxController {
           if (messages.any((m) => m.id == msgId)) return;
 
           if (isMe) {
-            // ── My own message echoed back from WebSocket ──────────────────
             // Find the local 'sending...' placeholder and upgrade in-place.
             final pendingIndex = messages.indexWhere(
-              (m) => m.isMe && m.status == 'sending...' && m.text == msgText,
+              (m) => m.isMe && m.status == 'sending...' && 
+                     (m.text == msgText || 
+                      (m.type == 'image' && msgType == 'image') || 
+                      (m.type == 'document' && msgType == 'document')),
             );
             if (pendingIndex != -1) {
               messages[pendingIndex] = messages[pendingIndex].copyWith(
                 id: msgId,
                 status: 'sent',
                 time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? messages[pendingIndex].time,
+                attachmentUrl: lastMsg['attachment_url']?.toString(),
+                image: msgType == 'image' ? lastMsg['attachment_url']?.toString() : null,
+                type: msgType,
               );
               messages.refresh();
             } else {
