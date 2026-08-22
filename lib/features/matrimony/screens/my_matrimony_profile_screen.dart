@@ -51,8 +51,8 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Get.back(),
         ),
-        title: const AppText(
-          'My Profile',
+        title: AppText(
+          'My Profile'.tr,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: Colors.white,
@@ -94,7 +94,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                 Icon(Icons.person_off_rounded, size: 80, color: AppColors.textColorHint),
                 const SizedBox(height: 16),
                 AppText(
-                  'Profile not found',
+                  'Profile not found'.tr,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textColorSecondary,
@@ -158,12 +158,12 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        _buildHeaderChip(Icons.cake_rounded, '${profile.age} Yrs'),
+                        _buildHeaderChip(Icons.cake_rounded, '${profile.age} ${"Yrs".tr}'),
                         _buildHeaderChip(
                           profile.gender.toLowerCase() == 'male' 
                             ? Icons.male_rounded 
                             : Icons.female_rounded,
-                          profile.gender,
+                          profile.gender.tr,
                         ),
                         _buildHeaderChip(Icons.location_on_rounded, profile.location),
                       ],
@@ -180,10 +180,10 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                 child: Column(
                   children: [
                     _buildSectionCard(
-                      title: 'About Me',
+                      title: 'About Me'.tr,
                       icon: Icons.auto_awesome_rounded,
                       child: AppText(
-                        profile.about.isNotEmpty ? profile.about : 'No description available',
+                        profile.about.isNotEmpty ? profile.about : 'No description available'.tr,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textColorSecondary,
@@ -194,45 +194,45 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
 
                     // Personal Details
                     _buildSectionCard(
-                      title: 'Personal Details',
+                      title: 'Personal Details'.tr,
                       icon: Icons.person_rounded,
                       child: Column(
                         children: [
-                          _buildDetailRow('Created For', profile.createdFor),
+                          _buildDetailRow('Created For'.tr, profile.createdFor.tr),
                           _buildDivider(),
-                          _buildDetailRow('Date of Birth', _formatDate(profile.dateOfBirth)),
+                          _buildDetailRow('Date of Birth'.tr, _formatDate(profile.dateOfBirth)),
                           _buildDivider(),
-                          _buildDetailRow('Height', profile.height),
+                          _buildDetailRow('Height'.tr, profile.height),
                           _buildDivider(),
-                          _buildDetailRow('Marital Status', profile.maritalStatus),
+                          _buildDetailRow('Marital Status'.tr, profile.maritalStatus.tr),
                         ],
                       ),
                     ),
 
                     // Contact Information
                     _buildSectionCard(
-                      title: 'Contact Information',
+                      title: 'Contact Information'.tr,
                       icon: Icons.contact_phone_rounded,
                       child: Column(
                         children: [
-                          _buildDetailRow('Email', profile.email),
+                          _buildDetailRow('Email'.tr, profile.email),
                           _buildDivider(),
-                          _buildDetailRow('Phone', profile.phone),
+                          _buildDetailRow('Phone'.tr, profile.phone),
                         ],
                       ),
                     ),
 
                     // Professional Details
                     _buildSectionCard(
-                      title: 'Professional Details',
+                      title: 'Professional Details'.tr,
                       icon: Icons.work_rounded,
                       child: Column(
                         children: [
-                          _buildDetailRow('Education', profile.education),
+                          _buildDetailRow('Education'.tr, profile.education.tr),
                           _buildDivider(),
-                          _buildDetailRow('Job Title', profile.jobTitle),
+                          _buildDetailRow('Job Title'.tr, profile.jobTitle.tr),
                           _buildDivider(),
-                          _buildDetailRow('Annual Income', profile.annualIncome),
+                          _buildDetailRow('Annual Income'.tr, profile.annualIncome),
                         ],
                       ),
                     ),
@@ -242,20 +242,20 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
                         profile.drivingLicenceNumber != null || 
                         profile.aadhaarCardNumber != null)
                       _buildSectionCard(
-                        title: 'Document Details',
+                        title: 'Document Details'.tr,
                         icon: Icons.description_rounded,
                         child: Column(
                           children: [
                             if (profile.panCardNumber != null) ...[
-                              _buildDetailRow('PAN Card', profile.panCardNumber!),
+                              _buildDetailRow('PAN Card'.tr, profile.panCardNumber!),
                               if (profile.drivingLicenceNumber != null || profile.aadhaarCardNumber != null) _buildDivider(),
                             ],
                             if (profile.drivingLicenceNumber != null) ...[
-                              _buildDetailRow('Driving Licence', profile.drivingLicenceNumber!),
+                              _buildDetailRow('Driving Licence'.tr, profile.drivingLicenceNumber!),
                               if (profile.aadhaarCardNumber != null) _buildDivider(),
                             ],
                             if (profile.aadhaarCardNumber != null)
-                              _buildDetailRow('Aadhaar Card', profile.aadhaarCardNumber!),
+                              _buildDetailRow('Aadhaar Card'.tr, profile.aadhaarCardNumber!),
                           ],
                         ),
                       ),
@@ -363,7 +363,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
           Expanded(
             flex: 3,
             child: AppText(
-              value.isNotEmpty ? value : 'Not provided',
+              value.isNotEmpty ? value : 'Not provided'.tr,
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColors.textColorPrimary,
@@ -383,7 +383,7 @@ class _MyMatrimonyProfileScreenState extends State<MyMatrimonyProfileScreen> {
   }
 
   String _formatDate(String dateStr) {
-    if (dateStr.isEmpty) return 'Not provided';
+    if (dateStr.isEmpty) return 'Not provided'.tr;
     try {
       final date = DateTime.parse(dateStr);
       return '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';

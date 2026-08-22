@@ -136,14 +136,14 @@ class SessionBottomSheetHelper {
               
               // Header
               AppText(
-                "Connect with ${astro.name}",
+                "Connect with".tr + " ${astro.name}",
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey.shade900,
               ),
               const SizedBox(height: 6),
               AppText(
-                "Select a service to start your session",
+                "Select a service to start your session".tr,
                 fontSize: 13,
                 color: Colors.grey.shade500,
               ),
@@ -173,7 +173,7 @@ class SessionBottomSheetHelper {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppText(
-                            "Remaining Package Time",
+                            "Remaining Package Time".tr,
                             fontSize: 11,
                             color: Colors.orange.shade800,
                             fontWeight: FontWeight.w500,
@@ -312,15 +312,15 @@ class SessionBottomSheetHelper {
           padding: const EdgeInsets.all(20),
           child: Obx(() {
             if (isPurchasing.value) {
-              return const SizedBox(
+              return SizedBox(
                 height: 180,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(color: AppColors.deepPink),
-                      SizedBox(height: 16),
-                      Text("Purchasing package, please wait..."),
+                      const CircularProgressIndicator(color: AppColors.deepPink),
+                      const SizedBox(height: 16),
+                      Text("Purchasing package, please wait...".tr),
                     ],
                   ),
                 ),
@@ -339,14 +339,14 @@ class SessionBottomSheetHelper {
                 ),
                 const SizedBox(height: 16),
                 AppText(
-                  "Confirm Package Purchase",
+                  "Confirm Package Purchase".tr,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.grey.shade900,
                 ),
                 const SizedBox(height: 6),
                 AppText(
-                  "Would you like to purchase this session package for ₹${astro.packagePrice ?? 500}?",
+                  "Would you like to purchase this session package for".tr + " ₹${astro.packagePrice ?? 500}?",
                   fontSize: 13,
                   color: Colors.grey.shade500,
                   textAlign: TextAlign.center,
@@ -356,7 +356,7 @@ class SessionBottomSheetHelper {
                   children: [
                     Expanded(
                       child: CustomButton(
-                        text: "Cancel",
+                        text: "Cancel".tr,
                         backgroundColor: Colors.grey.shade200,
                         textColor: Colors.grey.shade800,
                         borderColor: Colors.grey.shade200,
@@ -368,7 +368,7 @@ class SessionBottomSheetHelper {
                     const SizedBox(width: 12),
                     Expanded(
                       child: CustomButton(
-                        text: "Purchase",
+                        text: "Purchase".tr,
                         borderRadius: 12,
                         height: 48,
                         onTap: () async {
@@ -379,7 +379,7 @@ class SessionBottomSheetHelper {
                               data: {'astrologer_id': astro.userId},
                             );
                             if (response.isSuccess) {
-                              CustomSnackbar.showSuccess("Package purchased successfully.");
+                              CustomSnackbar.showSuccess("Package purchased successfully.".tr);
                               Navigator.pop(context);
                               // Refresh wallet balance
                               await Get.find<WalletController>().fetchWallet();
@@ -395,7 +395,7 @@ class SessionBottomSheetHelper {
                               isPurchasing.value = false;
                             }
                           } catch (e) {
-                            CustomSnackbar.showError("Something went wrong during purchase.");
+                            CustomSnackbar.showError("Something went wrong during purchase.".tr);
                             isPurchasing.value = false;
                           }
                         },

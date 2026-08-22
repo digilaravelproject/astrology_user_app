@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   
-  final List<String> filters = [AppStrings.homeFilter, AppStrings.homeAll, AppStrings.homeFavourite, AppStrings.homeNew];
+  List<String> get filters => [AppStrings.homeFilter, AppStrings.homeAll, AppStrings.homeFavourite, AppStrings.homeNew];
 
   @override
   void initState() {
