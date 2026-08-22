@@ -438,110 +438,244 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget _buildRingingScreen() {
     return Container(
-      color: Colors.white,
+      color: const Color(0xFFF8F4FF),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Avatar
-            Container(
-              width: 128,
-              height: 128,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.deepPink.withOpacity(0.15),
-              ),
-              clipBehavior: Clip.hardEdge,
-              child: widget.astrologerImage.isNotEmpty
-                  ? Image.network(
-                      widget.astrologerImage,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Center(
+            // Chat bubble icon with pulsing ring
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Outer pulsing ring
+                AnimatedBuilder(
+                  animation: _dotController,
+                  builder: (context, child) {
+                    final pulse = ((_dotController.value * 2) % 1.0);
+                    return Container(
+                      width: 148 + pulse * 20,
+                      height: 148 + pulse * 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.deepPink.withOpacity(0.07 - pulse * 0.05),
+                      ),
+                    );
+                  },
+                ),
+                // Inner ring
+                Container(
+                  width: 148,
+                  height: 148,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.deepPink.withOpacity(0.12),
+                  ),
+                ),
+                // Avatar circle
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.deepPink.withOpacity(0.18),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: widget.astrologerImage.isNotEmpty
+                      ? Image.network(
+                          widget.astrologerImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Text(
+                              widget.astrologerName.isNotEmpty
+                                  ? widget.astrologerName.substring(0, 1).toUpperCase()
+                                  : 'A',
+                              style: TextStyle(
+                                fontSize: 44,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.deepPink,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Center(
                           child: Text(
                             widget.astrologerName.isNotEmpty
                                 ? widget.astrologerName.substring(0, 1).toUpperCase()
                                 : 'A',
                             style: TextStyle(
-                              fontSize: 48,
+                              fontSize: 44,
                               fontWeight: FontWeight.bold,
                               color: AppColors.deepPink,
                             ),
                           ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Text(
-                        widget.astrologerName.isNotEmpty
-                            ? widget.astrologerName.substring(0, 1).toUpperCase()
-                            : 'A',
-                        style: TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.deepPink,
                         ),
-                      ),
+                ),
+                // Chat badge at bottom-right
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.deepPink,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
+                    child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 14),
+                  ),
+                ),
+              ],
             ),
+
             const SizedBox(height: 28),
 
             // Astrologer name
             Text(
               widget.astrologerName,
               style: const TextStyle(
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1A1A2E),
                 letterSpacing: 0.3,
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
-            // Subtitle
-            Text(
-              'Astrologer',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade500,
-                letterSpacing: 0.5,
+            // "Chat request sent" label
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.deepPink.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Chat Request Sent',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.deepPink,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Fake chat bubbles to hint chat context
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // User bubble
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.deepPink,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(14),
+                        topRight: Radius.circular(14),
+                        bottomLeft: Radius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'Namaste, mujhe aapki guidance chahiye...',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Typing indicator bubble
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(14),
+                          topRight: Radius.circular(14),
+                          bottomRight: Radius.circular(14),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: AnimatedBuilder(
+                        animation: _dotController,
+                        builder: (context, child) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildDot(0),
+                              _buildDot(1),
+                              _buildDot(2),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // Animated "Ringing..." dots
+            // "Waiting for astrologer to accept" animated text
             AnimatedBuilder(
               animation: _dotController,
               builder: (context, child) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Waiting for acceptance',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.deepPink,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    _buildDot(0),
-                    _buildDot(1),
-                    _buildDot(2),
-                  ],
+                return Text(
+                  'Waiting for astrologer to accept',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.3,
+                  ),
                 );
               },
             ),
 
-            const SizedBox(height: 56),
+            const SizedBox(height: 40),
 
-            // End Call button
+            // Cancel request button
             GestureDetector(
               onTap: () => _controller.rejectChatSession(),
-              child: const Icon(Icons.call_end_rounded, color: Colors.red, size: 48),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.red.shade200, width: 1.5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.close_rounded, color: Colors.red.shade400, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Cancel Request',
+                      style: TextStyle(
+                        color: Colors.red.shade400,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
