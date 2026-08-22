@@ -150,7 +150,7 @@ class AstrologerModel {
       durationStr = '$minutes ${"min".tr}';
     }
     
-    return '${'Session'.tr} ($durationStr)';
+    return '${'Session'.tr} ($durationStr) @ ₹$packagePrice';
   }
 
   String get packageSessionTimeOnly {
