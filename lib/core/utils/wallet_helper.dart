@@ -28,7 +28,8 @@ class WalletHelper {
     // Overlay permission check removed to rely on system notifications
     // Simulated wallet balance
     final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
-    final double requiredAmount = double.tryParse(price) ?? 0.0;
+    final double perMinuteRate = double.tryParse(price) ?? 0.0;
+    final double requiredAmount = perMinuteRate * 5; // Minimum 5 minutes required to start
     final bool hasSufficientBalance = walletBalance >= requiredAmount;
 
     if (!hasSufficientBalance) {
