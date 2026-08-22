@@ -537,7 +537,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   void _saveProfile() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Profile saved to your favorites!'),
+        content: Text('Profile saved to your favorites!'.tr),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(20),
@@ -564,16 +564,16 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         ),
         content: AppText(
           (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) 
-              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'
-              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.',
+              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'.tr
+              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.'.tr,
           fontSize: 14,
           color: Colors.black87,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const AppText(
-              'Cancel',
+            child: AppText(
+              'Cancel'.tr,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.grey,
@@ -644,17 +644,17 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               color: AppColors.primaryColor,
             ),
             const SizedBox(height: 8),
-            const AppText(
-              'Please select a reason for reporting this profile',
+            AppText(
+              'Please select a reason for reporting this profile'.tr,
               fontSize: 13,
               color: Colors.grey,
             ),
             const SizedBox(height: 20),
-            _buildReportOption(context, 'Fake Profile'),
-            _buildReportOption(context, 'Inappropriate Content'),
-            _buildReportOption(context, 'Harassment'),
-            _buildReportOption(context, 'Spam'),
-            _buildReportOption(context, 'Other'),
+            _buildReportOption(context, 'Fake Profile'.tr),
+            _buildReportOption(context, 'Inappropriate Content'.tr),
+            _buildReportOption(context, 'Harassment'.tr),
+            _buildReportOption(context, 'Spam'.tr),
+            _buildReportOption(context, 'Other'.tr),
             const SizedBox(height: 20),
           ],
         ),
@@ -869,12 +869,12 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       icon: Icons.auto_awesome_rounded,
       title: AppStrings.lifestyle,
       children: [
-        _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan"),
-        _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'),
-        _buildDetailRow(AppStrings.music, 'Indian classical'),
-        _buildDetailRow(AppStrings.sports, "I'm not a sportsperson"),
-        _buildDetailRow(AppStrings.smokingHabits, 'Not specified'),
-        _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'),
+        _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan".tr),
+        _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'.tr),
+        _buildDetailRow(AppStrings.music, 'Indian classical'.tr),
+        _buildDetailRow(AppStrings.sports, "I'm not a sportsperson".tr),
+        _buildDetailRow(AppStrings.smokingHabits, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'.tr),
       ],
     );
   }
