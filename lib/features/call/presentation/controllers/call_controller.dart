@@ -567,6 +567,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
             webrtcService.activeSessionId = sessionId;
             status.value = sessionStatus!;
             
+            // Dynamically set isPackageCall based on prepaid/package session flags
+            isPackageCall = (session['is_prepaid'] == true ||
+                session['is_package_session'] == true ||
+                session['billing_mode'] == 'prepaid' ||
+                (bodyMap is Map && (
+                  bodyMap['is_prepaid'] == true ||
+                  bodyMap['is_package_session'] == true ||
+                  bodyMap['billing_mode'] == 'prepaid' ||
+                  bodyMap['data']?['is_prepaid'] == true ||
+                  bodyMap['data']?['is_package_session'] == true ||
+                  bodyMap['data']?['billing_mode'] == 'prepaid'
+                )));
+            
             providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];
             providerName = provider?['name']?.toString() ?? 'Astrologer';

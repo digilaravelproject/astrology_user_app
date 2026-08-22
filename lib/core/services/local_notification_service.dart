@@ -54,11 +54,15 @@ class LocalNotificationService {
             isVisible = Get.find<CallController>().isCallScreenVisible;
           }
           if (!isVisible) {
-            Get.to(() => const CallScreen());
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.to(() => const CallScreen());
+            });
           }
         } else if (FloatingChatBubble.onTapCallback != null) {
           // ── Active Chat bubble tap ──
-          FloatingChatBubble.onTapCallback?.call();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            FloatingChatBubble.onTapCallback?.call();
+          });
         } else {
           // ── Chat session notification (payload = sessionId as string) ──
           final int? sId = int.tryParse(payload);
@@ -70,18 +74,20 @@ class LocalNotificationService {
                 ? FloatingChatBubble.chatStatus.value
                 : 'ongoing';
 
-            if (!Get.isRegistered<ChatController>()) {
-              ChatBinding().dependencies();
-            }
-            Get.to(
-              () => ChatScreen(
-                astrologerName: astroName,
-                astrologerImage: '',
-                sessionId: sId,
-                initialStatus: astroStatus,
-              ),
-              binding: ChatBinding(),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!Get.isRegistered<ChatController>()) {
+                ChatBinding().dependencies();
+              }
+              Get.to(
+                () => ChatScreen(
+                  astrologerName: astroName,
+                  astrologerImage: '',
+                  sessionId: sId,
+                  initialStatus: astroStatus,
+                ),
+                binding: ChatBinding(),
+              );
+            });
           }
         }
       },
