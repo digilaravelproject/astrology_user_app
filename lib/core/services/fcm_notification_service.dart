@@ -110,6 +110,42 @@ class FCMNotificationService {
           structuredPayload = rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
         }
 
+        // ── Suppress notification if user is already viewing that chat session ──
+        // Chat/message notifications are noisy when the user is actively in the
+        // chat room — WebSocket already delivers the message to the UI.
+        final bool isChatType = type == 'chat' ||
+            type == 'MessageSent' ||
+            type == 'chat_message' ||
+            type == 'new_message' ||
+            type == 'chat_assistance' ||
+            type == 'chat_assistance_message';
+        if (isChatType) {
+          final int incomingSessionId = int.tryParse(rawSessionId) ?? 0;
+          bool userIsOnChatScreen = false;
+          try {
+            // Check regular chat screen
+            if (Get.isRegistered<ChatController>()) {
+              final chatCtrl = Get.find<ChatController>();
+              if (chatCtrl.sessionId == incomingSessionId) {
+                userIsOnChatScreen = true;
+              }
+            }
+            // Check support/assistance chat screen (सहायता चैट)
+            if (!userIsOnChatScreen && Get.isRegistered<ChatAssistanceController>()) {
+              final assistanceCtrl = Get.find<ChatAssistanceController>();
+              if (assistanceCtrl.sessionId == incomingSessionId) {
+                userIsOnChatScreen = true;
+              }
+            }
+          } catch (_) {}
+
+          if (userIsOnChatScreen) {
+            debugPrint('[FCMNotificationService] Suppressing chat notification — user is on chat screen (sessionId=$incomingSessionId)');
+            return; // Skip the notification
+          }
+        }
+        // ──────────────────────────────────────────────────────────────────────────
+
         LocalNotificationService.showNotification(
           id: message.hashCode,
           title: message.notification?.title ?? 'Notification',
