@@ -1,4 +1,5 @@
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -91,7 +92,46 @@ class FCMNotificationService {
     // 5. Notification Opened Handler
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint('Notification Opened App: ${message.data}');
+      _handleNotificationClick(message.data);
     });
+
+    // 6. Cold Start / Initial Message Handler
+    _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        debugPrint('Notification Opened App (Cold Start): ${message.data}');
+        _handleNotificationClick(message.data);
+      }
+    });
+  }
+
+  static void _handleNotificationClick(Map<String, dynamic> data) {
+    try {
+      debugPrint('[FCM_SERVICE] Handling notification click with data: $data');
+      
+      final type = data['type']?.toString();
+      final screen = data['screen']?.toString();
+      final notificationType = data['notification_type']?.toString();
+      
+      if (type == 'live_stream' || screen == 'LIVE_STREAM_SCREEN' || notificationType == 'live_session') {
+        final sessionIdStr = data['session_id']?.toString() ?? data['live_session_id']?.toString() ?? data['id']?.toString();
+        if (sessionIdStr != null && sessionIdStr.isNotEmpty) {
+          final int? sessionId = int.tryParse(sessionIdStr);
+          if (sessionId != null) {
+            final String astrologerName = data['astrologer_name']?.toString() ?? 'Astrologer';
+            final String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
+            
+            // Navigate to LiveRoomScreen
+            Get.to(() => LiveRoomScreen(
+              sessionId: sessionId,
+              astrologerName: astrologerName,
+              astrologerImage: astrologerImage,
+            ));
+          }
+        }
+      }
+    } catch (e, stackTrace) {
+      debugPrint('[FCM_SERVICE] Error handling notification click: $e\n$stackTrace');
+    }
   }
 
   static Future<String?> getToken() async {
