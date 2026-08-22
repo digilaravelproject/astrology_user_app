@@ -264,9 +264,10 @@ class _CallScreenState extends State<CallScreen> {
     final providerImage = controller.providerImage ?? '';
     final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
 
+    Map<String, dynamic> spawnData = {};
     if (subSessionId > 0 && controller.isPackageCall) {
       try {
-        await PackageSessionService.spawnChannel(
+        spawnData = await PackageSessionService.spawnChannel(
           subSessionId: subSessionId,
           channelType: 'chat',
         );
@@ -296,8 +297,8 @@ class _CallScreenState extends State<CallScreen> {
       String chatInitialStatus = 'ongoing';
 
       if (subSessionId > 0 && controller.isPackageCall) {
-        activeChatSessionId = controller.sessionId ?? 0;
-        chatInitialStatus = 'ongoing';
+        activeChatSessionId = int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
+        chatInitialStatus = spawnData['chat_status']?.toString() ?? 'ongoing';
       } else {
         final response = await apiClient.post(
           AppUrls.initiateChat,
