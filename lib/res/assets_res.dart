@@ -19,6 +19,4 @@ class AssetsRes {
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
   static const String BUBBLE_IMG = 'assets/images/bubble_img.png';
   static const String LIVE_SESSION_BG = 'assets/images/live_session_bg.png';
-  static const String FIX_JSON = 'assets/translations/fix_json.js';
-  static const String FIX_NAV_TRANSLATIONS = 'assets/translations/fix_nav_translations.py';
 }

@@ -223,7 +223,7 @@ class LocalNotificationService {
           enableVibration: false,
         ),
       );
-      await androidPlugin.requestNotificationsPermission();
+      androidPlugin.requestNotificationsPermission();
     }
   }
 

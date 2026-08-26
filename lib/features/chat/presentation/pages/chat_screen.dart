@@ -190,8 +190,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             }),
           ],
         ),
-        body: Column(
-          children: [
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/background.png'),
+              fit: BoxFit.cover,
+              opacity: 0.12,
+            ),
+          ),
+          child: Column(
+            children: [
             // Timer / Status Bar
             Obx(() {
               final seconds = _controller.elapsedSeconds.value;
@@ -544,6 +552,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               );
             }),
           ],
+        ),
         ),
       ),
     );
