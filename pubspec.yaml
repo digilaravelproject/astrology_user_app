@@ -96,6 +96,7 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.14.3
   cloud_firestore: ^6.8.0
+  swipe_to: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -146,6 +147,8 @@ flutter:
     - assets/language/
     - assets/translations/
     - assets/translations/fix_nav_translations.py
+
+    - assets/translations/fix_json.js
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

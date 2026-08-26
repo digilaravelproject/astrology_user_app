@@ -89,17 +89,20 @@ class FCMNotificationService {
           return;
         }
 
-        // Read play_sound from FCM data map ('1' or 'true' = audible, anything else = silent)
-        final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
-        final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
+        // Read play_sound from FCM data map (Force disabled per user request)
+        // final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
+        // final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
+        const bool playSound = false; // Audio disabled globally
 
-        debugPrint('[FCMNotificationService] type=$type play_sound=$playSoundRaw → playSound=$playSound');
+        debugPrint('[FCMNotificationService] type=$type playSound=$playSound');
 
         // Build a structured payload so onDidReceiveNotificationResponse can route correctly.
         // live_ prefix  → LiveRoomScreen
         // call_ prefix  → CallScreen
         // bare int      → ChatScreen
         final String rawSessionId = message.data['session_id']?.toString() ??
+            message.data['chat_session_id']?.toString() ??
+            message.data['chat_assistance_session_id']?.toString() ??
             message.data['live_session_id']?.toString() ??
             message.data['id']?.toString() ?? '';
 
@@ -115,12 +118,10 @@ class FCMNotificationService {
         // ── Suppress notification if user is already viewing that chat session ──
         // Chat/message notifications are noisy when the user is actively in the
         // chat room — WebSocket already delivers the message to the UI.
-        final bool isChatType = type == 'chat' ||
-            type == 'MessageSent' ||
-            type == 'chat_message' ||
-            type == 'new_message' ||
-            type == 'chat_assistance' ||
-            type == 'chat_assistance_message';
+        final String lowerType = type?.toLowerCase() ?? '';
+        final bool isChatType = lowerType.contains('chat') ||
+            lowerType.contains('message') ||
+            lowerType.contains('messagesent');
         if (isChatType) {
           final int incomingSessionId = int.tryParse(rawSessionId) ?? 0;
           bool userIsOnChatScreen = false;
@@ -233,51 +234,69 @@ class FCMNotificationService {
 
   /// Register or Refresh FCM Device Token on Backend with full real metadata
   static Future<void> registerDeviceToken(String? fcmToken) async {
-    try {
-      debugPrint('[FCM_SERVICE] registerDeviceToken called. token: $fcmToken');
-      if (!Get.isRegistered<ApiClient>()) {
-        debugPrint('[FCM_SERVICE] ApiClient is NOT registered in GetX container!');
-        return;
+    // Run completely in background thread context to prevent UI block (ANR)
+    Future.microtask(() async {
+      try {
+        debugPrint('[FCM_SERVICE] registerDeviceToken background execution started.');
+        if (!Get.isRegistered<ApiClient>()) {
+          debugPrint('[FCM_SERVICE] ApiClient is NOT registered in GetX container!');
+          return;
+        }
+
+        // Safe getToken timeout helper to prevent freeze
+        String? tokenToRegister = fcmToken;
+        if (tokenToRegister == null) {
+          try {
+            tokenToRegister = await _firebaseMessaging.getToken().timeout(
+              const Duration(seconds: 4),
+              onTimeout: () {
+                debugPrint('[FCM_SERVICE] _firebaseMessaging.getToken timed out.');
+                return null;
+              },
+            );
+          } catch (tokEx) {
+            debugPrint('[FCM_SERVICE] Error fetching token with timeout: $tokEx');
+          }
+        }
+
+        if (tokenToRegister == null || tokenToRegister.isEmpty) {
+          debugPrint('[FCM_SERVICE] FCM token is null or empty, skipping API call.');
+          return;
+        }
+
+        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+        String deviceId = '';
+        String deviceModel = '';
+        String deviceType = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown');
+
+        if (Platform.isAndroid) {
+          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          deviceId = androidInfo.id;
+          deviceModel = '${androidInfo.manufacturer} ${androidInfo.model}';
+        } else if (Platform.isIOS) {
+          IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+          deviceId = iosInfo.identifierForVendor ?? '';
+          deviceModel = '${iosInfo.name} ${iosInfo.model}';
+        }
+
+        final payload = {
+          'fcm_token': tokenToRegister,
+          'device_type': deviceType,
+          'device_id': deviceId,
+          'device_model': deviceModel,
+          'app_version': packageInfo.version,
+        };
+
+        debugPrint('[FCM_SERVICE] Sending POST to ${AppUrls.registerDeviceToken} with full payload: $payload');
+        final apiClient = Get.find<ApiClient>();
+        final response = await apiClient.post(AppUrls.registerDeviceToken, data: payload, handleError: false, showToaster: false);
+        debugPrint('[FCM_SERVICE] Device token registered response | Status: ${response.statusCode} | Success: ${response.isSuccess}');
+      } catch (e, stackTrace) {
+        debugPrint('[FCM_SERVICE] Failed to register device token error: $e\n$stackTrace');
       }
-
-      final tokenToRegister = fcmToken ?? await getToken();
-      if (tokenToRegister == null || tokenToRegister.isEmpty) {
-        debugPrint('[FCM_SERVICE] FCM token is null or empty, skipping API call.');
-        return;
-      }
-
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-      String deviceId = '';
-      String deviceModel = '';
-      String deviceType = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown');
-
-      if (Platform.isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceId = androidInfo.id;
-        deviceModel = '${androidInfo.manufacturer} ${androidInfo.model}';
-      } else if (Platform.isIOS) {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceId = iosInfo.identifierForVendor ?? '';
-        deviceModel = '${iosInfo.name} ${iosInfo.model}';
-      }
-
-      final payload = {
-        'fcm_token': tokenToRegister,
-        'device_type': deviceType,
-        'device_id': deviceId,
-        'device_model': deviceModel,
-        'app_version': packageInfo.version,
-      };
-
-      debugPrint('[FCM_SERVICE] Sending POST to ${AppUrls.registerDeviceToken} with full payload: $payload');
-      final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.post(AppUrls.registerDeviceToken, data: payload, handleError: false, showToaster: false);
-      debugPrint('[FCM_SERVICE] Device token registered response | Status: ${response.statusCode} | Success: ${response.isSuccess} | Message: ${response.message} | Body: ${response.body}');
-    } catch (e, stackTrace) {
-      debugPrint('[FCM_SERVICE] Failed to register device token error: $e\n$stackTrace');
-    }
+    });
   }
 
   /// Remove Device Token on Logout

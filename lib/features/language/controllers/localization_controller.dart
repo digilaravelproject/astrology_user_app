@@ -7,6 +7,8 @@ import '../domain/models/language_model.dart';
 import '../widget/language_bottom_sheet.dart';
 import '../../home/controllers/blog_controller.dart';
 import '../../home/controllers/remedy_controller.dart';
+import '../../home/controllers/founder_controller.dart';
+
 class LocalizationController extends GetxController {
   final _selectedIndex = 0.obs;
   final _languages = <LanguageModel>[].obs;
@@ -106,6 +108,10 @@ class LocalizationController extends GetxController {
       
       try {
         Get.find<RemedyController>().fetchRemedies();
+      } catch (_) {}
+      
+      try {
+        Get.find<FounderController>().fetchFounderWords();
       } catch (_) {}
     }
   }

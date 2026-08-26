@@ -64,13 +64,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Refresh profile to get latest photo/data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FCMNotificationService.registerDeviceToken(null);
-      if (Get.isRegistered<ProfileController>()) {
-        Get.find<ProfileController>().refreshProfile();
-      }
-      if (Get.isRegistered<LiveController>()) {
-        Get.find<LiveController>().fetchActiveSessions();
-      }
+      Future.microtask(() async {
+        try {
+          FCMNotificationService.registerDeviceToken(null);
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().refreshProfile();
+          }
+          if (Get.isRegistered<LiveController>()) {
+            Get.find<LiveController>().fetchActiveSessions();
+          }
+        } catch (_) {}
+      });
     });
   }
 

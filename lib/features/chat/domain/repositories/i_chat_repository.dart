@@ -9,6 +9,7 @@ abstract class IChatRepository {
   Future<int?> sendTextMessage({
     required int sessionId,
     required String text,
+    int? replyToId,
   });
   Future<({int id, String url})?> sendImageAttachment({
     required int sessionId,

@@ -54,11 +54,15 @@ class LocalNotificationService {
             isVisible = Get.find<CallController>().isCallScreenVisible;
           }
           if (!isVisible) {
-            Get.to(() => const CallScreen());
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Get.to(() => const CallScreen());
+            });
           }
         } else if (FloatingChatBubble.onTapCallback != null) {
           // ── Active Chat bubble tap ──
-          FloatingChatBubble.onTapCallback?.call();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            FloatingChatBubble.onTapCallback?.call();
+          });
         } else {
           // ── Chat session notification (payload = sessionId as string) ──
           final int? sId = int.tryParse(payload);
@@ -70,18 +74,20 @@ class LocalNotificationService {
                 ? FloatingChatBubble.chatStatus.value
                 : 'ongoing';
 
-            if (!Get.isRegistered<ChatController>()) {
-              ChatBinding().dependencies();
-            }
-            Get.to(
-              () => ChatScreen(
-                astrologerName: astroName,
-                astrologerImage: '',
-                sessionId: sId,
-                initialStatus: astroStatus,
-              ),
-              binding: ChatBinding(),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!Get.isRegistered<ChatController>()) {
+                ChatBinding().dependencies();
+              }
+              Get.to(
+                () => ChatScreen(
+                  astrologerName: astroName,
+                  astrologerImage: '',
+                  sessionId: sId,
+                  initialStatus: astroStatus,
+                ),
+                binding: ChatBinding(),
+              );
+            });
           }
         }
       },
@@ -93,44 +99,44 @@ class LocalNotificationService {
 
     if (androidPlugin != null) {
       // --- FCM Spec Channels ---
-      // call_channel: Incoming Calls (max importance, sound ON)
+      // call_channel: Incoming Calls (max importance, sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'call_channel',
+          'call_channel_v2',
           'Incoming Calls',
           description: 'Incoming Audio/Video Call wake-up alert',
           importance: Importance.max,
-          playSound: true,
+          playSound: false,
         ),
       );
       // chat_channel: Chat messages (sound controlled per message via play_sound)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'chat_channel',
+          'chat_channel_v2',
           'Chat Messages & Requests',
           description: 'Regular chat messages (silent) and new chat session requests (audible)',
           importance: Importance.high,
-          playSound: true, // Channel allows sound; silenced per-message when play_sound==0
+          playSound: false, // Channel allows sound; silenced per-message when play_sound==0
         ),
       );
-      // live_session_channel: Live stream broadcasts (sound ON)
+      // live_session_channel: Live stream broadcasts (sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'live_session_channel',
+          'live_session_channel_v2',
           'Live Session Alerts',
           description: 'Astrologer live stream broadcast notifications',
           importance: Importance.high,
-          playSound: true,
+          playSound: false,
         ),
       );
       // astology_notifications: General / promo / system (default importance)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'astology_notifications',
+          'astology_notifications_v2',
           'General Announcements',
           description: 'Promotional messages, wallet updates and system alerts',
           importance: Importance.defaultImportance,
-          playSound: true,
+          playSound: false,
         ),
       );
 
@@ -420,47 +426,50 @@ class LocalNotificationService {
       case 'call':
       case 'CALL_REQUEST':
       case 'CALL_ACCEPTED':
-        channelId = 'call_channel';
+        channelId = 'call_channel_v2';
         channelName = 'Incoming Calls';
         break;
       case 'chat':
       case 'CHAT_REQUEST':
       case 'session_request':
       case 'MessageSent':
-        channelId = 'chat_channel';
+        channelId = 'chat_channel_v2';
         channelName = 'Chat Messages & Requests';
         break;
       case 'live_stream':
       case 'live':
       case 'live_session':
-        channelId = 'live_session_channel';
+        channelId = 'live_session_channel_v2';
         channelName = 'Live Session Alerts';
         break;
       default:
-        channelId = 'astology_notifications';
+        channelId = 'astology_notifications_v2';
         channelName = 'General Announcements';
     }
 
-    debugPrint('[LocalNotificationService] showNotification | type=$notificationType | channel=$channelId | playSound=$playSound');
+    // Force playSound to false globally per user request
+    const bool finalPlaySound = false;
+
+    debugPrint('[LocalNotificationService] showNotification | type=$notificationType | channel=$channelId | playSound=$finalPlaySound');
 
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       channelId,
       channelName,
       channelDescription: 'System and real-time notifications',
       icon: '@mipmap/ic_launcher',
-      importance: playSound ? Importance.max : Importance.high,
-      priority: playSound ? Priority.high : Priority.defaultPriority,
-      playSound: playSound,
-      enableVibration: playSound,
+      importance: finalPlaySound ? Importance.max : Importance.high,
+      priority: finalPlaySound ? Priority.high : Priority.defaultPriority,
+      playSound: finalPlaySound,
+      enableVibration: finalPlaySound,
       showWhen: true,
     );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(
+      iOS: const DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
-        presentSound: playSound, // iOS: only plays sound when play_sound == '1'
+        presentSound: finalPlaySound, // iOS: only plays sound when play_sound == '1'
       ),
     );
 

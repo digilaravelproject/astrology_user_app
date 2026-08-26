@@ -44,8 +44,8 @@ Future<void> initApp() async {
   // Initialize shared preferences
   await SharedPrefs.init();
 
-  // Initialize keep-alive foreground service
-  await initializeKeepAliveService();
+  // Initialize keep-alive foreground service (Disabled to prevent OOM crash on low-resource devices)
+  // await initializeKeepAliveService();
 
   // Initialize call foreground task service
   await ForegroundTaskService.init();

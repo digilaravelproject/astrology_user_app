@@ -16,6 +16,7 @@ import '../../features/call/presentation/pages/call_screen.dart';
 import '../../features/call/presentation/controllers/call_controller.dart';
 import '../../features/chat/presentation/pages/chat_screen.dart';
 import '../../features/chat/presentation/bindings/chat_binding.dart';
+import '../services/network/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SessionBottomSheetHelper {
@@ -426,11 +427,15 @@ class PackageSessionService {
       final Map<String, dynamic> data = (body is Map && body.containsKey('has_active_package'))
           ? Map<String, dynamic>.from(body)
           : (body is Map && body['data'] is Map ? Map<String, dynamic>.from(body['data']) : {});
+      final purchase = data['package_purchase'] != null 
+          ? PackagePurchase.fromJson(data['package_purchase']) 
+          : null;
+      if (purchase != null) {
+        WebSocketService.packageRemainingSeconds.value = purchase.remainingDuration;
+      }
       return ActiveStatusResponse(
         hasActivePackage: data['has_active_package'] ?? false,
-        purchase: data['package_purchase'] != null 
-            ? PackagePurchase.fromJson(data['package_purchase']) 
-            : null,
+        purchase: purchase,
         activeSubSession: data['active_sub_session'] != null 
             ? PackageSubSession.fromJson(data['active_sub_session']) 
             : null,
@@ -458,9 +463,11 @@ class PackageSessionService {
       final Map<String, dynamic> data = response.body is Map<String, dynamic> 
           ? response.body 
           : {};
+      final remainingDuration = int.tryParse(data['remaining_duration']?.toString() ?? '') ?? 0;
+      WebSocketService.packageRemainingSeconds.value = remainingDuration;
       return StartSubSessionResult(
         subSession: PackageSubSession.fromJson(data['sub_session']),
-        remainingDuration: data['remaining_duration'] ?? 0,
+        remainingDuration: remainingDuration,
         linkedChatSession: data['chat_session'] != null
             ? PackageChatSession.fromJson(data['chat_session'])
             : null,

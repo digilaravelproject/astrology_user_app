@@ -11,6 +11,8 @@ import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/call_summary_dialog.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 
 import 'package:flutter/material.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
@@ -27,6 +29,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final RxBool isSpeakerOn = false.obs;
   bool isCallScreenVisible = false;
   bool isPackageCall = false;
+  /// True when the package sub-session also has an active chat channel (used for granular end modal)
+  bool isChatAlsoActive = false;
+  /// Active package chat session ID (used when switching back to chat after "End Call Only")
+  int? activeChatSessionId;
+
+  /// Master package countdown in seconds — server-driven via WebSocket
+  int get packageMasterSeconds => WebSocketService.packageRemainingSeconds.value;
 
   int? sessionId;
   int? providerId;
@@ -97,9 +106,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callDismissedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final reason = data['reason']?.toString() ?? 'dismissed';
-          _handleCallDismissed(reason);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          Logger.d('CallController: callDismissed match check: incoming=$incomingId, expected=$sessionId');
+          if (incomingId == sessionId) {
+            final reason = data['reason']?.toString() ?? 'dismissed';
+            _handleCallDismissed(reason);
+          }
         }
       }
     });
@@ -107,12 +120,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _iceSubscription = WebSocketService.iceCandidateData.listen((data) {
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final candidate = data['candidate']?.toString();
-          final receiverId = data['receiverId'];
-          // Only add candidate if it is meant for us (receiverId matches current user ID)
-          if (candidate != null && receiverId == WebSocketService.currentUserId) {
-            webrtcService.addRemoteCandidate(candidate);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            final candidate = data['candidate']?.toString();
+            final receiverId = data['receiverId'];
+            // Only add candidate if it is meant for us (receiverId matches current user ID)
+            if (candidate != null && receiverId == WebSocketService.currentUserId) {
+              webrtcService.addRemoteCandidate(candidate);
+            }
           }
         }
       }
@@ -122,8 +138,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callEndedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          _handleCallEnded(data);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            _handleCallEnded(data);
+          }
         }
       }
     });
@@ -176,6 +195,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
           final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
           if (subSessionData != null) {
             SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
+          }
+          // Immediately sync the master countdown from REST API response
+          final remainingSecs = bodyMap is Map
+              ? (bodyMap['remaining_duration'] ?? bodyMap['data']?['remaining_duration'])
+              : null;
+          if (remainingSecs != null) {
+            WebSocketService.packageRemainingSeconds.value = int.tryParse(remainingSecs.toString()) ?? 0;
           }
         }
         if (sessionData != null) {
@@ -270,6 +296,82 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  // ─── Hybrid Package: Granular Channel Termination ───────────────────────
+
+  /// End Call Only — keeps chat alive, navigates back to chat screen
+  Future<void> terminateChannelOnly() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      Logger.e('CallController: terminateChannelOnly — no activeSubSessionId found');
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'channel_only',
+      );
+      Logger.d('CallController: terminateChannelOnly success. Returning to chat...');
+
+      final chatSessId = activeChatSessionId ?? 0;
+      final pName = providerName ?? 'Astrologer';
+      final pImage = providerImage ?? '';
+
+      // Reset call without ending the package sub-session
+      cleanUp();
+
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+
+      // Navigate back to chat screen
+      if (chatSessId > 0) {
+        Get.to(
+          () => ChatScreen(
+            astrologerName: pName,
+            astrologerImage: pImage,
+            sessionId: chatSessId,
+            initialStatus: 'ongoing',
+            isPackageChat: true,
+          ),
+          binding: ChatBinding(),
+        );
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateChannelOnly -> $e');
+      CustomSnackbar.showError('Failed to end call. Please try again.');
+    }
+  }
+
+  /// End Entire Session — terminates both call and chat, closes consultation
+  Future<void> terminateEntireSession() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      // Fallback to regular endCall
+      await endCall();
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'complete_session',
+      );
+      Logger.d('CallController: terminateEntireSession success.');
+      status.value = 'completed';
+      cleanUp();
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateEntireSession -> $e');
+      // Fallback
+      await endCall();
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+
   void toggleMute() {
     isMuted.value = !isMuted.value;
     webrtcService.toggleMute(isMuted.value);
@@ -300,14 +402,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   void _handleCallDismissed(String reason) {
     status.value = reason; // rejected, cancelled, timeout
+    final wasCallScreenVisible = isCallScreenVisible;
+    cleanUp();
+    if (wasCallScreenVisible) {
+      Get.back(); // Close CallScreen safely
+    }
     if (reason == 'cancelled') {
       CustomSnackbar.showInfo('Call cancelled.');
     } else {
       CustomSnackbar.showError('Call dismissed: $reason');
-    }
-    cleanUp();
-    if (isCallScreenVisible) {
-      Get.back(); // Close CallScreen safely
     }
   }
 
@@ -402,6 +505,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
     providerId = null;
     providerName = null;
     providerImage = null;
+    isChatAlsoActive = false;
+    activeChatSessionId = null;
 
     if (isCallScreenVisible) {
       isCallScreenVisible = false;
@@ -461,6 +566,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
             sessionId = int.tryParse(session['id']?.toString() ?? '');
             webrtcService.activeSessionId = sessionId;
             status.value = sessionStatus!;
+            
+            // Dynamically set isPackageCall based on prepaid/package session flags
+            isPackageCall = (session['is_prepaid'] == true ||
+                session['is_package_session'] == true ||
+                session['billing_mode'] == 'prepaid' ||
+                (bodyMap is Map && (
+                  bodyMap['is_prepaid'] == true ||
+                  bodyMap['is_package_session'] == true ||
+                  bodyMap['billing_mode'] == 'prepaid' ||
+                  bodyMap['data']?['is_prepaid'] == true ||
+                  bodyMap['data']?['is_package_session'] == true ||
+                  bodyMap['data']?['billing_mode'] == 'prepaid'
+                )));
             
             providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];
