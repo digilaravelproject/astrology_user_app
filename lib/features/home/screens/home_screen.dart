@@ -8,6 +8,7 @@ import '../../../core/widgets/custom_image_widget.dart';
 import '../../../features/auth/controllers/auth_controller.dart';
 import '../../../routes/app_routes.dart';
 import '../../../core/constants/app_urls.dart';
+import '../../../core/services/fcm_notification_service.dart';
 import '../widgets/animated_zodiac_wheel.dart';
 import '../widgets/home_greeting.dart';
 import '../widgets/horoscope_pill.dart';
@@ -22,6 +23,13 @@ import '../../matrimony/widgets/matrimony_section.dart';
 import '../widgets/remedy_services_section.dart';
 import '../../wallet/screens/wallet_screen.dart';
 import '../../notification/screens/notification_screen.dart';
+import '../../call/presentation/controllers/call_controller.dart';
+import '../../../core/services/network/api_client.dart';
+import '../../../core/services/network/websocket_service.dart';
+import '../../../core/services/local_notification_service.dart';
+import '../../chat/presentation/widgets/floating_chat_bubble.dart';
+import '../../chat/presentation/pages/chat_screen.dart';
+import '../../chat/presentation/bindings/chat_binding.dart';
 import '../../notification/controllers/notification_controller.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../../core/widgets/custom_drawer.dart';
@@ -32,6 +40,9 @@ import '../../profile/controllers/profile_controller.dart';
 import '../../profile/bindings/profile_binding.dart';
 import '../widgets/astrologer_filter_bottom_sheet.dart';
 import '../../live/presentation/controllers/live_controller.dart';
+import '../controllers/blog_controller.dart';
+import '../controllers/remedy_controller.dart';
+import '../controllers/founder_controller.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -46,19 +57,24 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   
-  final List<String> filters = [AppStrings.homeFilter, AppStrings.homeAll, AppStrings.homeFavourite, AppStrings.homeNew];
+  List<String> get filters => [AppStrings.homeFilter, AppStrings.homeAll, AppStrings.homeFavourite, AppStrings.homeNew];
 
   @override
   void initState() {
     super.initState();
     // Refresh profile to get latest photo/data
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.isRegistered<ProfileController>()) {
-        Get.find<ProfileController>().refreshProfile();
-      }
-      if (Get.isRegistered<LiveController>()) {
-        Get.find<LiveController>().fetchActiveSessions();
-      }
+      Future.microtask(() async {
+        try {
+          FCMNotificationService.registerDeviceToken(null);
+          if (Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().refreshProfile();
+          }
+          if (Get.isRegistered<LiveController>()) {
+            Get.find<LiveController>().fetchActiveSessions();
+          }
+        } catch (_) {}
+      });
     });
   }
 
@@ -84,11 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
-            pinned: true,
+            pinned: false,
             floating: false,
             elevation: 0,
             backgroundColor: Colors.white,
             automaticallyImplyLeading: false,
+            toolbarHeight: 145,
 
             titleSpacing: 0,
 
@@ -104,8 +121,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // Scrollable Content (Scrolls behind pinned headers)
             flexibleSpace: FlexibleSpaceBar(
               collapseMode: CollapseMode.pin,
-              background: Container(
-                color: Colors.white,
+              background: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    color: const Color(0xFFFFF7F2), // Light peach background
+                  ),
+                  const AnimatedZodiacWheel(),
+                ],
               ),
             ),
           ),
@@ -115,67 +138,38 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Container(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _buildScrollableGreeting(authController),
-                  ),
-                  const SizedBox(height: 25),
-                  const FounderMessageBanner(),
-                  const SizedBox(height: 25),
-                  const RemedyGrid(),
                   const SizedBox(height: 15),
-                  const AstrologyBlogsSection(),
-                  const SizedBox(height: 25),
-                  
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
+                  const FounderMessageBanner(),
+                  Obx(() {
+                    try {
+                      final remedyController = Get.find<RemedyController>();
+                      if (remedyController.remedies.isEmpty && !remedyController.isLoading.value) {
+                        return const SizedBox.shrink();
+                      }
+                    } catch (_) {}
+                    return const Column(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF9C27B0).withOpacity(0.1), // Purple tint
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.chat_bubble_outline_rounded,
-                            color: Color(0xFF9C27B0),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        AppText(
-                          AppStrings.talkToAstrologer,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF2E1A47),
-                        ),
+                        SizedBox(height: 25),
+                        RemedyGrid(),
                       ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-/*                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (value) => Get.find<AstrologerController>().updateSearch(value),
-                        decoration: InputDecoration(
-                          hintText: AppStrings.search,
-                          hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
-                          prefixIcon: const Icon(Icons.search, color: AppColors.primaryColor, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),*/
+                    );
+                  }),
+                  Obx(() {
+                    try {
+                      final blogController = Get.find<BlogController>();
+                      if (blogController.blogs.isEmpty && !blogController.isLoading.value) {
+                        return const SizedBox.shrink();
+                      }
+                    } catch (_) {}
+                    return const Column(
+                      children: [
+                        SizedBox(height: 15),
+                        AstrologyBlogsSection(),
+                        SizedBox(height: 25),
+                      ],
+                    );
+                  }),
+                  // Old Search Bar and chat row removed
                 ],
               )
             ),
@@ -206,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Column(
                 children: [
                   if (hasActiveSessions) const SizedBox(height: 35),
-                  const LiveSessionSection(),
+               //   const LiveSessionSection(),
                   const SizedBox(height: 130),
                 ],
               );
@@ -233,103 +227,245 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
   Future<void> _onRefresh() async {
-    await Future.wait([
+    final List<Future> refreshTasks = [
       Get.find<AuthController>().checkLoginStatus(),
       Get.find<WalletController>().fetchWallet(),
       Get.find<NotificationController>().fetchNotificationCount(),
       Get.find<AstrologerController>().fetchAstrologers(),
-    ]);
+    ];
+    
+    try {
+      refreshTasks.add(Get.find<ProfileController>().refreshProfile());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<BlogController>().fetchBlogs());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<RemedyController>().fetchRemedies());
+    } catch (_) {}
+    
+    try {
+      refreshTasks.add(Get.find<FounderController>().fetchFounderWords());
+    } catch (_) {}
+    
+    // Trigger session checks in background so UI refresh isn't blocked by timeout
+    try {
+      _checkCurrentActiveSession();
+    } catch (_) {}
+
+    try {
+      if (Get.isRegistered<CallController>()) {
+        Get.find<CallController>().checkCurrentActiveCallSession();
+      }
+    } catch (_) {}
+
+    await Future.wait(refreshTasks);
+  }
+
+  Future<void> _checkCurrentActiveSession() async {
+    try {
+      final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
+      if (response.isSuccess && response.body != null) {
+        final data = response.body;
+        final session = (data is Map)
+            ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
+            : null;
+        final sessionId = session?['id'];
+        final status = session?['status'];
+        final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
+        final name = session?['provider']?['name'] ?? 'Astrologer';
+
+        if (sessionId != null && startedAt != null) {
+          WebSocketService.sessionStartTimes[sessionId] = startedAt.toString();
+        }
+
+        DateTime? parsedStart;
+        if (startedAt != null) {
+          String isoUtc = startedAt.toString().replaceAll(' ', 'T');
+          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+            isoUtc += 'Z';
+          }
+          parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
+        }
+        final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
+
+        if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
+          if (sessionId != null) {
+            LocalNotificationService.showOngoingChatNotification(
+              sessionId: sessionId,
+              title: '$name • Chat',
+              body: 'Ongoing chat session',
+              startedAtMillis: startedAtMillis,
+            );
+          }
+          FloatingChatBubble.show(
+            context: Get.context!,
+            sessionId: sessionId,
+            name: name,
+            imageUrl: '',
+            status: status,
+            startedAt: startedAt,
+            onTap: () {
+              final currentStatus = FloatingChatBubble.chatStatus.value;
+              Get.to(
+                () => ChatScreen(
+                  astrologerName: name,
+                  astrologerImage: '',
+                  sessionId: sessionId,
+                  initialStatus: currentStatus,
+                ),
+                binding: ChatBinding(),
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking active chat session on refresh: $e');
+    }
   }
 
 
 
   Widget _buildStickyTopBar(AuthController authController, WalletController walletController) {
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(
-          onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
-            child: Obx(() {
-              final user = authController.currentUser.value;
-              return Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.primaryColor,
-                    width: 2.5,
-                  ),
-                ),
-                child: CustomImageWidget(
-                  imagePath: (() {
-                    final photo = user?.profilePhoto;
-                    if (photo == null || photo.isEmpty) return null;
-                    if (photo.startsWith('http')) return photo;
-                    final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
-                    return '${AppUrls.baseImageUrl}$cleanPhoto';
-                  })(),
-                  height: 48,
-                  width: 48,
-                  radius: BorderRadius.circular(24),
-                  fallbackWidget: Container(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        user?.name.isNotEmpty == true
-                            ? user!.name[0].toUpperCase()
-                            : 'U',
-                        style: GoogleFonts.poppins(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ),
+          // TOP ROW: Wallet, Notification, Profile
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              GestureDetector(
-                onTap: () => Get.toNamed(AppRoutes.wallet),
-                child: Obx(() {
-                  final bal = walletController.wallet.value?.balance ?? '0.00';
-                  return _buildCoinWalletChip(bal);
-                }),
-              ),
-              const SizedBox(width: 8),
-              GestureDetector(
-                onTap: () => Get.to(() => const NotificationScreen()),
-                child: Obx(() {
-                  final notificationController = Get.find<NotificationController>();
-                  final count = notificationController.unreadCount.value;
-                  return Badge(
-                    label: Text(count.toString()),
-                    isLabelVisible: count > 0,
-                    backgroundColor: AppColors.deepPink,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.notifications_outlined, size: 22, color: Color(0xFF2E1A47)),
-                    ),
-                  );
-                }),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () => Get.toNamed(AppRoutes.wallet),
+                    child: Obx(() {
+                      final bal = walletController.wallet.value?.balance ?? '0.00';
+                      return _buildCoinWalletChip(bal);
+                    }),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => Get.to(() => const NotificationScreen()),
+                    child: Obx(() {
+                      final notificationController = Get.find<NotificationController>();
+                      final count = notificationController.unreadCount.value;
+                      return Badge(
+                        label: Text(count.toString()),
+                        isLabelVisible: count > 0,
+                        backgroundColor: AppColors.deepPink,
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                            ],
+                          ),
+                          child: const Icon(Icons.notifications_none_rounded, size: 20, color: Color(0xFF2E1A47)),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () => Get.to(() => const ProfileScreen(), binding: ProfileBinding()),
+                    child: Obx(() {
+                      final user = authController.currentUser.value;
+                      return Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0,2)),
+                          ],
+                        ),
+                        child: CustomImageWidget(
+                          imagePath: (() {
+                            final photo = user?.profilePhoto;
+                            if (photo == null || photo.isEmpty) return null;
+                            if (photo.startsWith('http')) return photo;
+                            final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
+                            return '${AppUrls.baseImageUrl}$cleanPhoto';
+                          })(),
+                          height: 40,
+                          width: 40,
+                          radius: BorderRadius.circular(20),
+                          fallbackWidget: Container(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: Text(
+                                user?.name.isNotEmpty == true
+                                    ? user!.name[0].toUpperCase()
+                                    : 'U',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
               ),
             ],
           ),
+         // const SizedBox(height: 12),
+          // Greeting and Name
+          Row(
+            children: [
+              AppText(
+                'Hello',
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
+              const SizedBox(width: 4),
+              const WavingEmoji(),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Expanded(
+          //   child:
+            Obx(() => Text(
+              authController.currentUser.value?.name ?? AppStrings.guest,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: const Color(0xFF6A0C22), // Dark burgundy color
+                letterSpacing: -0.5,
+              ),
+            )
+            ),
+         // ),
+          // Obx(() => AppText(
+          //   authController.currentUser.value?.name ?? AppStrings.guest,
+          //   fontSize: 22,
+          //   fontWeight: FontWeight.w900,
+          //   color: const Color(0xFF8B0000), // Dark red as in image
+          //   letterSpacing: -0.5,
+          // )),
         ],
       ),
     );
@@ -460,35 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildScrollableGreeting(AuthController authController) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            AppText(
-              AppStrings.hello,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-            const SizedBox(width: 8),
-            Obx(() => AppText(
-              authController.currentUser.value?.name ?? AppStrings.guest,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: AppColors.deepPink,
-              height: 1.1,
-              letterSpacing: -0.5,
-            )),
-            const SizedBox(width: 4),
-            const WavingEmoji(),
-          ],
-        ),
 
-      ],
-    );
-  }
 
   Widget _buildCoinWalletChip(String balance) {
     return Container(

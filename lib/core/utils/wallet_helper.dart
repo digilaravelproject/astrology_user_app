@@ -25,20 +25,11 @@ class WalletHelper {
     required int providerId,
     double? simulatedBalance,
   }) async {
-    try {
-      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-      if (!isOverlayGranted) {
-        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
-        await FlutterOverlayWindow.requestPermission();
-        return;
-      }
-    } catch (e) {
-      debugPrint('Error checking overlay permission: $e');
-    }
-
+    // Overlay permission check removed to rely on system notifications
     // Simulated wallet balance
     final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
-    final double requiredAmount = double.tryParse(price) ?? 0.0;
+    final double perMinuteRate = double.tryParse(price) ?? 0.0;
+    final double requiredAmount = perMinuteRate * 5; // Minimum 5 minutes required to start
     final bool hasSufficientBalance = walletBalance >= requiredAmount;
 
     if (!hasSufficientBalance) {
@@ -90,7 +81,7 @@ class WalletHelper {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText(
-                          "Wallet Balance",
+                          "Wallet Balance".tr,
                           fontSize: 14,
                           color: Colors.grey.shade700,
                         ),
@@ -120,14 +111,14 @@ class WalletHelper {
               const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 32),
               const SizedBox(height: 8),
               AppText(
-                "Ready to Connect",
+                "Ready to Connect".tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: Colors.black87,
               ),
               const SizedBox(height: 8),
               AppText(
-                "You have sufficient balance to start the $type.",
+                "${"You have sufficient balance to start the".tr} ${type.tr}.",
                 fontSize: 14,
                 color: Colors.grey.shade600,
                 textAlign: TextAlign.center,
@@ -136,20 +127,10 @@ class WalletHelper {
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
-                  text: "Start ${type.capitalizeFirst}",
+                  text: type == 'chat' ? "Start Chat".tr : "Start Call".tr,
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
                   onTap: () async {
-                    try {
-                      final bool isOverlayGranted = await FlutterOverlayWindow.isPermissionGranted();
-                      if (!isOverlayGranted) {
-                        CustomSnackbar.showInfo("Please grant display over other apps permission to proceed.");
-                        await FlutterOverlayWindow.requestPermission();
-                        return;
-                      }
-                    } catch (e) {
-                      debugPrint('Error checking overlay permission: $e');
-                    }
 
                     if (type == 'chat') {
                       Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);

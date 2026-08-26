@@ -3,6 +3,8 @@ import 'package:astro_user/core/theme/dark_theme.dart';
 import 'package:astro_user/core/theme/light_theme.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'core/theme/theme_controller.dart';
 import 'features/language/controllers/localization_controller.dart';
@@ -20,6 +22,20 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await LocalNotificationService.initialize();
     final data = message.data;
+    final title = message.notification?.title ?? '';
+    final type = data['type']?.toString();
+
+    if (title.contains('Chat Ended') ||
+        type == 'chat_ended' ||
+        type == 'CHAT_ENDED' ||
+        type == 'session_ended' ||
+        type == 'chat_summary') {
+      await LocalNotificationService.cancelOngoingChatNotification(null);
+    } else if (title.contains('Call Ended') ||
+        type == 'call_ended' ||
+        type == 'CALL_ENDED') {
+      await LocalNotificationService.cancelOngoingCallNotification(null);
+    }
     if (data.containsKey('session')) {
       final sessionData = data['session'] is String 
           ? jsonDecode(data['session']) 
@@ -46,6 +62,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+    SystemUiOverlay.top,
+    SystemUiOverlay.bottom,
+  ]);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await initApp();
   runApp(const MyApp());
@@ -83,6 +103,21 @@ class MyApp extends StatelessWidget {
       ),
       fallbackLocale: const Locale('en', 'US'),
       translations: Get.find<Translations>(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: localizationController.languages
+          .map((lang) => Locale(lang.languageCode, lang.countryCode))
+          .toList(),
+      builder: (context, child) {
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: child ?? const SizedBox(),
+        );
+      },
     ));
   }
 }

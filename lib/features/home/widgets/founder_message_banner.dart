@@ -107,14 +107,14 @@ class FounderMessageBanner extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText(
-                              word.title,
+                              word.title.tr,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: const Color(0xFF8B0000), // Dark Red
                             ),
                             const SizedBox(height: 8),
                             AppText(
-                              word.message,
+                              word.message.tr,
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
                               color: Colors.black87.withOpacity(0.7),

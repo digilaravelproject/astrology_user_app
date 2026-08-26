@@ -10,7 +10,7 @@ import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import 'live_room_screen.dart';
 import '../../../../core/constants/app_urls.dart';
-
+import '../../../../core/constants/image_constants.dart';
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
 
@@ -19,6 +19,33 @@ class LiveAstrologerScreen extends StatefulWidget {
 }
 
 class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(top: 10, left: 20, right: 16, bottom: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppText(
+            'Join'.tr,
+            fontSize: 22,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF2D3142),
+            letterSpacing: -0.5,
+          ),
+          const SizedBox(width: 4),
+          AppText(
+            'Live Sessions',
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            color: const Color(0xFF2D3142),
+            letterSpacing: -0.5,
+          ),
+        ],
+      ),
+    );
+  }
+
   late LiveController _controller;
 
   @override
@@ -30,18 +57,21 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.liveSessionsTitle,
-        showLeading: false,
-        actions: [
-          _buildActionItem(Icons.search_rounded, () => Navigator.push(context, MaterialPageRoute(builder: (_) => ComingSoonScreen(title: AppStrings.search)))),
-          _buildActionItem(Icons.tune_rounded, () => Navigator.push(context, MaterialPageRoute(builder: (_) => ComingSoonScreen(title: AppStrings.filters)))),
-          const SizedBox(width: 12),
-        ],
-      ),
-      body: RefreshIndicator(
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0.25,
+            child: Image.asset(
+              ImageConstants.loginBackground,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: RefreshIndicator(
         onRefresh: () => _controller.fetchActiveSessions(),
         color: AppColors.primaryColor,
         child: SingleChildScrollView(
@@ -49,6 +79,7 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildHeader(context),
               _buildLiveBanner(),
               _buildSectionTitle(),
               
@@ -117,6 +148,9 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
           ),
         ),
       ),
+      ),
+        ),
+      ],
     );
   }
 
@@ -252,12 +286,12 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               ),
             ],
           ),
-          AppText(
-            AppStrings.seeAll,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: AppColors.primaryColor,
-          ),
+          // AppText(
+          //   AppStrings.seeAll,
+          //   fontSize: 12,
+          //   fontWeight: FontWeight.w700,
+          //   color: AppColors.primaryColor,
+          // ),
         ],
       ),
     );

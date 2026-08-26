@@ -50,7 +50,7 @@ class AppColors {
 
   // Pink Gradients
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryColor, secondaryColor],
+    colors: [secondaryColor, primaryColor],
     stops: [0.0, 1.0],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,

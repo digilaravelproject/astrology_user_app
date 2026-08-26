@@ -48,4 +48,9 @@ class AppConstants {
     static const String liveKitTurnServerUrl = 'turn:187.127.173.87:3478';
     static const String liveKitTurnUsername = 'livekit';
     static const String liveKitTurnCredential = 'livekit_secret_2024';
+
+    // Notification Sound Resource Names (Android Raw Resources & iOS Sound Files)
+    static const String callNotificationSound = 'outgoing_ring_sound';  // Connecting/Ringing tone when user initiates call/chat
+    static const String chatNotificationSound = 'incoming_ring_sound';  // Incoming tone when astrologer receives call/chat request
+    static const String generalNotificationSound = 'general_alert_sound'; // General/system notification tone
 }

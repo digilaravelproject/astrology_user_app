@@ -54,12 +54,25 @@ class PaymentSuccessScreen extends StatelessWidget {
               
               const SizedBox(height: 16),
               
-              AppText(
-                '₹$amount has been successfully added to your wallet.',
-                fontSize: 15,
-                color: Colors.grey.shade600,
+              RichText(
                 textAlign: TextAlign.center,
-                height: 1.4,
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                    fontFamily: 'Poppins',
+                  ),
+                  children: [
+                    TextSpan(
+                      text: '₹$amount ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                      text: 'has been successfully added to your wallet.'.tr,
+                    ),
+                  ],
+                ),
               ),
               
               const SizedBox(height: 50),

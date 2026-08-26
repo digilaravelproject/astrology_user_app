@@ -1,4 +1,5 @@
 import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:get/get.dart';
 
 class AstrologerModel {
   final int id;
@@ -16,11 +17,11 @@ class AstrologerModel {
   final String? email;
   final bool isChatEnabled;
   final bool isCallEnabled;
-  final bool isVideoCallEnabled;
   final double rating;
   final bool isOnline;
   final bool isFollowed;
   final bool isBlocked;
+  final bool isReviewEligible;
   final int totalOrders;
   final String? originalChatRatePerMinute;
   final String? originalCallRatePerMinute;
@@ -47,12 +48,12 @@ class AstrologerModel {
     this.email,
     this.isChatEnabled = false,
     this.isCallEnabled = false,
-    this.isVideoCallEnabled = false,
     this.isOnline = false,
     this.rating = 0.0,
     this.totalOrders = 0,
     this.isFollowed = false,
     this.isBlocked = false,
+    this.isReviewEligible = false,
     this.originalChatRatePerMinute,
     this.originalCallRatePerMinute,
     this.hasOffer = false,
@@ -82,12 +83,11 @@ class AstrologerModel {
       email: userData['email'],
       isChatEnabled: json['is_chat_enabled'] == true,
       isCallEnabled: json['is_call_enabled'] == true,
-      isVideoCallEnabled: json['is_video_call_enabled'] == true,
       isOnline: json['is_online'] == 1 || json['is_online'] == true,
-      rating: double.tryParse(json['reviews_avg_rating']?.toString() ?? json['avg_rating']?.toString() ?? '0') ?? 0.0,
-      totalOrders: json['total_orders'] ?? 0,
+      totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
       isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
       isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
+      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true,
       originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
       originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
       hasOffer: json['has_offer'] == true,
@@ -101,11 +101,11 @@ class AstrologerModel {
 
   String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 
-  bool get isAvailableOnline => isChatEnabled || isCallEnabled || isVideoCallEnabled;
+  bool get isAvailableOnline => isChatEnabled || isCallEnabled;
 
   String get packageSessionText {
     if (packagePrice == null || packageDuration == null) {
-      return 'Session (1 hr) @ ₹500';
+      return '${'Session'.tr} (1 hr) @ ₹500';
     }
     if (isPurchase == true && remainingTime != null) {
       final int remainingSeconds = remainingTime!;
@@ -135,7 +135,7 @@ class AstrologerModel {
           }
         }
       }
-      return 'Session ($remainingTimeStr)';
+      return '${'Session'.tr} ($remainingTimeStr)';
     }
     final int seconds = packageDuration!;
     final int hours = seconds ~/ 3600;
@@ -143,14 +143,30 @@ class AstrologerModel {
     
     String durationStr;
     if (hours > 0 && minutes > 0) {
-      durationStr = '$hours hr $minutes min';
+      durationStr = '$hours ${"hr".tr} $minutes ${"min".tr}';
     } else if (hours > 0) {
-      durationStr = '$hours hr';
+      durationStr = '$hours ${"hr".tr}';
     } else {
-      durationStr = '$minutes min';
+      durationStr = '$minutes ${"min".tr}';
     }
     
-    return 'Session ($durationStr) @ ₹$packagePrice';
+    return '${'Session'.tr} ($durationStr) @ ₹$packagePrice';
+  }
+
+  String get packageSessionTimeOnly {
+    final text = packageSessionText;
+    if (text.contains(' @ ')) {
+      return text.split(' @ ')[0];
+    }
+    return text;
+  }
+  
+  String? get packageSessionPriceOnly {
+    final text = packageSessionText;
+    if (text.contains(' @ ')) {
+      return text.split(' @ ')[1];
+    }
+    return null;
   }
 }
 

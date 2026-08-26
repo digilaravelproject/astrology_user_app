@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../routes/route_helper.dart';
 import '../../kundli/kundli_screen.dart';
@@ -18,18 +18,18 @@ class KundliMatchScreen extends GetView<MatchingController> {
   @override
   Widget build(BuildContext context) {
     final List<String> tabs = [
-      'RESULTS',
-      'DETAILS',
-      'VARNA',
-      'VASYA',
-      'TARA',
-      'YONI',
-      'MAITRI',
-      'GANA',
-      'BHAKOOT',
-      'NADI',
-      'DOWNLOAD PDF',
-      'BIRTH DETAILS',
+      'RESULTS'.tr,
+      'DETAILS'.tr,
+      'VARNA'.tr,
+      'VASYA'.tr,
+      'TARA'.tr,
+      'YONI'.tr,
+      'MAITRI'.tr,
+      'GANA'.tr,
+      'BHAKOOT'.tr,
+      'NADI'.tr,
+      'DOWNLOAD PDF'.tr,
+      'BIRTH DETAILS'.tr,
     ];
 
     return DefaultTabController(
@@ -43,9 +43,9 @@ class KundliMatchScreen extends GetView<MatchingController> {
             icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textColorPrimary),
             onPressed: () => Navigator.maybePop(context),
           ),
-          title: const Text(
-            'Match Result',
-            style: TextStyle(
+          title: Text(
+            'Match Result'.tr,
+            style: const TextStyle(
               color: AppColors.textColorPrimary,
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -67,19 +67,19 @@ class KundliMatchScreen extends GetView<MatchingController> {
               fontWeight: FontWeight.normal,
               fontSize: 13,
             ),
-            tabs: tabs.map((t) => Tab(text: t)).toList(),
+            tabs: tabs.map((t) => Tab(text: t.tr)).toList(),
           ),
         ),
         body: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: AppColors.primaryColor),
-                  SizedBox(height: 16),
+                  const CircularProgressIndicator(color: AppColors.primaryColor),
+                  const SizedBox(height: 16),
                   Text(
-                    'Fetching Kundli Matching Details...',
+                    'Fetching Kundli Matching Details...'.tr,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

@@ -73,7 +73,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     }
                   },
                   decoration: InputDecoration(
-                    hintText: 'Search by name...',
+                    hintText: 'Search by name...'.tr,
                     hintStyle: TextStyle(
                       color: Colors.grey.shade400,
                       fontSize: 14,
@@ -110,7 +110,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 Icon(Iconsax.search_status_copy,
                     size: 64, color: Colors.grey.shade300),
                 const SizedBox(height: 16),
-                AppText('No astrologers found',
+                AppText('No astrologers found'.tr,
                     color: Colors.grey.shade500, fontSize: 16),
               ],
             ),
@@ -125,7 +125,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 Icon(Iconsax.message_search_copy,
                     size: 64, color: Colors.grey.shade200),
                 const SizedBox(height: 16),
-                AppText('Start typing to search...',
+                AppText('Start typing to search...'.tr,
                     color: Colors.grey.shade400, fontSize: 14),
               ],
             ),
@@ -227,7 +227,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                 ),
                 const SizedBox(width: 12),
                 AppText(
-                  '${astro.totalOrders > 0 ? astro.totalOrders : (astro.id * 15 + 100)}k+ ${AppStrings.ordersLabel}',
+                  _formatOrdersCount(astro.totalOrders),
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
@@ -258,7 +258,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   ),
                   const SizedBox(height: 6),
                   AppText(
-                    astro.areasOfExpertise.join(', '),
+                    astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -266,7 +266,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   AppText(
-                    astro.languages.join(', '),
+                    astro.languages.map((l) => l.trim().tr).join(', '),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -274,7 +274,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   AppText(
-                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${AppStrings.years}',
+                    '${AppStrings.expLabelPrefix} ${astro.yearsOfExperience} ${"Years".tr}',
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
@@ -319,5 +319,15 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
         size: 50,
       ),
     );
+  }
+  String _formatOrdersCount(int count) {
+    if (count >= 1000) {
+      final double inK = count / 1000.0;
+      return '${inK.toStringAsFixed(inK.truncateToDouble() == inK ? 0 : 1)}k+ ${AppStrings.ordersLabel}';
+    } else if (count > 0) {
+      return '$count+ ${AppStrings.ordersLabel}';
+    } else {
+      return '0 ${AppStrings.ordersLabel}';
+    }
   }
 }

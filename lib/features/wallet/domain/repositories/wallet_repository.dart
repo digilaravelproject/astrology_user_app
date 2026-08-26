@@ -26,9 +26,22 @@ class WalletRepository implements WalletRepositoryInterface {
       final response = await apiClient.get(AppUrls.wallet);
       if (response.isSuccess && response.body != null) {
         print('[PCB_APP] [DEBUG] | getWallet body: ${response.body}');
-        final wallet = WalletModel.fromJson(response.body['wallet']);
-        print('[PCB_APP] [DEBUG] | Parsed Wallet: ${wallet.balance}');
-        return wallet;
+        final body = response.body;
+        Map<String, dynamic>? walletMap;
+        if (body is Map<String, dynamic>) {
+          if (body['wallet'] is Map<String, dynamic>) {
+            walletMap = body['wallet'];
+          } else if (body['data'] is Map<String, dynamic>) {
+            walletMap = body['data'];
+          } else {
+            walletMap = body;
+          }
+        }
+        if (walletMap != null) {
+          final wallet = WalletModel.fromJson(walletMap);
+          print('[PCB_APP] [DEBUG] | Parsed Wallet: ${wallet.balance}');
+          return wallet;
+        }
       }
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error getting wallet in Repo: $e');

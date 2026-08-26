@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
+import '../../../features/live/data/models/live_session_model.dart';
 import '../storage/token_manger.dart';
 import '../storage/shared_prefs.dart';
 import '../../../core/constants/app_constants.dart';
@@ -16,6 +17,7 @@ import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
@@ -188,6 +190,36 @@ class WebSocketService extends GetxService {
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        } else if (event == 'ChatQueueUpdated' || event == 'App\\Events\\ChatQueueUpdated') {
+          // Server sends ChatQueueUpdated instead of ChatAccepted/ChatDismissed
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: ChatQueueUpdated');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          try {
+            Map<String, dynamic> queueData = {};
+            if (data['data'] is String) {
+              queueData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              queueData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final String action = queueData['action']?.toString() ?? '';
+            if (action == 'accepted') {
+              // Route to ChatAccepted handler using the session from payload
+              final session = queueData['session'];
+              if (session != null) {
+                _handleChatAccepted({'session': session});
+              }
+            } else if (action == 'ended' || action == 'cancelled') {
+              final session = queueData['session'];
+              if (session != null) {
+                _handleChatEnded({'session': session});
+              }
+            }
+            // 'initiated' action is informational only — no action needed for user side
+          } catch (e) {
+            Logger.e('WebSocketService: Error handling ChatQueueUpdated -> $e');
+          }
         } else if (event == AppUrls.eventMessageStatusUpdated || event == 'App\\Events\\MessageStatusUpdated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
@@ -288,16 +320,32 @@ class WebSocketService extends GetxService {
           _handleUserLeftLiveSession(data['data']);
         } else if (event == AppUrls.eventPackageSubSessionStarted || event == 'App\\Events\\${AppUrls.eventPackageSubSessionStarted}') {
           Logger.d('Prepaid Package session started: ${data['data']}');
-          final eventData = data['data'];
-          if (eventData != null && eventData is Map) {
-            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+          try {
+            Map<String, dynamic> eventData = {};
+            if (data['data'] is String) {
+              eventData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              eventData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final secs = eventData['remainingDuration'] ?? eventData['remaining_duration'] ?? eventData['subSession']?['purchase']?['remaining_duration'];
+            packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
             isPackageSessionTerminated.value = false;
+          } catch (e) {
+            Logger.e('Error handling PackageSubSessionStarted -> $e');
           }
         } else if (event == AppUrls.eventPackageSubSessionEnded || event == 'App\\Events\\${AppUrls.eventPackageSubSessionEnded}') {
           Logger.d('Prepaid Package session ended: ${data['data']}');
-          final eventData = data['data'];
-          if (eventData != null && eventData is Map) {
-            packageRemainingSeconds.value = int.tryParse(eventData['remaining_duration']?.toString() ?? '') ?? 0;
+          try {
+            Map<String, dynamic> eventData = {};
+            if (data['data'] is String) {
+              eventData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              eventData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final secs = eventData['remainingDuration'] ?? eventData['remaining_duration'] ?? eventData['subSession']?['purchase']?['remaining_duration'];
+            packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
+          } catch (e) {
+            Logger.e('Error handling PackageSubSessionEnded -> $e');
           }
         } else if (event == AppUrls.eventPackageSessionTerminated || event == 'App\\Events\\${AppUrls.eventPackageSessionTerminated}') {
           Logger.d('Prepaid Package session terminated!');
@@ -798,16 +846,17 @@ class WebSocketService extends GetxService {
 
         // Show ongoing local notification since user minimized the chat and it just started!
         int? startedAtMillis;
-        if (startedAt != null) {
-          final parsedDate = DateTime.tryParse(startedAt);
-          if (parsedDate != null) {
-            startedAtMillis = parsedDate.millisecondsSinceEpoch;
+        if (startedAt != null && startedAt.isNotEmpty) {
+          String isoUtc = startedAt.trim().replaceAll(' ', 'T');
+          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+            isoUtc += 'Z';
           }
+          startedAtMillis = DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
         }
         LocalNotificationService.showOngoingChatNotification(
           sessionId: sessionId,
-          title: 'Chat in progress',
-          body: 'Active chat with ${FloatingChatBubble.name ?? "Astrologer"}',
+          title: '${FloatingChatBubble.name ?? "Astrologer"} • Chat',
+          body: 'Ongoing chat session',
           startedAtMillis: startedAtMillis,
         );
       }
@@ -846,32 +895,14 @@ class WebSocketService extends GetxService {
 
       Logger.d('WebSocketService: ChatEnded for sessionId=$sessionId, active=$activeSessionId');
 
-      // Cancel notification
+      // Cancel notification & floating bubble immediately
       LocalNotificationService.cancelOngoingChatNotification(sessionId);
+      FloatingChatBubble.dismiss(stopForegroundService: true);
 
-      // If the chat screen is open (active), signal it to close
       if (activeSessionId == sessionId) {
         activeSessionId = null;
-        // Emit signal — ChatScreen listens and closes itself
-        chatEndedSessionId.value = sessionId;
-        // Show summary after brief delay to allow screen pop
-        Future.delayed(const Duration(milliseconds: 300), () {
-          ChatSummaryDialog.show(
-            sessionId: sessionId,
-            durationSeconds: durationSeconds,
-            totalCost: totalCost,
-          );
-        });
-      } else if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sessionId) {
-        // Chat is minimized as a bubble
-        FloatingChatBubble.dismiss();
-        chatEndedSessionId.value = sessionId;
-        ChatSummaryDialog.show(
-          sessionId: sessionId,
-          durationSeconds: durationSeconds,
-          totalCost: totalCost,
-        );
       }
+      chatEndedSessionId.value = sessionId;
     } catch (e) {
       Logger.e('WebSocketService: error handling ChatEnded -> $e');
     }
@@ -892,13 +923,9 @@ class WebSocketService extends GetxService {
       final int sessionId = session['id'];
       Logger.d('WebSocketService: ChatDismissed for sessionId=$sessionId');
 
-      // Cancel notification
+      // Cancel notification & floating bubble immediately
       LocalNotificationService.cancelOngoingChatNotification(sessionId);
-
-      // Dismiss floating bubble if active
-      if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sessionId) {
-        FloatingChatBubble.dismiss();
-      }
+      FloatingChatBubble.dismiss(stopForegroundService: true);
 
       // Propagate the ended/dismissed status so ChatScreen / ChatController can react
       sessionStatusUpdates[sessionId] = 'ended';
@@ -931,7 +958,7 @@ class WebSocketService extends GetxService {
         incomingMessages.add(map);
 
         final int senderId = int.tryParse(map['sender_id']?.toString() ?? '') ?? 0;
-        final int sessionId = int.tryParse(map['chat_session_id']?.toString() ?? '') ?? 0;
+        final int sessionId = int.tryParse(map['chat_assistance_session_id']?.toString() ?? map['chat_session_id']?.toString() ?? '') ?? 0;
 
         if (senderId != currentUserId && activeSessionId != sessionId) {
           if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sessionId) {
@@ -1075,10 +1102,15 @@ class WebSocketService extends GetxService {
         eventData = Map<String, dynamic>.from(rawData);
       }
       final session = eventData['session'];
-      if (session != null) {
-        final int sessionId = session['id'] is int 
-            ? session['id'] 
-            : (int.tryParse(session['id']?.toString() ?? '') ?? 0);
+      final int sessionId = session != null && session['id'] != null
+          ? (session['id'] is int ? session['id'] : (int.tryParse(session['id']?.toString() ?? '') ?? 0))
+          : 0;
+
+      // Cancel call notifications & bubbles immediately
+      LocalNotificationService.cancelOngoingCallNotification(sessionId);
+      FloatingCallBubble.dismiss(stopForegroundService: true);
+
+      if (sessionId != 0) {
         callSessionStatusUpdates[sessionId] = 'completed';
         callSessionStatusUpdates.refresh();
         callEndedSessionId.value = sessionId;

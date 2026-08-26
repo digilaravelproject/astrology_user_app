@@ -17,9 +17,12 @@ class AppUrls {
   static const String astrologers = '/api/v1/user/astrologers';
   static String getAstrologerDetails(int id) => '/api/v1/user/astrologers/$id';
   static String blockAstrologer(int id) => '/api/v1/user/astrologers/$id/block';
+  static String unblockAstrologer(int id) => '/api/v1/user/astrologers/$id/unblock';
+  static const String blockedAstrologers = '/api/v1/user/blocked-astrologers';
   static const String wallet = '/api/v1/user/wallet';
   static const String walletTopup = '/api/v1/user/wallet/topup';
-  static const String walletTopupVerify = '/api/v1/user/wallet/topup/verify';
+  static const String walletTopupVerify = '/api/v1/user/wallet/verify-topup';
+  static String walletInvoice(int transactionId) => '/api/v1/user/wallet/transactions/$transactionId/invoice';
   static const String walletTransactions = '/api/v1/user/wallet/transactions';
   static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
   static const String updateMatrimonyProfile = '/api/v1/user/matrimony/update_profile';
@@ -42,6 +45,10 @@ class AppUrls {
   static const String packageActiveStatus = '/api/v1/user/packages/active-status';
   static const String packageSessionStart = '/api/v1/user/packages/session/start';
   static const String packageSessionEnd = '/api/v1/user/packages/session/end';
+  static const String packageSpawnChannel = '/api/v1/user/packages/session/spawn-channel';
+  static const String packageTerminateChannel = '/api/v1/user/packages/session/terminate-channel';
+  static const String packageHeartbeat = '/api/v1/user/packages/session/heartbeat';
+  static const String packageActiveBanner = '/api/v1/user/packages/active-banner';
 
   static const String faqs = '/api/v1/faqs';
   static const String privacyPolicy = '/api/v1/privacy-policy';
@@ -49,7 +56,9 @@ class AppUrls {
   static const String termsAndConditions = '/api/v1/terms-and-conditions';
   static const String paymentSuccess = '/payment-success';
 
-  // Notifications
+  // Notifications & Device Tokens
+  static const String registerDeviceToken = '/api/v1/user/device-token';
+  static const String removeDeviceToken = '/api/v1/user/remove-token';
   static String getNotificationCount(int userId) => '/api/v1/user/notifications/count?user_id=$userId';
   static String getNotifications(int userId) => '/api/v1/user/notifications?user_id=$userId';
   static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id?user_id=$userId';

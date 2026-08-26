@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'core/services/DynamicAppIcon/dynamic_app_icon_manager.dart';
@@ -11,9 +12,27 @@ import 'core/services/local_notification_service.dart';
 import 'core/services/keep_alive_service.dart';
 import 'core/services/foreground_task_service.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'firebase_options.dart';
+
+import 'core/services/fcm_notification_service.dart';
+
 Future<void> initApp() async {
   // Set environment configuration
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Initialize Firestore settings
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+  );
+
   await EnvConfig.load();
   // EnvConfig.setEnvironment(Environment.development); // Change as needed
 
@@ -25,8 +44,8 @@ Future<void> initApp() async {
   // Initialize shared preferences
   await SharedPrefs.init();
 
-  // Initialize keep-alive foreground service
-  await initializeKeepAliveService();
+  // Initialize keep-alive foreground service (Disabled to prevent OOM crash on low-resource devices)
+  // await initializeKeepAliveService();
 
   // Initialize call foreground task service
   await ForegroundTaskService.init();
@@ -49,4 +68,7 @@ Future<void> initApp() async {
 
   // Initialize local notifications service
   await LocalNotificationService.initialize();
+
+  // Initialize FCM Notification service (Foreground + Background + Terminated)
+  await FCMNotificationService.initialize();
 }

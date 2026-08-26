@@ -42,7 +42,7 @@ class SubscriptionScreen extends StatelessWidget {
               _buildCurrentPlan(profileController.activePlan),
               const SizedBox(height: 16),
               AppText(
-                "Available Plans",
+                "Available Plans".tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: Colors.black87,
@@ -85,14 +85,14 @@ class SubscriptionScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AppText(
-                    "Subscribed Plan",
+                    "Subscribed Plan".tr,
                     fontSize: 14,
                     color: Colors.white.withOpacity(0.8),
                     fontWeight: FontWeight.w500,
                   ),
                   const SizedBox(height: 4),
                   AppText(
-                    planName,
+                    planName.tr,
                     fontSize: 16,
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
@@ -119,7 +119,7 @@ class SubscriptionScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: AppText(
-                    activePlan.description,
+                    activePlan.description.tr,
                     fontSize: 12,
                     color: Colors.white,
                     maxLines: 2,
@@ -135,7 +135,7 @@ class SubscriptionScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: AppText(
-                    "Basic Daily Horoscope",
+                    "Basic Daily Horoscope".tr,
                     fontSize: 14,
                     color: Colors.white,
                   ),
@@ -195,7 +195,7 @@ class SubscriptionScreen extends StatelessWidget {
               //     ),
               //   ),
               AppText(
-                plan.name,
+                plan.name.tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.black,
@@ -209,13 +209,13 @@ class SubscriptionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               AppText(
-                '${plan.durationDays} days',
+                '${plan.durationDays} ${'days'.tr}',
                 fontSize: 12,
                 color: Colors.grey.shade600,
               ),
               const SizedBox(height: 10),
               AppText(
-                plan.description,
+                plan.description.tr,
                 fontSize: 14,
                 color: Colors.grey.shade700,
                 maxLines: 2,
@@ -224,7 +224,7 @@ class SubscriptionScreen extends StatelessWidget {
               const SizedBox(height: 8),
               if (isPurchased)
                 AppText(
-                  'Already Purchased',
+                  'Already Purchased'.tr,
                   fontSize: 12,
                   color: Colors.redAccent,
                   fontWeight: FontWeight.w600,

@@ -135,7 +135,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(0xFF880E4F)),
+              icon: const Icon(Icons.arrow_back, color: AppColors.primaryColor),
               onPressed: () => Navigator.pop(context),
             ),
           ),
@@ -156,7 +156,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(Icons.more_vert, color: Color(0xFF880E4F)),
+                icon: const Icon(Icons.more_vert, color: AppColors.primaryColor),
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
@@ -185,7 +185,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             Icons.bookmark_border,
-                            'Save Profile',
+                            'Save Profile'.tr,
                             () {
                               Navigator.pop(context);
                               _saveProfile();
@@ -194,7 +194,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Icons.check_circle_outline : Icons.block_outlined,
-                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
+                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User'.tr : 'Block User'.tr,
                             () {
                               Navigator.pop(context);
                               _blockUser(context);
@@ -203,7 +203,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           _buildMenuOption(
                             context,
                             Icons.report_outlined,
-                            'Report Profile',
+                            'Report Profile'.tr,
                             () {
                               Navigator.pop(context);
                               _reportProfile(context);
@@ -224,7 +224,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       body: Obx(() {
         if (_controller.isLoading.value && _controller.selectedProfile.value == null) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
           );
         }
 
@@ -360,26 +360,26 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   ),
                 ),
 
-              // Action buttons overlay - Redesigned
-              Positioned(
-                bottom: 40,
-                right: 20,
-                child: Column(
-                  children: [
-                    _buildActionButton(
-                      icon: Icons.call,
-                      color: const Color(0xFFE91E63),
-                      onTap: () {},
-                    ),
-                    const SizedBox(height: 16),
-                    _buildActionButton(
-                      icon: Icons.chat_bubble_rounded,
-                      color: const Color(0xFF4CAF50),
-                      onTap: () {},
-                    ),
-                  ],
-                ),
-              ),
+              // Action buttons overlay - Redesigned (Commented out as per request)
+              // Positioned(
+              //   bottom: 40,
+              //   right: 20,
+              //   child: Column(
+              //     children: [
+              //       _buildActionButton(
+              //         icon: Icons.call,
+              //         color: AppColors.primaryColor,
+              //         onTap: () {},
+              //       ),
+              //       const SizedBox(height: 16),
+              //       _buildActionButton(
+              //         icon: Icons.chat_bubble_rounded,
+              //         color: const Color(0xFF4CAF50),
+              //         onTap: () {},
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
           
@@ -394,7 +394,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF880E4F).withOpacity(0.06),
+                    color: AppColors.primaryColor.withOpacity(0.06),
                     blurRadius: 30,
                     offset: const Offset(0, 10),
                   ),
@@ -411,7 +411,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           '${profile.firstName} ${profile.lastName}',
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF880E4F),
+                          color: AppColors.primaryColor,
                           height: 1.3,
                         ),
 
@@ -420,7 +420,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                         'assets/icons/verify.png',
                         width: 24,
                         height: 24,
-                        color: const Color(0xFFE91E63), // Tinted verify icon
+                        color: AppColors.primaryColor, // Tinted verify icon
                       ),
                     ],
                   ),
@@ -430,14 +430,14 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                          decoration: BoxDecoration(
-                          color: const Color(0xFFE91E63).withOpacity(0.08),
+                          color: AppColors.primaryColor.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: AppText(
                           'ID: MT${profile.id ?? ""}',
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFFE91E63),
+                          color: AppColors.primaryColor,
                           letterSpacing: 0.5,
                         ),
                       ),
@@ -447,17 +447,17 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   const SizedBox(height: 16),
                   Divider(color: Colors.grey[200], thickness: 1),
                   const SizedBox(height: 16),
-                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus),
+                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus.tr),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} Years  • ${profile.height} Feet'),
+                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} ${"Years".tr}  • ${profile.height} ${"Feet".tr}'),
 
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.school_outlined, profile.education),
+                  _buildQuickInfo(Icons.school_outlined, profile.education.tr),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.work_outline, profile.jobTitle),
+                  _buildQuickInfo(Icons.work_outline, profile.jobTitle.tr),
 
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.location_on_outlined, profile.location),
+                  _buildQuickInfo(Icons.location_on_outlined, profile.location.tr),
 
 
                    const SizedBox(height: 24),
@@ -465,7 +465,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     fontSize: 15,
                     height: 50,
                     borderRadius: 25,
-                    text: _showDetails ? 'Collapse Details' : 'Show Full Profile',
+                    text: (_showDetails ? 'Collapse Details' : 'Show Full Profile').tr,
                     onTap: () {
                       setState(() {
                         _showDetails = !_showDetails;
@@ -515,10 +515,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
            Container(
              padding: const EdgeInsets.all(8),
              decoration: BoxDecoration(
-               color: const Color(0xFF880E4F).withOpacity(0.05),
+               color:  AppColors.primaryColor.withOpacity(0.05),
                shape: BoxShape.circle,
              ),
-             child: Icon(icon, size: 16, color: const Color(0xFF880E4F)),
+             child: Icon(icon, size: 16, color: AppColors.primaryColor),
            ),
            const SizedBox(width: 12),
            Expanded(
@@ -537,7 +537,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   void _saveProfile() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Profile saved to your favorites!'),
+        content: Text('Profile saved to your favorites!'.tr),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.all(20),
@@ -560,20 +560,20 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF880E4F),
+          color: AppColors.primaryColor,
         ),
         content: AppText(
           (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) 
-              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'
-              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.',
+              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'.tr
+              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.'.tr,
           fontSize: 14,
           color: Colors.black87,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const AppText(
-              'Cancel',
+            child: AppText(
+              'Cancel'.tr,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.grey,
@@ -641,20 +641,20 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               'Report Profile',
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF880E4F),
+              color: AppColors.primaryColor,
             ),
             const SizedBox(height: 8),
-            const AppText(
-              'Please select a reason for reporting this profile',
+            AppText(
+              'Please select a reason for reporting this profile'.tr,
               fontSize: 13,
               color: Colors.grey,
             ),
             const SizedBox(height: 20),
-            _buildReportOption(context, 'Fake Profile'),
-            _buildReportOption(context, 'Inappropriate Content'),
-            _buildReportOption(context, 'Harassment'),
-            _buildReportOption(context, 'Spam'),
-            _buildReportOption(context, 'Other'),
+            _buildReportOption(context, 'Fake Profile'.tr),
+            _buildReportOption(context, 'Inappropriate Content'.tr),
+            _buildReportOption(context, 'Harassment'.tr),
+            _buildReportOption(context, 'Spam'.tr),
+            _buildReportOption(context, 'Other'.tr),
             const SizedBox(height: 20),
           ],
         ),
@@ -721,7 +721,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF880E4F), size: 24),
+            Icon(icon, color: AppColors.primaryColor, size: 24),
             const SizedBox(width: 16),
             Expanded(
               child: AppText(
@@ -756,17 +756,17 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       icon: Icons.person_outline_rounded,
       title: AppStrings.personalInformation,
       children: [
-        _buildDetailRow(AppStrings.age, '${profile.age} Years'),
-        _buildDetailRow(AppStrings.height, '${profile.height} Feet'),
-        _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'),
-        _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor),
-        _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus),
-        _buildDetailRow(AppStrings.livesIn, profile.location),
-        _buildDetailRow(AppStrings.eatingHabits, 'Not specified'),
-        _buildDetailRow(AppStrings.religion, 'Not specified'),
-        _buildDetailRow(AppStrings.subcaste, 'Not specified'),
-        _buildDetailRow(AppStrings.manglik, 'Not specified'),
-        _buildDetailRow(AppStrings.employment, profile.jobTitle, isLink: true),
+        _buildDetailRow(AppStrings.age, '${profile.age} ${"Years".tr}'),
+        _buildDetailRow(AppStrings.height, '${profile.height} ${"Feet".tr}'),
+        _buildDetailRow(AppStrings.spokenLanguages, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.profileCreatedBy, profile.createdFor.tr),
+        _buildDetailRow(AppStrings.maritalStatus, profile.maritalStatus.tr),
+        _buildDetailRow(AppStrings.livesIn, profile.location.tr),
+        _buildDetailRow(AppStrings.eatingHabits, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.religion, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.subcaste, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.manglik, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.employment, profile.jobTitle.tr, isLink: true),
       ],
     );
   }
@@ -793,7 +793,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               value,
               fontSize: 13,
               fontWeight: isLink ? FontWeight.w600 : FontWeight.w500,
-              color: isLink ? const Color(0xFFE91E63) : const Color(0xFF263238),
+              color: isLink ? AppColors.primaryColor : const Color(0xFF263238),
               height: 1.4,
             ),
           ),
@@ -830,15 +830,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.stars_rounded, size: 16, color: Color(0xFFE91E63)),
+              const Icon(Icons.stars_rounded, size: 16, color: AppColors.primaryColor),
               const SizedBox(width: 6),
               AppText(
                 AppStrings.upgradeToView,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFFE91E63),
+                color: AppColors.primaryColor,
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFFE91E63)),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primaryColor),
             ],
           ),
         ),
@@ -869,12 +869,12 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       icon: Icons.auto_awesome_rounded,
       title: AppStrings.lifestyle,
       children: [
-        _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan"),
-        _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'),
-        _buildDetailRow(AppStrings.music, 'Indian classical'),
-        _buildDetailRow(AppStrings.sports, "I'm not a sportsperson"),
-        _buildDetailRow(AppStrings.smokingHabits, 'Not specified'),
-        _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'),
+        _buildDetailRow(AppStrings.cuisine, "I'm a foodie, Konkan".tr),
+        _buildDetailRow(AppStrings.hobbies, 'Cooking, Nature, Photography'.tr),
+        _buildDetailRow(AppStrings.music, 'Indian classical'.tr),
+        _buildDetailRow(AppStrings.sports, "I'm not a sportsperson".tr),
+        _buildDetailRow(AppStrings.smokingHabits, 'Not specified'.tr),
+        _buildDetailRow(AppStrings.drinkingHabits, 'Not specified'.tr),
       ],
     );
   }
@@ -892,7 +892,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF880E4F).withOpacity(0.04),
+            color: AppColors.primaryColor.withOpacity(0.04),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -907,10 +907,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE91E63).withOpacity(0.08),
+                  color: AppColors.primaryColor.withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: const Color(0xFFE91E63), size: 20),
+                child: Icon(icon, color: AppColors.primaryColor, size: 20),
               ),
               const SizedBox(width: 12),
               AppText(
@@ -935,7 +935,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.star, color: Color(0xFFE1BEE7), size: 20), // Placeholder for sparkles
+          const Icon(Icons.star, color: AppColors.secondaryColor, size: 20), // Placeholder for sparkles
           const SizedBox(width: 8),
           AppText(
             profile.gender.toLowerCase() == 'male' 
@@ -943,10 +943,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 : AppStrings.herPartnerPreferences,
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF880E4F),
+            color: AppColors.primaryColor,
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.star, color: Color(0xFFE1BEE7), size: 20),
+          const Icon(Icons.star, color: AppColors.secondaryColor, size: 20),
         ],
       ),
     );
@@ -968,7 +968,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
             AppStrings.youIgnoredThisProfile,
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF880E4F),
+            color: AppColors.primaryColor,
           ),
           const SizedBox(height: 12),
           Container(
@@ -983,7 +983,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               AppStrings.removeFromIgnoredList,
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF880E4F),
+              color: AppColors.primaryColor,
             ),
           ),
         ],

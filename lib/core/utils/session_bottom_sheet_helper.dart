@@ -16,6 +16,7 @@ import '../../features/call/presentation/pages/call_screen.dart';
 import '../../features/call/presentation/controllers/call_controller.dart';
 import '../../features/chat/presentation/pages/chat_screen.dart';
 import '../../features/chat/presentation/bindings/chat_binding.dart';
+import '../services/network/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SessionBottomSheetHelper {
@@ -135,14 +136,14 @@ class SessionBottomSheetHelper {
               
               // Header
               AppText(
-                "Connect with ${astro.name}",
+                "Connect with".tr + " ${astro.name}",
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: Colors.grey.shade900,
               ),
               const SizedBox(height: 6),
               AppText(
-                "Select a service to start your session",
+                "Select a service to start your session".tr,
                 fontSize: 13,
                 color: Colors.grey.shade500,
               ),
@@ -172,7 +173,7 @@ class SessionBottomSheetHelper {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppText(
-                            "Remaining Package Time",
+                            "Remaining Package Time".tr,
                             fontSize: 11,
                             color: Colors.orange.shade800,
                             fontWeight: FontWeight.w500,
@@ -311,15 +312,15 @@ class SessionBottomSheetHelper {
           padding: const EdgeInsets.all(20),
           child: Obx(() {
             if (isPurchasing.value) {
-              return const SizedBox(
+              return SizedBox(
                 height: 180,
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(color: AppColors.deepPink),
-                      SizedBox(height: 16),
-                      Text("Purchasing package, please wait..."),
+                      const CircularProgressIndicator(color: AppColors.deepPink),
+                      const SizedBox(height: 16),
+                      Text("Purchasing package, please wait...".tr),
                     ],
                   ),
                 ),
@@ -338,14 +339,14 @@ class SessionBottomSheetHelper {
                 ),
                 const SizedBox(height: 16),
                 AppText(
-                  "Confirm Package Purchase",
+                  "Confirm Package Purchase".tr,
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Colors.grey.shade900,
                 ),
                 const SizedBox(height: 6),
                 AppText(
-                  "Would you like to purchase this session package for ₹${astro.packagePrice ?? 500}?",
+                  "Would you like to purchase this session package for".tr + " ₹${astro.packagePrice ?? 500}?",
                   fontSize: 13,
                   color: Colors.grey.shade500,
                   textAlign: TextAlign.center,
@@ -355,7 +356,7 @@ class SessionBottomSheetHelper {
                   children: [
                     Expanded(
                       child: CustomButton(
-                        text: "Cancel",
+                        text: "Cancel".tr,
                         backgroundColor: Colors.grey.shade200,
                         textColor: Colors.grey.shade800,
                         borderColor: Colors.grey.shade200,
@@ -367,7 +368,7 @@ class SessionBottomSheetHelper {
                     const SizedBox(width: 12),
                     Expanded(
                       child: CustomButton(
-                        text: "Purchase",
+                        text: "Purchase".tr,
                         borderRadius: 12,
                         height: 48,
                         onTap: () async {
@@ -378,7 +379,7 @@ class SessionBottomSheetHelper {
                               data: {'astrologer_id': astro.userId},
                             );
                             if (response.isSuccess) {
-                              CustomSnackbar.showSuccess("Package purchased successfully.");
+                              CustomSnackbar.showSuccess("Package purchased successfully.".tr);
                               Navigator.pop(context);
                               // Refresh wallet balance
                               await Get.find<WalletController>().fetchWallet();
@@ -394,7 +395,7 @@ class SessionBottomSheetHelper {
                               isPurchasing.value = false;
                             }
                           } catch (e) {
-                            CustomSnackbar.showError("Something went wrong during purchase.");
+                            CustomSnackbar.showError("Something went wrong during purchase.".tr);
                             isPurchasing.value = false;
                           }
                         },
@@ -426,11 +427,15 @@ class PackageSessionService {
       final Map<String, dynamic> data = (body is Map && body.containsKey('has_active_package'))
           ? Map<String, dynamic>.from(body)
           : (body is Map && body['data'] is Map ? Map<String, dynamic>.from(body['data']) : {});
+      final purchase = data['package_purchase'] != null 
+          ? PackagePurchase.fromJson(data['package_purchase']) 
+          : null;
+      if (purchase != null) {
+        WebSocketService.packageRemainingSeconds.value = purchase.remainingDuration;
+      }
       return ActiveStatusResponse(
         hasActivePackage: data['has_active_package'] ?? false,
-        purchase: data['package_purchase'] != null 
-            ? PackagePurchase.fromJson(data['package_purchase']) 
-            : null,
+        purchase: purchase,
         activeSubSession: data['active_sub_session'] != null 
             ? PackageSubSession.fromJson(data['active_sub_session']) 
             : null,
@@ -458,9 +463,11 @@ class PackageSessionService {
       final Map<String, dynamic> data = response.body is Map<String, dynamic> 
           ? response.body 
           : {};
+      final remainingDuration = int.tryParse(data['remaining_duration']?.toString() ?? '') ?? 0;
+      WebSocketService.packageRemainingSeconds.value = remainingDuration;
       return StartSubSessionResult(
         subSession: PackageSubSession.fromJson(data['sub_session']),
-        remainingDuration: data['remaining_duration'] ?? 0,
+        remainingDuration: remainingDuration,
         linkedChatSession: data['chat_session'] != null
             ? PackageChatSession.fromJson(data['chat_session'])
             : null,
@@ -468,6 +475,52 @@ class PackageSessionService {
             ? PackageCallSession.fromJson(data['call_session'])
             : null,
       );
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
+  static int? activeSubSessionId;
+
+  /// Spawn Dual-Subchannel (WhatsApp-Style Switch)
+  static Future<Map<String, dynamic>> spawnChannel({
+    required int subSessionId,
+    required String channelType,
+    String? callType,
+    String? question,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageSpawnChannel,
+      data: {
+        'sub_session_id': subSessionId,
+        'channel_type': channelType,
+        if (callType != null) 'call_type': callType,
+        if (question != null) 'question': question,
+      },
+    );
+    if (response.isSuccess) {
+      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+    } else {
+      throw Exception(response.message);
+    }
+  }
+
+  /// Terminate channel
+  static Future<Map<String, dynamic>> terminateChannel({
+    required int subSessionId,
+    required String channelType,
+    required String action,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageTerminateChannel,
+      data: {
+        'sub_session_id': subSessionId,
+        'channel_type': channelType,
+        'action': action,
+      },
+    );
+    if (response.isSuccess) {
+      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
     } else {
       throw Exception(response.message);
     }

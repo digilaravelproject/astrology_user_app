@@ -22,17 +22,25 @@ class CallForegroundTaskHandler extends TaskHandler {
   Future<void> onDestroy(DateTime timestamp, bool isTimeout) async {
     Logger.d('Foreground Task Destroyed');
   }
+
+  @override
+  void onNotificationButtonPressed(String id) {
+    if (id == 'hangup_btn') {
+      FlutterForegroundTask.sendDataToMain({'action': 'hangup'});
+    }
+  }
 }
 
 class ForegroundTaskService {
   static Future<void> init() async {
     FlutterForegroundTask.init(
       androidNotificationOptions: AndroidNotificationOptions(
-        channelId: 'call_foreground_service',
-        channelName: 'Ongoing Call',
-        channelDescription: 'Keeps the call active in the background',
-        channelImportance: NotificationChannelImportance.LOW,
-        priority: NotificationPriority.LOW,
+        channelId: 'active_consultation_foreground_channel_v5',
+        channelName: 'Active Consultation Service',
+        channelDescription: 'Ongoing active call and chat consultation status',
+        channelImportance: NotificationChannelImportance.MAX,
+        priority: NotificationPriority.MAX,
+        visibility: NotificationVisibility.VISIBILITY_PUBLIC,
       ),
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: true,
@@ -43,16 +51,13 @@ class ForegroundTaskService {
         autoRunOnBoot: false,
         allowWakeLock: true,
         allowWifiLock: true,
-        stopWithTask: true,
+        stopWithTask: false,
       ),
     );
   }
 
   static Future<void> requestPermissions() async {
     if (Platform.isAndroid) {
-      if (!await FlutterForegroundTask.isIgnoringBatteryOptimizations) {
-        await FlutterForegroundTask.requestIgnoreBatteryOptimization();
-      }
       final NotificationPermission notificationPermissionStatus = await FlutterForegroundTask.checkNotificationPermission();
       if (notificationPermissionStatus != NotificationPermission.granted) {
         await FlutterForegroundTask.requestNotificationPermission();
@@ -61,18 +66,34 @@ class ForegroundTaskService {
   }
 
   static Future<void> startService({required String title, required String text}) async {
-    if (await FlutterForegroundTask.isRunningService) {
-      FlutterForegroundTask.updateService(
-        notificationTitle: title,
-        notificationText: text,
-      );
-    } else {
-      await FlutterForegroundTask.startService(
-        notificationTitle: title,
-        notificationText: text,
-        callback: startCallback,
-      );
+    await requestPermissions();
+    const buttons = [
+      NotificationButton(
+        id: 'hangup_btn',
+        text: 'Hang up',
+      ),
+    ];
+    try {
+      if (await FlutterForegroundTask.isRunningService) {
+        FlutterForegroundTask.updateService(
+          notificationTitle: title,
+          notificationText: text,
+        );
+      } else {
+        await FlutterForegroundTask.startService(
+          notificationTitle: title,
+          notificationText: text,
+          callback: startCallback,
+          notificationButtons: buttons,
+        );
+      }
+    } catch (e) {
+      Logger.d("ForegroundTaskService startService failed/ignored: $e");
     }
+  }
+
+  static void listenTaskData(Function(dynamic) callback) {
+    FlutterForegroundTask.addTaskDataCallback(callback);
   }
 
   static Future<void> stopService() async {

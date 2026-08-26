@@ -14,13 +14,17 @@ import '../../matrimony/controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import '../../live/presentation/controllers/live_controller.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -32,6 +36,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+  DateTime? _lastBackPressTime;
   final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
 
   final List<Widget> _screens = [
@@ -43,13 +48,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const MatchingScreen(),
   ];
 
-  final List<NavItem> _navItems = [
-    NavItem(icon: Iconsax.home_2_copy, label: AppStrings.navHome),
-    NavItem(icon: Iconsax.lovely_copy, label: AppStrings.navMatrimony),
-    NavItem(icon: Iconsax.message_copy, label: 'Chat'),
-    NavItem(icon: Iconsax.call_copy, label: 'Call'),
-    NavItem(icon: Iconsax.play_circle_copy, label: AppStrings.navLive),
-    NavItem(icon: Iconsax.heart_copy, label: 'Matching'),
+  List<NavItem> get _navItems => [
+    NavItem(icon: Iconsax.home_2_copy, label: 'home'.tr),
+    NavItem(icon: Iconsax.lovely_copy, label: 'matrimony'.tr),
+    NavItem(icon: Iconsax.message_copy, label: 'chat'.tr),
+    NavItem(icon: Iconsax.call_copy, label: 'call'.tr),
+    NavItem(icon: Iconsax.play_circle_copy, label: 'live'.tr),
+    NavItem(icon: Iconsax.heart_copy, label: 'matching'.tr),
   ];
 
   void _onItemTapped(int index) {
@@ -79,48 +84,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // if (!skipPromo) {
       //   _showPromotionalSheet();
       // }
-      _checkOverlayPermission();
       _checkCurrentActiveSession();
       Get.find<CallController>().checkCurrentActiveCallSession();
     });
   }
 
-  Future<void> _checkOverlayPermission() async {
-    if (Platform.isAndroid) {
-      try {
-        final bool isGranted = await FlutterOverlayWindow.isPermissionGranted();
-        if (!isGranted) {
-          Get.dialog(
-            CupertinoAlertDialog(
-              title: const Text('Overlay Permission'),
-              content: const Text('To show the floating chat bubble when the app is in the background, please allow "Display over other apps" permission.'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('Cancel'),
-                  onPressed: () => Get.back(),
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: const Text('Allow'),
-                  onPressed: () {
-                    Get.back();
-                    FlutterOverlayWindow.requestPermission();
-                  },
-                ),
-              ],
-            ),
-          );
-        }
-      } catch (e) {
-        debugPrint('Error checking overlay permission: $e');
-      }
-    }
-  }
-
   Future<void> _checkCurrentActiveSession() async {
     try {
-      if (await FlutterOverlayWindow.isActive()) return;
-
       final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
       if (response.isSuccess && response.body != null) {
         final data = response.body;
@@ -133,7 +103,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // For user app, other person is provider (astrologer)
         final name = session?['provider']?['name'] ?? 'Astrologer';
 
+        if (sessionId != null && startedAt != null) {
+          WebSocketService.sessionStartTimes[sessionId] = startedAt.toString();
+        }
+
+        DateTime? parsedStart;
+        if (startedAt != null) {
+          String isoUtc = startedAt.toString().replaceAll(' ', 'T');
+          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+            isoUtc += 'Z';
+          }
+          parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
+        }
+        final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
+
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
+          if (sessionId != null) {
+            LocalNotificationService.showOngoingChatNotification(
+              sessionId: sessionId,
+              title: '$name • Chat',
+              body: 'Ongoing chat session',
+              startedAtMillis: startedAtMillis,
+            );
+          }
           FloatingChatBubble.show(
               context: Get.context!,
               sessionId: sessionId,
@@ -143,7 +135,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               startedAt: startedAt,
               onTap: () {
                 final currentStatus = FloatingChatBubble.chatStatus.value;
-                FloatingChatBubble.dismiss();
                 Get.to(
                       () => ChatScreen(
                     astrologerName: name,
@@ -356,15 +347,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
             } catch (e) {
               debugPrint("Error sending to background: $e");
             }
-          } else {
-            SystemNavigator.pop();
+            return;
           }
+
+          // If user is not on Home tab (index 0), navigate to Home tab first
+          if (_selectedIndex != 0) {
+            setState(() {
+              _selectedIndex = 0;
+            });
+            return;
+          }
+
+          // Double tap to exit logic on Home tab
+          final now = DateTime.now();
+          if (_lastBackPressTime == null || now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+            _lastBackPressTime = now;
+            CustomSnackbar.showInfo('Press back again to exit app');
+            return;
+          }
+
+          SystemNavigator.pop();
         },
         child: Scaffold(
           extendBody: true,
-          body: IndexedStack(
-            index: _selectedIndex,
-            children: _screens,
+          body: Column(
+            children: [
+              Obx(() {
+                if (FloatingCallBubble.isActive &&
+                    FloatingCallBubble.sessionId != null &&
+                    FloatingCallBubble.name != null) {
+                  return FloatingCallBubbleWidget(
+                    sessionId: FloatingCallBubble.sessionId!,
+                    name: FloatingCallBubble.name!,
+                    imageUrl: '',
+                  );
+                } else if (FloatingChatBubble.isActive &&
+                    FloatingChatBubble.sessionId != null &&
+                    FloatingChatBubble.name != null) {
+                  return FloatingChatBubbleWidget(
+                    sessionId: FloatingChatBubble.sessionId!,
+                    name: FloatingChatBubble.name!,
+                    imageUrl: '',
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
+              Expanded(
+                child: IndexedStack(
+                  index: _selectedIndex,
+                  children: _screens,
+                ),
+              ),
+            ],
           ),
           bottomNavigationBar: CustomBottomNavBar(
             selectedIndex: _selectedIndex,

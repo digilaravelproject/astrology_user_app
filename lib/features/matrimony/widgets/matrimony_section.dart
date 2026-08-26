@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/theme/app_colors.dart';
 import '../screens/matrimony_profile_screen.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
@@ -23,14 +24,14 @@ class MatrimonySection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.transparent,
       ),
       child: Obx(() {
         if (controller.isLoading.value && controller.allProfiles.isEmpty) {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(50.0),
-              child: CircularProgressIndicator(color: Color(0xFFE91E63)),
+              child: CircularProgressIndicator(color: AppColors.primaryColor),
             ),
           );
         }
@@ -103,7 +104,7 @@ class MatrimonySection extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF0F5), // Soft Pink Card
+          color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFFFFD1DC), width: 1),
           boxShadow: [
@@ -121,48 +122,78 @@ class MatrimonySection extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Premium Profile Image
-                  Stack(
-                    alignment: Alignment.bottomRight,
+                  // Left Column: Image, Age, Location
+                  Column(
                     children: [
-                      Container(
-                        // padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: const Color(0xFFE91E63),
-                            width: 2.0,
-                          ),
-                        ),
-                        child: CustomImageWidget(
-                          imagePath: imageUrl,
-                          height: 80,
-                          width: 80,
-                          radius: BorderRadius.circular(40),
-                          fallbackWidget: Container(
-                            height: 80,
-                            width: 80,
+                      Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFE91E63).withOpacity(0.1),
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.primaryColor,
+                                width: 2.0,
+                              ),
                             ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.person_rounded,
-                              size: 48,
-                              color: const Color(0xFFE91E63).withOpacity(0.5),
+                            child: CustomImageWidget(
+                              imagePath: imageUrl,
+                              height: 70,
+                              width: 70,
+                              radius: BorderRadius.circular(35),
+                              fallbackWidget: Container(
+                                height: 70,
+                                width: 70,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Icons.person_rounded,
+                                  size: 40,
+                                  color: AppColors.primaryColor.withOpacity(0.5),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          Image.asset(
+                            'assets/icons/verify.png',
+                            width: 18,
+                            height: 18,
+                          ),
+                        ],
                       ),
-                      Image.asset(
-                        'assets/icons/verify.png',
-                        width: 22,
-                        height: 22,
+                      const SizedBox(height: 8),
+                      AppText(
+                        '${data.age} yrs',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF2D3142),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.location_on_outlined, size: 12, color: AppColors.primaryColor),
+                          const SizedBox(width: 2),
+                          SizedBox(
+                            width: 70,
+                            child: AppText(
+                              data.location.split(',').first,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF7F8487),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   
                   // Details Column
                   Expanded(
@@ -188,45 +219,12 @@ class MatrimonySection extends StatelessWidget {
                         
                         const SizedBox(height: 4),
                         
-                        // Age, Religion, Caste
-                        Row(
-                          children: [
-                            const Text('🇮🇳 ', style: TextStyle(fontSize: 12)),
-                            Expanded(
-                              child: AppText(
-                                '${data.age} ${AppStrings.yrs.toLowerCase()}, ${data.maritalStatus}',
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF7F8487),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                          ],
+                        AppText(
+                          data.maritalStatus.tr,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF7F8487),
                         ),
-                        
-                        const SizedBox(height: 4),
-                        
-                        // Location
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFFE91E63)),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: AppText(
-                                data.location,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF7F8487),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                          ],
-                        ),
-                        
                         const SizedBox(height: 8),
                         Container(height: 1, color: Colors.grey.withOpacity(0.1)),
                         const SizedBox(height: 8),
@@ -238,6 +236,7 @@ class MatrimonySection extends StatelessWidget {
                         _buildDetailItem(Icons.school_outlined, 'Education', data.education),
                         const SizedBox(height: 6),
                         _buildDetailItem(Icons.work_outline, 'Profession', data.jobTitle),
+
 
                         const SizedBox(height: 4),
                        Row(
@@ -251,7 +250,7 @@ class MatrimonySection extends StatelessWidget {
                              fontWeight: FontWeight.w700,
                              icon: Icons.chevron_right,
                              gradient: const LinearGradient(
-                               colors: [Color(0xFFE91E63), Color(0xFFFF5E9D)],
+                               colors: [AppColors.primaryColor, AppColors.secondaryColor],
                                begin: Alignment.topLeft,
                                end: Alignment.bottomRight,
                              ),
@@ -288,10 +287,10 @@ class MatrimonySection extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0xFFE91E63).withOpacity(0.05),
+            color: AppColors.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 12, color: const Color(0xFFE91E63).withOpacity(0.7)),
+          child: Icon(icon, size: 12, color: AppColors.primaryColor.withOpacity(0.7)),
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -305,9 +304,9 @@ class MatrimonySection extends StatelessWidget {
                 color: const Color(0xFF2D3142).withOpacity(0.6),
               ),
               children: [
-                TextSpan(text: '$label: '),
+                TextSpan(text: '${label.tr}: '),
                 TextSpan(
-                  text: displayValue,
+                  text: displayValue.tr,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF2D3142),

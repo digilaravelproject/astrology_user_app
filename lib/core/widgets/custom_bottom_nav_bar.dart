@@ -55,10 +55,11 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
   @override
   Widget build(BuildContext context) {
     final Color fadeColor = widget.gradientColor ?? Colors.white;
+    final double bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      height: 140,
-      padding: const EdgeInsets.only(bottom: 20),
+      height: 100 + bottomInset,
+      padding: EdgeInsets.only(bottom: bottomInset > 0 ? bottomInset : 4),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -77,7 +78,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
         children: [
           // Main Nav Bar Container
           Container(
-            height: 70,
+            height: 65,
             margin: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -106,7 +107,7 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
           // Elevated selected item
           Positioned(
             left: 16 + ((Get.width - 32) / 6) * widget.selectedIndex + ((Get.width - 32) / 12) - 25,
-            top: 30,
+            top: 5,
             child: _buildElevatedItem(widget.selectedIndex),
           ),
         ],
@@ -121,19 +122,22 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
       onTap: () => widget.onItemSelected(index),
       behavior: HitTestBehavior.opaque,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             item.icon,
-            color: Colors.grey.shade400,
-            size: 24,
+            color: const Color(0xFF4A4A4A),
+            size: 22,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           AppText(
             item.label,
-            fontSize: 8,
-            fontWeight: FontWeight.w500,
-            color: Colors.grey.shade400,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF4A4A4A),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -148,21 +152,14 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
       child: ScaleTransition(
         scale: _pulseAnimation,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              height: 50,
-              width: 50,
+              height: 48,
+              width: 48,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    AppColors.primaryColor,
-                    AppColors.accentColor,
-                  ],
-                  stops: [0.0, 1.0],
-                ),
+                color: AppColors.primaryColor,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -177,15 +174,17 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> with SingleTick
               child: Icon(
                 item.icon,
                 color: Colors.white,
-                size: 22,
+                size: 20,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             AppText(
               item.label,
-              fontSize: 8,
+              fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: AppColors.accentColor,
+              color: AppColors.primaryColor,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

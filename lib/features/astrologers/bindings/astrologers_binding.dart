@@ -12,6 +12,7 @@ import '../domain/usecases/follow_astrologer_usecase.dart';
 import '../domain/usecases/get_gifts_usecase.dart';
 import '../domain/usecases/send_gift_usecase.dart';
 import '../domain/usecases/get_gift_history_usecase.dart';
+import '../domain/usecases/get_astrologer_gallery_usecase.dart';
 import '../domain/repositories/gift_repository.dart';
 import '../domain/services/gift_service.dart';
 import '../controllers/astrologer_controller.dart';
@@ -33,6 +34,7 @@ class AstrologersBinding extends Bindings {
     Get.lazyPut(() => GetGiftsUseCase(service: Get.find()));
     Get.lazyPut(() => SendGiftUseCase(service: Get.find()));
     Get.lazyPut(() => GetGiftHistoryUseCase(service: Get.find()));
+    Get.lazyPut(() => GetAstrologerGalleryUseCase(service: Get.find()));
     Get.lazyPut(() => AstrologerController(
       getAstrologersUseCase: Get.find(),
       getAstrologerByIdUseCase: Get.find(),
@@ -44,6 +46,7 @@ class AstrologersBinding extends Bindings {
       getGiftsUseCase: Get.find(),
       sendGiftUseCase: Get.find(),
       getGiftHistoryUseCase: Get.find(),
+      getAstrologerGalleryUseCase: Get.find(),
     ));
   }
 }

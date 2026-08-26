@@ -79,6 +79,7 @@ class ChatAssistanceController extends GetxController {
     final cachedSessionId = SharedPrefs.getInt(cacheKey);
     if (cachedSessionId != null && cachedSessionId != 0) {
       _sessionId = cachedSessionId;
+      WebSocketService.activeSessionId = cachedSessionId;
       messages.clear();
       await fetchMessages();
       _setupWebsocketListeners();
@@ -117,6 +118,7 @@ class ChatAssistanceController extends GetxController {
           _sessionId = int.tryParse(session['id']?.toString() ?? '');
           if (_sessionId != null) {
             SharedPrefs.setInt(cacheKey, _sessionId!);
+            WebSocketService.activeSessionId = _sessionId;
           }
           
           // Clear previous messages and fetch history
@@ -165,12 +167,14 @@ class ChatAssistanceController extends GetxController {
         messages.assignAll(dataList.map((msg) {
           final int senderId = int.tryParse(msg['sender_id']?.toString() ?? '') ?? 0;
           final bool isMe = senderId == _currentUserId;
+          final bool isRead = msg['is_read'] == true || msg['is_read'] == 1 || msg['is_read']?.toString() == '1' || msg['is_read']?.toString() == 'true';
+          final bool isDelivered = msg['is_delivered'] == true || msg['is_delivered'] == 1 || msg['is_delivered']?.toString() == '1' || msg['is_delivered']?.toString() == 'true';
           return ChatMessage(
             id: int.tryParse(msg['id']?.toString() ?? '') ?? 0,
             text: msg['message']?.toString() ?? '',
             isMe: isMe,
             time: DateTime.tryParse(msg['created_at']?.toString() ?? '') ?? DateTime.now(),
-            status: msg['is_read'] == true ? 'seen' : (msg['is_delivered'] == true ? 'delivered' : 'sent'),
+            status: isRead ? 'seen' : (isDelivered ? 'delivered' : 'sent'),
             type: msg['type']?.toString() ?? 'text',
             attachmentUrl: msg['attachment_url']?.toString(),
             image: msg['type'] == 'image' ? msg['attachment_url']?.toString() : null,
@@ -216,7 +220,7 @@ class ChatAssistanceController extends GetxController {
       if (index != -1) {
         if (response.isSuccess) {
           final data = response.body['data']['message'];
-          final serverId = data['id'];
+          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
           messages[index] = messages[index].copyWith(id: serverId, status: 'sent');
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
@@ -374,28 +378,74 @@ class ChatAssistanceController extends GetxController {
   }
 
   void _setupWebsocketListeners() {
+    if (_sessionId != null) {
+      try {
+        Get.find<WebSocketService>().subscribeToChannel('private-chat-assistance.$_sessionId');
+      } catch (e) {
+        debugPrint('Error subscribing to chat assistance channel: $e');
+      }
+    }
     _msgSub?.cancel();
     _msgSub = WebSocketService.incomingMessages.listen((list) {
       if (list.isNotEmpty) {
         final lastMsg = list.last;
-        final msgSessionId = int.tryParse(lastMsg['chat_assistance_session_id']?.toString() ?? '') ?? 0;
+        final msgSessionId = int.tryParse(lastMsg['chat_assistance_session_id']?.toString() ?? '') ?? 
+                             int.tryParse(lastMsg['chat_session_id']?.toString() ?? '') ?? 0;
         if (msgSessionId == _sessionId) {
           final int senderId = int.tryParse(lastMsg['sender_id']?.toString() ?? '') ?? 0;
           final bool isMe = senderId == _currentUserId;
 
           final int msgId = int.tryParse(lastMsg['id']?.toString() ?? '') ?? 0;
-          final alreadyExists = messages.any((m) => m.id == msgId);
-          if (!alreadyExists) {
+          final String msgText = lastMsg['message']?.toString() ?? '';
+          final String msgType = lastMsg['type']?.toString() ?? 'text';
+
+          // Guard: already in list with the real server id → skip
+          if (messages.any((m) => m.id == msgId)) return;
+
+          if (isMe) {
+            // Find the local 'sending...' placeholder and upgrade in-place.
+            final pendingIndex = messages.indexWhere(
+              (m) => m.isMe && m.status == 'sending...' && 
+                     (m.text == msgText || 
+                      (m.type == 'image' && msgType == 'image') || 
+                      (m.type == 'document' && msgType == 'document')),
+            );
+            if (pendingIndex != -1) {
+              messages[pendingIndex] = messages[pendingIndex].copyWith(
+                id: msgId,
+                status: 'sent',
+                time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? messages[pendingIndex].time,
+                attachmentUrl: lastMsg['attachment_url']?.toString(),
+                image: msgType == 'image' ? lastMsg['attachment_url']?.toString() : null,
+                type: msgType,
+              );
+              messages.refresh();
+            } else {
+              messages.insert(0, ChatMessage(
+                id: msgId,
+                text: msgText,
+                isMe: true,
+                time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? DateTime.now(),
+                status: 'sent',
+                type: msgType,
+                attachmentUrl: lastMsg['attachment_url']?.toString(),
+              ));
+              messages.refresh();
+              _scrollToBottom();
+            }
+          } else {
+            // ── Message from the other side ────────────────────────────────
             messages.insert(0, ChatMessage(
               id: msgId,
-              text: lastMsg['message']?.toString() ?? '',
-              isMe: isMe,
+              text: msgText,
+              isMe: false,
               time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? DateTime.now(),
-              status: 'delivered', 
-              type: lastMsg['type']?.toString() ?? 'text',
+              status: 'delivered',
+              type: msgType,
               attachmentUrl: lastMsg['attachment_url']?.toString(),
-              image: lastMsg['type'] == 'image' ? lastMsg['attachment_url']?.toString() : null,
+              image: msgType == 'image' ? lastMsg['attachment_url']?.toString() : null,
             ));
+            messages.refresh();
             _scrollToBottom();
             syncReadStatus();
           }
@@ -407,17 +457,20 @@ class ChatAssistanceController extends GetxController {
     _statusUpdateSub = WebSocketService.messageStatusUpdates.listen((list) {
       if (list.isNotEmpty) {
         final lastUpdate = list.last;
-        final updateSessionId = int.tryParse(lastUpdate['sessionId']?.toString() ?? '') ?? 0;
+        final updateSessionId = int.tryParse(lastUpdate['sessionId']?.toString() ?? 
+                                             lastUpdate['session_id']?.toString() ?? 
+                                             lastUpdate['chat_assistance_session_id']?.toString() ?? '') ?? 0;
         if (updateSessionId == _sessionId) {
           final newStatus = lastUpdate['status']?.toString();
-          final messageIdsList = lastUpdate['messageIds'] as List<dynamic>?;
-          if (newStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
+          final mappedStatus = newStatus == 'seen' ? 'seen' : (newStatus ?? 'sent');
+          final messageIdsList = (lastUpdate['messageIds'] ?? lastUpdate['message_ids']) as List<dynamic>?;
+          if (mappedStatus != null && messageIdsList != null && messageIdsList.isNotEmpty) {
              final messageIds = messageIdsList.map((e) => int.tryParse(e.toString()) ?? 0).toList();
              bool changed = false;
              for (int i = 0; i < messages.length; i++) {
                if (messageIds.contains(messages[i].id)) {
                  if (messages[i].status != 'seen') {
-                   messages[i] = messages[i].copyWith(status: newStatus);
+                   messages[i] = messages[i].copyWith(status: mappedStatus);
                    changed = true;
                  }
                }
@@ -448,6 +501,14 @@ class ChatAssistanceController extends GetxController {
     _limitReachedSub?.cancel();
     messageController.dispose();
     scrollController.dispose();
+    if (WebSocketService.activeSessionId == _sessionId) {
+      WebSocketService.activeSessionId = null;
+    }
+    if (_sessionId != null) {
+      try {
+        Get.find<WebSocketService>().unsubscribeFromChannel('private-chat-assistance.$_sessionId');
+      } catch (_) {}
+    }
     super.onClose();
   }
 }

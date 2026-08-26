@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:vibration/vibration.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/webrtc/webrtc_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/call_summary_dialog.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 
 import 'package:flutter/material.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
@@ -28,13 +29,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final RxBool isSpeakerOn = false.obs;
   bool isCallScreenVisible = false;
   bool isPackageCall = false;
+  /// True when the package sub-session also has an active chat channel (used for granular end modal)
+  bool isChatAlsoActive = false;
+  /// Active package chat session ID (used when switching back to chat after "End Call Only")
+  int? activeChatSessionId;
+
+  /// Master package countdown in seconds — server-driven via WebSocket
+  int get packageMasterSeconds => WebSocketService.packageRemainingSeconds.value;
 
   int? sessionId;
   int? providerId;
   String? providerName;
   String? providerImage;
 
-  AudioPlayer? _audioPlayer;
   Timer? _callTimer;
   Timer? _ringingTimer;
   bool _isSummaryShown = false;
@@ -99,9 +106,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callDismissedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final reason = data['reason']?.toString() ?? 'dismissed';
-          _handleCallDismissed(reason);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          Logger.d('CallController: callDismissed match check: incoming=$incomingId, expected=$sessionId');
+          if (incomingId == sessionId) {
+            final reason = data['reason']?.toString() ?? 'dismissed';
+            _handleCallDismissed(reason);
+          }
         }
       }
     });
@@ -109,12 +120,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _iceSubscription = WebSocketService.iceCandidateData.listen((data) {
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          final candidate = data['candidate']?.toString();
-          final receiverId = data['receiverId'];
-          // Only add candidate if it is meant for us (receiverId matches current user ID)
-          if (candidate != null && receiverId == WebSocketService.currentUserId) {
-            webrtcService.addRemoteCandidate(candidate);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            final candidate = data['candidate']?.toString();
+            final receiverId = data['receiverId'];
+            // Only add candidate if it is meant for us (receiverId matches current user ID)
+            if (candidate != null && receiverId == WebSocketService.currentUserId) {
+              webrtcService.addRemoteCandidate(candidate);
+            }
           }
         }
       }
@@ -124,8 +138,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
       Logger.d('CallController: WebSocket callEndedData received: $data');
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null && session['id'] == sessionId) {
-          _handleCallEnded(data);
+        if (session != null) {
+          final incomingId = int.tryParse(session['id']?.toString() ?? '');
+          if (incomingId == sessionId) {
+            _handleCallEnded(data);
+          }
         }
       }
     });
@@ -178,6 +195,13 @@ class CallController extends GetxController with WidgetsBindingObserver {
           final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
           if (subSessionData != null) {
             SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
+          }
+          // Immediately sync the master countdown from REST API response
+          final remainingSecs = bodyMap is Map
+              ? (bodyMap['remaining_duration'] ?? bodyMap['data']?['remaining_duration'])
+              : null;
+          if (remainingSecs != null) {
+            WebSocketService.packageRemainingSeconds.value = int.tryParse(remainingSecs.toString()) ?? 0;
           }
         }
         if (sessionData != null) {
@@ -262,20 +286,91 @@ class CallController extends GetxController with WidgetsBindingObserver {
         
         final sId = sessionId ?? 0;
         cleanUp();
-        
-        Future.delayed(const Duration(milliseconds: 300), () {
-          CallSummaryDialog.show(
-            sessionId: sId,
-            durationSeconds: duration,
-            totalCost: cost,
-          );
-        });
+        if (isCallScreenVisible) {
+          Get.back();
+        }
       }
     } catch (e) {
       Logger.e('CallController: Error ending call -> $e');
       cleanUp();
     }
   }
+
+  // ─── Hybrid Package: Granular Channel Termination ───────────────────────
+
+  /// End Call Only — keeps chat alive, navigates back to chat screen
+  Future<void> terminateChannelOnly() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      Logger.e('CallController: terminateChannelOnly — no activeSubSessionId found');
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'channel_only',
+      );
+      Logger.d('CallController: terminateChannelOnly success. Returning to chat...');
+
+      final chatSessId = activeChatSessionId ?? 0;
+      final pName = providerName ?? 'Astrologer';
+      final pImage = providerImage ?? '';
+
+      // Reset call without ending the package sub-session
+      cleanUp();
+
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+
+      // Navigate back to chat screen
+      if (chatSessId > 0) {
+        Get.to(
+          () => ChatScreen(
+            astrologerName: pName,
+            astrologerImage: pImage,
+            sessionId: chatSessId,
+            initialStatus: 'ongoing',
+            isPackageChat: true,
+          ),
+          binding: ChatBinding(),
+        );
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateChannelOnly -> $e');
+      CustomSnackbar.showError('Failed to end call. Please try again.');
+    }
+  }
+
+  /// End Entire Session — terminates both call and chat, closes consultation
+  Future<void> terminateEntireSession() async {
+    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+    if (subId == null) {
+      // Fallback to regular endCall
+      await endCall();
+      return;
+    }
+    try {
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'call',
+        action: 'complete_session',
+      );
+      Logger.d('CallController: terminateEntireSession success.');
+      status.value = 'completed';
+      cleanUp();
+      if (isCallScreenVisible) {
+        Get.back();
+      }
+    } catch (e) {
+      Logger.e('CallController: Error in terminateEntireSession -> $e');
+      // Fallback
+      await endCall();
+    }
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
 
   void toggleMute() {
     isMuted.value = !isMuted.value;
@@ -293,21 +388,29 @@ class CallController extends GetxController with WidgetsBindingObserver {
     status.value = 'ongoing';
     durationSeconds.value = 0;
 
-    await webrtcService.setRemoteAnswer(answerSdp);
+    final acceptedMillis = DateTime.now().millisecondsSinceEpoch;
+    LocalNotificationService.cancelIncomingCallNotification(sessionId!);
     _startCallTimer();
-    _showOngoingNotification();
+    _showOngoingNotification(startedAtMillis: acceptedMillis);
+
+    try {
+      await webrtcService.setRemoteAnswer(answerSdp);
+    } catch (e) {
+      Logger.e('CallController: Error setting remote answer -> $e');
+    }
   }
 
   void _handleCallDismissed(String reason) {
     status.value = reason; // rejected, cancelled, timeout
+    final wasCallScreenVisible = isCallScreenVisible;
+    cleanUp();
+    if (wasCallScreenVisible) {
+      Get.back(); // Close CallScreen safely
+    }
     if (reason == 'cancelled') {
       CustomSnackbar.showInfo('Call cancelled.');
     } else {
       CustomSnackbar.showError('Call dismissed: $reason');
-    }
-    cleanUp();
-    if (isCallScreenVisible) {
-      Get.back(); // Close CallScreen safely
     }
   }
 
@@ -337,13 +440,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (wasCallScreenVisible) {
         Get.back();
       }
-      Future.delayed(const Duration(milliseconds: 300), () {
-        CallSummaryDialog.show(
-          sessionId: sId,
-          durationSeconds: duration,
-          totalCost: cost,
-        );
-      });
     });
   }
 
@@ -362,51 +458,44 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _callTimer?.cancel();
     _callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       durationSeconds.value++;
-      _showOngoingNotification();
     });
   }
 
-  void _showOngoingNotification() {
+  void _showOngoingNotification({int? startedAtMillis}) {
     if (sessionId != null) {
-      final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
-      final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
       LocalNotificationService.showOngoingCallNotification(
         sessionId: sessionId!,
         title: 'Active Call in Progress',
-        body: 'Talking with $providerName - $minutes:$seconds',
+        body: 'Talking with $providerName',
+        startedAtMillis: startedAtMillis,
       );
     }
   }
 
-  Future<void> _startRingtone({required bool isIncoming}) async {
-    try {
-      _audioPlayer = AudioPlayer();
-      final path = isIncoming ? AppConstants.incomingRingPath : AppConstants.outgoingRingPath;
-      await _audioPlayer?.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer?.play(AssetSource(path));
-
-      if (isIncoming && (await Vibration.hasVibrator() ?? false)) {
-        Vibration.vibrate(pattern: [500, 1000, 500, 1000], repeat: 0);
-      }
-    } catch (e) {
-      Logger.e('CallController: Error playing ringtone -> $e');
-    }
+  void _startRingtone({required bool isIncoming}) {
+    // outgoing_ring.mp3 = user hears this while waiting for astrologer to accept
+    // incoming_ring.mp3 = would be for astrologer (not used on user side)
+    final sound = isIncoming ? 'audio/incoming_ring.mp3' : 'audio/outgoing_ring.mp3';
+    SoundVibrationService().startRingtone(sound, loop: true, vibrate: false);
+    Logger.d('[CallController] Ringtone started → $sound');
   }
 
   void _stopRingtone() {
-    _audioPlayer?.stop();
-    _audioPlayer?.dispose();
-    _audioPlayer = null;
-    Vibration.cancel();
+    SoundVibrationService().stopRingtone();
+    Logger.d('[CallController] Ringtone stopped');
   }
 
   void cleanUp() {
+    if (status.value == 'idle' && sessionId == null) return;
     _stopRingtone();
     _callTimer?.cancel();
     _ringingTimer?.cancel();
     if (sessionId != null) {
       LocalNotificationService.cancelOngoingCallNotification(sessionId!);
     }
+    try {
+      ForegroundTaskService.stopService();
+    } catch (_) {}
     FloatingCallBubble.dismiss();
     webrtcService.dispose();
     status.value = 'idle';
@@ -416,6 +505,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
     providerId = null;
     providerName = null;
     providerImage = null;
+    isChatAlsoActive = false;
+    activeChatSessionId = null;
 
     if (isCallScreenVisible) {
       isCallScreenVisible = false;
@@ -434,22 +525,29 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
-    if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) return;
+    debugPrint("==== [CALL_DEBUG] CallController.minimizeToBubble called! sessionId=$sessionId, status=${status.value}, shouldPop=$shouldPop ====");
+    if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) {
+      debugPrint("==== [CALL_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====");
+      return;
+    }
+    final startStr = WebSocketService.sessionStartTimes[sessionId!] ?? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toIso8601String();
+    WebSocketService.sessionStartTimes[sessionId!] = startStr;
+
     FloatingCallBubble.show(
       context: context,
       sessionId: sessionId!,
       name: name,
       imageUrl: image,
-      startedAt: status.value == 'ongoing' ? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toUtc().toIso8601String() : null,
+      startedAt: status.value == 'ongoing' ? startStr : null,
       status: status.value,
       onTap: () {
-        final currentStatus = FloatingCallBubble.callStatus.value;
-        FloatingCallBubble.dismiss();
+        debugPrint("==== [CALL_DEBUG] FloatingCallBubble tapped! Returning to CallScreen ====");
+        FloatingCallBubble.dismiss(stopForegroundService: false);
         Get.to(() => const CallScreen());
       },
     );
     if (shouldPop) {
-      Navigator.of(context).pop();
+      Get.back();
     }
   }
 
@@ -468,6 +566,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
             sessionId = int.tryParse(session['id']?.toString() ?? '');
             webrtcService.activeSessionId = sessionId;
             status.value = sessionStatus!;
+            
+            // Dynamically set isPackageCall based on prepaid/package session flags
+            isPackageCall = (session['is_prepaid'] == true ||
+                session['is_package_session'] == true ||
+                session['billing_mode'] == 'prepaid' ||
+                (bodyMap is Map && (
+                  bodyMap['is_prepaid'] == true ||
+                  bodyMap['is_package_session'] == true ||
+                  bodyMap['billing_mode'] == 'prepaid' ||
+                  bodyMap['data']?['is_prepaid'] == true ||
+                  bodyMap['data']?['is_package_session'] == true ||
+                  bodyMap['data']?['billing_mode'] == 'prepaid'
+                )));
             
             providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];
@@ -499,11 +610,18 @@ class CallController extends GetxController with WidgetsBindingObserver {
             final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
             LocalNotificationService.showOngoingCallNotification(
               sessionId: sessionId!,
-              title: 'Active Call in Progress',
-              body: 'Talking with $providerName - $minutes:$seconds',
-              startedAtMillis: sessionStatus == 'ongoing' && session['started_at'] != null 
-                  ? DateTime.tryParse(session['started_at'].toString())?.millisecondsSinceEpoch
-                  : null,
+              title: '$providerName • Call',
+              body: 'Tap to return to call session',
+              startedAtMillis: () {
+                if (sessionStatus == 'ongoing' && session['started_at'] != null) {
+                  String isoUtc = session['started_at'].toString().trim().replaceAll(' ', 'T');
+                  if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+                    isoUtc += 'Z';
+                  }
+                  return DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
+                }
+                return null;
+              }(),
             );
 
             // Show Floating Bubble
@@ -558,6 +676,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    debugPrint("==== [CALL_DEBUG] CallController.onClose invoked! sessionId=$sessionId, status=${status.value} ====");
     WidgetsBinding.instance.removeObserver(this);
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();

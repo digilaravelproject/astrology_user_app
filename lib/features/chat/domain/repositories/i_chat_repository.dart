@@ -2,7 +2,7 @@ import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_session.dart';
 
 abstract class IChatRepository {
-  Future<({List<ChatMessage> messages, String? startedAt, int? peerId})> getChatHistory({
+  Future<({List<ChatMessage> messages, String? startedAt, int? peerId, String? sessionStatus})> getChatHistory({
     required int sessionId,
     required int currentUserId,
   });

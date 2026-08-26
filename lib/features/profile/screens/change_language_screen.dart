@@ -27,6 +27,31 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
     _selectedIndex = _localizationController.selectedIndex;
   }
 
+  String _getLanguageSubtitle(String code) {
+    switch (code.toLowerCase()) {
+      case 'en':
+        return 'English';
+      case 'hi':
+        return 'Hindi';
+      case 'ta':
+        return 'Tamil';
+      case 'bn':
+        return 'Bengali';
+      case 'te':
+        return 'Telugu';
+      case 'mr':
+        return 'Marathi';
+      case 'kn':
+        return 'Kannada';
+      case 'gu':
+        return 'Gujarati';
+      case 'ml':
+        return 'Malayalam';
+      default:
+        return code.toUpperCase();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final languages = _localizationController.languages;
@@ -86,7 +111,7 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
                               color: Colors.black87,
                             ),
                             AppText(
-                              '${lang.languageCode.toUpperCase()}_${lang.countryCode}',
+                              _getLanguageSubtitle(lang.languageCode),
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey,

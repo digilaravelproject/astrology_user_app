@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart' as sax;
 import '../../../core/utils/custom_snackbar.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/widgets/location_search_screen.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/constants/image_constants.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/route_helper.dart';
 import '../../kundli/screens/kundli_matching_screen.dart';
@@ -97,17 +99,51 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFCECF1),
-      appBar: CustomAppBar(
-        title: 'Match Making',
-        showLeading: false,
-        backgroundColor: Colors.white,
-        titleColor: AppColors.textColorPrimary,
-        iconColor: AppColors.textColorPrimary,
-      ),
-      body: Column(
-        children: [
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: Opacity(
+            opacity: 0.25,
+            child: Image.asset(
+              ImageConstants.loginBackground,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: CustomAppBar(
+            title: 'Match Making'.tr,
+            showLeading: false,
+            backgroundColor: Colors.transparent,
+            titleColor: AppColors.textColorPrimary,
+            iconColor: AppColors.textColorPrimary,
+            /*actions: [
+              GestureDetector(
+                onTap: () {
+                  // Action for searchl
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.search, color: Color(0xFF2E1A47), size: 22),
+                ),
+              ),
+            ],*/
+          ),
+          body: Column(
+            children: [
           // Custom Circular Tab Bar
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -194,8 +230,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
           ),
         ],
       ),
-    );
-  }
+    ),
+  ],
+);
+}
+
 
   Widget _buildOpenKundliTab() {
     final kundliController = Get.find<KundliController>();
@@ -208,48 +247,60 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         Column(
           children: [
             // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {}); // Trigger rebuild to filter list
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search Kundli...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 14,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Container(
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        blurRadius: 10,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    textAlignVertical: TextAlignVertical.center,
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Search Kundli...'.tr,
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: AppColors.primaryColor,
+                        size: 22,
+                      ),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: Colors.grey.shade500,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey.shade500,
-                      size: 22,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: Colors.grey.shade500,
-                              size: 20,
-                            ),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),
-            ),
 
             // Saved Kundlis List
             Expanded(
@@ -515,8 +566,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                         color: AppColors.textColorPrimary,
                                       ),
                                       const SizedBox(width: 12),
-                                      const AppText(
-                                        'View',
+                                      AppText(
+                                        'View'.tr,
                                         fontSize: 14,
                                         color: AppColors.textColorPrimary,
                                       ),
@@ -533,8 +584,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                         color: AppColors.primaryColor,
                                       ),
                                       const SizedBox(width: 12),
-                                      const AppText(
-                                        'Edit',
+                                      AppText(
+                                        'Edit'.tr,
                                         fontSize: 14,
                                         color: AppColors.textColorPrimary,
                                       ),
@@ -552,7 +603,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                       ),
                                       const SizedBox(width: 12),
                                       AppText(
-                                        'Delete',
+                                        'Delete'.tr,
                                         fontSize: 14,
                                         color: Colors.red.shade400,
                                       ),
@@ -1095,7 +1146,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   AppText(
-                    isEdit ? 'Edit Kundli' : 'Add New Kundli',
+                    isEdit ? 'Edit Kundli'.tr : 'Add New Kundli'.tr,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textColorPrimary,
@@ -1338,7 +1389,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     elevation: 2,
                   ),
                   child: AppText(
-                    isEdit ? 'Update Kundli' : 'Save & View Kundli',
+                    isEdit ? 'Update Kundli'.tr : 'Save & View Kundli'.tr,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -1385,7 +1436,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   Icon(titleIcon, size: 20, color: AppColors.primaryColor),
                   const SizedBox(width: 8),
                 ],
-                Text(title, style: TextStyle(fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8))),
+                AppText(title.tr, fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8)),
               ],
             ),
             const SizedBox(height: 8),
@@ -1404,7 +1455,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 4, top: 8),
-          child: AppText(label, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
+          child: AppText(label.tr, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
         ),
         GestureDetector(
           onTap: isPicker ? (onTap ?? () {}) : null,
@@ -1428,28 +1479,41 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 Icon(icon, size: 16, color: AppColors.primaryColor.withOpacity(0.6)),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: TextField(
-                    controller: controller,
-                    cursorColor: AppColors.primaryColor,
-                    readOnly: isPicker,
-                    enabled: !isPicker,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
-                    onTap: isPicker ? (onTap ?? () {}) : null,
-                    decoration: InputDecoration(
-                      hintText: hint,
-                      hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
-                      filled: false,
-                      fillColor: Colors.transparent,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      focusedErrorBorder: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
+                  child: isPicker
+                      ? ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: controller,
+                          builder: (context, value, _) {
+                            final textVal = value.text;
+                            return AppText(
+                              textVal.isEmpty ? hint.tr : textVal.tr,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: textVal.isEmpty ? AppColors.textColorHint.withOpacity(0.6) : AppColors.textColorPrimary,
+                            );
+                          },
+                        )
+                      : TextField(
+                          controller: controller,
+                          cursorColor: AppColors.primaryColor,
+                          readOnly: isPicker,
+                          enabled: !isPicker,
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
+                          onTap: isPicker ? (onTap ?? () {}) : null,
+                          decoration: InputDecoration(
+                            hintText: hint.tr,
+                            hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
+                            filled: false,
+                            fillColor: Colors.transparent,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            focusedErrorBorder: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -1510,48 +1574,174 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   }
 
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    final initial = _parseDateString(controller.text) ?? DateTime.now();
-    final DateTime? picked = await showDatePicker(
+    DateTime tempDate = _parseDateString(controller.text) ?? DateTime.now();
+    final result = await showModalBottomSheet<DateTime>(
       context: context,
-      initialDate: initial,
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryColor,
-            ),
-          ),
-          child: child!,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: 320,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Select Birth Date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoTheme(
+                      data: const CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: TextStyle(
+                            color: AppColors.deepPink,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.date,
+                        initialDateTime: tempDate,
+                        minimumDate: DateTime(1900),
+                        maximumDate: DateTime.now(),
+                        onDateTimeChanged: (DateTime newDate) {
+                          setModalState(() {
+                            tempDate = newDate;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: Colors.black12),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(tempDate),
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(
+                        'Done'.tr,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) {
-      controller.text = "${picked.day}-${_getMonthName(picked.month)}-${picked.year}";
+    if (result != null) {
+      controller.text = "${result.day}-${_getMonthName(result.month)}-${result.year}";
     }
   }
 
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
-    final initial = _parseTimeString(controller.text) ?? TimeOfDay.now();
-    final TimeOfDay? picked = await showTimePicker(
+    DateTime tempTime = DateTime.now();
+    final result = await showModalBottomSheet<DateTime>(
       context: context,
-      initialTime: initial,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primaryColor,
-            ),
-          ),
-          child: child!,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: 320,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Select Birth Time',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoTheme(
+                      data: const CupertinoThemeData(
+                        textTheme: CupertinoTextThemeData(
+                          dateTimePickerTextStyle: TextStyle(
+                            color: AppColors.deepPink,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.time,
+                        initialDateTime: tempTime,
+                        onDateTimeChanged: (DateTime newTime) {
+                          setModalState(() {
+                            tempTime = newTime;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const Divider(height: 1, color: Colors.black12),
+                  InkWell(
+                    onTap: () => Navigator.of(context).pop(tempTime),
+                    child: Container(
+                      width: double.infinity,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(
+                        'Done'.tr,
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
-    if (picked != null) {
-      final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
-      final period = picked.period == DayPeriod.am ? 'AM' : 'PM';
-      controller.text = "${hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')} $period";
+    if (result != null) {
+      final hour = result.hour;
+      final minute = result.minute.toString().padLeft(2, '0');
+      final period = hour >= 12 ? 'PM' : 'AM';
+      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+      controller.text = "$formattedHour:$minute $period";
     }
   }
 
@@ -1924,14 +2114,74 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               controller: _dobController,
               readOnly: true,
               onTap: () async {
-                final date = await showDatePicker(
+                DateTime tempDate = DateTime.now();
+                final result = await showModalBottomSheet<DateTime>(
                   context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
+                  backgroundColor: Colors.transparent,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return Container(
+                          height: 320,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'Select Birth Date',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoTheme(
+                                  data: const CupertinoThemeData(
+                                    textTheme: CupertinoTextThemeData(
+                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    initialDateTime: tempDate,
+                                    minimumDate: DateTime(1900),
+                                    maximumDate: DateTime.now(),
+                                    onDateTimeChanged: (DateTime newDate) {
+                                      setModalState(() => tempDate = newDate);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1, color: Colors.black12),
+                              InkWell(
+                                onTap: () => Navigator.of(context).pop(tempDate),
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 );
-                if (date != null) {
-                  _dobController.text = "${date.day}-${date.month}-${date.year}";
+                if (result != null) {
+                  _dobController.text = "${result.day}-${result.month}-${result.year}";
                 }
               },
               decoration: InputDecoration(
@@ -1955,12 +2205,76 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               controller: _tobController,
               readOnly: true,
               onTap: () async {
-                final time = await showTimePicker(
+                DateTime tempTime = DateTime.now();
+                final result = await showModalBottomSheet<DateTime>(
                   context: context,
-                  initialTime: TimeOfDay.now(),
+                  backgroundColor: Colors.transparent,
+                  builder: (BuildContext context) {
+                    return StatefulBuilder(
+                      builder: (context, setModalState) {
+                        return Container(
+                          height: 320,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                          ),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'Select Birth Time',
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                ),
+                              ),
+                              Expanded(
+                                child: CupertinoTheme(
+                                  data: const CupertinoThemeData(
+                                    textTheme: CupertinoTextThemeData(
+                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.time,
+                                    initialDateTime: tempTime,
+                                    onDateTimeChanged: (DateTime newTime) {
+                                      setModalState(() => tempTime = newTime);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const Divider(height: 1, color: Colors.black12),
+                              InkWell(
+                                onTap: () => Navigator.of(context).pop(tempTime),
+                                child: Container(
+                                  width: double.infinity,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 );
-                if (time != null) {
-                  _tobController.text = time.format(context);
+                if (result != null) {
+                  final hour = result.hour;
+                  final minute = result.minute.toString().padLeft(2, '0');
+                  final period = hour >= 12 ? 'PM' : 'AM';
+                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+                  _tobController.text = "$formattedHour:$minute $period";
                 }
               },
               decoration: InputDecoration(

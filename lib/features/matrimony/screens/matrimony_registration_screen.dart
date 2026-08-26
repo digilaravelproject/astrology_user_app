@@ -491,7 +491,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           CustomButton(
             text: AppStrings.next,
             onTap: _nextStep,
-            backgroundColor: const Color(0xFFB01D53),
+            backgroundColor: AppColors.primaryColor,
             textColor: Colors.white,
           ),
         ],
@@ -617,7 +617,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           CustomButton(
             text: AppStrings.next,
             onTap: _nextStep,
-            backgroundColor: const Color(0xFFB01D53),
+            backgroundColor: AppColors.primaryColor,
             textColor: Colors.white,
           ),
         ],
@@ -738,7 +738,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           CustomButton(
             text: AppStrings.verifyNow,
             onTap: _nextStep,
-            backgroundColor: const Color(0xFFB01D53),
+            backgroundColor: AppColors.primaryColor,
             textColor: Colors.white,
           ),
         ],
@@ -819,7 +819,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
           CustomButton(
             text: widget.isEditMode ? 'Update Profile' : AppStrings.uploadPhotos,
             onTap: _nextStep,
-            backgroundColor: const Color(0xFFB01D53),
+            backgroundColor: AppColors.primaryColor,
             textColor: Colors.white,
           ),
         ],
@@ -927,7 +927,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFB01D53) : Colors.white,
+          color: isSelected ? AppColors.primaryColor : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: isSelected ? Colors.transparent : Colors.grey.shade300),
         ),

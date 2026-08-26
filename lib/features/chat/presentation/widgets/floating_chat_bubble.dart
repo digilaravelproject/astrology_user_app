@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
+
 
 class FloatingChatBubble {
   static final RxInt unreadCount = 0.obs;
@@ -16,8 +17,8 @@ class FloatingChatBubble {
   static VoidCallback? onTapCallback;
   static final RxString chatStatus = 'initiated'.obs;
 
-  static bool _isActive = false;
-  static bool get isActive => _isActive;
+  static final RxBool _isActive = false.obs;
+  static bool get isActive => _isActive.value;
 
   static StreamSubscription? _overlaySub;
   static const MethodChannel _appRetainChannel = MethodChannel('com.suryapath.user/app_retain');
@@ -56,12 +57,12 @@ class FloatingChatBubble {
     required String status,
     required VoidCallback onTap,
   }) async {
+    debugPrint("==== [DEBUG LOG] FloatingChatBubble.show called for sessionId=$sessionId, status=$status ====");
     _setupIsolatePort();
 
-    if (_isActive && FloatingChatBubble.sessionId == sessionId) {
-      // Just update status if already active
+    if (_isActive.value && FloatingChatBubble.sessionId == sessionId) {
+      debugPrint("==== [DEBUG LOG] FloatingChatBubble already active for sessionId=$sessionId. Updating status to $status ====");
       chatStatus.value = status;
-      _syncData();
       return;
     }
     FloatingChatBubble.sessionId = sessionId;
@@ -69,111 +70,59 @@ class FloatingChatBubble {
     unreadCount.value = 0;
     onTapCallback = onTap;
     chatStatus.value = status;
-    _isActive = true;
+    _isActive.value = true;
+    debugPrint("==== [DEBUG LOG] FloatingChatBubble set _isActive = true for sessionId=$sessionId ====");
 
     try {
-      final bool isGranted = await FlutterOverlayWindow.isPermissionGranted();
-      if (!isGranted) {
-        await FlutterOverlayWindow.requestPermission();
-      }
-
-      if (await FlutterOverlayWindow.isActive()) {
-        await FlutterOverlayWindow.shareData({
-          'type': 'update',
-          'sessionId': sessionId,
-          'name': name,
-          'imageUrl': imageUrl,
-          'status': status,
-          'unreadCount': 0,
-        });
-      } else {
-        await FlutterOverlayWindow.showOverlay(
-          enableDrag: true,
-          overlayTitle: "Chat in progress",
-          overlayContent: "Active chat with $name",
-          flag: OverlayFlag.defaultFlag,
-          visibility: NotificationVisibility.visibilitySecret,
-          positionGravity: PositionGravity.none,
-          height: 260,
-          width: 260,
-        );
-
-        await FlutterOverlayWindow.shareData({
-          'type': 'init',
-          'sessionId': sessionId,
-          'name': name,
-          'imageUrl': imageUrl,
-          'status': status,
-          'startedAt': startedAt,
-          'unreadCount': 0,
-        });
-      }
-
-      // Cancel the local notification to avoid duplicates
       try {
-        LocalNotificationService.cancelOngoingChatNotification(sessionId);
+        await ForegroundTaskService.stopService();
       } catch (_) {}
 
-      // Listen for tap events from overlay ALWAYS
-      _overlaySub?.cancel();
-      _overlaySub = FlutterOverlayWindow.overlayListener.listen((event) async {
-        if (event != null && event is Map && event['action'] == 'tap') {
-          debugPrint("==== OVERLAY TAPPED ====");
-          try {
-            debugPrint("==== ATTEMPTING TO BRING TO FOREGROUND ====");
-            await _appRetainChannel.invokeMethod('bringToForeground');
-            debugPrint("==== BROUGHT TO FOREGROUND SUCCESS ====");
-          } catch (e) {
-            debugPrint("==== Error bringing app to foreground: $e ====");
-          }
-          Future.delayed(const Duration(milliseconds: 500), () {
-            debugPrint("==== CALLING ON TAP CALLBACK ====");
-            onTapCallback?.call();
-          });
+      int? startedAtMillis;
+      if (startedAt != null && startedAt.isNotEmpty) {
+        String isoUtc = startedAt.trim().replaceAll(' ', 'T');
+        if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+          isoUtc += 'Z';
         }
-      });
+        startedAtMillis = DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
+      }
 
+      LocalNotificationService.showOngoingChatNotification(
+        sessionId: sessionId,
+        title: status == 'ongoing' ? '$name • Chat' : 'Waiting for acceptance with $name...',
+        body: 'Tap to return to chat session',
+        startedAtMillis: status == 'ongoing' ? startedAtMillis : null,
+      );
     } catch (e) {
-      debugPrint("FloatingChatBubble show error: $e");
+      debugPrint("FloatingChatBubble show notification error: $e");
     }
   }
 
-  static Future<void> dismiss() async {
-    _isActive = false;
+  static Future<void> dismiss({bool stopForegroundService = true}) async {
+    _isActive.value = false;
+    final int? idToCancel = sessionId;
     sessionId = null;
     onTapCallback = null;
     unreadCount.value = 0;
     _overlaySub?.cancel();
     _overlaySub = null;
-    try {
-      if (await FlutterOverlayWindow.isActive()) {
-        await FlutterOverlayWindow.closeOverlay();
-      }
-    } catch (_) {}
+
+    if (stopForegroundService) {
+      try {
+        await LocalNotificationService.cancelOngoingChatNotification(idToCancel);
+      } catch (_) {}
+      try {
+        await ForegroundTaskService.stopService();
+      } catch (_) {}
+    }
   }
 
   static void incrementUnreadCount() {
     unreadCount.value++;
-    _syncData();
   }
 
   static void updateStatus(String status) {
     chatStatus.value = status;
-    _syncData();
-  }
-
-  static Future<void> _syncData() async {
-    if (_isActive) {
-      try {
-        if (await FlutterOverlayWindow.isActive()) {
-          await FlutterOverlayWindow.shareData({
-            'type': 'update',
-            'status': chatStatus.value,
-            'unreadCount': unreadCount.value,
-          });
-        }
-      } catch (_) {}
-    }
   }
 }
 
@@ -184,27 +133,25 @@ class FloatingChatBubbleWidget extends StatefulWidget {
   final String? startedAt;
 
   const FloatingChatBubbleWidget({
-    Key? key,
+    super.key,
     required this.sessionId,
     required this.name,
     required this.imageUrl,
     this.startedAt,
-  }) : super(key: key);
+  });
 
   @override
   State<FloatingChatBubbleWidget> createState() => _FloatingChatBubbleWidgetState();
 }
 
 class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
-  double xPosition = 20.0;
-  double yPosition = 120.0;
   Timer? _timer;
   final RxInt _elapsedSeconds = 0.obs;
 
   @override
   void initState() {
     super.initState();
-    _startTimer(widget.startedAt);
+    _startTimer();
   }
 
   @override
@@ -213,36 +160,56 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
     super.dispose();
   }
 
-  void _startTimer(String? startedAtStr) {
-    if (startedAtStr != null && startedAtStr.isNotEmpty) {
-      try {
-        final startedAt = DateTime.tryParse(startedAtStr)?.toLocal();
-        if (startedAt != null) {
-          final now = DateTime.now();
-          final diff = now.difference(startedAt).inSeconds;
-          _elapsedSeconds.value = diff > 0 ? diff : 0;
-        }
-      } catch (_) {}
+  DateTime? _parseSmartDate(dynamic input) {
+    if (input == null) return null;
+    if (input is DateTime) return input.toLocal();
+    final dateStr = input.toString().trim();
+    if (dateStr.isEmpty) return null;
+
+    String isoUtc = dateStr.replaceAll(' ', 'T');
+    if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+      isoUtc += 'Z';
     }
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final currentStatus = FloatingChatBubble.chatStatus.value;
-      if (currentStatus == 'ongoing') {
-        final actualStartedAtStr = widget.startedAt ?? WebSocketService.sessionStartTimes[widget.sessionId];
-        if (actualStartedAtStr != null && actualStartedAtStr.isNotEmpty) {
-          try {
-            final startedAt = DateTime.tryParse(actualStartedAtStr)?.toLocal();
-            if (startedAt != null) {
-              final diff = DateTime.now().difference(startedAt).inSeconds;
-              _elapsedSeconds.value = diff > 0 ? diff : 0;
-            } else {
-              _elapsedSeconds.value++;
-            }
-          } catch (_) {
-            _elapsedSeconds.value++;
-          }
+
+    DateTime? parsed = DateTime.tryParse(isoUtc)?.toLocal();
+    if (parsed == null) {
+      parsed = DateTime.tryParse(dateStr)?.toLocal();
+    }
+
+    if (parsed == null) return null;
+
+    final now = DateTime.now();
+    if (parsed.isAfter(now)) {
+      final offsetDate = parsed.subtract(now.timeZoneOffset);
+      if (!offsetDate.isAfter(now)) {
+        return offsetDate;
+      }
+    }
+
+    return parsed;
+  }
+
+  void _startTimer() {
+    void updateDuration() {
+      final actualStr = widget.startedAt ?? WebSocketService.sessionStartTimes[widget.sessionId];
+      final startedAt = _parseSmartDate(actualStr);
+      if (startedAt != null) {
+        final diff = DateTime.now().difference(startedAt).inSeconds;
+        if (diff >= 0) {
+          _elapsedSeconds.value = diff;
         } else {
           _elapsedSeconds.value++;
         }
+      } else {
+        _elapsedSeconds.value++;
+      }
+    }
+
+    updateDuration();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      final currentStatus = FloatingChatBubble.chatStatus.value.toLowerCase();
+      if (currentStatus == 'ongoing' || currentStatus == 'accepted') {
+        updateDuration();
       }
     });
   }
@@ -253,150 +220,153 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
-    // Constraints to keep bubble inside screen bounds
-    if (xPosition < 0) xPosition = 0;
-    if (xPosition > size.width - 80) xPosition = size.width - 80;
-    if (yPosition < 40) yPosition = 40;
-    if (yPosition > size.height - 100) yPosition = size.height - 100;
-
-    return Positioned(
-      left: xPosition,
-      top: yPosition,
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          setState(() {
-            xPosition += details.delta.dx;
-            yPosition += details.delta.dy;
-          });
-        },
-        onTap: () {
-          FloatingChatBubble.onTapCallback?.call();
-        },
-        child: Material(
-          type: MaterialType.transparency,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                width: 65,
-                height: 65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: const Color(0xFFFF6F00), // Saffron border
-                    width: 2.5,
-                  ),
-                ),
-                child: ClipOval(
-                  child: widget.imageUrl.isNotEmpty
-                      ? Image.network(
-                    widget.imageUrl.startsWith('http')
-                        ? widget.imageUrl
-                        : '${AppUrls.baseImageUrl}${widget.imageUrl}',
-                    fit: BoxFit.cover,
-                    errorBuilder: (c, e, s) => _buildInitials(),
-                  )
-                      : _buildInitials(),
-                ),
-              ),
-
-              // Timing overlay
-              Positioned(
-                bottom: -4,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E1A47), // Deep Violet
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Obx(() {
-                      final currentStatus = FloatingChatBubble.chatStatus.value;
-                      if (currentStatus == 'initiated' || currentStatus == 'ringing') {
-                        return const Text(
-                          'Waiting',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                      return Text(
-                        _formatDuration(_elapsedSeconds.value),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-              ),
-
-              // Unread count badge
-              Obx(() {
-                final count = FloatingChatBubble.unreadCount.value;
-                if (count <= 0) return const SizedBox.shrink();
-                return Positioned(
-                  top: -2,
-                  right: -2,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 18,
-                      minHeight: 18,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '$count',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ],
-          ),
+  Widget _buildInitialAvatar(String name) {
+    final String initial = name.trim().isNotEmpty ? name.trim()[0].toUpperCase() : 'A';
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFD700),
+        shape: BoxShape.circle,
+      ),
+      child: Text(
+        initial,
+        style: const TextStyle(
+          color: Color(0xFF6A0C22),
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
       ),
     );
   }
 
-  Widget _buildInitials() {
-    final String initial = widget.name.isNotEmpty ? widget.name[0].toUpperCase() : 'C';
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF2E1A47),
-      child: Center(
-        child: Text(
-          initial,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF6A0C22), Color(0xFF8B0D31)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 3)),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: GestureDetector(
+          onTap: () {
+            FloatingChatBubble.onTapCallback?.call();
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Colors.white24,
+                      shape: BoxShape.circle,
+                    ),
+                    child: widget.imageUrl.trim().isNotEmpty
+                        ? Image.network(
+                            widget.imageUrl,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => _buildInitialAvatar(widget.name),
+                          )
+                        : _buildInitialAvatar(widget.name),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              widget.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFD700).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.5), width: 0.8),
+                            ),
+                            child: const Text(
+                              'CHAT',
+                              style: TextStyle(
+                                color: Color(0xFFFFD700),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Obx(() {
+                        final currentStatus = FloatingChatBubble.chatStatus.value;
+                        if (currentStatus == 'initiated' || currentStatus == 'ringing' || currentStatus == 'waiting') {
+                          return const Text(
+                            'Waiting for acceptance...',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        }
+                        return Text(
+                          'Active Chat • ${_formatDuration(_elapsedSeconds.value)}',
+                          style: const TextStyle(
+                            color: Color(0xFFFFD700),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Text(
+                    'Return',
+                    style: TextStyle(
+                      color: Color(0xFF6A0C22),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

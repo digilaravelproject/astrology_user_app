@@ -113,10 +113,10 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                 fontWeight: FontWeight.w600,
               ),
               dividerColor: Colors.transparent,
-              tabs: const [
-                Tab(text: "Chat"),
-                Tab(text: "Call"),
-                Tab(text: "Join Live"),
+              tabs: [
+                Tab(text: "Chat".tr),
+                Tab(text: "Call".tr),
+                Tab(text: "Join Live".tr),
               ],
             ),
           ),
@@ -259,7 +259,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                             ),
                             const SizedBox(height: 2),
                             AppText(
-                              "Chat Duration: $durationMins mins",
+                              "${'Chat Duration'.tr}: $durationMins ${'mins'.tr}",
                               fontSize: 12,
                               color: Colors.grey.shade600,
                               fontWeight: FontWeight.w500,
@@ -418,7 +418,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                           ),
                           const SizedBox(height: 2),
                           AppText(
-                            "Call Duration: $durationMins mins",
+                            "${'Call Duration'.tr}: $durationMins ${'mins'.tr}",
                             fontSize: 12,
                             color: Colors.grey.shade600,
                             fontWeight: FontWeight.w500,

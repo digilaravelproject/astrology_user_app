@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+3
+version: 1.0.0+1
 
 environment:
   sdk: ^3.7.2
@@ -29,6 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
   # Environment
@@ -48,7 +50,7 @@ dependencies:
 
   # Network
   dio: ^5.8.0+1
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^7.0.0
   http: ^1.4.0
 
   # Local Storage
@@ -62,8 +64,8 @@ dependencies:
   flutter_native_splash: ^2.4.6
   url_launcher: ^6.3.1
   permission_handler: ^12.0.0+1
-  package_info_plus: ^8.3.0
-  device_info_plus: ^11.4.0
+  package_info_plus: 8.3.1
+  device_info_plus: 12.4.0
   image_picker: ^1.1.2
   share_plus: ^11.0.0
   flutter_local_notifications: ^19.1.0
@@ -84,15 +86,16 @@ dependencies:
   web_socket_channel: ^3.0.3
   flutter_background_service: ^5.1.0
   flutter_overlay_window: ^0.5.0
-  flutter_webrtc: ^1.4.1
+  flutter_webrtc: ^1.6.0
   audioplayers: ^6.7.1
   vibration: ^3.1.8
   video_player: ^2.11.0
   chewie: ^1.13.0
-  livekit_client: ^2.4.0
+  livekit_client: 2.10.0
   flutter_foreground_task: ^9.2.2
-  pdf: ^3.12.0
+  pdf: ^3.11.3
   printing: ^5.14.3
+  cloud_firestore: ^6.8.0
 
 dev_dependencies:
   flutter_test:
@@ -104,13 +107,12 @@ dev_dependencies:
   # Code Generation
   build_runner: ^2.4.13
   hive_generator: ^2.0.1
-  rename: ^3.1.0
 
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/SURYAPATH.jpeg"
+  image_path: "assets/images/app_logo.png"
   remove_alpha_ios: true
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -131,9 +133,11 @@ flutter:
     - assets/icons/bubble_img.png
     - assets/icons/verify.png
     - assets/images/
+    - assets/images/SURYAPATH.jpeg
     - assets/images/app_icon.png
     - assets/images/app_logo.png
     - assets/images/astro.jpg
+    - assets/images/background.png
     - assets/images/bg_join_session_home.jpeg
     - assets/images/bg_login.jpeg
     - assets/images/bubble_img.png
@@ -141,6 +145,8 @@ flutter:
     - assets/images/services/
     - assets/language/
     - assets/translations/
+    - assets/translations/fix_json.js
+    - assets/translations/fix_nav_translations.py
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -191,3 +197,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+

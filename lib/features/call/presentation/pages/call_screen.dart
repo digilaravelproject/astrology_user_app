@@ -9,7 +9,9 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
+import 'package:astro_user/core/services/network/websocket_service.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -26,7 +28,10 @@ class _CallScreenState extends State<CallScreen> {
     super.initState();
     controller = Get.find<CallController>();
     controller.isCallScreenVisible = true;
-    FloatingCallBubble.dismiss();
+    // Defer dismiss to avoid setState() during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FloatingCallBubble.dismiss();
+    });
   }
 
   @override
@@ -57,130 +62,184 @@ class _CallScreenState extends State<CallScreen> {
         return Stack(
           fit: StackFit.expand,
           children: [
-            // Blurred profile background
+            // Blurred profile background image
             if (controller.providerImage != null && controller.providerImage!.isNotEmpty)
               CachedNetworkImage(
                 imageUrl: controller.providerImage!.startsWith('http')
                     ? controller.providerImage!
                     : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(color: AppColors.primaryColor.withValues(alpha: 0.8)),
+                errorWidget: (context, url, error) => Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF2E1A47), Color(0xFF1A0E2E)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
               )
             else
-              Container(color: AppColors.primaryColor.withValues(alpha: 0.8)),
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF2E1A47), Color(0xFF1A0E2E)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+              ),
             
+            // Soft overlay blur mapping
             BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
               child: Container(
-                color: Colors.black.withValues(alpha: 0.4),
+                color: Colors.black.withValues(alpha: 0.55),
               ),
             ),
 
-            // Main UI content
+            // Top-down smooth dark shadow overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.black.withValues(alpha: 0.6),
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.5),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+
+            // Main Content Layout
             SafeArea(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Top Bar: Title/Status + Switch to Chat icon
+                  // Top Bar: Call Status / Sub-Title / Timer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        const SizedBox(width: 48), // Spacer to balance
-                        Column(
-                          children: [
-                            const SizedBox(height: 32),
-                            Text(
-                              status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            if (status == 'ongoing')
-                              Text(
-                                '$minutes:$seconds',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
+                        Align(
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                                ),
+                                child: Text(
+                                  status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.2,
+                                  ),
                                 ),
                               ),
-                          ],
+                              const SizedBox(height: 12),
+                              if (status == 'ongoing') ...[
+                                Text(
+                                  '$minutes:$seconds',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 38,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
-                        if (status == 'ongoing')
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32.0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.chat_bubble_outline_rounded,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                              onPressed: () => _showSwitchToChatDialog(context),
-                            ),
-                          )
-                        else
-                          const SizedBox(width: 48),
                       ],
                     ),
                   ),
 
-                  // Middle Profile Display
+                  // Middle Area: Pulsing profile image with premium borders
                   Column(
                     children: [
-                      // Pulsing avatar
                       Stack(
                         alignment: Alignment.center,
                         children: [
                           _buildPulseCircle(delay: 0),
                           _buildPulseCircle(delay: 1),
-                          CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Colors.white24,
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [Colors.white.withValues(alpha: 0.4), Colors.white.withValues(alpha: 0.1)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                            ),
                             child: CircleAvatar(
-                              radius: 66,
-                              backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
-                                  ? CachedNetworkImageProvider(
-                                      controller.providerImage!.startsWith('http')
-                                          ? controller.providerImage!
-                                          : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
-                                    )
-                                  : null,
-                              child: controller.providerImage == null || controller.providerImage!.isEmpty
-                                  ? const Icon(Icons.person, size: 60, color: Colors.white)
-                                  : null,
+                              radius: 76,
+                              backgroundColor: Colors.black26,
+                              child: CircleAvatar(
+                                radius: 72,
+                                backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
+                                    ? CachedNetworkImageProvider(
+                                        controller.providerImage!.startsWith('http')
+                                            ? controller.providerImage!
+                                            : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
+                                      )
+                                    : null,
+                                child: controller.providerImage == null || controller.providerImage!.isEmpty
+                                    ? const Icon(Icons.person, size: 68, color: Colors.white70)
+                                    : null,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
                       Text(
                         controller.providerName ?? 'Astrologer',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         status == 'ringing' ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
 
-                  // Bottom Controls
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 60.0),
+                  // Bottom Controls Panel: Translucent Glassmorphic Panel
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.25),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -192,14 +251,16 @@ class _CallScreenState extends State<CallScreen> {
                           onPressed: () => controller.toggleMute(),
                         ),
 
-                        _buildEndCallButton(onPressed: () {
-                          if (controller.status.value == 'ongoing') {
-                            controller.endCall();
-                          } else {
-                            controller.cancelCall();
-                          }
-                          Get.back();
-                        }),
+                        // Switch to Chat (visible during ongoing call)
+                        if (controller.isPackageCall && status == 'ongoing')
+                          _buildControlButton(
+                            icon: Icons.swap_calls_rounded,
+                            label: 'Chat',
+                            isActive: false,
+                            onPressed: () => _showSwitchToChatDialog(context),
+                          ),
+
+                        _buildEndCallButton(onPressed: () => _onEndTapped()),
 
                         // Speaker button
                         _buildControlButton(
@@ -219,6 +280,193 @@ class _CallScreenState extends State<CallScreen> {
       }),
     );
   }
+
+  /// Decides which end dialog to show based on session state
+  void _onEndTapped() {
+    if (controller.isPackageCall) {
+      if (controller.isChatAlsoActive) {
+        _showGranularEndModal(context);
+      } else {
+        _showSingleEndDialog(context);
+      }
+    } else {
+      // Normal (non-package) call
+      if (controller.status.value == 'ongoing') {
+        controller.endCall();
+      } else {
+        controller.cancelCall();
+      }
+      Get.back();
+    }
+  }
+
+  /// Case A: Both Chat + Call active — 3-option granular modal
+  void _showGranularEndModal(BuildContext context) {
+    final rem = WebSocketService.packageRemainingSeconds.value;
+    final m = (rem ~/ 60).toString().padLeft(2, '0');
+    final s = (rem % 60).toString().padLeft(2, '0');
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40, height: 4,
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            // Title
+            const Row(
+              children: [
+                Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
+                SizedBox(width: 8),
+                Text(
+                  'End Consultation Options',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Package time remaining: $m:$s',
+                style: TextStyle(fontSize: 13, color: Colors.orange.shade700, fontWeight: FontWeight.w500),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Option 1: End Call Only
+            _buildEndOption(
+              icon: Icons.call_end_rounded,
+              iconColor: Colors.blue.shade700,
+              bgColor: Colors.blue.shade50,
+              title: 'End Call Only (Continue Chatting)',
+              subtitle: 'Hangs up audio and returns you to the active chat thread.',
+              onTap: () {
+                Navigator.of(ctx).pop();
+                controller.terminateChannelOnly();
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // Option 2: End Entire Session
+            _buildEndOption(
+              icon: Icons.cancel_rounded,
+              iconColor: Colors.red,
+              bgColor: Colors.red.shade50,
+              title: 'End Entire Session',
+              subtitle: 'Completes consultation and finalises package time.',
+              onTap: () {
+                Navigator.of(ctx).pop();
+                controller.terminateEntireSession();
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // Option 3: Cancel
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontSize: 15)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Case B: Call only (no active chat) — simple confirmation
+  void _showSingleEndDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('End Consultation', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to end this consultation?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              controller.terminateEntireSession();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('End Session'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEndOption({
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: iconColor.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF1A1A2E))),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
   void _showSwitchToChatDialog(BuildContext context) {
     showDialog(
@@ -260,52 +508,77 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
+
   Future<void> _switchToChat() async {
     final providerId = controller.providerId;
     final providerName = controller.providerName ?? 'Astrologer';
     final providerImage = controller.providerImage ?? '';
+    final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
 
-    // End call first
-    if (controller.status.value == 'ongoing') {
-      await controller.endCall();
+    Map<String, dynamic> spawnData = {};
+    if (subSessionId > 0 && controller.isPackageCall) {
+      try {
+        spawnData = await PackageSessionService.spawnChannel(
+          subSessionId: subSessionId,
+          channelType: 'chat',
+        );
+        controller.cleanUp();
+      } catch (e) {
+        debugPrint("Error spawning chat channel: $e");
+      }
     } else {
-      await controller.cancelCall();
+      if (controller.status.value == 'ongoing') {
+        await controller.endCall();
+      } else {
+        await controller.cancelCall();
+      }
     }
-    Get.back(); // Pop CallScreen
 
-    // Show loading and call chat initiate
-    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    // Pop CallScreen
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+
+    // Show loader
+    Get.dialog(const Center(child: CircularProgressIndicator(color: AppColors.deepPink)), barrierDismissible: false);
+    
     try {
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.post(
-        AppUrls.initiateChat,
-        data: {'provider_id': providerId},
-      );
-      Get.back(); // close loader
+      int activeChatSessionId = 0;
+      String chatInitialStatus = 'ongoing';
 
-      if (response.isSuccess) {
-        CustomSnackbar.showSuccess(response.message);
-        
-        int sessionId = 0;
-        if (response.body != null && response.body is Map) {
-          final sessionData = response.body['session'];
-          if (sessionData != null && sessionData is Map) {
-            sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
-          }
+      if (subSessionId > 0 && controller.isPackageCall) {
+        activeChatSessionId = int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
+        chatInitialStatus = spawnData['chat_status']?.toString() ?? 'ongoing';
+      } else {
+        final response = await apiClient.post(
+          AppUrls.initiateChat,
+          data: {'provider_id': providerId},
+        );
+        if (response.isSuccess && response.body != null) {
+          final body = response.body['data'] ?? response.body;
+          // API returns { data: { session: { id: 487, status: 'initiated' } } }
+          final session = body['session'] ?? body;
+          activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
+          chatInitialStatus = session['status']?.toString() ?? 'initiated';
         }
-        
-        Get.to(() => ChatScreen(
+      }
+
+      if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
+
+      Get.to(
+        () => ChatScreen(
           astrologerName: providerName,
           astrologerImage: providerImage,
-          sessionId: sessionId,
-          initialStatus: 'initiated',
-        ), binding: ChatBinding());
-      } else {
-        CustomSnackbar.showError(response.message);
-      }
+          sessionId: activeChatSessionId,
+          initialStatus: chatInitialStatus,
+          isPackageChat: controller.isPackageCall || subSessionId > 0,
+        ),
+        binding: ChatBinding(),
+      );
     } catch (e) {
-      Get.back(); // close loader
-      CustomSnackbar.showError(e.toString());
+      if (Get.isDialogOpen ?? false) Get.back();
+      CustomSnackbar.showError("Failed to open chat: $e");
     }
   }
 

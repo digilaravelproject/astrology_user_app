@@ -1,17 +1,26 @@
 import '../../../../core/services/network/api_client.dart';
 import '../../../../core/services/network/response_model.dart';
 import '../../../../core/constants/app_urls.dart';
-
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/storage/shared_prefs.dart';
 class RemedyRepository {
   final ApiClient apiClient;
 
   RemedyRepository(this.apiClient);
 
   Future<ResponseModel> getRemedies() async {
-    return await apiClient.get(AppUrls.remedies);
+    final languageCode = SharedPrefs.getString(AppConstants.language) ?? AppConstants.defaultLanguage;
+    return await apiClient.get(
+      AppUrls.remedies,
+      queryParameters: {'language': languageCode},
+    );
   }
 
   Future<ResponseModel> getRemedyById(int id) async {
-    return await apiClient.get("${AppUrls.remedies}/$id");
+    final languageCode = SharedPrefs.getString(AppConstants.language) ?? AppConstants.defaultLanguage;
+    return await apiClient.get(
+      "${AppUrls.remedies}/$id",
+      queryParameters: {'language': languageCode},
+    );
   }
 }

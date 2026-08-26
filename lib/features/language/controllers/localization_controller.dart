@@ -5,7 +5,8 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/services/storage/shared_prefs.dart';
 import '../domain/models/language_model.dart';
 import '../widget/language_bottom_sheet.dart';
-
+import '../../home/controllers/blog_controller.dart';
+import '../../home/controllers/remedy_controller.dart';
 class LocalizationController extends GetxController {
   final _selectedIndex = 0.obs;
   final _languages = <LanguageModel>[].obs;
@@ -95,7 +96,17 @@ class LocalizationController extends GetxController {
         language.countryCode,
       ));
 
+      Get.forceAppUpdate();
+
       SharedPrefs.setString(AppConstants.language, language.languageCode);
+
+      try {
+        Get.find<BlogController>().fetchBlogs();
+      } catch (_) {}
+      
+      try {
+        Get.find<RemedyController>().fetchRemedies();
+      } catch (_) {}
     }
   }
 

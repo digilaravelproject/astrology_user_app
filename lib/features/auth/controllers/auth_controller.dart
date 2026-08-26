@@ -8,6 +8,7 @@ import '../../language/controllers/localization_controller.dart';
 import '../domain/services/auth_service.dart';
 import '../../../core/services/network/response_model.dart';
 import '../../../core/services/network/websocket_service.dart';
+import '../../../core/services/fcm_notification_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
 
@@ -97,7 +98,8 @@ class AuthController extends GetxController {
         CustomSnackbar.showError('Signup failed. Please try again.');
       }
     } catch (e) {
-      CustomSnackbar.showError(e.toString());
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Signup failed. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -125,7 +127,8 @@ class AuthController extends GetxController {
       
     } catch (e) {
       print('Login error: $e');
-      CustomSnackbar.showError('An error occurred. Please try again.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -147,7 +150,8 @@ class AuthController extends GetxController {
       
     } catch (e) {
       print('Resend OTP error: $e');
-      CustomSnackbar.showError('An error occurred. Please try again.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
     }
@@ -176,10 +180,12 @@ class AuthController extends GetxController {
         
         if (user.profileCompleted == true) {
           Get.find<WebSocketService>().connect();
+          FCMNotificationService.registerDeviceToken(null);
           Get.offAllNamed(RouteHelper.getDashboardRoute());
         } else {
           // Still connect if they successfully logged in, even if profile is pending
           Get.find<WebSocketService>().connect();
+          FCMNotificationService.registerDeviceToken(null);
           Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
         }
       } else {
@@ -187,7 +193,8 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       print('OTP Verification error: $e');
-      CustomSnackbar.showError('An error occurred during verification.');
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred during verification.');
     } finally {
       isLoading.value = false;
     }
@@ -236,7 +243,8 @@ class AuthController extends GetxController {
         CustomSnackbar.showError('Failed to update profile');
       }
     } catch (e) {
-       CustomSnackbar.showError(e.toString());
+      final errorMsg = e.toString().replaceAll('Exception: ', '');
+      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Failed to update profile');
     } finally {
        isLoading.value = false;
     }
@@ -246,6 +254,7 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       print('AuthController.logout() called');
+      await FCMNotificationService.removeDeviceToken();
       final response = await _logoutUseCase.execute();
       
       if (response.isSuccess) {
@@ -407,8 +416,9 @@ class LoginUseCase {
     final response = await _authService.login(mobile);
     if (response.isSuccess && response.body != null) {
       return UserModel.fromJson(response.body);
+    } else {
+      throw Exception(response.message);
     }
-    return null;
   }
 }
 
@@ -439,9 +449,11 @@ class VerifyOtpUseCase {
         return userModel;
       } catch (e) {
         print('Error parsing VerifyOtpResponse: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-    return null;
   }
 }
 
@@ -494,10 +506,11 @@ class RegisterUseCase {
         return UserModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing user data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -516,10 +529,11 @@ class SendOtpUseCase {
         return SendOtpModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing SendOtpModel data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -538,10 +552,11 @@ class ResendOtpUseCase {
         return SendOtpModel.fromJson(response.body);
       } catch (e) {
         print('Error parsing SendOtpModel data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 
@@ -560,10 +575,11 @@ class UpdateProfileUseCase {
         return UserModel.fromJson(userJson);
       } catch (e) {
         print('Error parsing UpdateProfile data: $e');
+        throw Exception('Failed to parse response');
       }
+    } else {
+      throw Exception(response.message);
     }
-
-    return null;
   }
 }
 

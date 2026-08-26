@@ -14,8 +14,20 @@ class AstrologerService {
     return await repository.getAstrologerById(id);
   }
 
-  Future<ResponseModel> blockAstrologer(int id) async {
-    return await repository.blockAstrologer(id);
+  Future<ResponseModel> getAstrologerGallery(int id) async {
+    return await repository.getAstrologerGallery(id);
+  }
+
+  Future<ResponseModel> blockAstrologer(int id, {String? reason}) async {
+    return await repository.blockAstrologer(id, reason: reason);
+  }
+
+  Future<ResponseModel> unblockAstrologer(int id) async {
+    return await repository.unblockAstrologer(id);
+  }
+
+  Future<ResponseModel> getBlockedAstrologers({Map<String, dynamic>? queryParameters}) async {
+    return await repository.getBlockedAstrologers(queryParameters: queryParameters);
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {

@@ -16,15 +16,10 @@ class ChatRepositoryImpl implements IChatRepository {
         _localDataSource = localDataSource;
 
   @override
-  Future<({List<ChatMessage> messages, String? startedAt, int? peerId})> getChatHistory({
+  Future<({List<ChatMessage> messages, String? startedAt, int? peerId, String? sessionStatus})> getChatHistory({
     required int sessionId,
     required int currentUserId,
   }) async {
-    final cached = _localDataSource.getCachedMessages(sessionId);
-    if (cached.isNotEmpty) {
-      return (messages: cached, startedAt: null, peerId: null);
-    }
-
     final response = await _remoteDataSource.getChatHistory(sessionId);
     if (response.isSuccess && response.body != null) {
       final body = response.body;
@@ -79,12 +74,13 @@ class ChatRepositoryImpl implements IChatRepository {
         }
       }
 
-      final String? startedAt = body['started_at']?.toString();
+      final String? startedAt = sessionData['started_at']?.toString() ?? body['started_at']?.toString();
+      final String? sessionStatus = sessionData['status']?.toString() ?? body['status']?.toString();
       _localDataSource.cacheMessages(sessionId, messagesList);
-      return (messages: messagesList, startedAt: startedAt, peerId: peerId);
+      return (messages: messagesList, startedAt: startedAt, peerId: peerId, sessionStatus: sessionStatus);
     }
 
-    return (messages: <ChatMessage>[], startedAt: null, peerId: null);
+    return (messages: <ChatMessage>[], startedAt: null, peerId: null, sessionStatus: null);
   }
 
   @override
@@ -95,8 +91,14 @@ class ChatRepositoryImpl implements IChatRepository {
     final response = await _remoteDataSource.sendTextMessage(sessionId, text);
     if (response.isSuccess && response.body != null) {
       final data = response.body['data'] ?? response.body;
-      if (data != null && data['id'] != null) {
-        return int.tryParse(data['id'].toString());
+      if (data != null) {
+        final messageData = data['message'];
+        if (messageData != null && messageData['id'] != null) {
+          return int.tryParse(messageData['id'].toString());
+        }
+        if (data['id'] != null) {
+          return int.tryParse(data['id'].toString());
+        }
       }
     }
     return null;

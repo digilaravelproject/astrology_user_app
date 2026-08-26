@@ -50,7 +50,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(
-        title: "Blog Details",
+        title: "Blog Details".tr,
         backgroundColor: Colors.white,
         iconColor: Colors.black,
         elevation: 0.5,
@@ -99,7 +99,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: AppText(
-                                  _blog!.type!.toUpperCase(),
+                                  _blog!.type!.toUpperCase().tr,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: widget.blogColor,

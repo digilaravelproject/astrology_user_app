@@ -26,6 +26,7 @@ import 'about_us_screen.dart';
 import 'following_screen.dart';
 import 'feedback_screen.dart';
 import 'astrologer_registration_screen.dart';
+import 'blocked_astrologers_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -247,9 +248,9 @@ class ProfileScreen extends StatelessWidget {
           onTap: () => Get.toNamed(AppRoutes.followingScreen),
         ),
         _buildMenuItem(
-          icon: Iconsax.user_add_copy,
-          title: AppStrings.astrologerRegistration,
-          onTap: () => Get.to(() => AstrologerRegistrationScreen()),
+          icon: Iconsax.user_remove_copy,
+          title: 'Blocked Astrologers'.tr,
+          onTap: () => Get.to(() => const BlockedAstrologersScreen(), binding: ProfileBinding()),
         ),
 
         const SizedBox(height: 10),
@@ -481,7 +482,7 @@ class ProfileScreen extends StatelessWidget {
 
   void _shareApp() {
     Share.share(
-      'Download ${AppConstants.appName} app for accurate astrology predictions and consultations: https://play.google.com/store/apps/details?id=com.suryapath.user',
+      '${"Download Astro User app for accurate astrology predictions and consultations:".tr} https://play.google.com/store/apps/details?id=com.suryapath.user',
     );
   }
 }
