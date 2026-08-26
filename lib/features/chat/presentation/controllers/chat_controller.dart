@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
+import 'package:astro_user/features/chat/data/models/chat_message_model.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/reject_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/load_chat_history_usecase.dart';
@@ -321,29 +322,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             }
             // If no placeholder found (e.g. another device), fall through and add normally
             else {
-              messages.add(ChatMessage(
-                id: msgId,
-                text: msgText,
-                isMe: true,
-                time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? DateTime.now(),
-                status: 'sent',
-                type: msgType,
-                attachmentUrl: lastMsg['attachment_url']?.toString(),
-              ));
+              messages.add(ChatMessageModel.fromJson(lastMsg, currentUserId: _currentUserId!));
               _scrollToBottom();
             }
           } else {
             // ── Message from the other side ────────────────────────────────
-            messages.add(ChatMessage(
-              id: msgId,
-              text: msgText,
-              isMe: false,
-              time: DateTime.tryParse(lastMsg['created_at']?.toString() ?? '') ?? DateTime.now(),
-              status: 'seen',
-              image: msgType == 'image' ? lastMsg['attachment_url']?.toString() : null,
-              type: msgType,
-              attachmentUrl: lastMsg['attachment_url']?.toString(),
-            ));
+            messages.add(ChatMessageModel.fromJson(lastMsg, currentUserId: _currentUserId!));
             _scrollToBottom();
             markRead();
           }
