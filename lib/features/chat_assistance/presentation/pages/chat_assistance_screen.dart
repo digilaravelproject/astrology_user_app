@@ -85,9 +85,17 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.cover,
+            opacity: 0.12,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
             Obx(() {
               if (controller.limitReached.value) {
                 return Container(
@@ -134,6 +142,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
             ),
             _buildMessageInput(context),
           ],
+        ),
         ),
       ),
     );
