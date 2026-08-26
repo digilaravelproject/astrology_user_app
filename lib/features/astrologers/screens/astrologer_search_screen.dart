@@ -12,6 +12,7 @@ import '../screens/astrologer_detail_screen.dart';
 import '../bindings/astrologers_binding.dart';
 import '../../../core/utils/wallet_helper.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class AstrologerSearchScreen extends StatefulWidget {
   final String? serviceType;
@@ -209,7 +210,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                         width: 14,
                         height: 14,
                         decoration: BoxDecoration(
-                          color: Colors.green,
+                          color: astro.statusBadge['color'],
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white,
@@ -281,25 +282,35 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   ),
                   const SizedBox(height: 8),
                   CustomButton(
-                    text: isCall
-                        ? '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min'
-                        : '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min',
+                    text: astro.isBusy
+                        ? 'Busy'
+                        : (!astro.isOnline
+                            ? 'Offline'
+                            : (isCall
+                                ? '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min'
+                                : '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min')),
                     icon: isCall ? Icons.call : Icons.chat,
                     fontSize: 11,
                     height: 32,
                     borderRadius: 8,
-                    backgroundColor: Colors.transparent,
-                    textColor: const Color(0xFF4CAF50),
-                    borderColor: const Color(0xFF4CAF50),
-                    onTap: () => WalletHelper.checkBalanceAndProceed(
-                      context: context,
-                      type: isCall ? 'call' : 'chat',
-                      name: astro.name,
-                      imageUrl: astro.fullProfilePhoto,
-                      price: (isCall ? astro.callRate : astro.chatRate) ?? '0',
-                      providerId: astro.userId,
-                      simulatedBalance: 10.0,
-                    ),
+                    backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                    textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                    borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                    onTap: () {
+                      if (!astro.isOnline || astro.isBusy) {
+                        CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                        return;
+                      }
+                      WalletHelper.checkBalanceAndProceed(
+                        context: context,
+                        type: isCall ? 'call' : 'chat',
+                        name: astro.name,
+                        imageUrl: astro.fullProfilePhoto,
+                        price: (isCall ? astro.callRate : astro.chatRate) ?? '0',
+                        providerId: astro.userId,
+                        simulatedBalance: 10.0,
+                      );
+                    },
                   ),
                 ],
               ),

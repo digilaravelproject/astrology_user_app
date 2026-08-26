@@ -24,6 +24,7 @@ import 'package:astro_user/features/chat/domain/usecases/sync_message_status_use
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/features/astrologers/controllers/astrologer_controller.dart';
 
 class WebSocketService extends GetxService {
   WebSocketChannel? _channel;
@@ -369,6 +370,12 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatAssistanceLimitReached(data['data']);
+        } else if (event == 'AstrologerAvailabilityUpdated' || event == '.AstrologerAvailabilityUpdated' || event == 'App\\Events\\AstrologerAvailabilityUpdated') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: AstrologerAvailabilityUpdated');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleAstrologerAvailabilityUpdated(data['data']);
         }
       } catch (e) {
         Logger.e('WebSocketService: Error parsing message -> $e');
@@ -428,6 +435,33 @@ class WebSocketService extends GetxService {
           "channel": channelName
         }
       }));
+    }
+  }
+
+  void _handleAstrologerAvailabilityUpdated(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      
+      final int astroId = eventData['astrologer_id'] ?? 0;
+      final bool isBusy = eventData['is_busy'] == true || eventData['is_busy'] == 1;
+      final bool isOnline = eventData['is_online'] == true || eventData['is_online'] == 1;
+      final String availabilityStatus = eventData['availability_status'] ?? 'Offline';
+
+      if (Get.isRegistered<AstrologerController>() && astroId > 0) {
+        Get.find<AstrologerController>().updateAstrologerAvailability(
+          astrologerId: astroId,
+          isOnline: isOnline,
+          isBusy: isBusy,
+          availabilityStatus: availabilityStatus,
+        );
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: error handling AstrologerAvailabilityUpdated -> $e');
     }
   }
 
@@ -726,10 +760,23 @@ class WebSocketService extends GetxService {
     final Set<String> channelsToSubscribe = {
       AppUrls.privateUserChannel(_userId!),
       AppUrls.presenceRoomChannel,
+      'astrologers',
       ..._subscribedChannels,
     };
 
     for (String channelName in channelsToSubscribe) {
+      if (!channelName.startsWith('private-') && !channelName.startsWith('presence-')) {
+        Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        Logger.d('|✅ WEBSOCKET PUBLIC CHANNEL SUBSCRIPTION');
+        Logger.d('|📺 Channel: $channelName');
+        Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        _send(jsonEncode({
+          "event": AppUrls.pusherSubscribe,
+          "data": { "channel": channelName }
+        }));
+        continue;
+      }
+
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       Logger.d('|🔐 WEBSOCKET AUTHENTICATING');
       Logger.d('|📺 Channel: $channelName');

@@ -457,4 +457,36 @@ class AstrologerController extends GetxController {
         .where((a) => a.name.toLowerCase().contains(query.toLowerCase()))
         .toList();
   }
+
+  void updateAstrologerAvailability({
+    required int astrologerId,
+    required bool isOnline,
+    required bool isBusy,
+    required String availabilityStatus,
+  }) {
+    void updateList(RxList<AstrologerModel> list) {
+      final index = list.indexWhere((a) => a.id == astrologerId);
+      if (index != -1) {
+        final current = list[index];
+        list[index] = current.copyWith(
+          isOnline: isOnline,
+          isBusy: isBusy,
+          availabilityStatus: availabilityStatus,
+        );
+      }
+    }
+
+    updateList(astrologers);
+    updateList(filteredAstrologers);
+    updateList(searchResults);
+    updateList(topAstrologers);
+
+    if (selectedAstrologer.value?.id == astrologerId) {
+      selectedAstrologer.value = selectedAstrologer.value!.copyWith(
+        isOnline: isOnline,
+        isBusy: isBusy,
+        availabilityStatus: availabilityStatus,
+      );
+    }
+  }
 }

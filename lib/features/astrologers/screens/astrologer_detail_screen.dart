@@ -784,7 +784,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           width: 16,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                            color: astro.statusBadge['color'],
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 2),
                           ),
@@ -796,15 +796,15 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.1),
+                      color: astro.statusBadge['color'].withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: (astro.isAvailableOnline ? Colors.green : Colors.grey).withOpacity(0.5), width: 0.5),
+                      border: Border.all(color: astro.statusBadge['color'].withOpacity(0.5), width: 0.5),
                     ),
                     child: AppText(
-                      astro.isAvailableOnline ? 'Online' : 'Offline',
+                      astro.statusBadge['text'],
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                      color: astro.statusBadge['color'],
                     ),
                   ),
                   // if (astro.isBlocked)
@@ -1371,31 +1371,33 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               child: GestureDetector(
                 onTap: _astrologer?.isBlocked == true 
                   ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : () {
-                      final walletController = Get.find<WalletController>();
-                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                      WalletHelper.checkBalanceAndProceed(
-                        context: context,
-                        type: 'chat',
-                        name: _astrologer?.name ?? 'Astrologer',
-                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                        price: _astrologer?.chatRate ?? '0',
-                        providerId: _astrologer?.userId ?? widget.astrologerId,
-                        simulatedBalance: balance,
-                      );
-                    },
+                  : (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
+                      ? () => CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.')
+                      : () {
+                          final walletController = Get.find<WalletController>();
+                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                          WalletHelper.checkBalanceAndProceed(
+                            context: context,
+                            type: 'chat',
+                            name: _astrologer?.name ?? 'Astrologer',
+                            imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                            price: _astrologer?.chatRate ?? '0',
+                            providerId: _astrologer?.userId ?? widget.astrologerId,
+                            simulatedBalance: balance,
+                          );
+                        },
                 child: Opacity(
                   opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: _astrologer?.isBlocked == true 
+                      gradient: (_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
                           ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
                           : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
+                          color: ((_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -1412,7 +1414,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           children: [
                             Row(
                               children: [
-                                Text((_astrologer?.isBlocked == true ? 'Blocked' : 'Chat').tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text((_astrologer?.isBlocked == true ? 'Blocked' : (_astrologer?.isBusy == true ? 'Busy' : (!(_astrologer?.isOnline ?? false) ? 'Offline' : 'Chat'))).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
                                 if (_astrologer?.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),
@@ -1457,31 +1459,33 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               child: GestureDetector(
                 onTap: _astrologer?.isBlocked == true 
                   ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : () {
-                      final walletController = Get.find<WalletController>();
-                      final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                      WalletHelper.checkBalanceAndProceed(
-                        context: context,
-                        type: 'call',
-                        name: _astrologer?.name ?? 'Astrologer',
-                        imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                        price: _astrologer?.callRate ?? '0',
-                        providerId: _astrologer?.userId ?? widget.astrologerId,
-                        simulatedBalance: balance,
-                      );
-                    },
+                  : (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
+                      ? () => CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.')
+                      : () {
+                          final walletController = Get.find<WalletController>();
+                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                          WalletHelper.checkBalanceAndProceed(
+                            context: context,
+                            type: 'call',
+                            name: _astrologer?.name ?? 'Astrologer',
+                            imageUrl: _astrologer?.fullProfilePhoto ?? '',
+                            price: _astrologer?.callRate ?? '0',
+                            providerId: _astrologer?.userId ?? widget.astrologerId,
+                            simulatedBalance: balance,
+                          );
+                        },
                 child: Opacity(
                   opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: _astrologer?.isBlocked == true 
+                      gradient: (_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
                           ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
                           : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: (_astrologer?.isBlocked == true ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
+                          color: ((_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -1498,7 +1502,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           children: [
                             Row(
                               children: [
-                                Text((_astrologer?.isBlocked == true ? 'Blocked' : 'Call').tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text((_astrologer?.isBlocked == true ? 'Blocked' : (_astrologer?.isBusy == true ? 'Busy' : (!(_astrologer?.isOnline ?? false) ? 'Offline' : 'Call'))).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
                                 if (_astrologer?.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),

@@ -17,6 +17,7 @@ import '../../astrologers/domain/models/astrologer_model.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../../core/utils/session_bottom_sheet_helper.dart';
+import '../../../core/utils/custom_snackbar.dart';
 
 class AstrologersPreviewSection extends StatelessWidget {
   const AstrologersPreviewSection({Key? key}) : super(key: key);
@@ -137,7 +138,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                         width: 18,
                         height: 18,
                         decoration: BoxDecoration(
-                          color: astro.isAvailableOnline ? Colors.green : Colors.red,
+                          color: astro.statusBadge['color'],
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2.5),
                           boxShadow: [
@@ -261,16 +262,20 @@ class AstrologersPreviewSection extends StatelessWidget {
                                     (astro.isChatEnabled && astro.isCallEnabled)
                                         ? Expanded(
                                             child: CustomButton(
-                                              text: '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min',
+                                              text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min'),
                                               icon: Icons.chat_bubble_outline_rounded,
                                               fontSize: 10,
                                               height: 32,
                                               borderRadius: 8,
-                                              backgroundColor: Colors.transparent,
-                                              textColor: const Color(0xFF4CAF50),
-                                              borderColor: const Color(0xFF4CAF50),
+                                              backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                                              textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                                              borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                                               padding: const EdgeInsets.symmetric(horizontal: 4),
                                               onTap: () {
+                                                if (!astro.isOnline || astro.isBusy) {
+                                                  CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                                  return;
+                                                }
                                                 final walletController = Get.find<WalletController>();
                                                 final double balance = double.tryParse(walletController.balance) ?? 0.0;
                                                 WalletHelper.checkBalanceAndProceed(
@@ -286,17 +291,21 @@ class AstrologersPreviewSection extends StatelessWidget {
                                             ),
                                           )
                                         : CustomButton(
-                                            text: '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min',
+                                            text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min'),
                                             icon: Icons.chat_bubble_outline_rounded,
                                             fontSize: 10,
                                             height: 32,
                                             width: 110,
                                             borderRadius: 8,
-                                            backgroundColor: Colors.transparent,
-                                            textColor: const Color(0xFF4CAF50),
-                                            borderColor: const Color(0xFF4CAF50),
+                                            backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                                            textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                                            borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                                             padding: const EdgeInsets.symmetric(horizontal: 4),
                                             onTap: () {
+                                              if (!astro.isOnline || astro.isBusy) {
+                                                CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                                return;
+                                              }
                                               final walletController = Get.find<WalletController>();
                                               final double balance = double.tryParse(walletController.balance) ?? 0.0;
                                               WalletHelper.checkBalanceAndProceed(
@@ -316,16 +325,20 @@ class AstrologersPreviewSection extends StatelessWidget {
                                     (astro.isChatEnabled && astro.isCallEnabled)
                                         ? Expanded(
                                             child: CustomButton(
-                                              text: '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
+                                              text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min'),
                                               icon: Icons.call_outlined,
                                               fontSize: 10,
                                               height: 32,
                                               borderRadius: 8,
-                                              backgroundColor: Colors.transparent,
-                                              textColor: const Color(0xFF4CAF50),
-                                              borderColor: const Color(0xFF4CAF50),
+                                              backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                                              textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                                              borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                                               padding: const EdgeInsets.symmetric(horizontal: 4),
                                               onTap: () {
+                                                if (!astro.isOnline || astro.isBusy) {
+                                                  CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                                  return;
+                                                }
                                                 final walletController = Get.find<WalletController>();
                                                 final double balance = double.tryParse(walletController.balance) ?? 0.0;
                                                 WalletHelper.checkBalanceAndProceed(
@@ -341,17 +354,21 @@ class AstrologersPreviewSection extends StatelessWidget {
                                             ),
                                           )
                                         : CustomButton(
-                                            text: '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
+                                            text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min'),
                                             icon: Icons.call_outlined,
                                             fontSize: 10,
                                             height: 32,
                                             width: 110,
                                             borderRadius: 8,
-                                            backgroundColor: Colors.transparent,
-                                            textColor: const Color(0xFF4CAF50),
-                                            borderColor: const Color(0xFF4CAF50),
+                                            backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                                            textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                                            borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                                             padding: const EdgeInsets.symmetric(horizontal: 4),
                                             onTap: () {
+                                              if (!astro.isOnline || astro.isBusy) {
+                                                CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                                return;
+                                              }
                                               final walletController = Get.find<WalletController>();
                                               final double balance = double.tryParse(walletController.balance) ?? 0.0;
                                               WalletHelper.checkBalanceAndProceed(

@@ -1,5 +1,6 @@
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
 class AstrologerModel {
   final int id;
@@ -31,6 +32,8 @@ class AstrologerModel {
   final int? packageDuration;
   final bool? isPurchase;
   final int? remainingTime;
+  final bool isBusy;
+  final String availabilityStatus;
 
   AstrologerModel({
     required this.id,
@@ -62,6 +65,8 @@ class AstrologerModel {
     this.packageDuration,
     this.isPurchase,
     this.remainingTime,
+    this.isBusy = false,
+    this.availabilityStatus = 'Offline',
   });
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
@@ -96,12 +101,94 @@ class AstrologerModel {
       packageDuration: json['package_details']?['duration'] != null ? int.tryParse(json['package_details']['duration'].toString()) : null,
       isPurchase: json['package_details']?['is_purchase'] == true,
       remainingTime: json['package_details']?['remaining_time'] != null ? int.tryParse(json['package_details']['remaining_time'].toString()) : null,
+      isBusy: json['is_busy'] == 1 || json['is_busy'] == true,
+      availabilityStatus: json['availability_status'] ?? (json['is_online'] == 1 || json['is_online'] == true ? 'Online' : 'Offline'),
     );
   }
 
   String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 
-  bool get isAvailableOnline => isChatEnabled || isCallEnabled;
+  bool get isAvailableOnline => !isBusy && isOnline && (isChatEnabled || isCallEnabled);
+
+  Map<String, dynamic> get statusBadge {
+    switch (availabilityStatus) {
+      case 'Engaged':
+        return { 'text': 'Engaged', 'color': Colors.orange, 'buttonText': 'Busy' };
+      case 'Online':
+        return { 'text': 'Online', 'color': Colors.green, 'buttonText': 'Call / Chat' };
+      case 'Offline':
+      default:
+        return { 'text': 'Offline', 'color': Colors.grey, 'buttonText': 'Offline' };
+    }
+  }
+
+  AstrologerModel copyWith({
+    int? id,
+    int? userId,
+    int? yearsOfExperience,
+    List<String>? areasOfExpertise,
+    List<String>? languages,
+    String? profilePhoto,
+    String? bio,
+    String? chatRate,
+    String? callRate,
+    String? videoCallRate,
+    String? name,
+    String? phone,
+    String? email,
+    bool? isChatEnabled,
+    bool? isCallEnabled,
+    double? rating,
+    bool? isOnline,
+    bool? isFollowed,
+    bool? isBlocked,
+    bool? isReviewEligible,
+    int? totalOrders,
+    String? originalChatRatePerMinute,
+    String? originalCallRatePerMinute,
+    bool? hasOffer,
+    String? discountPercentage,
+    int? packagePrice,
+    int? packageDuration,
+    bool? isPurchase,
+    int? remainingTime,
+    bool? isBusy,
+    String? availabilityStatus,
+  }) {
+    return AstrologerModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
+      areasOfExpertise: areasOfExpertise ?? this.areasOfExpertise,
+      languages: languages ?? this.languages,
+      profilePhoto: profilePhoto ?? this.profilePhoto,
+      bio: bio ?? this.bio,
+      chatRate: chatRate ?? this.chatRate,
+      callRate: callRate ?? this.callRate,
+      videoCallRate: videoCallRate ?? this.videoCallRate,
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      isChatEnabled: isChatEnabled ?? this.isChatEnabled,
+      isCallEnabled: isCallEnabled ?? this.isCallEnabled,
+      isOnline: isOnline ?? this.isOnline,
+      rating: rating ?? this.rating,
+      totalOrders: totalOrders ?? this.totalOrders,
+      isFollowed: isFollowed ?? this.isFollowed,
+      isBlocked: isBlocked ?? this.isBlocked,
+      isReviewEligible: isReviewEligible ?? this.isReviewEligible,
+      originalChatRatePerMinute: originalChatRatePerMinute ?? this.originalChatRatePerMinute,
+      originalCallRatePerMinute: originalCallRatePerMinute ?? this.originalCallRatePerMinute,
+      hasOffer: hasOffer ?? this.hasOffer,
+      discountPercentage: discountPercentage ?? this.discountPercentage,
+      packagePrice: packagePrice ?? this.packagePrice,
+      packageDuration: packageDuration ?? this.packageDuration,
+      isPurchase: isPurchase ?? this.isPurchase,
+      remainingTime: remainingTime ?? this.remainingTime,
+      isBusy: isBusy ?? this.isBusy,
+      availabilityStatus: availabilityStatus ?? this.availabilityStatus,
+    );
+  }
 
   String get packageSessionText {
     if (packagePrice == null || packageDuration == null) {
