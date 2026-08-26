@@ -407,8 +407,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _statusSub?.cancel();
     if (_sessionId != null && WebSocketService.sessionStatusUpdates.containsKey(_sessionId)) {
       final cachedStatus = WebSocketService.sessionStatusUpdates[_sessionId!];
-      if (cachedStatus != null && cachedStatus == 'ongoing' && status.value != 'ongoing') {
-        status.value = 'ongoing';
+      if (cachedStatus != null && (cachedStatus == 'ongoing' || cachedStatus == 'accepted') && (status.value != 'ongoing' && status.value != 'accepted')) {
+        status.value = cachedStatus;
         _stopRingtone();
         _setupTimer(_startedAt);
       }
@@ -418,7 +418,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         final newStatus = updates[_sessionId!];
         if (newStatus != null && status.value != newStatus) {
           status.value = newStatus;
-          if (newStatus == 'ongoing') {
+          if (newStatus == 'ongoing' || newStatus == 'accepted') {
             _stopRingtone();
             final startedAtStr = WebSocketService.sessionStartTimes[_sessionId];
             DateTime? serverStartTime;
