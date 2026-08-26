@@ -58,7 +58,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   void _startRingtone() {
     // User initiated chat → play outgoing ring so user knows request is sent
-    SoundVibrationService().startRingtone('audio/outgoing_ring.mp3', loop: true, vibrate: false);
+    SoundVibrationService().startRingtone('audio/outgoing_ring.mp3', loop: true, vibrate: true);
   }
 
   void _stopRingtone() {
