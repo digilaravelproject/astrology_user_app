@@ -246,6 +246,21 @@ class ApiChecker {
             message: 'No internet connection',
           );
 
+        case DioExceptionType.transformTimeout:
+          if (showErrorScreen) {
+            _showErrorScreen(
+              title: 'Processing Timeout',
+              message: 'Data processing timed out. Please try again.',
+            );
+          } else {
+            CustomSnackbar.showError('Processing timeout');
+          }
+          return const ResponseModel(
+            isSuccess: false,
+            message: 'Processing timeout',
+            statusCode: 408,
+          );
+
         case DioExceptionType.unknown:
           if (showErrorScreen) {
             _showErrorScreen(
