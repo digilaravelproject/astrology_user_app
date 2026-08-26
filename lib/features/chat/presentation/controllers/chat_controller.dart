@@ -71,6 +71,16 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+  
+  final Rx<ChatMessage?> replyingToMessage = Rx<ChatMessage?>(null);
+
+  void setReply(ChatMessage message) {
+    replyingToMessage.value = message;
+  }
+
+  void cancelReply() {
+    replyingToMessage.value = null;
+  }
 
   int? _sessionId;
   int? _currentUserId;
@@ -293,7 +303,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             // when the echo arrives BEFORE the API response updates the tempId.
             final pendingIndex = messages.indexWhere(
               (m) => m.isMe && m.status == 'sending...' && 
-                     (m.text == msgText || 
+                     (m.text.replaceAll(RegExp(r'\s+'), '') == msgText.replaceAll(RegExp(r'\s+'), '') || 
                       (m.type == 'image' && msgType == 'image') || 
                       (m.type == 'file' && msgType == 'file')),
             );
@@ -627,9 +637,13 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> sendTextMessage() async {
-    final text = messageController.text.trim();
+    String text = messageController.text.trim();
     if (text.isEmpty || _sessionId == null) return;
 
+    final replyToMessage = replyingToMessage.value;
+    final replyToId = replyToMessage?.id;
+    
+    cancelReply();
     messageController.clear();
 
     // Local temporary ID for UI responsiveness
@@ -641,6 +655,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       time: DateTime.now(),
       status: 'sending...',
       type: 'text',
+      replyToId: replyToId,
+      replyTo: replyToMessage,
     );
     messages.add(localMsg);
     _scrollToBottom();
@@ -649,6 +665,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       final serverId = await _sendTextMessageUseCase.execute(
         sessionId: _sessionId!,
         text: text,
+        replyToId: replyToId,
       );
 
       final index = messages.indexWhere((m) => m.id == tempId);

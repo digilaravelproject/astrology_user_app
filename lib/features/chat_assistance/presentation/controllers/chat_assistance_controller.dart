@@ -23,8 +23,18 @@ class ChatAssistanceController extends GetxController {
   final RxBool isInitiating = false.obs;
   final RxBool limitReached = false.obs;
   
+  final Rx<ChatMessage?> replyingToMessage = Rx<ChatMessage?>(null);
+  
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
+
+  void setReply(ChatMessage message) {
+    replyingToMessage.value = message;
+  }
+
+  void cancelReply() {
+    replyingToMessage.value = null;
+  }
 
   int? _sessionId;
   int? _currentUserId;
@@ -195,11 +205,20 @@ class ChatAssistanceController extends GetxController {
     if (text.isEmpty || _sessionId == null || limitReached.value) return;
 
     messageController.clear();
+    String finalMessage = text;
+
+    if (replyingToMessage.value != null) {
+      final replyMsg = replyingToMessage.value!;
+      final replyUser = replyMsg.isMe ? 'You' : (astrologerName ?? 'Assistant');
+      final replyText = replyMsg.text.replaceAll('\n', ' ');
+      finalMessage = '>>reply>>$replyUser: $replyText<<reply<<\n$text';
+      cancelReply();
+    }
 
     final tempId = DateTime.now().millisecondsSinceEpoch;
     final localMsg = ChatMessage(
       id: tempId,
-      text: text,
+      text: finalMessage,
       isMe: true,
       time: DateTime.now(),
       status: 'sending...',
@@ -210,7 +229,7 @@ class ChatAssistanceController extends GetxController {
 
     try {
       final body = {
-        'message': text,
+        'message': finalMessage,
         'type': 'text',
       };
       
@@ -406,7 +425,7 @@ class ChatAssistanceController extends GetxController {
             // Find the local 'sending...' placeholder and upgrade in-place.
             final pendingIndex = messages.indexWhere(
               (m) => m.isMe && m.status == 'sending...' && 
-                     (m.text == msgText || 
+                     (m.text.replaceAll(RegExp(r'\s+'), '') == msgText.replaceAll(RegExp(r'\s+'), '') || 
                       (m.type == 'image' && msgType == 'image') || 
                       (m.type == 'document' && msgType == 'document')),
             );

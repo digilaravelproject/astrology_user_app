@@ -9,6 +9,7 @@ import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:swipe_to/swipe_to.dart';
 
 class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
   const ChatAssistanceScreen({Key? key}) : super(key: key);
@@ -139,116 +140,197 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
   }
 
   Widget _buildMessageBubble(ChatMessage message) {
-    return Align(
-      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: message.isMe ? AppColors.deepPink : Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(message.isMe ? 16 : 0),
-            bottomRight: Radius.circular(message.isMe ? 0 : 16),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        constraints: const BoxConstraints(maxWidth: 280),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (message.type == 'image')
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: message.image != null && message.image!.startsWith('http')
-                      ? Image.network(
+    bool isReply = false;
+    String replyUser = '';
+    String replyText = '';
+    String mainText = message.text;
+    
+    if (message.replyTo != null) {
+      isReply = true;
+      replyUser = message.replyTo!.isMe ? 'You' : (controller.astrologerName ?? 'Assistant');
+      replyText = message.replyTo!.text;
+    } else if (mainText.startsWith('>>reply>>')) {
+      // Fallback for old cached messages
+      isReply = true;
+      final endQuote = mainText.indexOf('<<reply<<');
+      if (endQuote != -1) {
+        final quotePart = mainText.substring(9, endQuote);
+        final colonIdx = quotePart.indexOf(': ');
+        if (colonIdx != -1) {
+          replyUser = quotePart.substring(0, colonIdx);
+          replyText = quotePart.substring(colonIdx + 2);
+        } else {
+          replyText = quotePart;
+        }
+        mainText = mainText.substring(endQuote + 9).trimLeft();
+      } else {
+        final quotePart = mainText.substring(9);
+        final colonIdx = quotePart.indexOf(': ');
+        if (colonIdx != -1) {
+          replyUser = quotePart.substring(0, colonIdx);
+          replyText = quotePart.substring(colonIdx + 2);
+        } else {
+          replyUser = 'User';
+          replyText = quotePart;
+        }
+        mainText = '';
+      }
+    }
+
+    return SwipeTo(
+          onRightSwipe: (details) {
+            controller.setReply(message);
+          },
+          onLeftSwipe: (details) {
+            controller.setReply(message);
+          },
+          child: Align(
+            alignment: message.isMe ? Alignment.centerRight : Alignment
+                .centerLeft,
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: message.isMe ? AppColors.deepPink : Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(message.isMe ? 16 : 0),
+                  bottomRight: Radius.circular(message.isMe ? 0 : 16),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              constraints: const BoxConstraints(maxWidth: 280),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (isReply)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: message.isMe ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border(left: BorderSide(
+                            color: message.isMe ? Colors.white : AppColors
+                                .deepPink, width: 4)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppText(replyUser,
+                              color: message.isMe ? Colors.white : AppColors
+                                  .deepPink,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12),
+                          const SizedBox(height: 4),
+                          AppText(replyText, color: message.isMe ? Colors.white70 : Colors.black87,
+                              fontSize: 12,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  if (message.type == 'image')
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: message.image != null &&
+                            message.image!.startsWith('http')
+                            ? Image.network(
                           message.image!,
                           height: 150,
                           width: 200,
                           fit: BoxFit.cover,
                         )
-                      : (message.image != null
-                          ? Image.file(
-                              File(message.image!),
-                              height: 150,
-                              width: 200,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.network(
-                              message.attachmentUrl != null && message.attachmentUrl!.startsWith('http')
-                                  ? message.attachmentUrl!
-                                  : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
-                              height: 150,
-                              width: 200,
-                              fit: BoxFit.cover,
-                              errorBuilder: (c, e, s) => Container(
+                            : (message.image != null
+                            ? Image.file(
+                          File(message.image!),
+                          height: 150,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        )
+                            : Image.network(
+                          message.attachmentUrl != null &&
+                              message.attachmentUrl!.startsWith('http')
+                              ? message.attachmentUrl!
+                              : '${AppUrls.baseImageUrl}${message
+                              .attachmentUrl ?? ""}',
+                          height: 150,
+                          width: 200,
+                          fit: BoxFit.cover,
+                          errorBuilder: (c, e, s) =>
+                              Container(
                                 height: 150,
                                 width: 200,
                                 color: Colors.grey,
-                                child: const Icon(Icons.broken_image, color: Colors.white),
+                                child: const Icon(
+                                    Icons.broken_image, color: Colors.white),
                               ),
-                            )),
-                ),
-              )
-            else if (message.type == 'document')
-              Container(
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.only(bottom: 8.0),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.insert_drive_file, color: message.isMe ? Colors.white : Colors.black54, size: 24),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: AppText(
-                        message.text.replaceFirst('📄 ', ''),
-                        fontSize: 14,
-                        color: message.isMe ? Colors.white : Colors.black87,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        )),
                       ),
-                    ),
-                  ],
-                ),
-              )
-            else
-              AppText(
-                message.text,
-                fontSize: 14,
-                color: message.isMe ? Colors.white : Colors.black87,
-              ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AppText(
-                  _formatTime(message.time),
-                  fontSize: 10,
-                  color: message.isMe ? Colors.white70 : Colors.grey.shade500,
-                ),
-                if (message.isMe) ...[
-                  const SizedBox(width: 4),
-                  _buildStatusIcon(message.status),
+                    )
+                  else
+                    if (message.type == 'document')
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(bottom: 8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.insert_drive_file, color: Colors.black54,
+                                size: 24),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: AppText(
+                                mainText.replaceFirst('📄 ', ''),
+                                fontSize: 14,
+                                color: Colors.black87,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      if (mainText.isNotEmpty)
+                        AppText(
+                          mainText,
+                          fontSize: 14,
+                          color: message.isMe ? Colors.white : Colors.black87,
+                        ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AppText(
+                        _formatTime(message.time),
+                        fontSize: 10,
+                        color: message.isMe ? Colors.white.withOpacity(0.7) : Colors.grey[600]!,
+                      ),
+                      if (message.isMe) ...[
+                        const SizedBox(width: 4),
+                        _buildStatusIcon(message.status),
+                      ],
+                    ],
+                  ),
                 ],
-              ],
+              ),
             ),
-          ],
-        ),
-      ),
-    );
+          )
+      );
   }
 
   Widget _buildStatusIcon(String status) {
@@ -262,20 +344,20 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
           height: 12,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white70),
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
           ),
         );
       case 'sent':
         iconData = Icons.check;
-        iconColor = Colors.white70;
+        iconColor = Colors.white.withOpacity(0.7);
         break;
       case 'delivered':
         iconData = Icons.done_all;
-        iconColor = Colors.white70;
+        iconColor = Colors.white.withOpacity(0.7);
         break;
       case 'seen':
         iconData = Icons.done_all;
-        iconColor = Colors.blue.shade200;
+        iconColor = Colors.blueAccent;
         break;
       case 'failed':
         iconData = Icons.error_outline;
@@ -283,7 +365,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
         break;
       default:
         iconData = Icons.access_time;
-        iconColor = Colors.white70;
+        iconColor = Colors.white.withOpacity(0.7);
     }
 
     return Icon(iconData, size: 14, color: iconColor);
@@ -301,56 +383,104 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
         border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
       ),
       child: SafeArea(
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
-              onPressed: () => _showAttachmentBottomSheet(context),
+            Obx(() {
+              if (controller.replyingToMessage.value != null) {
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: const Border(left: BorderSide(color: AppColors.deepPink, width: 4)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppText(
+                              controller.replyingToMessage.value!.isMe ? 'You' : (controller.astrologerName ?? 'Assistant'),
+                              color: AppColors.deepPink,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                            const SizedBox(height: 4),
+                            AppText(
+                              controller.replyingToMessage.value!.text.replaceAll('\n', ' '),
+                              color: Colors.black87,
+                              fontSize: 12,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20, color: Colors.grey),
+                        onPressed: () => controller.cancelReply(),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            }),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
+                  onPressed: () => _showAttachmentBottomSheet(context),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: controller.messageController,
+                    decoration: InputDecoration(
+                      hintText: "Type a message...",
+                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    textCapitalization: TextCapitalization.sentences,
+                    minLines: 1,
+                    maxLines: 4,
+                    enabled: !controller.limitReached.value,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Obx(() => GestureDetector(
+                  onTap: controller.limitReached.value ? null : controller.sendMessage,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: controller.limitReached.value ? Colors.grey : AppColors.deepPink,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Iconsax.send_1_copy,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                )),
+              ],
             ),
-            Expanded(
-              child: TextField(
-                controller: controller.messageController,
-                decoration: InputDecoration(
-                  hintText: "Type a message...",
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                textCapitalization: TextCapitalization.sentences,
-                minLines: 1,
-                maxLines: 4,
-                enabled: !controller.limitReached.value,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Obx(() => GestureDetector(
-              onTap: controller.limitReached.value ? null : controller.sendMessage,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: controller.limitReached.value ? Colors.grey : AppColors.deepPink,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Iconsax.send_1_copy,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            )),
           ],
         ),
       ),
