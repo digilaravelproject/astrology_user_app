@@ -235,8 +235,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                   // Buttons Row
                   Align(
                     alignment: Alignment.centerRight,
-                    child: (astro.isAvailableOnline)
-                        ? Column(
+                    child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               CustomButton(
@@ -246,11 +245,15 @@ class AstrologersPreviewSection extends StatelessWidget {
                                 height: 32,
                                 width: (astro.isChatEnabled && astro.isCallEnabled) ? 198 : 180,
                                 borderRadius: 8,
-                                backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
-                                textColor: Colors.white,
-                                borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
+                                backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                                textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
+                                borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 onTap: () {
+                                  if (!astro.isOnline || astro.isBusy) {
+                                    CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                    return;
+                                  }
                                   SessionBottomSheetHelper.show(context, astro);
                                 },
                               ),
@@ -385,14 +388,6 @@ class AstrologersPreviewSection extends StatelessWidget {
                                 ],
                               ),
                             ],
-                          )
-                        : Text(
-                            "Astrologer is offline.".tr,
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
                           ),
                   ),
                 ],

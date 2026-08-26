@@ -612,19 +612,7 @@ class CallListScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            !astro.isAvailableOnline
-                ? Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                "Astrologer is offline.".tr,
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-                : Row(
+            Row(
                     children: [
                       Expanded(
                         child: CustomButton(
@@ -633,10 +621,14 @@ class CallListScreen extends StatelessWidget {
                           fontSize: 11,
                           height: 32,
                           borderRadius: 8,
-                          backgroundColor: astro.isPurchase == true ? Colors.green : Colors.orange,
-                          textColor: Colors.white,
-                          borderColor: astro.isPurchase == true ? Colors.green : Colors.orange,
+                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
+                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
                           onTap: () {
+                            if (!astro.isOnline || astro.isBusy) {
+                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              return;
+                            }
                             SessionBottomSheetHelper.show(context, astro);
                           },
                         ),
@@ -645,15 +637,19 @@ class CallListScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: CustomButton(
-                            text: '${AppStrings.call.tr} - ₹${astro.callRate ?? '0'}/${"min".tr}',
+                            text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.call.tr} - ₹${astro.callRate ?? '0'}${"/min".tr}'),
                             icon: Icons.call,
                             fontSize: 11,
                             height: 32,
                             borderRadius: 8,
-                            backgroundColor: Colors.transparent,
-                            textColor: const Color(0xFF4CAF50),
-                            borderColor: const Color(0xFF4CAF50),
+                            backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                            textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                            borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                             onTap: () {
+                              if (!astro.isOnline || astro.isBusy) {
+                                CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                return;
+                              }
                               final walletController = Get.find<WalletController>();
                               final double balance = double.tryParse(walletController.balance) ?? 0.0;
                               WalletHelper.checkBalanceAndProceed(

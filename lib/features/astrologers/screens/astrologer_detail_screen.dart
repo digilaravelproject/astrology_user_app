@@ -1354,10 +1354,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             height: 48,
             width: double.infinity,
             borderRadius: 12,
-            backgroundColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
-            textColor: Colors.white,
-            borderColor: _astrologer?.isPurchase == true ? Colors.green : Colors.orange,
+            backgroundColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey.withOpacity(0.2) : (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
+            textColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey : Colors.white,
+            borderColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey : (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
             onTap: () {
+              if (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) {
+                CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                return;
+              }
               if (_astrologer != null) {
                 SessionBottomSheetHelper.show(context, _astrologer!);
               }
