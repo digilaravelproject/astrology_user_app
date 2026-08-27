@@ -21,6 +21,8 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
+import 'package:astro_user/helper/route_helper.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
@@ -89,7 +91,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     _connectivitySubscription?.cancel();
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
       final isConnected = results.any((r) => r != ConnectivityResult.none);
-      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
       if (isConnected && !_isConnected && !_isConnecting && !_isManuallyDisconnected && isLoggedIn) {
         Logger.d('|🌐 Connectivity restored! Triggering immediate WebSocket reconnect.');
         _reconnectAttempts = 0;
@@ -101,7 +103,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
       if (!_isManuallyDisconnected && isLoggedIn) {
         Logger.d('|📱 App resumed from background/sleep. Checking WebSocket health...');
         if (!_isConnected && !_isConnecting) {
@@ -163,7 +165,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     if (isExplicitUserLogin) {
       _isManuallyDisconnected = false;
     }
-    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
     if (!isLoggedIn || _isManuallyDisconnected) {
       _isConnecting = false;
       _isConnected = false;
@@ -214,7 +216,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _socketId = null;
           _stopHeartbeat();
           if (!_isManuallyDisconnected && wasConnected) {
-            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
             if (loggedIn) {
               Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
               Logger.d('|🔌 WEBSOCKET DISCONNECTED');
@@ -231,7 +233,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _socketId = null;
           _stopHeartbeat();
           if (!_isManuallyDisconnected && wasConnected) {
-            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
             if (loggedIn) {
               Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
               Logger.e('|🔌 WEBSOCKET ERROR');
@@ -492,10 +494,57 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleAstrologerAvailabilityUpdated(data['data']);
+        } else if (event == 'UserForceLoggedOut' || event == '.UserForceLoggedOut' || event == 'App\\Events\\UserForceLoggedOut') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|⚠️ WEBSOCKET EVENT: UserForceLoggedOut');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleForceLoggedOut(data['data']);
         }
       } catch (e) {
         Logger.e('WebSocketService: Error parsing message -> $e');
       }
+    }
+  }
+
+  void _handleForceLoggedOut(dynamic rawData) async {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        try {
+          eventData = jsonDecode(rawData);
+        } catch (_) {}
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
+      final String message = eventData['message']?.toString() ?? 
+          'Your account was logged in on another device. Please log in again.';
+
+      // 1. Immediately disconnect and unsubscribe from WebSocket
+      disconnect();
+
+      // 2. Stop ongoing services and notifications
+      try {
+        ForegroundTaskService.stopService();
+        LocalNotificationService.cancelOngoingChatNotification(null);
+        LocalNotificationService.cancelOngoingCallNotification(null);
+      } catch (_) {}
+
+      // 3. Clear local auth and user state
+      SharedPrefs.remove(AppConstants.userData);
+      SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+      await TokenManager.clearToken();
+
+      // 4. Show error snackbar / toast
+      CustomSnackbar.showError(message);
+
+      // 5. Navigate to Login screen and clear all routes
+      if (Get.currentRoute != RouteHelper.getLoginRoute()) {
+        Get.offAllNamed(RouteHelper.getLoginRoute());
+      }
+    } catch (e) {
+      Logger.e('WebSocketService: Error handling force logout: $e');
     }
   }
 
@@ -1011,7 +1060,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
 
   void _reconnect() {
     if (_isManuallyDisconnected) return;
-    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
     if (!isLoggedIn) return;
     if (_isConnecting || _isConnected) return;
     if (_reconnectTimer != null && _reconnectTimer!.isActive) return;
