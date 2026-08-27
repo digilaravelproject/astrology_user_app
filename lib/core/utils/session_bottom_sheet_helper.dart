@@ -196,9 +196,14 @@ class SessionBottomSheetHelper {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Obx(() {
                   final astroCtrl = Get.isRegistered<AstrologerController>() ? Get.find<AstrologerController>() : null;
-                  final currentAstro = astroCtrl?.astrologers.firstWhereOrNull((a) => a.id == astro.id || (astro.userId > 0 && a.userId == astro.userId)) ?? 
-                                       astroCtrl?.selectedAstrologer.value ?? 
-                                       astro;
+                  AstrologerModel? matchedAstro;
+                  if (astroCtrl != null) {
+                    matchedAstro = astroCtrl.astrologers.firstWhereOrNull((a) => (astro.id > 0 && a.id == astro.id) || (astro.userId > 0 && a.userId == astro.userId)) ??
+                                   astroCtrl.filteredAstrologers.firstWhereOrNull((a) => (astro.id > 0 && a.id == astro.id) || (astro.userId > 0 && a.userId == astro.userId)) ??
+                                   astroCtrl.topAstrologers.firstWhereOrNull((a) => (astro.id > 0 && a.id == astro.id) || (astro.userId > 0 && a.userId == astro.userId)) ??
+                                   (astroCtrl.selectedAstrologer.value != null && (astroCtrl.selectedAstrologer.value!.id == astro.id || (astro.userId > 0 && astroCtrl.selectedAstrologer.value!.userId == astro.userId)) ? astroCtrl.selectedAstrologer.value : null);
+                  }
+                  final currentAstro = matchedAstro ?? astro;
 
                   final bool hasChat = currentAstro.isChatEnabled == true;
                   final bool hasCall = currentAstro.isCallEnabled == true;
@@ -286,7 +291,7 @@ class SessionBottomSheetHelper {
                             fontSize: 13,
                             height: 48,
                             borderRadius: 12,
-                            backgroundColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                            backgroundColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
                             textColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.white,
                             borderColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.transparent,
                             gradient: (!currentAstro.isOnline || currentAstro.isBusy) ? null : const LinearGradient(
