@@ -112,11 +112,9 @@ class AstrologerController extends GetxController {
   Future<void> fetchTopAstrologers({String? serviceType}) async {
     try {
       isTopLoading.value = true;
-      final Map<String, dynamic> params = {'type': 'top'};
+      final Map<String, dynamic> params = {'sort_by': 'popular'};
       if (serviceType != null && serviceType != 'all') {
-        params['service_type'] = serviceType;
-      } else if (serviceType == 'all') {
-        params['service_type'] = 'all';
+        params['type'] = serviceType;
       }
       
       final result = await _getAstrologersUseCase.execute(params: params);
@@ -136,8 +134,6 @@ class AstrologerController extends GetxController {
       if (serviceType != null) selectedServiceType.value = serviceType;
       if (online != null) isOnlineOnly.value = online;
       
-      // Ensure type is 'all' when filtering by skill if not specified, 
-      // as per user requirement: {type: all, service_type: chat, skills: ...}
       if (type != null) {
         selectedType.value = type;
       } else if (skills != null && skills.isNotEmpty) {
@@ -148,17 +144,24 @@ class AstrologerController extends GetxController {
         selectedSkills.assignAll(skills);
         selectedSkills.refresh();
       } else if (type == 'all' && online == null) {
-        // Only clear everything if 'All' is clicked (and online is not being toggled)
         selectedSkills.clear();
         selectedSkills.refresh();
         isOnlineOnly.value = false;
       }
 
       final Map<String, dynamic> params = {};
-      params['type'] = selectedType.value;
-      if (selectedServiceType.value != 'all') params['service_type'] = selectedServiceType.value;
+      if (selectedServiceType.value != 'all') {
+        params['type'] = selectedServiceType.value;
+      } else if (selectedType.value != 'all') {
+        params['type'] = selectedType.value;
+      }
       if (isOnlineOnly.value) params['is_online'] = 1;
       if (selectedSkills.isNotEmpty) params['skills'] = selectedSkills.join(',');
+      if (selectedLanguages.isNotEmpty) params['language'] = selectedLanguages.join(',');
+      if (sortBy.value.isNotEmpty) params['sort_by'] = sortBy.value;
+      if (minPrice.value > 0) params['min_price'] = minPrice.value;
+      if (maxPrice.value < 1000) params['max_price'] = maxPrice.value;
+      if (minRating.value > 0) params['min_rating'] = minRating.value;
       
       print('--- Astrologer Filter Debug ---');
       print('Params: $params');
@@ -182,7 +185,9 @@ class AstrologerController extends GetxController {
       final Map<String, dynamic> params = {
         'search_query': query,
       };
-      if (serviceType != null) params['service_type'] = serviceType;
+      if (serviceType != null && serviceType != 'all') {
+        params['type'] = serviceType;
+      }
       
       final result = await _getAstrologersUseCase.execute(params: params);
       searchResults.assignAll(result);
@@ -199,12 +204,10 @@ class AstrologerController extends GetxController {
 
       final Map<String, dynamic> params = {};
 
-      if (selectedType.value != 'all') {
-        params['type'] = selectedType.value;
-      }
-
       if (selectedServiceType.value != 'all') {
-        params['service_type'] = selectedServiceType.value;
+        params['type'] = selectedServiceType.value;
+      } else if (selectedType.value != 'all') {
+        params['type'] = selectedType.value;
       }
       
       if (minPrice.value > 0) {
@@ -223,7 +226,7 @@ class AstrologerController extends GetxController {
         params['is_online'] = 1;
       }
 
-      if (sortBy.value.isNotEmpty && sortBy.value != 'rating_high_to_low') {
+      if (sortBy.value.isNotEmpty) {
         params['sort_by'] = sortBy.value;
       }
 

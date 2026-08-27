@@ -9,6 +9,7 @@ class AstrologerModel {
   final List<String> areasOfExpertise;
   final List<String> languages;
   final String? profilePhoto;
+  final String? profilePhotoUrl;
   final String bio;
   final String? chatRate;
   final String? callRate;
@@ -18,14 +19,19 @@ class AstrologerModel {
   final String? email;
   final bool isChatEnabled;
   final bool isCallEnabled;
+  final bool isVideoCallEnabled;
   final double rating;
   final bool isOnline;
   final bool isFollowed;
   final bool isBlocked;
   final bool isReviewEligible;
   final int totalOrders;
+  final String? ordersFormatted;
   final String? originalChatRatePerMinute;
   final String? originalCallRatePerMinute;
+  final bool poAt5Enabled;
+  final double? poAt5RatePerMinute;
+  final int? poAt5Sessions;
   final bool hasOffer;
   final String? discountPercentage;
   final int? packagePrice;
@@ -42,6 +48,7 @@ class AstrologerModel {
     required this.areasOfExpertise,
     required this.languages,
     this.profilePhoto,
+    this.profilePhotoUrl,
     required this.bio,
     this.chatRate,
     this.callRate,
@@ -51,14 +58,19 @@ class AstrologerModel {
     this.email,
     this.isChatEnabled = false,
     this.isCallEnabled = false,
+    this.isVideoCallEnabled = false,
     this.isOnline = false,
     this.rating = 0.0,
     this.totalOrders = 0,
+    this.ordersFormatted,
     this.isFollowed = false,
     this.isBlocked = false,
     this.isReviewEligible = false,
     this.originalChatRatePerMinute,
     this.originalCallRatePerMinute,
+    this.poAt5Enabled = false,
+    this.poAt5RatePerMinute,
+    this.poAt5Sessions,
     this.hasOffer = false,
     this.discountPercentage,
     this.packagePrice,
@@ -94,10 +106,20 @@ class AstrologerModel {
                         parseBool(availData['is_call_enabled']) ||
                         parseBool(availData['call_enabled']);
 
+    final bool isVideo = parseBool(json['is_video_call_enabled']) ||
+                         parseBool(json['video_call_enabled']) ||
+                         parseBool(userData['is_video_call_enabled']) ||
+                         parseBool(userData['video_call_enabled']) ||
+                         parseBool(availData['is_video_call_enabled']) ||
+                         parseBool(availData['video_call_enabled']);
+
+    final rawName = (json['name'] ?? userData['name'] ?? 'Astrologer').toString().trim();
+    final formattedName = rawName.split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' ');
+
     return AstrologerModel(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       userId: int.tryParse(json['user_id']?.toString() ?? '') ?? 0,
-      yearsOfExperience: int.tryParse(json['years_of_experience']?.toString() ?? '') ?? 0,
+      yearsOfExperience: int.tryParse(json['years_of_experience']?.toString() ?? json['experience']?.toString() ?? '') ?? 0,
       areasOfExpertise: (json['areas_of_expertise'] is List)
           ? (json['areas_of_expertise'] as List).map((e) => e.toString()).toList()
           : [],
@@ -105,34 +127,52 @@ class AstrologerModel {
           ? (json['languages'] as List).map((e) => e.toString()).toList()
           : [],
       profilePhoto: json['profile_photo']?.toString(),
+      profilePhotoUrl: json['profile_photo_url']?.toString() ?? userData['profile_photo_url']?.toString(),
       bio: json['bio']?.toString() ?? '',
       chatRate: json['chat_rate_per_minute']?.toString(),
       callRate: json['call_rate_per_minute']?.toString(),
       videoCallRate: (json['video_call_rate_per_minute'] ?? json['video_call_rate'])?.toString(),
-      name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
+      name: formattedName.isNotEmpty ? formattedName : 'Astrologer',
       phone: userData['phone']?.toString(),
       email: userData['email']?.toString(),
       isChatEnabled: isChat,
       isCallEnabled: isCall,
-      isOnline: json['is_online'] == 1 || json['is_online'] == true || json['is_online']?.toString() == '1' || json['is_online']?.toString().toLowerCase() == 'true',
+      isVideoCallEnabled: isVideo,
+      isOnline: parseBool(json['is_online']) || json['availability_status']?.toString().toLowerCase() == 'online',
+      rating: double.tryParse(json['avg_rating']?.toString() ?? json['reviews_avg_rating']?.toString() ?? json['rating']?.toString() ?? '0.0') ?? 0.0,
       totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
-      isFollowed: json['is_followed'] == 1 || json['is_followed'] == true || json['is_followed']?.toString() == '1',
-      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true || json['is_blocked']?.toString() == '1',
-      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true || json['is_review_eligible']?.toString() == '1',
+      ordersFormatted: json['orders_formatted']?.toString(),
+      isFollowed: parseBool(json['is_followed']),
+      isBlocked: parseBool(json['is_blocked']),
+      isReviewEligible: parseBool(json['is_review_eligible']),
       originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
       originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
-      hasOffer: json['has_offer'] == true || json['has_offer'] == 1 || json['has_offer']?.toString() == '1',
+      poAt5Enabled: parseBool(json['po_at_5_enabled']),
+      poAt5RatePerMinute: double.tryParse(json['po_at_5_rate_per_minute']?.toString() ?? ''),
+      poAt5Sessions: int.tryParse(json['po_at_5_sessions']?.toString() ?? ''),
+      hasOffer: parseBool(json['has_offer']),
       discountPercentage: offerDetails['discount_percentage']?.toString(),
       packagePrice: packageDetails['price'] != null ? int.tryParse(packageDetails['price'].toString()) : null,
       packageDuration: packageDetails['duration'] != null ? int.tryParse(packageDetails['duration'].toString()) : null,
-      isPurchase: packageDetails['is_purchase'] == true || packageDetails['is_purchase'] == 1 || packageDetails['is_purchase']?.toString() == '1',
+      isPurchase: parseBool(packageDetails['is_purchase']),
       remainingTime: packageDetails['remaining_time'] != null ? int.tryParse(packageDetails['remaining_time'].toString()) : null,
-      isBusy: json['is_busy'] == 1 || json['is_busy'] == true || json['is_busy']?.toString() == '1',
-      availabilityStatus: json['availability_status']?.toString() ?? (json['is_online'] == 1 || json['is_online'] == true ? 'Online' : 'Offline'),
+      isBusy: parseBool(json['is_busy']) || json['availability_status']?.toString().toLowerCase() == 'engaged' || json['availability_status']?.toString().toLowerCase() == 'busy',
+      availabilityStatus: json['availability_status']?.toString() ?? (parseBool(json['is_online']) ? 'Online' : 'Offline'),
     );
   }
 
-  String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
+  String get fullProfilePhoto {
+    if (profilePhotoUrl != null && profilePhotoUrl!.trim().isNotEmpty) {
+      return profilePhotoUrl!.trim();
+    }
+    if (profilePhoto != null && profilePhoto!.trim().isNotEmpty) {
+      if (profilePhoto!.startsWith('http')) return profilePhoto!.trim();
+      return '${AppUrls.baseImageUrl}${profilePhoto!.startsWith('/') ? profilePhoto!.substring(1) : profilePhoto}';
+    }
+    return '';
+  }
+
+  String get formattedOrders => ordersFormatted ?? (totalOrders > 0 ? '$totalOrders+ orders' : '100+ orders');
 
   bool get isAvailableOnline => !isBusy && isOnline && (isChatEnabled || isCallEnabled);
 
@@ -155,6 +195,7 @@ class AstrologerModel {
     List<String>? areasOfExpertise,
     List<String>? languages,
     String? profilePhoto,
+    String? profilePhotoUrl,
     String? bio,
     String? chatRate,
     String? callRate,
@@ -164,14 +205,19 @@ class AstrologerModel {
     String? email,
     bool? isChatEnabled,
     bool? isCallEnabled,
+    bool? isVideoCallEnabled,
     double? rating,
     bool? isOnline,
     bool? isFollowed,
     bool? isBlocked,
     bool? isReviewEligible,
     int? totalOrders,
+    String? ordersFormatted,
     String? originalChatRatePerMinute,
     String? originalCallRatePerMinute,
+    bool? poAt5Enabled,
+    double? poAt5RatePerMinute,
+    int? poAt5Sessions,
     bool? hasOffer,
     String? discountPercentage,
     int? packagePrice,
@@ -188,6 +234,7 @@ class AstrologerModel {
       areasOfExpertise: areasOfExpertise ?? this.areasOfExpertise,
       languages: languages ?? this.languages,
       profilePhoto: profilePhoto ?? this.profilePhoto,
+      profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
       bio: bio ?? this.bio,
       chatRate: chatRate ?? this.chatRate,
       callRate: callRate ?? this.callRate,
@@ -197,14 +244,19 @@ class AstrologerModel {
       email: email ?? this.email,
       isChatEnabled: isChatEnabled ?? this.isChatEnabled,
       isCallEnabled: isCallEnabled ?? this.isCallEnabled,
+      isVideoCallEnabled: isVideoCallEnabled ?? this.isVideoCallEnabled,
       isOnline: isOnline ?? this.isOnline,
       rating: rating ?? this.rating,
       totalOrders: totalOrders ?? this.totalOrders,
+      ordersFormatted: ordersFormatted ?? this.ordersFormatted,
       isFollowed: isFollowed ?? this.isFollowed,
       isBlocked: isBlocked ?? this.isBlocked,
       isReviewEligible: isReviewEligible ?? this.isReviewEligible,
       originalChatRatePerMinute: originalChatRatePerMinute ?? this.originalChatRatePerMinute,
       originalCallRatePerMinute: originalCallRatePerMinute ?? this.originalCallRatePerMinute,
+      poAt5Enabled: poAt5Enabled ?? this.poAt5Enabled,
+      poAt5RatePerMinute: poAt5RatePerMinute ?? this.poAt5RatePerMinute,
+      poAt5Sessions: poAt5Sessions ?? this.poAt5Sessions,
       hasOffer: hasOffer ?? this.hasOffer,
       discountPercentage: discountPercentage ?? this.discountPercentage,
       packagePrice: packagePrice ?? this.packagePrice,
