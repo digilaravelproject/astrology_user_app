@@ -71,7 +71,27 @@ class AstrologerModel {
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
     final userData = json['user'] as Map<String, dynamic>? ?? {};
-    
+    final availData = json['availability'] as Map<String, dynamic>? ?? {};
+
+    bool parseBool(dynamic val) {
+      if (val == null) return false;
+      return val == true || val == 1 || val.toString() == '1' || val.toString().toLowerCase() == 'true';
+    }
+
+    final bool isChat = parseBool(json['is_chat_enabled']) ||
+                        parseBool(json['chat_enabled']) ||
+                        parseBool(userData['is_chat_enabled']) ||
+                        parseBool(userData['chat_enabled']) ||
+                        parseBool(availData['is_chat_enabled']) ||
+                        parseBool(availData['chat_enabled']);
+
+    final bool isCall = parseBool(json['is_call_enabled']) ||
+                        parseBool(json['call_enabled']) ||
+                        parseBool(userData['is_call_enabled']) ||
+                        parseBool(userData['call_enabled']) ||
+                        parseBool(availData['is_call_enabled']) ||
+                        parseBool(availData['call_enabled']);
+
     return AstrologerModel(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
@@ -86,8 +106,8 @@ class AstrologerModel {
       name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
       phone: userData['phone'],
       email: userData['email'],
-      isChatEnabled: json['is_chat_enabled'] == true || json['is_chat_enabled'] == 1 || json['is_chat_enabled']?.toString() == '1' || json['chat_enabled'] == true || json['chat_enabled'] == 1 || json['chat_enabled']?.toString() == '1',
-      isCallEnabled: json['is_call_enabled'] == true || json['is_call_enabled'] == 1 || json['is_call_enabled']?.toString() == '1' || json['call_enabled'] == true || json['call_enabled'] == 1 || json['call_enabled']?.toString() == '1',
+      isChatEnabled: isChat,
+      isCallEnabled: isCall,
       isOnline: json['is_online'] == 1 || json['is_online'] == true,
       totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
       isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,

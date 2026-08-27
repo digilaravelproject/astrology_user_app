@@ -536,6 +536,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
       }
       
       final int astroId = int.tryParse(eventData['astrologer_id']?.toString() ?? eventData['id']?.toString() ?? '') ?? 0;
+      final int? userId = int.tryParse(eventData['user_id']?.toString() ?? '');
       final bool isBusy = eventData['is_busy'] == true || eventData['is_busy'] == 1 || eventData['is_busy']?.toString() == '1';
       final bool isOnline = eventData['is_online'] == true || eventData['is_online'] == 1 || eventData['is_online']?.toString() == '1';
       final String availabilityStatus = eventData['availability_status'] ?? eventData['status'] ?? (isOnline ? 'Online' : 'Offline');
@@ -561,9 +562,10 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
         isVideoCallEnabled = eventData['video_call_enabled'] == true || eventData['video_call_enabled'] == 1 || eventData['video_call_enabled']?.toString() == '1';
       }
 
-      if (Get.isRegistered<AstrologerController>() && astroId > 0) {
+      if (Get.isRegistered<AstrologerController>() && (astroId > 0 || (userId != null && userId > 0))) {
         Get.find<AstrologerController>().updateAstrologerAvailability(
           astrologerId: astroId,
+          userId: userId,
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,

@@ -460,6 +460,7 @@ class AstrologerController extends GetxController {
 
   void updateAstrologerAvailability({
     required int astrologerId,
+    int? userId,
     required bool isOnline,
     required bool isBusy,
     required String availabilityStatus,
@@ -468,7 +469,7 @@ class AstrologerController extends GetxController {
     bool? isVideoCallEnabled,
   }) {
     void updateList(RxList<AstrologerModel> list) {
-      final index = list.indexWhere((a) => a.id == astrologerId);
+      final index = list.indexWhere((a) => (astrologerId > 0 && a.id == astrologerId) || (userId != null && userId > 0 && a.userId == userId));
       if (index != -1) {
         final current = list[index];
         list[index] = current.copyWith(
@@ -486,7 +487,9 @@ class AstrologerController extends GetxController {
     updateList(searchResults);
     updateList(topAstrologers);
 
-    if (selectedAstrologer.value?.id == astrologerId) {
+    if (selectedAstrologer.value != null &&
+        ((astrologerId > 0 && selectedAstrologer.value!.id == astrologerId) ||
+         (userId != null && userId > 0 && selectedAstrologer.value!.userId == userId))) {
       selectedAstrologer.value = selectedAstrologer.value!.copyWith(
         isOnline: isOnline,
         isBusy: isBusy,

@@ -196,7 +196,7 @@ class SessionBottomSheetHelper {
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Obx(() {
                   final astroCtrl = Get.isRegistered<AstrologerController>() ? Get.find<AstrologerController>() : null;
-                  final currentAstro = astroCtrl?.astrologers.firstWhereOrNull((a) => a.id == astro.id) ?? 
+                  final currentAstro = astroCtrl?.astrologers.firstWhereOrNull((a) => a.id == astro.id || (astro.userId > 0 && a.userId == astro.userId)) ?? 
                                        astroCtrl?.selectedAstrologer.value ?? 
                                        astro;
 
