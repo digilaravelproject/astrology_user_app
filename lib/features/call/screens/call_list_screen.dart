@@ -245,6 +245,8 @@ class _CallListScreenState extends State<CallListScreen> {
     ],
   ),
 ),
+),
+],
 );
 }
 
