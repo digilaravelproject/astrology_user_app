@@ -29,7 +29,95 @@ class AstrologerActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool hasChat = showChat && (astro.isChatEnabled == true);
     final bool hasCall = showCall && (astro.isCallEnabled == true);
+    final bool isActuallyBusy = astro.isBusy || 
+                                astro.availabilityStatus.toLowerCase() == 'engaged' || 
+                                astro.availabilityStatus.toLowerCase() == 'busy';
     final bool isActuallyOffline = !(astro.isOnline) || (!hasChat && !hasCall);
+
+    if (isActuallyBusy) {
+      if (isDetailStyle) {
+        return Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFFECACA), width: 1.2),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Engaged'.tr,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFDC2626),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        );
+      } else {
+        return Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  CustomSnackbar.showInfo('Astrologer is currently engaged in another session.'.tr);
+                },
+                child: Container(
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFFECACA), width: 1.2),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFEF4444),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Engaged'.tr,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFFDC2626),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }
+    }
 
     if (isActuallyOffline) {
       if (isDetailStyle) {

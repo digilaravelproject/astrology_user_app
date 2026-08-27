@@ -617,7 +617,7 @@ class CallListScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                if (astro.isCallEnabled == true) ...[
+                if (astro.isCallEnabled == true && astro.isAvailableOnline) ...[
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),

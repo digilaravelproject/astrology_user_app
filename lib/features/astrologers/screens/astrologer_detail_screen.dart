@@ -1348,27 +1348,25 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CustomButton(
-            text: _astrologer?.packageSessionText ?? 'Session (1 hr) @ ₹500',
-            icon: Icons.timer,
-            fontSize: 14,
-            height: 48,
-            width: double.infinity,
-            borderRadius: 12,
-            backgroundColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey.withOpacity(0.2) : (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
-            textColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey : Colors.white,
-            borderColor: ((_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))) ? Colors.grey : (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
-            onTap: () {
-              if (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) {
-                CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                return;
-              }
-              if (_astrologer != null) {
-                SessionBottomSheetHelper.show(context, _astrologer!);
-              }
-            },
-          ),
-          const SizedBox(height: 12),
+          if (_astrologer?.isAvailableOnline == true) ...[
+            CustomButton(
+              text: _astrologer?.packageSessionText ?? 'Session (1 hr) @ ₹500',
+              icon: Icons.timer,
+              fontSize: 14,
+              height: 48,
+              width: double.infinity,
+              borderRadius: 12,
+              backgroundColor: (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
+              textColor: Colors.white,
+              borderColor: (_astrologer?.isPurchase == true ? Colors.green : Colors.orange),
+              onTap: () {
+                if (_astrologer != null) {
+                  SessionBottomSheetHelper.show(context, _astrologer!);
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
           Row(
             children: [
               if (_astrologer != null)

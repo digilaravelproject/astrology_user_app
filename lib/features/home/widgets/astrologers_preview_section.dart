@@ -243,46 +243,31 @@ class AstrologersPreviewSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        CustomButton(
-                          text: astro.packageSessionText,
-                          icon: Icons.timer,
-                          fontSize: 10,
-                          height: 32,
-                          width:
-                              (astro.isChatEnabled && astro.isCallEnabled)
-                                  ? 198
-                                  : 180,
-                          borderRadius: 8,
-                          backgroundColor:
-                              (!astro.isOnline || astro.isBusy)
-                                  ? Colors.grey.withOpacity(0.2)
-                                  : (astro.isPurchase == true
-                                      ? Colors.green
-                                      : Colors.orange),
-                          textColor:
-                              (!astro.isOnline || astro.isBusy)
-                                  ? Colors.grey
-                                  : Colors.white,
-                          borderColor:
-                              (!astro.isOnline || astro.isBusy)
-                                  ? Colors.grey
-                                  : (astro.isPurchase == true
-                                      ? Colors.green
-                                      : Colors.orange),
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          onTap: () {
-                            if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(
-                                astro.isBusy
-                                    ? 'Astrologer is currently engaged.'
-                                    : 'Astrologer is offline.',
-                              );
-                              return;
-                            }
-                            SessionBottomSheetHelper.show(context, astro);
-                          },
-                        ),
-                        const SizedBox(height: 8),
+                        if (astro.isAvailableOnline) ...[
+                          CustomButton(
+                            text: astro.packageSessionText,
+                            icon: Icons.timer,
+                            fontSize: 10,
+                            height: 32,
+                            width:
+                                (astro.isChatEnabled && astro.isCallEnabled)
+                                    ? 198
+                                    : 180,
+                            borderRadius: 8,
+                            backgroundColor: (astro.isPurchase == true
+                                ? Colors.green
+                                : Colors.orange),
+                            textColor: Colors.white,
+                            borderColor: (astro.isPurchase == true
+                                ? Colors.green
+                                : Colors.orange),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            onTap: () {
+                              SessionBottomSheetHelper.show(context, astro);
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                        ],
                         AstrologerActionButtons(
                           astro: astro,
                           isDetailStyle: false,
