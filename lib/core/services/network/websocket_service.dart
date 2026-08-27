@@ -535,10 +535,31 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
         eventData = Map<String, dynamic>.from(rawData);
       }
       
-      final int astroId = eventData['astrologer_id'] ?? 0;
-      final bool isBusy = eventData['is_busy'] == true || eventData['is_busy'] == 1;
-      final bool isOnline = eventData['is_online'] == true || eventData['is_online'] == 1;
-      final String availabilityStatus = eventData['availability_status'] ?? 'Offline';
+      final int astroId = int.tryParse(eventData['astrologer_id']?.toString() ?? eventData['id']?.toString() ?? '') ?? 0;
+      final bool isBusy = eventData['is_busy'] == true || eventData['is_busy'] == 1 || eventData['is_busy']?.toString() == '1';
+      final bool isOnline = eventData['is_online'] == true || eventData['is_online'] == 1 || eventData['is_online']?.toString() == '1';
+      final String availabilityStatus = eventData['availability_status'] ?? eventData['status'] ?? (isOnline ? 'Online' : 'Offline');
+
+      bool? isChatEnabled;
+      if (eventData.containsKey('is_chat_enabled')) {
+        isChatEnabled = eventData['is_chat_enabled'] == true || eventData['is_chat_enabled'] == 1 || eventData['is_chat_enabled']?.toString() == '1';
+      } else if (eventData.containsKey('chat_enabled')) {
+        isChatEnabled = eventData['chat_enabled'] == true || eventData['chat_enabled'] == 1 || eventData['chat_enabled']?.toString() == '1';
+      }
+
+      bool? isCallEnabled;
+      if (eventData.containsKey('is_call_enabled')) {
+        isCallEnabled = eventData['is_call_enabled'] == true || eventData['is_call_enabled'] == 1 || eventData['is_call_enabled']?.toString() == '1';
+      } else if (eventData.containsKey('call_enabled')) {
+        isCallEnabled = eventData['call_enabled'] == true || eventData['call_enabled'] == 1 || eventData['call_enabled']?.toString() == '1';
+      }
+
+      bool? isVideoCallEnabled;
+      if (eventData.containsKey('is_video_call_enabled')) {
+        isVideoCallEnabled = eventData['is_video_call_enabled'] == true || eventData['is_video_call_enabled'] == 1 || eventData['is_video_call_enabled']?.toString() == '1';
+      } else if (eventData.containsKey('video_call_enabled')) {
+        isVideoCallEnabled = eventData['video_call_enabled'] == true || eventData['video_call_enabled'] == 1 || eventData['video_call_enabled']?.toString() == '1';
+      }
 
       if (Get.isRegistered<AstrologerController>() && astroId > 0) {
         Get.find<AstrologerController>().updateAstrologerAvailability(
@@ -546,6 +567,9 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,
+          isChatEnabled: isChatEnabled,
+          isCallEnabled: isCallEnabled,
+          isVideoCallEnabled: isVideoCallEnabled,
         );
       }
     } catch (e) {

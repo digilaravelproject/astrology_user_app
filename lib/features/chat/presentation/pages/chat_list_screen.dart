@@ -641,16 +641,14 @@ class ChatListScreen extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                 ],
-                if (astro.isChatEnabled) ...[
-                  Expanded(
-                    child: AstrologerActionButtons(
-                      astro: astro,
-                      isDetailStyle: false,
-                      showChat: true,
-                      showCall: false,
-                    ),
+                Expanded(
+                  child: AstrologerActionButtons(
+                    astro: astro,
+                    isDetailStyle: false,
+                    showChat: true,
+                    showCall: false,
                   ),
-                ],
+                ),
               ],
             ),
           ],

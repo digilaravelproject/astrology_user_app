@@ -463,6 +463,9 @@ class AstrologerController extends GetxController {
     required bool isOnline,
     required bool isBusy,
     required String availabilityStatus,
+    bool? isChatEnabled,
+    bool? isCallEnabled,
+    bool? isVideoCallEnabled,
   }) {
     void updateList(RxList<AstrologerModel> list) {
       final index = list.indexWhere((a) => a.id == astrologerId);
@@ -472,8 +475,8 @@ class AstrologerController extends GetxController {
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,
-          isChatEnabled: isOnline ? true : current.isChatEnabled,
-          isCallEnabled: isOnline ? true : current.isCallEnabled,
+          isChatEnabled: isChatEnabled ?? current.isChatEnabled,
+          isCallEnabled: isCallEnabled ?? current.isCallEnabled,
         );
       }
     }
@@ -488,8 +491,8 @@ class AstrologerController extends GetxController {
         isOnline: isOnline,
         isBusy: isBusy,
         availabilityStatus: availabilityStatus,
-        isChatEnabled: isOnline ? true : selectedAstrologer.value!.isChatEnabled,
-        isCallEnabled: isOnline ? true : selectedAstrologer.value!.isCallEnabled,
+        isChatEnabled: isChatEnabled ?? selectedAstrologer.value!.isChatEnabled,
+        isCallEnabled: isCallEnabled ?? selectedAstrologer.value!.isCallEnabled,
       );
     }
   }
