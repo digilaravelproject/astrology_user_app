@@ -95,6 +95,60 @@ class _CallListScreenState extends State<CallListScreen> {
                     child: CustomScrollView(
                       controller: _scrollController,
                       slivers: [
+
+              // White Container with Content
+              SliverToBoxAdapter(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Top Astrologers Heading
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: AppColors.primaryColor,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 8),
+                            const AppText(
+                              'Top Astrologers',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Container(
+                        height: 120,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Obx(() {
+                          if (astrologerController.isTopLoading.value) {
+                            return _buildTopShimmerList();
+                          }
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: astrologerController.topAstrologers.length,
+                            itemBuilder: (context, index) {
+                              return _buildStoryItem(astrologerController.topAstrologers[index]);
+                            },
+                          );
+                        }),
+                      ),
+
+                      // Filter Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: Obx(() {
                           final isOnlineOnly = astrologerController.isOnlineOnly.value;
                           
                           return SingleChildScrollView(
@@ -133,67 +187,66 @@ class _CallListScreenState extends State<CallListScreen> {
                         }),
                       ),
                       const SizedBox(height: 12),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // Astrologer Cards List (REACTIVE SECTION)
-            Obx(() {
-              if (astrologerController.isFilteredLoading.value && astrologerController.filteredAstrologers.isEmpty) {
+              // Astrologer Cards List (REACTIVE SECTION)
+              Obx(() {
+                if (astrologerController.isFilteredLoading.value && astrologerController.filteredAstrologers.isEmpty) {
+                  return SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    sliver: _buildShimmerList(),
+                  );
+                }
+
+                final astrologers = astrologerController.filteredAstrologers;
+                if (astrologers.isEmpty && !astrologerController.isFilteredLoading.value) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 50),
+                        child: AppText('No astrologers available', color: Colors.grey),
+                      ),
+                    ),
+                  );
+                }
+
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  sliver: _buildShimmerList(),
-                );
-              }
-
-              final astrologers = astrologerController.filteredAstrologers;
-              if (astrologers.isEmpty && !astrologerController.isFilteredLoading.value) {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 50),
-                      child: AppText('No astrologers available', color: Colors.grey),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == astrologers.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          );
+                        }
+                        return _buildAstrologerCard(context, astrologers[index]);
+                      },
+                      childCount: astrologers.length + (astrologerController.isMoreFilteredLoading.value ? 1 : 0),
                     ),
                   ),
                 );
-              }
+              }),
 
-              return SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      if (index == astrologers.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.primaryColor,
-                            ),
-                          ),
-                        );
-                      }
-                      return _buildAstrologerCard(context, astrologers[index]);
-                    },
-                    childCount: astrologers.length + (astrologerController.isMoreFilteredLoading.value ? 1 : 0),
-                  ),
-                ),
-              );
-            }),
-
-            const SliverToBoxAdapter(child: SizedBox(height: 150)),
-          ],
+              const SliverToBoxAdapter(child: SizedBox(height: 150)),
+            ],
+          ),
         ),
       ),
-        )
-      ],)
-          )
-        )
-      ]
-    );
-  }
+    ],
+  ),
+),
+);
+}
 
   Widget _buildStoryItem(AstrologerModel astro) {
     return GestureDetector(

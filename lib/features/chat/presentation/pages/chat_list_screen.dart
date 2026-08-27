@@ -144,6 +144,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         }),
                       ),
 
+                      // Filter Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
+                        child: Obx(() {
                           final isOnlineOnly = astrologerController.isOnlineOnly.value;
                           
                           return SingleChildScrollView(
@@ -236,14 +240,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ],
           ),
         ),
-        )
-      ],
-    )
-    )
-        )
-    ]
-    );
-  }
+      ),
+    ],
+  ),
+),
+);
+}
 
   Widget _buildStoryItem(AstrologerModel astro) {
     return GestureDetector(
