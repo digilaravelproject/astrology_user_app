@@ -70,8 +70,10 @@ class AstrologerModel {
   });
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
-    final userData = json['user'] as Map<String, dynamic>? ?? {};
-    final availData = json['availability'] as Map<String, dynamic>? ?? {};
+    final userData = (json['user'] is Map) ? Map<String, dynamic>.from(json['user']) : <String, dynamic>{};
+    final availData = (json['availability'] is Map) ? Map<String, dynamic>.from(json['availability']) : <String, dynamic>{};
+    final offerDetails = (json['offer_details'] is Map) ? Map<String, dynamic>.from(json['offer_details']) : <String, dynamic>{};
+    final packageDetails = (json['package_details'] is Map) ? Map<String, dynamic>.from(json['package_details']) : <String, dynamic>{};
 
     bool parseBool(dynamic val) {
       if (val == null) return false;
@@ -93,36 +95,40 @@ class AstrologerModel {
                         parseBool(availData['call_enabled']);
 
     return AstrologerModel(
-      id: json['id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      yearsOfExperience: json['years_of_experience'] ?? 0,
-      areasOfExpertise: List<String>.from(json['areas_of_expertise'] ?? []),
-      languages: List<String>.from(json['languages'] ?? []),
-      profilePhoto: json['profile_photo'],
-      bio: json['bio'] ?? '',
-      chatRate: json['chat_rate_per_minute'],
-      callRate: json['call_rate_per_minute'],
-      videoCallRate: json['video_call_rate_per_minute'] ?? json['video_call_rate'],
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      userId: int.tryParse(json['user_id']?.toString() ?? '') ?? 0,
+      yearsOfExperience: int.tryParse(json['years_of_experience']?.toString() ?? '') ?? 0,
+      areasOfExpertise: (json['areas_of_expertise'] is List)
+          ? (json['areas_of_expertise'] as List).map((e) => e.toString()).toList()
+          : [],
+      languages: (json['languages'] is List)
+          ? (json['languages'] as List).map((e) => e.toString()).toList()
+          : [],
+      profilePhoto: json['profile_photo']?.toString(),
+      bio: json['bio']?.toString() ?? '',
+      chatRate: json['chat_rate_per_minute']?.toString(),
+      callRate: json['call_rate_per_minute']?.toString(),
+      videoCallRate: (json['video_call_rate_per_minute'] ?? json['video_call_rate'])?.toString(),
       name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
-      phone: userData['phone'],
-      email: userData['email'],
+      phone: userData['phone']?.toString(),
+      email: userData['email']?.toString(),
       isChatEnabled: isChat,
       isCallEnabled: isCall,
-      isOnline: json['is_online'] == 1 || json['is_online'] == true,
+      isOnline: json['is_online'] == 1 || json['is_online'] == true || json['is_online']?.toString() == '1' || json['is_online']?.toString().toLowerCase() == 'true',
       totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
-      isFollowed: json['is_followed'] == 1 || json['is_followed'] == true,
-      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true,
-      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true,
+      isFollowed: json['is_followed'] == 1 || json['is_followed'] == true || json['is_followed']?.toString() == '1',
+      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true || json['is_blocked']?.toString() == '1',
+      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true || json['is_review_eligible']?.toString() == '1',
       originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
       originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
-      hasOffer: json['has_offer'] == true,
-      discountPercentage: json['offer_details']?['discount_percentage']?.toString(),
-      packagePrice: json['package_details']?['price'] != null ? int.tryParse(json['package_details']['price'].toString()) : null,
-      packageDuration: json['package_details']?['duration'] != null ? int.tryParse(json['package_details']['duration'].toString()) : null,
-      isPurchase: json['package_details']?['is_purchase'] == true,
-      remainingTime: json['package_details']?['remaining_time'] != null ? int.tryParse(json['package_details']['remaining_time'].toString()) : null,
-      isBusy: json['is_busy'] == 1 || json['is_busy'] == true,
-      availabilityStatus: json['availability_status'] ?? (json['is_online'] == 1 || json['is_online'] == true ? 'Online' : 'Offline'),
+      hasOffer: json['has_offer'] == true || json['has_offer'] == 1 || json['has_offer']?.toString() == '1',
+      discountPercentage: offerDetails['discount_percentage']?.toString(),
+      packagePrice: packageDetails['price'] != null ? int.tryParse(packageDetails['price'].toString()) : null,
+      packageDuration: packageDetails['duration'] != null ? int.tryParse(packageDetails['duration'].toString()) : null,
+      isPurchase: packageDetails['is_purchase'] == true || packageDetails['is_purchase'] == 1 || packageDetails['is_purchase']?.toString() == '1',
+      remainingTime: packageDetails['remaining_time'] != null ? int.tryParse(packageDetails['remaining_time'].toString()) : null,
+      isBusy: json['is_busy'] == 1 || json['is_busy'] == true || json['is_busy']?.toString() == '1',
+      availabilityStatus: json['availability_status']?.toString() ?? (json['is_online'] == 1 || json['is_online'] == true ? 'Online' : 'Offline'),
     );
   }
 
