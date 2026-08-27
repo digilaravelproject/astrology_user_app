@@ -23,6 +23,7 @@ import '../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import '../../../core/constants/image_constants.dart';
 import '../../profile/controllers/profile_controller.dart';
+import '../../home/widgets/astrologer_action_buttons.dart';
 
 class AstrologerDetailScreen extends StatefulWidget {
   final int astrologerId;
@@ -1370,183 +1371,16 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-          if (_astrologer?.isChatEnabled == true) ...[
-            Expanded(
-              child: GestureDetector(
-                onTap: _astrologer?.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
-                      ? () => CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.')
-                      : () {
-                          final walletController = Get.find<WalletController>();
-                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                          WalletHelper.checkBalanceAndProceed(
-                            context: context,
-                            type: 'chat',
-                            name: _astrologer?.name ?? 'Astrologer',
-                            imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                            price: _astrologer?.chatRate ?? '0',
-                            providerId: _astrologer?.userId ?? widget.astrologerId,
-                            simulatedBalance: balance,
-                          );
-                        },
-                child: Opacity(
-                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: (_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ((_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.message_rounded, color: Colors.white, size: 18),
-                        const SizedBox(width: 8),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text((_astrologer?.isBlocked == true ? 'Blocked' : (_astrologer?.isBusy == true ? 'Busy' : (!(_astrologer?.isOnline ?? false) ? 'Offline' : 'Chat'))).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                                if (_astrologer?.hasOffer == true)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_astrologer?.hasOffer == true && _astrologer?.originalChatRatePerMinute != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: Text(
-                                      '₹ ${double.tryParse(_astrologer!.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalChatRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9), decoration: TextDecoration.lineThrough,decorationColor: Colors.white,),
-                                    ),
-                                  ),
-                                Text('₹ ${double.tryParse(_astrologer?.chatRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.chatRate ?? '0'}${"/min".tr}', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+              if (_astrologer != null)
+                Expanded(
+                  child: AstrologerActionButtons(
+                    astro: _astrologer!,
+                    isDetailStyle: true,
+                    showChat: true,
+                    showCall: true,
+                    providerIdFallback: widget.astrologerId,
                   ),
                 ),
-              ),
-            ),
-            if (_astrologer?.isCallEnabled == true) const SizedBox(width: 10),
-          ],
-          if (_astrologer?.isCallEnabled == true)
-            Expanded(
-              child: GestureDetector(
-                onTap: _astrologer?.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : (_astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
-                      ? () => CustomSnackbar.showInfo(_astrologer?.isBusy == true ? 'Astrologer is currently engaged.' : 'Astrologer is offline.')
-                      : () {
-                          final walletController = Get.find<WalletController>();
-                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                          WalletHelper.checkBalanceAndProceed(
-                            context: context,
-                            type: 'call',
-                            name: _astrologer?.name ?? 'Astrologer',
-                            imageUrl: _astrologer?.fullProfilePhoto ?? '',
-                            price: _astrologer?.callRate ?? '0',
-                            providerId: _astrologer?.userId ?? widget.astrologerId,
-                            simulatedBalance: balance,
-                          );
-                        },
-                child: Opacity(
-                  opacity: _astrologer?.isBlocked == true ? 0.6 : 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      gradient: (_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false))
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ((_astrologer?.isBlocked == true || _astrologer?.isBusy == true || !(_astrologer?.isOnline ?? false)) ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.call, color: Colors.white, size: 18),
-                        const SizedBox(width: 8),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text((_astrologer?.isBlocked == true ? 'Blocked' : (_astrologer?.isBusy == true ? 'Busy' : (!(_astrologer?.isOnline ?? false) ? 'Offline' : 'Call'))).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                                if (_astrologer?.hasOffer == true)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: Colors.yellow.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(3),
-                                    ),
-                                    child: Text(
-                                      '${_astrologer?.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_astrologer?.hasOffer == true && _astrologer?.originalCallRatePerMinute != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 4),
-                                    child: Text(
-                                      '₹ ${double.tryParse(_astrologer!.originalCallRatePerMinute!)?.toStringAsFixed(2) ?? _astrologer!.originalCallRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9),
-                                          decoration: TextDecoration.lineThrough,
-                                        decorationColor: Colors.white, // Strike-through line color
-                                        ),
-                                    ),
-                                  ),
-                                Text('₹ ${double.tryParse(_astrologer?.callRate ?? '0')?.toStringAsFixed(2) ?? _astrologer?.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ),
-            )
             ],
           ),
         ],

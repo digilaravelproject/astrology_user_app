@@ -473,11 +473,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void _startRingtone({required bool isIncoming}) {
-    // outgoing_ring.mp3 = user hears this while waiting for astrologer to accept
-    // incoming_ring.mp3 = would be for astrologer (not used on user side)
-    final sound = isIncoming ? 'audio/incoming_ring.mp3' : 'audio/outgoing_ring.mp3';
-    SoundVibrationService().startRingtone(sound, loop: true, vibrate: true);
-    Logger.d('[CallController] Ringtone started → $sound');
+    // Play user app sound for outgoing call
+    if (!isIncoming) {
+      SoundVibrationService().startRingtone('audio/user_app_sound.mp3', loop: true, vibrate: true);
+      Logger.d('[CallController] Ringtone started → user_app_sound.mp3');
+    }
   }
 
   void _stopRingtone() {

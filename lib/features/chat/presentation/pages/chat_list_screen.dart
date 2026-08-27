@@ -1,4 +1,5 @@
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import '../../../home/widgets/astrologer_action_buttons.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -614,60 +615,44 @@ class ChatListScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          text: astro.packageSessionTimeOnly,
-                          icon: Icons.timer,
-                          fontSize: 11,
-                          height: 32,
-                          borderRadius: 8,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
-                          onTap: () {
-                            if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                              return;
-                            }
-                            SessionBottomSheetHelper.show(context, astro);
-                          },
-                        ),
+              children: [
+                if (astro.isChatEnabled == true) ...[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: CustomButton(
+                        text: astro.packageSessionTimeOnly,
+                        icon: Icons.timer,
+                        fontSize: 11,
+                        height: 32,
+                        borderRadius: 8,
+                        backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
+                        borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        onTap: () {
+                          if (!astro.isOnline || astro.isBusy) {
+                            CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                            return;
+                          }
+                          SessionBottomSheetHelper.show(context, astro);
+                        },
                       ),
-                      if (astro.isChatEnabled) ...[
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: CustomButton(
-                            text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : '${AppStrings.chat.tr} - ₹${astro.chatRate ?? '0'}${"/min".tr}'),
-                            icon: Icons.chat,
-                            fontSize: 11,
-                            height: 32,
-                            borderRadius: 8,
-                            backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
-                            textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                            borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                            onTap: () {
-                              if (!astro.isOnline || astro.isBusy) {
-                                CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                                return;
-                              }
-                              final walletController = Get.find<WalletController>();
-                              final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                              WalletHelper.checkBalanceAndProceed(
-                                context: context,
-                                type: 'chat',
-                                name: astro.name,
-                                imageUrl: astro.fullProfilePhoto,
-                                price: astro.chatRate ?? '0',
-                                providerId: astro.userId,
-                                simulatedBalance: balance,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
+                  const SizedBox(width: 10),
+                ],
+                if (astro.isChatEnabled) ...[
+                  Expanded(
+                    child: AstrologerActionButtons(
+                      astro: astro,
+                      isDetailStyle: false,
+                      showChat: true,
+                      showCall: false,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ],
         ),
       ),

@@ -200,12 +200,19 @@ class SessionBottomSheetHelper {
                     if (astro.isChatEnabled)
                       Expanded(
                         child: CustomButton(
-                          text: AppStrings.chat,
+                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.chat),
                           icon: Icons.chat_bubble_outline_rounded,
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
+                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
+                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
+                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
                           onTap: () async {
+                            if (!astro.isOnline || astro.isBusy) {
+                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              return;
+                            }
                             showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -242,12 +249,15 @@ class SessionBottomSheetHelper {
                     if (astro.isCallEnabled)
                       Expanded(
                         child: CustomButton(
-                          text: AppStrings.call,
+                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.call),
                           icon: Icons.call_outlined,
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
-                          gradient: const LinearGradient(
+                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
+                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
+                          gradient: (!astro.isOnline || astro.isBusy) ? null : const LinearGradient(
                             colors: [
                               Color(0xFF4CAF50),
                               Color(0xFF388E3C),
@@ -256,6 +266,10 @@ class SessionBottomSheetHelper {
                             end: Alignment.bottomRight,
                           ),
                           onTap: () async {
+                            if (!astro.isOnline || astro.isBusy) {
+                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              return;
+                            }
                             var permissionStatus = await Permission.microphone.status;
                             if (!permissionStatus.isGranted) {
                               permissionStatus = await Permission.microphone.request();
@@ -280,6 +294,8 @@ class SessionBottomSheetHelper {
                                 providerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
                                 isPackageSession: true,
                               );
+                            } else {
+                              CustomSnackbar.showError('Microphone permission is required for calling.');
                             }
                           },
                         ),

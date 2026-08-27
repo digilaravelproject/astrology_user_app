@@ -472,6 +472,8 @@ class AstrologerController extends GetxController {
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,
+          isChatEnabled: isOnline ? true : current.isChatEnabled,
+          isCallEnabled: isOnline ? true : current.isCallEnabled,
         );
       }
     }
@@ -486,6 +488,8 @@ class AstrologerController extends GetxController {
         isOnline: isOnline,
         isBusy: isBusy,
         availabilityStatus: availabilityStatus,
+        isChatEnabled: isOnline ? true : selectedAstrologer.value!.isChatEnabled,
+        isCallEnabled: isOnline ? true : selectedAstrologer.value!.isCallEnabled,
       );
     }
   }

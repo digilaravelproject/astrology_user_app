@@ -18,6 +18,7 @@ import '../../../core/widgets/custom_rating_bar.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 import '../../../core/utils/session_bottom_sheet_helper.dart';
 import '../../../core/utils/custom_snackbar.dart';
+import 'astrologer_action_buttons.dart';
 
 class AstrologersPreviewSection extends StatelessWidget {
   const AstrologersPreviewSection({Key? key}) : super(key: key);
@@ -80,10 +81,7 @@ class AstrologersPreviewSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.2),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -191,7 +189,11 @@ class AstrologersPreviewSection extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 4),
-                                const Icon(Icons.verified, color: Colors.green, size: 16),
+                                const Icon(
+                                  Icons.verified,
+                                  color: Colors.green,
+                                  size: 16,
+                                ),
                               ],
                             ),
 
@@ -199,7 +201,9 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Skills
                             AppText(
-                              astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
+                              astro.areasOfExpertise
+                                  .map((e) => e.trim().tr)
+                                  .join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -209,7 +213,9 @@ class AstrologersPreviewSection extends StatelessWidget {
 
                             // Languages
                             AppText(
-                              astro.languages.map((l) => l.trim().tr).join(', '),
+                              astro.languages
+                                  .map((l) => l.trim().tr)
+                                  .join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
@@ -227,7 +233,6 @@ class AstrologersPreviewSection extends StatelessWidget {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -243,92 +248,46 @@ class AstrologersPreviewSection extends StatelessWidget {
                           icon: Icons.timer,
                           fontSize: 10,
                           height: 32,
-                          width: (astro.isChatEnabled && astro.isCallEnabled) ? 198 : 180,
+                          width:
+                              (astro.isChatEnabled && astro.isCallEnabled)
+                                  ? 198
+                                  : 180,
                           borderRadius: 8,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                          backgroundColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey.withOpacity(0.2)
+                                  : (astro.isPurchase == true
+                                      ? Colors.green
+                                      : Colors.orange),
+                          textColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : Colors.white,
+                          borderColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : (astro.isPurchase == true
+                                      ? Colors.green
+                                      : Colors.orange),
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           onTap: () {
                             if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              CustomSnackbar.showInfo(
+                                astro.isBusy
+                                    ? 'Astrologer is currently engaged.'
+                                    : 'Astrologer is offline.',
+                              );
                               return;
                             }
                             SessionBottomSheetHelper.show(context, astro);
                           },
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            if (astro.isChatEnabled)
-                              Expanded(
-                                child: CustomButton(
-                                  text: astro.isBusy
-                                      ? 'Busy'
-                                      : (!astro.isOnline ? 'Offline' : '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min'),
-                                  icon: Icons.chat_bubble_outline_rounded,
-                                  fontSize: 10,
-                                  height: 32,
-                                  borderRadius: 8,
-                                  backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
-                                  textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                                  borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  onTap: () {
-                                    if (!astro.isOnline || astro.isBusy) {
-                                      CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                                      return;
-                                    }
-                                    final walletController = Get.find<WalletController>();
-                                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                                    WalletHelper.checkBalanceAndProceed(
-                                      context: context,
-                                      type: 'chat',
-                                      name: astro.name,
-                                      imageUrl: astro.fullProfilePhoto,
-                                      price: astro.chatRate ?? '0',
-                                      providerId: astro.userId,
-                                      simulatedBalance: balance,
-                                    );
-                                  },
-                                ),
-                              ),
-                            if (astro.isChatEnabled && astro.isCallEnabled)
-                              const SizedBox(width: 8),
-                            if (astro.isCallEnabled)
-                              Expanded(
-                                child: CustomButton(
-                                  text: astro.isBusy
-                                      ? 'Busy'
-                                      : (!astro.isOnline ? 'Offline' : '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min'),
-                                  icon: Icons.call_outlined,
-                                  fontSize: 10,
-                                  height: 32,
-                                  borderRadius: 8,
-                                  backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
-                                  textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                                  borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                                  onTap: () {
-                                    if (!astro.isOnline || astro.isBusy) {
-                                      CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                                      return;
-                                    }
-                                    final walletController = Get.find<WalletController>();
-                                    final double balance = double.tryParse(walletController.balance) ?? 0.0;
-                                    WalletHelper.checkBalanceAndProceed(
-                                      context: context,
-                                      type: 'call',
-                                      name: astro.name,
-                                      imageUrl: astro.fullProfilePhoto,
-                                      price: astro.callRate ?? '0',
-                                      providerId: astro.userId,
-                                      simulatedBalance: balance,
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
+                        AstrologerActionButtons(
+                          astro: astro,
+                          isDetailStyle: false,
+                          showChat: true,
+                          showCall: true,
                         ),
                       ],
                     ),
@@ -356,8 +315,6 @@ class AstrologersPreviewSection extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildShimmerList() {
     return Column(
       children: List.generate(
@@ -378,6 +335,7 @@ class AstrologersPreviewSection extends StatelessWidget {
       ),
     );
   }
+
   String _formatOrdersCount(int count) {
     if (count >= 1000) {
       final double inK = count / 1000.0;
