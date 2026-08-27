@@ -9,7 +9,6 @@ import 'core/services/storage/shared_prefs.dart';
 import 'translations/translations.dart';
 
 import 'core/services/local_notification_service.dart';
-import 'core/services/keep_alive_service.dart';
 import 'core/services/foreground_task_service.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -43,9 +42,6 @@ Future<void> initApp() async {
 
   // Initialize shared preferences
   await SharedPrefs.init();
-
-  // Initialize keep-alive foreground service (Disabled to prevent OOM crash on low-resource devices)
-  // await initializeKeepAliveService();
 
   // Initialize call foreground task service
   await ForegroundTaskService.init();

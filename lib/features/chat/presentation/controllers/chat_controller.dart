@@ -24,7 +24,6 @@ import 'package:astro_user/features/auth/domain/models/user_model.dart';
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
@@ -122,7 +121,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       // Update local state to show chat is ended/completed
       status.value = 'ended';
       _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
+      ForegroundTaskService.stopService();
       if (_sessionId != null) {
         LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
       }
@@ -158,7 +157,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       
       status.value = 'ended';
       _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
+      ForegroundTaskService.stopService();
       if (_sessionId != null) {
         LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
       }
@@ -456,7 +455,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   void _handleChatEndedByPeer() {
     status.value = 'ended';
     _timer?.cancel();
-    FlutterBackgroundService().invoke('stopService');
+    ForegroundTaskService.stopService();
     if (_sessionId != null) {
       LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
     }
@@ -475,7 +474,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _stopRingtone();
     status.value = 'ended';
     _timer?.cancel();
-    FlutterBackgroundService().invoke('stopService');
+    ForegroundTaskService.stopService();
     if (_sessionId != null) {
       LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
     }
@@ -795,7 +794,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
       status.value = 'ended';
       _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
+      ForegroundTaskService.stopService();
       LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
       FloatingChatBubble.dismiss();
       if (session != null) {
@@ -817,7 +816,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _stopRingtone();
     status.value = 'ended';
     _timer?.cancel();
-    FlutterBackgroundService().invoke('stopService');
+    ForegroundTaskService.stopService();
     LocalNotificationService.cancelOngoingChatNotification(targetId);
     FloatingChatBubble.dismiss();
     
@@ -893,7 +892,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   void _handlePackageTerminated() {
     status.value = 'ended';
     _timer?.cancel();
-    FlutterBackgroundService().invoke('stopService');
+    ForegroundTaskService.stopService();
     if (_sessionId != null) {
       LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
     }
@@ -923,6 +922,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _msgSub?.cancel();
     _endSub?.cancel();
     _statusSub?.cancel();
+    _statusUpdateSub?.cancel();
     _dismissSub?.cancel();
     _packageTerminatedSub?.cancel();
     

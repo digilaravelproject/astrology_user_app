@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -26,7 +28,7 @@ import 'package:astro_user/features/chat_assistance/presentation/controllers/cha
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'package:astro_user/features/astrologers/controllers/astrologer_controller.dart';
 
-class WebSocketService extends GetxService {
+class WebSocketService extends GetxService with WidgetsBindingObserver {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   bool _isConnecting = false;
@@ -34,6 +36,18 @@ class WebSocketService extends GetxService {
   final Set<String> _subscribedChannels = {};
   int? _userId;
   String? _token;
+  
+  // Heartbeat & Watchdog
+  Timer? _heartbeatTimer;
+  Timer? _pongTimeoutTimer;
+  static const Duration _heartbeatInterval = Duration(seconds: 25);
+  static const Duration _pongTimeout = Duration(seconds: 10);
+
+  // Auto-reconnect & Backoff
+  Timer? _reconnectTimer;
+  int _reconnectAttempts = 0;
+  StreamSubscription? _connectivitySubscription;
+  final List<String> _offlineQueue = [];
   
   static int? activeSessionId;
   static final RxMap<int, String> sessionStatusUpdates = <int, String>{}.obs;
@@ -65,14 +79,85 @@ class WebSocketService extends GetxService {
   bool get isConnected => _isConnected;
 
   Future<WebSocketService> init() async {
-    // We will wait until we actually have user data to connect
+    WidgetsBinding.instance.addObserver(this);
+    _setupConnectivityListener();
     return this;
+  }
+
+  void _setupConnectivityListener() {
+    _connectivitySubscription?.cancel();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
+      final isConnected = results.any((r) => r != ConnectivityResult.none);
+      if (isConnected && !_isConnected && !_isConnecting) {
+        Logger.d('|🌐 Connectivity restored! Triggering immediate WebSocket reconnect.');
+        _reconnectAttempts = 0;
+        connect();
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Logger.d('|📱 App resumed from background/sleep. Checking WebSocket health...');
+      if (!_isConnected && !_isConnecting) {
+        _reconnectAttempts = 0;
+        connect();
+      } else if (_isConnected) {
+        _sendHeartbeat();
+      }
+    }
+  }
+
+  void _startHeartbeat() {
+    _stopHeartbeat();
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
+      if (_isConnected && _channel != null) {
+        _sendHeartbeat();
+      }
+    });
+  }
+
+  void _sendHeartbeat() {
+    try {
+      _pongTimeoutTimer?.cancel();
+      _pongTimeoutTimer = Timer(_pongTimeout, () {
+        Logger.w('|⚠️ WebSocket pong timeout! Socket is unresponsive. Forcing reconnect...');
+        _forceDisconnectAndReconnect();
+      });
+      _sendRaw(jsonEncode({
+        "event": AppUrls.pusherPing,
+        "data": {}
+      }));
+    } catch (e) {
+      Logger.e('|⚠️ Error sending heartbeat ping: $e');
+    }
+  }
+
+  void _stopHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    _pongTimeoutTimer?.cancel();
+    _pongTimeoutTimer = null;
+  }
+
+  void _forceDisconnectAndReconnect() {
+    _isConnecting = false;
+    _isConnected = false;
+    _socketId = null;
+    _stopHeartbeat();
+    try {
+      _channel?.sink.close();
+    } catch (_) {}
+    _channel = null;
+    _reconnect();
   }
 
   /// Connects the websocket if user is logged in
   Future<void> connect() async {
     if (_isConnected || _isConnecting) return;
     _isConnecting = true;
+    _reconnectTimer?.cancel();
 
     try {
       _token = await TokenManager.getToken();
@@ -89,11 +174,12 @@ class WebSocketService extends GetxService {
         Logger.e('|🔌 WEBSOCKET ERROR');
         Logger.e('|⚠️ Cannot connect, token or userId is missing.');
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        _isConnecting = false;
         return;
       }
 
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      Logger.d('|🔌 WEBSOCKET CONNECTING');
+      Logger.d('|🔌 WEBSOCKET CONNECTING (Attempt: ${_reconnectAttempts + 1})');
       Logger.d('|📍 URL: $_wsUrl');
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       
@@ -104,10 +190,7 @@ class WebSocketService extends GetxService {
       
       _channel?.stream.listen(
         (message) {
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          Logger.d('|📥 WEBSOCKET RECEIVED');
-          Logger.d('|📨 Data: $message');
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _pongTimeoutTimer?.cancel();
           _handleMessage(message);
         },
         onDone: () {
@@ -118,6 +201,7 @@ class WebSocketService extends GetxService {
           _isConnecting = false;
           _isConnected = false;
           _socketId = null;
+          _stopHeartbeat();
           _reconnect();
         },
         onError: (error) {
@@ -128,6 +212,7 @@ class WebSocketService extends GetxService {
           _isConnecting = false;
           _isConnected = false;
           _socketId = null;
+          _stopHeartbeat();
           _reconnect();
         },
       );
@@ -137,6 +222,7 @@ class WebSocketService extends GetxService {
       Logger.e('|⚠️ Exception: $e');
       Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       _isConnecting = false;
+      _stopHeartbeat();
       _reconnect();
     }
   }
@@ -157,6 +243,8 @@ class WebSocketService extends GetxService {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _isConnecting = false;
           _isConnected = true;
+          _reconnectAttempts = 0;
+          _startHeartbeat();
           _authenticateAndSubscribe();
         } else if (event == AppUrls.pusherSubscriptionSucceeded) {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -831,6 +919,25 @@ class WebSocketService extends GetxService {
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       }
     }
+
+    // Flush any pending queued messages now that channels are authenticated
+    _flushOfflineQueue();
+  }
+
+  void _flushOfflineQueue() {
+    if (_offlineQueue.isEmpty || !_isConnected || _channel == null) return;
+    Logger.d('|📤 Flushing ${_offlineQueue.length} queued offline WebSocket messages...');
+    final List<String> pending = List.from(_offlineQueue);
+    _offlineQueue.clear();
+    for (final msg in pending) {
+      _send(msg);
+    }
+  }
+
+  void _sendRaw(String data) {
+    if (_channel != null && _isConnected) {
+      _channel!.sink.add(data);
+    }
   }
 
   void _send(String data) {
@@ -840,15 +947,23 @@ class WebSocketService extends GetxService {
       Logger.d('|📦 Data: $data');
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       _channel!.sink.add(data);
+    } else {
+      Logger.w('|⚠️ WebSocket disconnected. Adding message to offline queue.');
+      if (_offlineQueue.length < 50) {
+        _offlineQueue.add(data);
+      }
     }
   }
 
   void _reconnect() {
+    _reconnectTimer?.cancel();
+    _reconnectAttempts++;
+    final delaySeconds = min(30, max(2, pow(2, _reconnectAttempts).toInt()));
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     Logger.d('|⏱️ WEBSOCKET RECONNECTING');
-    Logger.d('|⚠️ Attempting to reconnect in 5 seconds...');
+    Logger.d('|⚠️ Attempting to reconnect in $delaySeconds seconds (Attempt $_reconnectAttempts)...');
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    Future.delayed(const Duration(seconds: 5), () {
+    _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
       connect();
     });
   }
@@ -860,9 +975,21 @@ class WebSocketService extends GetxService {
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     _isConnected = false;
     _socketId = null;
+    _reconnectAttempts = 0;
+    _stopHeartbeat();
+    _reconnectTimer?.cancel();
+    _offlineQueue.clear();
     _subscribedChannels.clear();
     _channel?.sink.close();
     _channel = null;
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _connectivitySubscription?.cancel();
+    disconnect();
+    super.onClose();
   }
 
   void _handleChatAccepted(dynamic rawData) {
@@ -1007,12 +1134,7 @@ class WebSocketService extends GetxService {
         final int senderId = int.tryParse(map['sender_id']?.toString() ?? '') ?? 0;
         final int sessionId = int.tryParse(map['chat_assistance_session_id']?.toString() ?? map['chat_session_id']?.toString() ?? '') ?? 0;
 
-        if (senderId != currentUserId && activeSessionId != sessionId) {
-          if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sessionId) {
-            FloatingChatBubble.incrementUnreadCount();
-          }
-          _showInAppNotification(map);
-          
+        if (senderId != currentUserId) {
           final int messageId = int.tryParse(map['id']?.toString() ?? '') ?? 0;
           if (messageId > 0 && Get.isRegistered<SyncMessageStatusUseCase>()) {
             Get.find<SyncMessageStatusUseCase>().execute(
@@ -1022,6 +1144,13 @@ class WebSocketService extends GetxService {
             ).catchError((e) {
               debugPrint('Error syncing message status: $e');
             });
+          }
+
+          if (activeSessionId != sessionId) {
+            if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sessionId) {
+              FloatingChatBubble.incrementUnreadCount();
+            }
+            _showInAppNotification(map);
           }
         }
       }

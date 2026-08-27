@@ -150,12 +150,19 @@ class WebRTCService {
 
   Future<RTCSessionDescription> acceptOffer(int sessionId, String offerSdp) async {
     try {
+      activeSessionId = sessionId;
       await initLocalStream();
       peerConnection = await createPeerConnection(_iceConfig, _constraints);
 
       // Listeners
       peerConnection!.onIceCandidate = (candidate) {
-        _sendIceCandidate(sessionId, candidate);
+        final currentId = activeSessionId;
+        if (currentId != null && currentId > 0) {
+          _sendIceCandidate(currentId, candidate);
+        } else {
+          _queuedIceCandidates.add(candidate);
+          Logger.d('WebRTCService: Queued ICE candidate because activeSessionId is not set yet.');
+        }
       };
 
       peerConnection!.onIceConnectionState = (state) {
@@ -276,13 +283,20 @@ class WebRTCService {
 
   void dispose() {
     try {
+      toggleSpeaker(false);
+      toggleMute(false);
       localStream?.getTracks().forEach((track) => track.stop());
       localStream?.dispose();
+      localStream = null;
       remoteStream?.dispose();
+      remoteStream = null;
       peerConnection?.close();
       peerConnection?.dispose();
+      peerConnection = null;
       _isRemoteDescriptionSet = false;
       _remoteCandidateQueue.clear();
+      _queuedIceCandidates.clear();
+      _activeSessionId = null;
       Logger.d('WebRTCService: Disposed peer connection & streams.');
     } catch (e) {
       Logger.e('WebRTCService: Error disposing WebRTC resources -> $e');
