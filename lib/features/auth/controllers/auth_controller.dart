@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/custom_snackbar.dart';
@@ -58,6 +59,28 @@ class AuthController extends GetxController {
   final otpController = TextEditingController();
   final selectedGender = ''.obs;
 
+  Timer? _resendTimer;
+  final resendTimerSeconds = 30.obs;
+  final canResendOtp = false.obs;
+
+  void startResendTimer() {
+    _resendTimer?.cancel();
+    resendTimerSeconds.value = 30;
+    canResendOtp.value = false;
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resendTimerSeconds.value > 0) {
+        resendTimerSeconds.value--;
+      } else {
+        canResendOtp.value = true;
+        timer.cancel();
+      }
+    });
+  }
+
+  void cancelResendTimer() {
+    _resendTimer?.cancel();
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -66,6 +89,7 @@ class AuthController extends GetxController {
 
   @override
   void onClose() {
+    _resendTimer?.cancel();
     super.onClose();
   }
 
@@ -90,6 +114,7 @@ class AuthController extends GetxController {
       if (user != null) {
         currentUser.value = user;
         currentMobile.value = mobileController.text.trim();
+        startResendTimer();
         Get.toNamed(RouteHelper.getOtpRoute());
         Future.delayed(const Duration(milliseconds: 300), () {
           CustomSnackbar.showSuccess('OTP sent to your mobile number');
@@ -116,6 +141,7 @@ class AuthController extends GetxController {
 
       if (responseModel != null) {
         currentMobile.value = mobile;
+        startResendTimer();
         print('Navigating to OTP Screen');
         Get.toNamed(RouteHelper.getOtpRoute());
         Future.delayed(const Duration(milliseconds: 300), () {
@@ -135,6 +161,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> resendOtp() async {
+    if (!canResendOtp.value && resendTimerSeconds.value > 0) return;
     print('Resend OTP called');
     
     try {
@@ -144,6 +171,7 @@ class AuthController extends GetxController {
 
       if (responseModel != null) {
         CustomSnackbar.showSuccess('OTP resent successfully');
+        startResendTimer();
       } else {
         CustomSnackbar.showError('Failed to resend OTP. Please try again.');
       }
@@ -254,31 +282,35 @@ class AuthController extends GetxController {
     try {
       isLoading.value = true;
       print('AuthController.logout() called');
-      await FCMNotificationService.removeDeviceToken();
+      try {
+        await FCMNotificationService.removeDeviceToken();
+      } catch (_) {}
       final response = await _logoutUseCase.execute();
       
-      if (response.isSuccess) {
-        print('AuthController.logout() completed successfully');
-        currentUser.value = null;
-        currentMobile.value = '';
-        mobileController.clear();
-        otpController.clear();
-        nameController.clear();
-        
+      currentUser.value = null;
+      currentMobile.value = '';
+      mobileController.clear();
+      otpController.clear();
+      nameController.clear();
+      
+      try {
         Get.find<WebSocketService>().disconnect();
         ForegroundTaskService.stopService();
-        
-        Get.offAllNamed(RouteHelper.getLoginRoute());
-        
-        Future.delayed(const Duration(milliseconds: 300), () {
-          CustomSnackbar.showSuccess('Logged out successfully');
-        });
-      } else {
-        CustomSnackbar.showError(response.message ?? 'Logout failed');
-      }
+      } catch (_) {}
+      await Get.find<AuthService>().clearUserInfo();
+
+      Get.offAllNamed(RouteHelper.getLoginRoute());
+      
+      Future.delayed(const Duration(milliseconds: 300), () {
+        CustomSnackbar.showSuccess('Logged out successfully');
+      });
     } catch (e) {
       print('Logout error: $e');
-      CustomSnackbar.showError('An error occurred during logout');
+      currentUser.value = null;
+      try {
+        await Get.find<AuthService>().clearUserInfo();
+      } catch (_) {}
+      Get.offAllNamed(RouteHelper.getLoginRoute());
     } finally {
       isLoading.value = false;
     }

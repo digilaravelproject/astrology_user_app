@@ -38,8 +38,15 @@ class ApiClient {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        String token = await TokenManager.getToken() ?? "";
-        options.headers["Authorization"] = "Bearer $token";
+        String token = '';
+        if (options.headers['no_auth'] == true) {
+          options.headers.remove('no_auth');
+        } else {
+          token = await TokenManager.getToken();
+          if (token.isNotEmpty) {
+            options.headers["Authorization"] = "Bearer $token";
+          }
+        }
         options.headers["Accept"] = "application/json";
 
         if (options.path.contains('/user/live/')) {

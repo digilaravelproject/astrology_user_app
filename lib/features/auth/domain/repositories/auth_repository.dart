@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 
 import '../../../../core/constants/app_constants.dart';
@@ -18,6 +19,7 @@ class AuthRepository implements AuthRepositoryInterface {
       data: {
         "phone": phone,
       },
+      options: Options(headers: {'no_auth': true}),
     );
   }
 
@@ -28,6 +30,7 @@ class AuthRepository implements AuthRepositoryInterface {
       data: {
         "phone": phone,
       },
+      options: Options(headers: {'no_auth': true}),
     );
   }
 
@@ -57,6 +60,7 @@ class AuthRepository implements AuthRepositoryInterface {
         "phone": mobile,
         "otp": otp,
       },
+      options: Options(headers: {'no_auth': true}),
     );
   }
 

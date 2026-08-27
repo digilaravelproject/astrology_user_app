@@ -13,14 +13,34 @@ class TokenManager {
   );
 
   static Future<String> getToken() async {
-    return await _secureStorage.read(key: AppConstants.token) ?? '';
+    try {
+      return await _secureStorage.read(key: AppConstants.token) ?? '';
+    } catch (e) {
+      try {
+        await _secureStorage.deleteAll();
+      } catch (_) {}
+      return '';
+    }
   }
 
   static Future<void> saveToken(String token) async {
-    await _secureStorage.write(key: AppConstants.token, value: token);
+    try {
+      await _secureStorage.write(key: AppConstants.token, value: token);
+    } catch (e) {
+      try {
+        await _secureStorage.deleteAll();
+        await _secureStorage.write(key: AppConstants.token, value: token);
+      } catch (_) {}
+    }
   }
 
   static Future<void> clearToken() async {
-    await _secureStorage.delete(key: AppConstants.token);
+    try {
+      await _secureStorage.delete(key: AppConstants.token);
+    } catch (e) {
+      try {
+        await _secureStorage.deleteAll();
+      } catch (_) {}
+    }
   }
 }

@@ -221,25 +221,37 @@ class OtpScreen extends StatelessWidget {
   }
 
   Widget _buildResendSection(AuthController authController) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        AppText(
-          AppStrings.didntReceiveCode,
-          color: AppColors.textColorSecondary,
-          fontSize: 14,
-        ),
-        GestureDetector(
-          onTap: () => authController.resendOtp(),
-          child: AppText(
-            AppStrings.resend,
-            color: AppColors.deepPink,
-            fontWeight: FontWeight.bold,
+    return Obx(() {
+      final isTimerActive = authController.resendTimerSeconds.value > 0 && !authController.canResendOtp.value;
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AppText(
+            AppStrings.didntReceiveCode,
+            color: AppColors.textColorSecondary,
             fontSize: 14,
           ),
-        ),
-      ],
-    );
+          const SizedBox(width: 4),
+          if (isTimerActive)
+            AppText(
+              'Resend in 00:${authController.resendTimerSeconds.value.toString().padLeft(2, '0')}',
+              color: AppColors.textColorSecondary,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            )
+          else
+            GestureDetector(
+              onTap: () => authController.resendOtp(),
+              child: AppText(
+                AppStrings.resend,
+                color: AppColors.deepPink,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+        ],
+      );
+    });
   }
 
   Widget _buildBackButton() {

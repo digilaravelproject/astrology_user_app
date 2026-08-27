@@ -1028,29 +1028,30 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => _showReviewBottomSheet(context, _astrologer!.name),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.deepPink.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
-                      const SizedBox(width: 4),
-                      AppText(
-                        'Write',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.deepPink,
-                      ),
-                    ],
+              if (_astrologer?.isReviewEligible == true)
+                GestureDetector(
+                  onTap: () => _showReviewBottomSheet(context, _astrologer!.name),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.deepPink.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
+                        const SizedBox(width: 4),
+                        AppText(
+                          'Write',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepPink,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
           if (reviews.isNotEmpty) ...[
