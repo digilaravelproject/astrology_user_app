@@ -486,7 +486,6 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void cleanUp() {
-    if (status.value == 'idle' && sessionId == null) return;
     _stopRingtone();
     _callTimer?.cancel();
     _ringingTimer?.cancel();
@@ -557,7 +556,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (response.isSuccess && response.body != null) {
         final bodyMap = response.body;
         final session = bodyMap is Map 
-            ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['data'] ?? bodyMap)
+            ? (bodyMap['data'] is Map 
+                ? (bodyMap['data']['session'] ?? (bodyMap['data']['id'] != null ? bodyMap['data'] : null))
+                : (bodyMap['session'] ?? (bodyMap['id'] != null ? bodyMap : null)))
             : null;
         if (session != null) {
           final sessionStatus = session['status']?.toString();
