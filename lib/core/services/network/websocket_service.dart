@@ -32,6 +32,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   bool _isConnecting = false;
+  bool _isManuallyDisconnected = false;
   String? _socketId;
   final Set<String> _subscribedChannels = {};
   int? _userId;
@@ -88,7 +89,8 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     _connectivitySubscription?.cancel();
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
       final isConnected = results.any((r) => r != ConnectivityResult.none);
-      if (isConnected && !_isConnected && !_isConnecting) {
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+      if (isConnected && !_isConnected && !_isConnecting && !_isManuallyDisconnected && isLoggedIn) {
         Logger.d('|🌐 Connectivity restored! Triggering immediate WebSocket reconnect.');
         _reconnectAttempts = 0;
         connect();
@@ -99,12 +101,15 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      Logger.d('|📱 App resumed from background/sleep. Checking WebSocket health...');
-      if (!_isConnected && !_isConnecting) {
-        _reconnectAttempts = 0;
-        connect();
-      } else if (_isConnected) {
-        _sendHeartbeat();
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+      if (!_isManuallyDisconnected && isLoggedIn) {
+        Logger.d('|📱 App resumed from background/sleep. Checking WebSocket health...');
+        if (!_isConnected && !_isConnecting) {
+          _reconnectAttempts = 0;
+          connect();
+        } else if (_isConnected) {
+          _sendHeartbeat();
+        }
       }
     }
   }
@@ -154,7 +159,16 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   }
 
   /// Connects the websocket if user is logged in
-  Future<void> connect() async {
+  Future<void> connect({bool isExplicitUserLogin = false}) async {
+    if (isExplicitUserLogin) {
+      _isManuallyDisconnected = false;
+    }
+    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+    if (!isLoggedIn || _isManuallyDisconnected) {
+      _isConnecting = false;
+      _isConnected = false;
+      return;
+    }
     if (_isConnected || _isConnecting) return;
     _isConnecting = true;
     _reconnectTimer?.cancel();
@@ -199,12 +213,15 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _isConnected = false;
           _socketId = null;
           _stopHeartbeat();
-          if (wasConnected) {
-            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            Logger.d('|🔌 WEBSOCKET DISCONNECTED');
-            Logger.d('|⚠️ Connection closed (onDone)');
-            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            _reconnect();
+          if (!_isManuallyDisconnected && wasConnected) {
+            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+            if (loggedIn) {
+              Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              Logger.d('|🔌 WEBSOCKET DISCONNECTED');
+              Logger.d('|⚠️ Connection closed (onDone)');
+              Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              _reconnect();
+            }
           }
         },
         onError: (error) {
@@ -213,12 +230,15 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _isConnected = false;
           _socketId = null;
           _stopHeartbeat();
-          if (wasConnected) {
-            Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            Logger.e('|🔌 WEBSOCKET ERROR');
-            Logger.e('|⚠️ Exception: $error');
-            Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            _reconnect();
+          if (!_isManuallyDisconnected && wasConnected) {
+            final loggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+            if (loggedIn) {
+              Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              Logger.e('|🔌 WEBSOCKET ERROR');
+              Logger.e('|⚠️ Exception: $error');
+              Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+              _reconnect();
+            }
           }
         },
       );
@@ -229,7 +249,9 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
       Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       _isConnecting = false;
       _stopHeartbeat();
-      _reconnect();
+      if (!_isManuallyDisconnected) {
+        _reconnect();
+      }
     }
   }
 
@@ -988,6 +1010,9 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   }
 
   void _reconnect() {
+    if (_isManuallyDisconnected) return;
+    final bool isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn, defaultValue: false);
+    if (!isLoggedIn) return;
     if (_isConnecting || _isConnected) return;
     if (_reconnectTimer != null && _reconnectTimer!.isActive) return;
 
@@ -998,7 +1023,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     Logger.d('|⚠️ Attempting to reconnect in $delaySeconds seconds (Attempt $_reconnectAttempts)...');
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
-      if (!_isConnected && !_isConnecting) {
+      if (!_isConnected && !_isConnecting && !_isManuallyDisconnected) {
         connect();
       }
     });
@@ -1006,17 +1031,40 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
 
   void disconnect() {
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    Logger.d('|🔌 WEBSOCKET DISCONNECTING');
+    Logger.d('|🔌 WEBSOCKET DISCONNECTING (Unsubscribing & Closing)');
     Logger.d('|⚠️ Client manually closing connection.');
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    _isManuallyDisconnected = true;
+
+    // Unsubscribe from all active channels before closing connection
+    if (_isConnected && _channel != null) {
+      for (final channelName in _subscribedChannels.toList()) {
+        try {
+          _sendRaw(jsonEncode({
+            "event": "pusher:unsubscribe",
+            "data": {
+              "channel": channelName
+            }
+          }));
+        } catch (_) {}
+      }
+    }
+
     _isConnected = false;
+    _isConnecting = false;
     _socketId = null;
+    _userId = null;
+    currentUserId = null;
+    _token = null;
     _reconnectAttempts = 0;
     _stopHeartbeat();
     _reconnectTimer?.cancel();
+    _reconnectTimer = null;
     _offlineQueue.clear();
     _subscribedChannels.clear();
-    _channel?.sink.close();
+    try {
+      _channel?.sink.close();
+    } catch (_) {}
     _channel = null;
   }
 
