@@ -74,7 +74,14 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   final Rx<ChatMessage?> replyingToMessage = Rx<ChatMessage?>(null);
 
   void setReply(ChatMessage message) {
-    replyingToMessage.value = message;
+    String cleanText = message.text;
+    if (cleanText.startsWith('>>reply>>')) {
+      final endQuote = cleanText.indexOf('<<reply<<');
+      if (endQuote != -1) {
+        cleanText = cleanText.substring(endQuote + 9).trimLeft();
+      }
+    }
+    replyingToMessage.value = message.copyWith(text: cleanText);
   }
 
   void cancelReply() {

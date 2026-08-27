@@ -265,8 +265,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     
                     if (message.replyTo != null) {
                       isReply = true;
-                      replyUser = message.replyTo!.isMe ? 'You' : (widget.astrologerName);
+                      replyUser = message.replyTo!.isMe ? 'You' : widget.astrologerName;
                       replyText = message.replyTo!.text;
+                    } else if (message.replyToId != null && message.replyToId != 0) {
+                      final originalMsg = _controller.messages.firstWhereOrNull((m) => m.id == message.replyToId);
+                      if (originalMsg != null) {
+                        isReply = true;
+                        replyUser = originalMsg.isMe ? 'You' : widget.astrologerName;
+                        replyText = originalMsg.text;
+                      }
                     } else if (mainText.startsWith('>>reply>>')) {
                       // Fallback for old cached messages
                       isReply = true;
@@ -295,7 +302,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       }
                     }
 
+                    if (replyText.startsWith('>>reply>>')) {
+                      final endQuote = replyText.indexOf('<<reply<<');
+                      if (endQuote != -1) {
+                        replyText = replyText.substring(endQuote + 9).trimLeft();
+                      }
+                    }
+
                     return SwipeTo(
+                      key: ValueKey('user_chat_msg_${message.id}_${message.time.millisecondsSinceEpoch}_$index'),
                       onRightSwipe: (details) {
                         _controller.setReply(message);
                       },

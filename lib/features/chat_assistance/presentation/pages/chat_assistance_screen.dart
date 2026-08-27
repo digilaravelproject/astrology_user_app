@@ -135,7 +135,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   itemCount: controller.messages.length,
                   itemBuilder: (context, index) {
                     final message = controller.messages[index];
-                    return _buildMessageBubble(message);
+                    return _buildMessageBubble(message, index);
                   },
                 );
               }),
@@ -148,7 +148,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _buildMessageBubble(ChatMessage message, int index) {
     bool isReply = false;
     String replyUser = '';
     String replyText = '';
@@ -158,6 +158,13 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
       isReply = true;
       replyUser = message.replyTo!.isMe ? 'You' : (controller.astrologerName ?? 'Assistant');
       replyText = message.replyTo!.text;
+    } else if (message.replyToId != null && message.replyToId != 0) {
+      final originalMsg = controller.messages.firstWhereOrNull((m) => m.id == message.replyToId);
+      if (originalMsg != null) {
+        isReply = true;
+        replyUser = originalMsg.isMe ? 'You' : (controller.astrologerName ?? 'Assistant');
+        replyText = originalMsg.text;
+      }
     } else if (mainText.startsWith('>>reply>>')) {
       // Fallback for old cached messages
       isReply = true;
@@ -186,7 +193,15 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
       }
     }
 
+    if (replyText.startsWith('>>reply>>')) {
+      final endQuote = replyText.indexOf('<<reply<<');
+      if (endQuote != -1) {
+        replyText = replyText.substring(endQuote + 9).trimLeft();
+      }
+    }
+
     return SwipeTo(
+          key: ValueKey('assist_chat_msg_${message.id}_${message.time.millisecondsSinceEpoch}_$index'),
           onRightSwipe: (details) {
             controller.setReply(message);
           },
