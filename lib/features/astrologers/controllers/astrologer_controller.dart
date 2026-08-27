@@ -86,6 +86,16 @@ class AstrologerController extends GetxController {
   final RxList<AstrologerModel> topAstrologers = <AstrologerModel>[].obs;
   final RxBool isTopLoading = false.obs;
 
+  // Pagination for Home
+  final RxInt homePage = 1.obs;
+  final RxBool hasMoreHome = true.obs;
+  final RxBool isMoreHomeLoading = false.obs;
+
+  // Pagination for Filtered List (Chat/Call)
+  final RxInt filteredPage = 1.obs;
+  final RxBool hasMoreFiltered = true.obs;
+  final RxBool isMoreFilteredLoading = false.obs;
+
   // Filter States
   final RxString selectedType = 'all'.obs; // all, favourite, new, top
   final RxString selectedServiceType = 'all'.obs; // all, chat, call
@@ -102,11 +112,11 @@ class AstrologerController extends GetxController {
   void onInit() {
     super.onInit();
     // Fetch astrologers when controller is initialized
-    fetchAstrologers();
+    fetchAstrologers(isRefresh: true);
     fetchGifts();
     
     // Setup debouncer for search
-    debounce(searchQuery, (_) => fetchAstrologers(), time: const Duration(milliseconds: 500));
+    debounce(searchQuery, (_) => fetchAstrologers(isRefresh: true), time: const Duration(milliseconds: 500));
   }
 
   Future<void> fetchTopAstrologers({String? serviceType}) async {
@@ -126,9 +136,19 @@ class AstrologerController extends GetxController {
     }
   }
 
-  Future<void> fetchFilteredAstrologers({String? type, String? serviceType, List<String>? skills, bool? online}) async {
+  Future<void> fetchFilteredAstrologers({
+    String? type,
+    String? serviceType,
+    List<String>? skills,
+    bool? online,
+    bool isRefresh = true,
+  }) async {
     try {
-      isFilteredLoading.value = true;
+      if (isRefresh) {
+        filteredPage.value = 1;
+        hasMoreFiltered.value = true;
+        isFilteredLoading.value = true;
+      }
       
       // Sync global states so UI chips update
       if (serviceType != null) selectedServiceType.value = serviceType;
@@ -143,13 +163,16 @@ class AstrologerController extends GetxController {
       if (skills != null) {
         selectedSkills.assignAll(skills);
         selectedSkills.refresh();
-      } else if (type == 'all' && online == null) {
+      } else if (type == 'all' && online == null && isRefresh) {
         selectedSkills.clear();
         selectedSkills.refresh();
         isOnlineOnly.value = false;
       }
 
-      final Map<String, dynamic> params = {};
+      final Map<String, dynamic> params = {
+        'page': filteredPage.value,
+        'per_page': 10,
+      };
       if (selectedServiceType.value != 'all') {
         params['type'] = selectedServiceType.value;
       } else if (selectedType.value != 'all') {
@@ -169,13 +192,35 @@ class AstrologerController extends GetxController {
       print('Selected Skills: $selectedSkills');
       print('-------------------------------');
       
-      final result = await _getAstrologersUseCase.execute(params: params);
-      filteredAstrologers.assignAll(result);
+      final result = await _getAstrologersUseCase.executeWithPagination(params: params);
+      if (filteredPage.value == 1) {
+        filteredAstrologers.assignAll(result.astrologers);
+      } else {
+        filteredAstrologers.addAll(result.astrologers);
+      }
+      hasMoreFiltered.value = result.hasMore;
       filteredAstrologers.refresh();
     } catch (e) {
       print('Error fetching filtered astrologers: $e');
     } finally {
       isFilteredLoading.value = false;
+      isMoreFilteredLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreFilteredAstrologers({String? serviceType}) async {
+    if (isFilteredLoading.value || isMoreFilteredLoading.value || !hasMoreFiltered.value) return;
+    try {
+      isMoreFilteredLoading.value = true;
+      filteredPage.value++;
+      await fetchFilteredAstrologers(
+        serviceType: serviceType ?? selectedServiceType.value,
+        isRefresh: false,
+      );
+    } catch (e) {
+      print('Error loadMoreFilteredAstrologers: $e');
+    } finally {
+      isMoreFilteredLoading.value = false;
     }
   }
 
@@ -198,11 +243,18 @@ class AstrologerController extends GetxController {
     }
   }
 
-  Future<void> fetchAstrologers({bool showLoader = true}) async {
+  Future<void> fetchAstrologers({bool showLoader = true, bool isRefresh = false}) async {
     try {
-      if (showLoader) isLoading.value = true;
+      if (isRefresh) {
+        homePage.value = 1;
+        hasMoreHome.value = true;
+      }
+      if (showLoader && homePage.value == 1) isLoading.value = true;
 
-      final Map<String, dynamic> params = {};
+      final Map<String, dynamic> params = {
+        'page': homePage.value,
+        'per_page': 10,
+      };
 
       if (selectedServiceType.value != 'all') {
         params['type'] = selectedServiceType.value;
@@ -241,18 +293,37 @@ class AstrologerController extends GetxController {
         params['language'] = selectedLanguages.join(',');
       }
 
-      final result = await _getAstrologersUseCase.execute(params: params);
-      astrologers.assignAll(result);
+      final result = await _getAstrologersUseCase.executeWithPagination(params: params);
+      if (homePage.value == 1) {
+        astrologers.assignAll(result.astrologers);
+      } else {
+        astrologers.addAll(result.astrologers);
+      }
+      hasMoreHome.value = result.hasMore;
     } catch (e) {
       print('Error fetching astrologers: $e');
     } finally {
       isLoading.value = false;
+      isMoreHomeLoading.value = false;
+    }
+  }
+
+  Future<void> loadMoreAstrologers() async {
+    if (isLoading.value || isMoreHomeLoading.value || !hasMoreHome.value) return;
+    try {
+      isMoreHomeLoading.value = true;
+      homePage.value++;
+      await fetchAstrologers(showLoader: false, isRefresh: false);
+    } catch (e) {
+      print('Error loadMoreAstrologers: $e');
+    } finally {
+      isMoreHomeLoading.value = false;
     }
   }
 
   void updateType(String type) {
     selectedType.value = type;
-    fetchAstrologers();
+    fetchAstrologers(isRefresh: true);
   }
 
   void updateSearch(String query) {

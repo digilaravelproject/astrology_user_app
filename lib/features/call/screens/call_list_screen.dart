@@ -30,20 +30,43 @@ import 'call_screen.dart';
 import '../../../core/utils/wallet_helper.dart';
 import '../../wallet/controllers/wallet_controller.dart';
 
-class CallListScreen extends StatelessWidget {
+class CallListScreen extends StatefulWidget {
   const CallListScreen({super.key});
+
+  @override
+  State<CallListScreen> createState() => _CallListScreenState();
+}
+
+class _CallListScreenState extends State<CallListScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final astrologerController = Get.find<AstrologerController>();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300) {
+        astrologerController.loadMoreFilteredAstrologers(serviceType: 'call');
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      astrologerController.fetchTopAstrologers(serviceType: 'call');
+      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call', isRefresh: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final astrologerController = Get.find<AstrologerController>();
-    
-    // Fetch top astrologers for stories and all astrologers for the filtered list
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      astrologerController.fetchTopAstrologers(serviceType: 'call');
-      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call');
-    });
-
-    final TextEditingController searchController = TextEditingController();
 
     return Stack(
       children: [
@@ -67,67 +90,11 @@ class CallListScreen extends StatelessWidget {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       await astrologerController.fetchTopAstrologers(serviceType: 'call');
-                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call');
+                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'call', isRefresh: true);
                     },
                     child: CustomScrollView(
+                      controller: _scrollController,
                       slivers: [
-
-
-              // White Container with Content
-              SliverToBoxAdapter(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Top Astrologers Heading
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: AppColors.primaryColor,
-                              size: 22,
-                            ),
-                            const SizedBox(width: 8),
-                            const AppText(
-                              'Top Astrologers',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryColor,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        height: 120,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Obx(() {
-                          if (astrologerController.isTopLoading.value) {
-                            return _buildTopShimmerList();
-                          }
-                          return ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: astrologerController.topAstrologers.length,
-                            itemBuilder: (context, index) {
-                              return _buildStoryItem(astrologerController.topAstrologers[index]);
-                            },
-                          );
-                        }),
-                      ),
-
-                      // Filter Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0),
-                        child: Obx(() {
-                          // Access reactive properties directly to ensure GetX registers the dependency
-                          final _ = astrologerController.selectedSkills.length;
                           final isOnlineOnly = astrologerController.isOnlineOnly.value;
                           
                           return SingleChildScrollView(
@@ -173,7 +140,7 @@ class CallListScreen extends StatelessWidget {
 
             // Astrologer Cards List (REACTIVE SECTION)
             Obx(() {
-              if (astrologerController.isFilteredLoading.value) {
+              if (astrologerController.isFilteredLoading.value && astrologerController.filteredAstrologers.isEmpty) {
                 return SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   sliver: _buildShimmerList(),
@@ -181,7 +148,7 @@ class CallListScreen extends StatelessWidget {
               }
 
               final astrologers = astrologerController.filteredAstrologers;
-              if (astrologers.isEmpty) {
+              if (astrologers.isEmpty && !astrologerController.isFilteredLoading.value) {
                 return const SliverToBoxAdapter(
                   child: Center(
                     child: Padding(
@@ -197,9 +164,20 @@ class CallListScreen extends StatelessWidget {
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
+                      if (index == astrologers.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        );
+                      }
                       return _buildAstrologerCard(context, astrologers[index]);
                     },
-                    childCount: astrologers.length,
+                    childCount: astrologers.length + (astrologerController.isMoreFilteredLoading.value ? 1 : 0),
                   ),
                 ),
               );

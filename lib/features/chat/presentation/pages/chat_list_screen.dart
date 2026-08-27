@@ -29,20 +29,43 @@ import 'chat_screen.dart';
 import '../../../../core/utils/wallet_helper.dart';
 import '../../../wallet/controllers/wallet_controller.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
+
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final astrologerController = Get.find<AstrologerController>();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300) {
+        astrologerController.loadMoreFilteredAstrologers(serviceType: 'chat');
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      astrologerController.fetchTopAstrologers(serviceType: 'chat');
+      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat', isRefresh: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final astrologerController = Get.find<AstrologerController>();
-    
-    // Fetch top astrologers for stories and all astrologers for the filtered list
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      astrologerController.fetchTopAstrologers(serviceType: 'chat');
-      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
-    });
-    
-    final TextEditingController searchController = TextEditingController();
 
     return Stack(
       children: [
@@ -66,9 +89,10 @@ class ChatListScreen extends StatelessWidget {
                   child: RefreshIndicator(
                     onRefresh: () async {
                       await astrologerController.fetchTopAstrologers(serviceType: 'chat');
-                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
+                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat', isRefresh: true);
                     },
                     child: CustomScrollView(
+                      controller: _scrollController,
                       slivers: [
 
               // White Container with Content
@@ -120,12 +144,6 @@ class ChatListScreen extends StatelessWidget {
                         }),
                       ),
 
-                      // Filter Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0),
-                        child: Obx(() {
-                          // Access reactive properties directly to ensure GetX registers the dependency
-                          final _ = astrologerController.selectedSkills.length;
                           final isOnlineOnly = astrologerController.isOnlineOnly.value;
                           
                           return SingleChildScrollView(
@@ -171,7 +189,7 @@ class ChatListScreen extends StatelessWidget {
 
               // Astrologer Cards List (REACTIVE SECTION)
               Obx(() {
-                if (astrologerController.isFilteredLoading.value) {
+                if (astrologerController.isFilteredLoading.value && astrologerController.filteredAstrologers.isEmpty) {
                   return SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     sliver: _buildShimmerList(),
@@ -179,7 +197,7 @@ class ChatListScreen extends StatelessWidget {
                 }
 
                 final astrologers = astrologerController.filteredAstrologers;
-                if (astrologers.isEmpty) {
+                if (astrologers.isEmpty && !astrologerController.isFilteredLoading.value) {
                   return const SliverToBoxAdapter(
                     child: Center(
                       child: Padding(
@@ -195,9 +213,20 @@ class ChatListScreen extends StatelessWidget {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
+                        if (index == astrologers.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                          );
+                        }
                         return _buildAstrologerCard(context, astrologers[index]);
                       },
-                      childCount: astrologers.length,
+                      childCount: astrologers.length + (astrologerController.isMoreFilteredLoading.value ? 1 : 0),
                     ),
                   ),
                 );

@@ -62,6 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300) {
+        if (Get.isRegistered<AstrologerController>()) {
+          Get.find<AstrologerController>().loadMoreAstrologers();
+        }
+      }
+    });
+
     // Refresh profile to get latest photo/data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() async {
@@ -231,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Get.find<AuthController>().checkLoginStatus(),
       Get.find<WalletController>().fetchWallet(),
       Get.find<NotificationController>().fetchNotificationCount(),
-      Get.find<AstrologerController>().fetchAstrologers(),
+      Get.find<AstrologerController>().fetchAstrologers(isRefresh: true),
     ];
     
     try {

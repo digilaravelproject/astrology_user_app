@@ -61,6 +61,16 @@ class AstrologersPreviewSection extends StatelessWidget {
           ...controller.astrologers
               .map((astro) => _buildAstrologerCard(context, astro))
               .toList(),
+          if (controller.isMoreHomeLoading.value)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primaryColor,
+                ),
+              ),
+            ),
         ],
       );
     });
