@@ -22,7 +22,7 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
-import 'package:astro_user/helper/route_helper.dart';
+import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/usecases/sync_message_status_usecase.dart';
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
