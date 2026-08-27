@@ -194,114 +194,147 @@ class SessionBottomSheetHelper {
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (astro.isChatEnabled)
-                      Expanded(
-                        child: CustomButton(
-                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.chat),
-                          icon: Icons.chat_bubble_outline_rounded,
-                          fontSize: 13,
-                          height: 48,
-                          borderRadius: 12,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
-                          onTap: () async {
-                            if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                              return;
-                            }
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(color: AppColors.deepPink),
-                              ),
-                            );
-                            try {
-                              final result = await PackageSessionService.startSubSession(
-                                astrologerId: astro.userId,
-                                mode: 'chat',
-                              );
-                              Navigator.pop(context); // Dismiss loading dialog
-                              Navigator.pop(context); // Dismiss bottom sheet
-                              
-                              activeSubSessionId = result.subSession.id;
-                              
-                              Get.to(() => ChatScreen(
-                                astrologerName: astro.name,
-                                astrologerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
-                                sessionId: result.linkedChatSession!.id,
-                                initialStatus: 'initiated',
-                                isPackageChat: true,
-                              ), binding: ChatBinding());
-                            } catch (e) {
-                              Navigator.pop(context); // Dismiss loading dialog
-                              CustomSnackbar.showError(e.toString());
-                            }
-                          },
-                        ),
-                      ),
-                    if (astro.isChatEnabled && astro.isCallEnabled)
-                      const SizedBox(width: 12),
-                    if (astro.isCallEnabled)
-                      Expanded(
-                        child: CustomButton(
-                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.call),
-                          icon: Icons.call_outlined,
-                          fontSize: 13,
-                          height: 48,
-                          borderRadius: 12,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
-                          gradient: (!astro.isOnline || astro.isBusy) ? null : const LinearGradient(
-                            colors: [
-                              Color(0xFF4CAF50),
-                              Color(0xFF388E3C),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          onTap: () async {
-                            if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
-                              return;
-                            }
-                            var permissionStatus = await Permission.microphone.status;
-                            if (!permissionStatus.isGranted) {
-                              permissionStatus = await Permission.microphone.request();
-                            }
-                            if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
-                              await openAppSettings();
-                              return;
-                            }
+                child: Obx(() {
+                  final astroCtrl = Get.isRegistered<AstrologerController>() ? Get.find<AstrologerController>() : null;
+                  final currentAstro = astroCtrl?.astrologers.firstWhereOrNull((a) => a.id == astro.id) ?? 
+                                       astroCtrl?.selectedAstrologer.value ?? 
+                                       astro;
 
-                            if (permissionStatus.isGranted) {
-                              Navigator.pop(context); // Dismiss bottom sheet
-                              
-                              final callController = Get.isRegistered<CallController>()
-                                  ? Get.find<CallController>()
-                                  : Get.put(CallController());
-                                  
-                              Get.to(() => const CallScreen());
-                              
-                              callController.initiateCall(
-                                providerId: astro.userId,
-                                providerName: astro.name,
-                                providerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
-                                isPackageSession: true,
-                              );
-                            } else {
-                              CustomSnackbar.showError('Microphone permission is required for calling.');
-                            }
-                          },
+                  final bool hasChat = currentAstro.isChatEnabled == true;
+                  final bool hasCall = currentAstro.isCallEnabled == true;
+                  final bool isActuallyOffline = !currentAstro.isOnline || (!hasChat && !hasCall);
+
+                  if (isActuallyOffline) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            text: 'Offline'.tr,
+                            icon: Icons.person_off,
+                            fontSize: 13,
+                            height: 48,
+                            borderRadius: 12,
+                            backgroundColor: Colors.grey.withOpacity(0.2),
+                            textColor: Colors.grey,
+                            borderColor: Colors.grey,
+                            onTap: () {
+                              CustomSnackbar.showInfo('Astrologer is offline.');
+                            },
+                          ),
                         ),
-                      ),
-                  ],
-                ),
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      if (hasChat)
+                        Expanded(
+                          child: CustomButton(
+                            text: currentAstro.isBusy ? 'Busy' : (!currentAstro.isOnline ? 'Offline' : AppStrings.chat),
+                            icon: Icons.chat_bubble_outline_rounded,
+                            fontSize: 13,
+                            height: 48,
+                            borderRadius: 12,
+                            backgroundColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
+                            textColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.white,
+                            borderColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.transparent,
+                            onTap: () async {
+                              if (!currentAstro.isOnline || currentAstro.isBusy) {
+                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                return;
+                              }
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(color: AppColors.deepPink),
+                                ),
+                              );
+                              try {
+                                final result = await PackageSessionService.startSubSession(
+                                  astrologerId: currentAstro.userId,
+                                  mode: 'chat',
+                                );
+                                Navigator.pop(context); // Dismiss loading dialog
+                                Navigator.pop(context); // Dismiss bottom sheet
+                                
+                                activeSubSessionId = result.subSession.id;
+                                
+                                Get.to(() => ChatScreen(
+                                  astrologerName: currentAstro.name,
+                                  astrologerImage: currentAstro.profilePhoto != null ? '${AppUrls.baseImageUrl}${currentAstro.profilePhoto}' : '',
+                                  sessionId: result.linkedChatSession!.id,
+                                  initialStatus: 'initiated',
+                                  isPackageChat: true,
+                                ), binding: ChatBinding());
+                              } catch (e) {
+                                Navigator.pop(context); // Dismiss loading dialog
+                                CustomSnackbar.showError(e.toString());
+                              }
+                            },
+                          ),
+                        ),
+                      if (hasChat && hasCall)
+                        const SizedBox(width: 12),
+                      if (hasCall)
+                        Expanded(
+                          child: CustomButton(
+                            text: currentAstro.isBusy ? 'Busy' : (!currentAstro.isOnline ? 'Offline' : AppStrings.call),
+                            icon: Icons.call_outlined,
+                            fontSize: 13,
+                            height: 48,
+                            borderRadius: 12,
+                            backgroundColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                            textColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.white,
+                            borderColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.transparent,
+                            gradient: (!currentAstro.isOnline || currentAstro.isBusy) ? null : const LinearGradient(
+                              colors: [
+                                Color(0xFF4CAF50),
+                                Color(0xFF388E3C),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            onTap: () async {
+                              if (!currentAstro.isOnline || currentAstro.isBusy) {
+                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                return;
+                              }
+                              var permissionStatus = await Permission.microphone.status;
+                              if (!permissionStatus.isGranted) {
+                                permissionStatus = await Permission.microphone.request();
+                              }
+                              if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+                                await openAppSettings();
+                                return;
+                              }
+
+                              if (permissionStatus.isGranted) {
+                                Navigator.pop(context); // Dismiss bottom sheet
+                                
+                                final callController = Get.isRegistered<CallController>()
+                                    ? Get.find<CallController>()
+                                    : Get.put(CallController());
+                                    
+                                Get.to(() => const CallScreen());
+                                
+                                callController.initiateCall(
+                                  providerId: currentAstro.userId,
+                                  providerName: currentAstro.name,
+                                  providerImage: currentAstro.profilePhoto != null ? '${AppUrls.baseImageUrl}${currentAstro.profilePhoto}' : '',
+                                  isPackageSession: true,
+                                );
+                              } else {
+                                CustomSnackbar.showError('Microphone permission is required for calling.');
+                              }
+                            },
+                          ),
+                        ),
+                    ],
+                  );
+                }),
               ),
               const SizedBox(height: 10),
             ],
