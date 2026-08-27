@@ -137,16 +137,16 @@ class AstrologerModel {
   bool get isAvailableOnline => !isBusy && isOnline && (isChatEnabled || isCallEnabled);
 
   Map<String, dynamic> get statusBadge {
-    switch (availabilityStatus) {
-      case 'Engaged':
-        return { 'text': 'Engaged', 'color': Colors.orange, 'buttonText': 'Busy' };
-      case 'Online':
-        return { 'text': 'Online', 'color': Colors.green, 'buttonText': 'Call / Chat' };
-      case 'Offline':
-      default:
-        return { 'text': 'Offline', 'color': Colors.grey, 'buttonText': 'Offline' };
+    if (isBusy || availabilityStatus.toLowerCase() == 'engaged' || availabilityStatus.toLowerCase() == 'busy') {
+      return { 'text': 'Busy', 'color': const Color(0xFFEF4444), 'buttonText': 'Busy' };
     }
+    if (!isOnline || (!isChatEnabled && !isCallEnabled) || availabilityStatus.toLowerCase() == 'offline') {
+      return { 'text': 'Offline', 'color': const Color(0xFF94A3B8), 'buttonText': 'Offline' };
+    }
+    return { 'text': 'Online', 'color': const Color(0xFF22C55E), 'buttonText': 'Call / Chat' };
   }
+
+  Color get statusColor => statusBadge['color'] as Color;
 
   AstrologerModel copyWith({
     int? id,

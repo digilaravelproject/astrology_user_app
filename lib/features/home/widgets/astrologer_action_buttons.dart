@@ -36,17 +36,35 @@ class AstrologerActionButtons extends StatelessWidget {
         return Row(
           children: [
             Expanded(
-              child: Opacity(
-                opacity: 0.6,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text('Offline'.tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                  ),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF94A3B8),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Currently Offline'.tr,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF64748B),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             )
@@ -56,18 +74,41 @@ class AstrologerActionButtons extends StatelessWidget {
         return Row(
           children: [
             Expanded(
-              child: CustomButton(
-                text: 'Offline'.tr,
-                icon: Icons.person_off,
-                fontSize: 10,
-                height: 32,
-                borderRadius: 8,
-                backgroundColor: Colors.grey.withOpacity(0.2),
-                textColor: Colors.grey,
-                borderColor: Colors.grey,
+              child: GestureDetector(
                 onTap: () {
-                  CustomSnackbar.showInfo('Astrologer is offline.');
+                  CustomSnackbar.showInfo('Astrologer is currently offline.');
                 },
+                child: Container(
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF94A3B8),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Offline'.tr,
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF64748B),
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],

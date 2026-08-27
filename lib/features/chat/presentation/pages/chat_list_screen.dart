@@ -264,7 +264,7 @@ class ChatListScreen extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                      color: astro.statusColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Colors.white,
@@ -489,7 +489,7 @@ class ChatListScreen extends StatelessWidget {
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
-                              color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                              color: astro.statusColor,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
