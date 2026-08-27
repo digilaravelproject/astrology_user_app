@@ -35,8 +35,8 @@ class NotificationController extends GetxController {
       final response = await repository.getNotificationCount(_userId);
       print('[NotificationController] Count Response body: ${response.body}');
       if (response.isSuccess && response.body != null) {
-        // Since ResponseModel.fromJson already maps json['data'] to body
-        final count = int.tryParse(response.body['unread']?.toString() ?? '0') ?? 0;
+        final unreadVal = response.body['unread'] ?? response.body['unread_count'] ?? response.body['count'] ?? 0;
+        final count = int.tryParse(unreadVal.toString()) ?? 0;
         unreadCount.value = count;
         print('[NotificationController] Successfully updated unreadCount to: $count');
       } else {

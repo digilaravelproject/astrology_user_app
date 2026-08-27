@@ -59,10 +59,13 @@ class AppUrls {
   // Notifications & Device Tokens
   static const String registerDeviceToken = '/api/v1/user/device-token';
   static const String removeDeviceToken = '/api/v1/user/remove-token';
-  static String getNotificationCount(int userId) => '/api/v1/user/notifications/count?user_id=$userId';
-  static String getNotifications(int userId) => '/api/v1/user/notifications?user_id=$userId';
-  static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id?user_id=$userId';
-  static String markNotificationRead(int id, int userId) => '/api/v1/user/notifications/$id/mark-read?user_id=$userId';
+  static String getNotificationCount(int userId) => '/api/v1/user/notifications/count';
+  static String getNotifications(int userId) => '/api/v1/user/notifications';
+  static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id';
+  static String markNotificationRead(int id, int userId) => '/api/v1/user/notifications/$id/mark-read';
+  static const String markAllNotificationsRead = '/api/v1/user/notifications/mark-all-read';
+  static String deleteNotification(int id) => '/api/v1/user/notifications/$id';
+  static const String deleteAllNotifications = '/api/v1/user/notifications/delete-all';
 
   // Gifts
   static const String gifts = '/api/v1/gifts';
