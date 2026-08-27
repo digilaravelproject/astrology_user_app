@@ -45,6 +45,34 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
           icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Iconsax.trash, color: Colors.red, size: 20),
+            tooltip: 'Delete Notification',
+            onPressed: () {
+              Get.dialog(
+                AlertDialog(
+                  title: const Text('Delete Notification'),
+                  content: const Text('Are you sure you want to delete this notification?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.back();
+                        controller.deleteNotification(widget.notification.id);
+                        Get.back();
+                      },
+                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

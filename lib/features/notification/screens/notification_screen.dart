@@ -37,14 +37,70 @@ class NotificationScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Iconsax.tick_circle, color: AppColors.deepPink),
-            tooltip: "Mark all as read",
-            onPressed: () {
-              // Mark all as read logic can be added to controller if needed
-              // For now, we can loop through unread notifications
-            },
-          ),
+          Obx(() {
+            if (controller.notifications.isEmpty) return const SizedBox.shrink();
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (controller.unreadCount.value > 0)
+                  IconButton(
+                    icon: const Icon(Iconsax.tick_circle, color: AppColors.deepPink, size: 22),
+                    tooltip: "Mark all as read",
+                    onPressed: () => controller.markAllAsRead(),
+                  ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, color: Colors.black87),
+                  onSelected: (value) {
+                    if (value == 'mark_all_read') {
+                      controller.markAllAsRead();
+                    } else if (value == 'clear_all') {
+                      Get.dialog(
+                        AlertDialog(
+                          title: const Text('Clear All Notifications'),
+                          content: const Text('Are you sure you want to delete all notifications?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Get.back(),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Get.back();
+                                controller.deleteAllNotifications();
+                              },
+                              child: const Text('Delete All', style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'mark_all_read',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.tick_circle, size: 18, color: AppColors.deepPink),
+                          SizedBox(width: 8),
+                          Text('Mark all as read'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'clear_all',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.trash, size: 18, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Clear all', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }),
         ],
       ),
       body: Obx(() {
@@ -65,9 +121,22 @@ class NotificationScreen extends StatelessWidget {
             separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
-              return GestureDetector(
-                onTap: () => Get.to(() => NotificationDetailScreen(notification: notification)),
-                child: _buildNotificationItem(notification),
+              return Dismissible(
+                key: ValueKey('user_notif_${notification.id}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  color: Colors.redAccent,
+                  child: const Icon(Icons.delete_outline, color: Colors.white, size: 24),
+                ),
+                onDismissed: (_) {
+                  controller.deleteNotification(notification.id);
+                },
+                child: GestureDetector(
+                  onTap: () => Get.to(() => NotificationDetailScreen(notification: notification)),
+                  child: _buildNotificationItem(notification),
+                ),
               );
             },
           ),

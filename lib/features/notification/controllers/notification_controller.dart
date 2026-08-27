@@ -109,4 +109,54 @@ class NotificationController extends GetxController {
       print('Error marking notification as read: $e');
     }
   }
+
+  Future<void> markAllAsRead() async {
+    if (_userId == 0) return;
+    try {
+      final response = await repository.markAllAsRead(_userId);
+      if (response.isSuccess) {
+        final updated = notifications.map((old) => NotificationModel(
+          id: old.id,
+          title: old.title,
+          message: old.message,
+          isRead: true,
+          type: old.type,
+          createdAt: old.createdAt,
+        )).toList();
+        notifications.assignAll(updated);
+        unreadCount.value = 0;
+      }
+    } catch (e) {
+      print('Error marking all notifications as read: $e');
+    }
+  }
+
+  Future<void> deleteNotification(int id) async {
+    if (_userId == 0) return;
+    try {
+      final response = await repository.deleteNotification(id, _userId);
+      if (response.isSuccess) {
+        final item = notifications.firstWhereOrNull((n) => n.id == id);
+        if (item != null && !item.isRead && unreadCount.value > 0) {
+          unreadCount.value--;
+        }
+        notifications.removeWhere((n) => n.id == id);
+      }
+    } catch (e) {
+      print('Error deleting notification: $e');
+    }
+  }
+
+  Future<void> deleteAllNotifications() async {
+    if (_userId == 0) return;
+    try {
+      final response = await repository.deleteAllNotifications(_userId);
+      if (response.isSuccess) {
+        notifications.clear();
+        unreadCount.value = 0;
+      }
+    } catch (e) {
+      print('Error deleting all notifications: $e');
+    }
+  }
 }
