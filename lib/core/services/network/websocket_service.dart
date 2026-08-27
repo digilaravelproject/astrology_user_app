@@ -194,26 +194,32 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _handleMessage(message);
         },
         onDone: () {
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          Logger.d('|🔌 WEBSOCKET DISCONNECTED');
-          Logger.d('|⚠️ Connection closed (onDone)');
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          final wasConnected = _isConnected || _isConnecting;
           _isConnecting = false;
           _isConnected = false;
           _socketId = null;
           _stopHeartbeat();
-          _reconnect();
+          if (wasConnected) {
+            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            Logger.d('|🔌 WEBSOCKET DISCONNECTED');
+            Logger.d('|⚠️ Connection closed (onDone)');
+            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            _reconnect();
+          }
         },
         onError: (error) {
-          Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          Logger.e('|🔌 WEBSOCKET ERROR');
-          Logger.e('|⚠️ Exception: $error');
-          Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          final wasConnected = _isConnected || _isConnecting;
           _isConnecting = false;
           _isConnected = false;
           _socketId = null;
           _stopHeartbeat();
-          _reconnect();
+          if (wasConnected) {
+            Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            Logger.e('|🔌 WEBSOCKET ERROR');
+            Logger.e('|⚠️ Exception: $error');
+            Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            _reconnect();
+          }
         },
       );
     } catch (e) {
@@ -982,15 +988,19 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   }
 
   void _reconnect() {
-    _reconnectTimer?.cancel();
+    if (_isConnecting || _isConnected) return;
+    if (_reconnectTimer != null && _reconnectTimer!.isActive) return;
+
     _reconnectAttempts++;
-    final delaySeconds = min(30, max(2, pow(2, _reconnectAttempts).toInt()));
+    final delaySeconds = min(30, max(2, pow(2, min(5, _reconnectAttempts)).toInt()));
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     Logger.d('|⏱️ WEBSOCKET RECONNECTING');
     Logger.d('|⚠️ Attempting to reconnect in $delaySeconds seconds (Attempt $_reconnectAttempts)...');
     Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     _reconnectTimer = Timer(Duration(seconds: delaySeconds), () {
-      connect();
+      if (!_isConnected && !_isConnecting) {
+        connect();
+      }
     });
   }
 
