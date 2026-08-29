@@ -73,16 +73,16 @@ class AstrologerModel {
     final userData = json['user'] as Map<String, dynamic>? ?? {};
     
     return AstrologerModel(
-      id: json['id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      yearsOfExperience: json['years_of_experience'] ?? 0,
+      id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      userId: int.tryParse(json['user_id']?.toString() ?? '') ?? 0,
+      yearsOfExperience: int.tryParse(json['years_of_experience']?.toString() ?? json['experience']?.toString() ?? '') ?? 0,
       areasOfExpertise: List<String>.from(json['areas_of_expertise'] ?? []),
       languages: List<String>.from(json['languages'] ?? []),
       profilePhoto: json['profile_photo'],
       bio: json['bio'] ?? '',
-      chatRate: json['chat_rate_per_minute'],
-      callRate: json['call_rate_per_minute'],
-      videoCallRate: json['video_call_rate_per_minute'] ?? json['video_call_rate'],
+      chatRate: json['chat_rate_per_minute']?.toString(),
+      callRate: json['call_rate_per_minute']?.toString(),
+      videoCallRate: (json['video_call_rate_per_minute'] ?? json['video_call_rate'])?.toString(),
       name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
       phone: userData['phone'],
       email: userData['email'],
