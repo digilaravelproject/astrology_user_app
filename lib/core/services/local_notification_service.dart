@@ -49,14 +49,28 @@ class LocalNotificationService {
           }
         } else if (payload.startsWith('call_')) {
           // ── Ongoing / Incoming Call notification ──
+          bool isValidStatus = false;
           bool isVisible = false;
+          
           if (Get.isRegistered<CallController>()) {
-            isVisible = Get.find<CallController>().isCallScreenVisible;
+            final ctrl = Get.find<CallController>();
+            isVisible = ctrl.isCallScreenVisible;
+            final status = ctrl.status.value;
+            isValidStatus = (status == 'ongoing' || status == 'ringing' || status == 'dialing' || status == 'waiting');
           }
-          if (!isVisible) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Get.to(() => const CallScreen());
-            });
+          
+          if (isValidStatus) {
+            if (!isVisible) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Get.to(() => const CallScreen());
+              });
+            }
+          } else {
+            // It's a stale notification, cancel it
+            debugPrint('[LocalNotificationService] Stale call notification tapped, cancelling...');
+            final sessionIdStr = payload.replaceFirst('call_', '');
+            final int? sessionId = int.tryParse(sessionIdStr);
+            cancelOngoingCallNotification(sessionId);
           }
         } else if (FloatingChatBubble.onTapCallback != null) {
           // ── Active Chat bubble tap ──
