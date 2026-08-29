@@ -254,7 +254,7 @@ class SessionBottomSheetHelper {
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
+                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
                           textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
                           borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
                           gradient: (!astro.isOnline || astro.isBusy) ? null : const LinearGradient(
