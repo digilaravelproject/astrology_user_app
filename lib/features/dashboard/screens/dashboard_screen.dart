@@ -119,7 +119,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           final sessionType = session?['session_type']?.toString().toLowerCase() ?? 
-                              session?['type']?.toString().toLowerCase() ?? '';
+                              session?['type']?.toString().toLowerCase() ?? 
+                              session?['mode']?.toString().toLowerCase() ?? '';
           final isCall = sessionType == 'call' || sessionType == 'audio_call' || sessionType == 'video_call';
           
           if (!isCall) {
