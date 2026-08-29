@@ -628,6 +628,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
               _startRingingTimeout();
             }
             
+            // Double check before showing notification in case status changed during async operations
+            if (status.value == 'completed' || status.value == 'cancelled' || status.value == 'ended' || status.value == 'idle' || _isEndingCall) {
+              return;
+            }
+
             // Show Notification
             final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
             final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
