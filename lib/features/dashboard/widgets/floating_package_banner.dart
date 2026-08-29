@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'package:astro_user/core/constants/app_colors.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../core/theme/app_colors.dart';
 
 class FloatingPackageBannerWidget extends StatefulWidget {
   const FloatingPackageBannerWidget({Key? key}) : super(key: key);

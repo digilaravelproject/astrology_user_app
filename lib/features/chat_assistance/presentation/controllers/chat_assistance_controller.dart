@@ -50,6 +50,7 @@ class ChatAssistanceController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    
     _currentUserId = WebSocketService.currentUserId;
     if (_currentUserId == null || _currentUserId == 0) {
       try {
@@ -558,18 +559,17 @@ class ChatAssistanceController extends GetxController {
 
   @override
   void onClose() {
-    _msgSub?.cancel();
-    _statusUpdateSub?.cancel();
-    _limitReachedSub?.cancel();
-    messageController.dispose();
-    scrollController.dispose();
-    if (WebSocketService.activeSessionId == _sessionId) {
-      WebSocketService.activeSessionId = null;
-    }
     if (_sessionId != null) {
       try {
         Get.find<WebSocketService>().unsubscribeFromChannel('private-chat-assistance.$_sessionId');
       } catch (_) {}
+    }
+    _msgSub?.cancel();
+    _statusUpdateSub?.cancel();
+    _limitReachedSub?.cancel();
+    scrollController.dispose();
+    if (WebSocketService.activeSessionId == _sessionId) {
+      WebSocketService.activeSessionId = null;
     }
     super.onClose();
   }
