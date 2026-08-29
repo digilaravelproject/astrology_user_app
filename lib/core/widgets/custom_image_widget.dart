@@ -184,6 +184,7 @@ class CustomImageWidget extends StatelessWidget {
                     width: width,
                     fit: fit ?? BoxFit.cover,
                     color: color,
+                    errorBuilder: (context, error, stackTrace) => fallbackWidget ?? _buildDefaultFallback(),
                   );
                 } else {
                   return Image.file(

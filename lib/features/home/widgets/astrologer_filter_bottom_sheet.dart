@@ -276,7 +276,7 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
       itemCount: options.length,
       itemBuilder: (context, index) {
         final option = options[index];
-        final displayText = displayOptions != null ? displayOptions[index] : option.toString();
+        final String displayText = displayOptions != null ? displayOptions[index].toString() : option.toString();
 
         if (type == 'checkbox') {
           final isChecked = cat['title'] == AppStrings.skills

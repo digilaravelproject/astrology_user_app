@@ -26,7 +26,17 @@ Future<void> initApp() async {
   );
 
   // Initialize Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    final bool isImageError = details.library == 'image resource service';
+    final bool isHttpError = details.exception.toString().contains('HttpException') || 
+                             details.exception.toString().contains('SocketException');
+    
+    if (isImageError || isHttpError) {
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
 
   // Initialize Firestore settings
   FirebaseFirestore.instance.settings = const Settings(
