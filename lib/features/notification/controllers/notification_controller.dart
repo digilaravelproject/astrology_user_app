@@ -36,9 +36,12 @@ class NotificationController extends GetxController {
       print('[NotificationController] Count Response body: ${response.body}');
       if (response.isSuccess && response.body != null) {
         // Since ResponseModel.fromJson already maps json['data'] to body
-        final count = int.tryParse(response.body['unread']?.toString() ?? '0') ?? 0;
+        final count =
+            int.tryParse(response.body['unread']?.toString() ?? '0') ?? 0;
         unreadCount.value = count;
-        print('[NotificationController] Successfully updated unreadCount to: $count');
+        print(
+          '[NotificationController] Successfully updated unreadCount to: $count',
+        );
       } else {
         print('[NotificationController] Request failed: ${response.message}');
       }
@@ -55,10 +58,11 @@ class NotificationController extends GetxController {
       if (response.isSuccess && response.body != null) {
         // Since ResponseModel.fromJson already maps json['data'] to body
         final dynamic body = response.body;
-        final List<dynamic> dataList = (body is List) 
-            ? body 
-            : (body?['notifications'] ?? body ?? []);
-        notifications.assignAll(dataList.map((json) => NotificationModel.fromJson(json)).toList());
+        final List<dynamic> dataList =
+            (body is List) ? body : (body?['notifications'] ?? body ?? []);
+        notifications.assignAll(
+          dataList.map((json) => NotificationModel.fromJson(json)).toList(),
+        );
       }
     } catch (e) {
       print('Error fetching notifications: $e');
@@ -73,7 +77,9 @@ class NotificationController extends GetxController {
     try {
       final response = await repository.getNotificationById(id, _userId);
       if (response.isSuccess && response.body != null) {
-        selectedNotification.value = NotificationModel.fromJson(response.body['notification'] ?? response.body);
+        selectedNotification.value = NotificationModel.fromJson(
+          response.body['notification'] ?? response.body,
+        );
       }
     } catch (e) {
       print('Error fetching notification detail: $e');

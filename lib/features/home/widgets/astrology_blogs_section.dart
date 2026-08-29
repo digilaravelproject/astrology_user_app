@@ -70,7 +70,11 @@ class AstrologyBlogsSection extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.menu_book_rounded, color: Color(0xFFB57E2F), size: 20), // Book icon
+                      const Icon(
+                        Icons.menu_book_rounded,
+                        color: Color(0xFFB57E2F),
+                        size: 20,
+                      ), // Book icon
                       const SizedBox(width: 8),
                       AppText(
                         'Latest Blogs',
@@ -93,14 +97,18 @@ class AstrologyBlogsSection extends StatelessWidget {
                           color: const Color(0xFF5D1E2D),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.arrow_forward_ios, size: 10, color: Color(0xFF5D1E2D)),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 10,
+                          color: Color(0xFF5D1E2D),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Grid
             SizedBox(
               height: 165,
@@ -110,17 +118,20 @@ class AstrologyBlogsSection extends StatelessWidget {
                 itemCount: blogController.blogs.length,
                 itemBuilder: (context, index) {
                   final blog = blogController.blogs[index];
-                  final imageUrl = blog.blogImage != null && blog.blogImage!.isNotEmpty
-                      ? "${AppUrls.baseImageUrl}${blog.blogImage}"
-                      : "";
-                  
+                  final imageUrl =
+                      blog.blogImage != null && blog.blogImage!.isNotEmpty
+                          ? "${AppUrls.baseImageUrl}${blog.blogImage}"
+                          : "";
+
                   return GestureDetector(
                     onTap: () {
-                      Get.to(() => BlogDetailScreen(
-                        blogId: blog.id,
-                        blogColor: AppColors.primaryColor,
-                        imageUrl: imageUrl,
-                      ));
+                      Get.to(
+                        () => BlogDetailScreen(
+                          blogId: blog.id,
+                          blogColor: AppColors.primaryColor,
+                          imageUrl: imageUrl,
+                        ),
+                      );
                     },
                     child: Container(
                       width: cardWidth,
@@ -171,11 +182,17 @@ class AstrologyBlogsSection extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    const Icon(Icons.access_time_rounded, size: 10, color: Colors.grey),
+                                    const Icon(
+                                      Icons.access_time_rounded,
+                                      size: 10,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     AppText(
-                                      blog.createdAt != null 
-                                          ? DateFormat('dd MMM yyyy').format(blog.createdAt!) 
+                                      blog.createdAt != null
+                                          ? DateFormat(
+                                            'dd MMM yyyy',
+                                          ).format(blog.createdAt!)
                                           : 'Recently',
                                       fontSize: 9,
                                       color: Colors.grey.shade600,

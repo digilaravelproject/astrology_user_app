@@ -12,10 +12,19 @@ class GiftHistoryModel {
   factory GiftHistoryModel.fromJson(Map<String, dynamic> json) {
     return GiftHistoryModel(
       astrologerId: json['astrologer_id'] ?? 0,
-      astrologerName: (json['astrologer_name']?.toString() ?? '').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
-      gifts: (json['gifts'] as List? ?? [])
-          .map((i) => GiftHistoryItem.fromJson(i))
-          .toList(),
+      astrologerName: (json['astrologer_name']?.toString() ?? '')
+          .split(' ')
+          .map(
+            (str) =>
+                str.isNotEmpty
+                    ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}'
+                    : '',
+          )
+          .join(' '),
+      gifts:
+          (json['gifts'] as List? ?? [])
+              .map((i) => GiftHistoryItem.fromJson(i))
+              .toList(),
     );
   }
 }
@@ -51,7 +60,9 @@ class GiftHistoryItem {
       giftId: json['gift_id'] ?? 0,
       amount: json['amount']?.toString() ?? '0.00',
       status: json['status'] ?? '',
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
       gift: json['gift'] != null ? GiftDetails.fromJson(json['gift']) : null,
       senderName: json['meta'] != null ? json['meta']['sender_name'] : null,
     );

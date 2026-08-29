@@ -49,47 +49,59 @@ class CustomButton extends StatelessWidget {
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: backgroundColor ?? (gradient == null && textColor == AppColors.deepPink ? Colors.white : null),
-            gradient: gradient ?? (backgroundColor == null && textColor != AppColors.deepPink ? AppColors.primaryGradient : null),
-            border: borderColor != null ? Border.all(color: borderColor!, width: 1) : null,
+            color:
+                backgroundColor ??
+                (gradient == null && textColor == AppColors.deepPink
+                    ? Colors.white
+                    : null),
+            gradient:
+                gradient ??
+                (backgroundColor == null && textColor != AppColors.deepPink
+                    ? AppColors.primaryGradient
+                    : null),
+            border:
+                borderColor != null
+                    ? Border.all(color: borderColor!, width: 1)
+                    : null,
             borderRadius: BorderRadius.circular(borderRadius ?? height / 2),
           ),
           child: Center(
-            child: isLoading
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(
-                          icon,
-                          color: textColor ?? Colors.white,
-                          size: fontSize + 2,
-                        ),
-                        const SizedBox(width: 8),
-                      ],
-                      Flexible(
-                        child: Text(
-                          text,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          style: GoogleFonts.poppins(
+            child:
+                isLoading
+                    ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                    : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(
+                            icon,
                             color: textColor ?? Colors.white,
-                            fontSize: fontSize,
-                            fontWeight: fontWeight,
-                            letterSpacing: 0.5,
+                            size: fontSize + 2,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Flexible(
+                          child: Text(
+                            text,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: GoogleFonts.poppins(
+                              color: textColor ?? Colors.white,
+                              fontSize: fontSize,
+                              fontWeight: fontWeight,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
           ),
         ),
       ),

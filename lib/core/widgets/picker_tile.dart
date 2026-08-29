@@ -44,7 +44,11 @@ class PickerTile extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.black.withOpacity(0.3)),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.black.withOpacity(0.3),
+            ),
           ],
         ),
       ),

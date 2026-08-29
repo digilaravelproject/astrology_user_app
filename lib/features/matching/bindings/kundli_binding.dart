@@ -24,39 +24,27 @@ class KundliBinding extends Bindings {
 
     // Kundli UseCases
     Get.lazyPut<GetBirthChartUseCase>(
-      () => GetBirthChartUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => GetBirthChartUseCase(repository: Get.find<KundliRepository>()),
     );
 
     Get.lazyPut<CreateKundliUseCase>(
-      () => CreateKundliUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => CreateKundliUseCase(repository: Get.find<KundliRepository>()),
     );
 
     Get.lazyPut<GetKundliListUseCase>(
-      () => GetKundliListUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => GetKundliListUseCase(repository: Get.find<KundliRepository>()),
     );
 
     Get.lazyPut<GetKundliByIdUseCase>(
-      () => GetKundliByIdUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => GetKundliByIdUseCase(repository: Get.find<KundliRepository>()),
     );
 
     Get.lazyPut<UpdateKundliUseCase>(
-      () => UpdateKundliUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => UpdateKundliUseCase(repository: Get.find<KundliRepository>()),
     );
 
     Get.lazyPut<DeleteKundliUseCase>(
-      () => DeleteKundliUseCase(
-        repository: Get.find<KundliRepository>(),
-      ),
+      () => DeleteKundliUseCase(repository: Get.find<KundliRepository>()),
     );
 
     // Kundli Controller
@@ -72,15 +60,11 @@ class KundliBinding extends Bindings {
     );
 
     // Matching Repository
-    Get.lazyPut<MatchingRepository>(
-      () => MatchingRepositoryImpl(),
-    );
+    Get.lazyPut<MatchingRepository>(() => MatchingRepositoryImpl());
 
     // Matching UseCase
     Get.lazyPut<GetMatchingUseCase>(
-      () => GetMatchingUseCase(
-        repository: Get.find<MatchingRepository>(),
-      ),
+      () => GetMatchingUseCase(repository: Get.find<MatchingRepository>()),
     );
 
     // Matching Controller

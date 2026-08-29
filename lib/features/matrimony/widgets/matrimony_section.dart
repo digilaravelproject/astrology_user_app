@@ -12,7 +12,6 @@ import '../../../core/constants/app_urls.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 import '../../auth/controllers/auth_controller.dart';
 
-
 class MatrimonySection extends StatelessWidget {
   const MatrimonySection({super.key});
 
@@ -23,9 +22,7 @@ class MatrimonySection extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-      ),
+      decoration: const BoxDecoration(color: Colors.transparent),
       child: Obx(() {
         if (controller.isLoading.value && controller.allProfiles.isEmpty) {
           return const Center(
@@ -39,15 +36,16 @@ class MatrimonySection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ...controller.filteredProfiles.map((p) =>
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _buildCompactCustomerCard(context, p),
-                )).toList(),
+            ...controller.filteredProfiles
+                .map(
+                  (p) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _buildCompactCustomerCard(context, p),
+                  ),
+                )
+                .toList(),
             if (controller.filteredProfiles.isEmpty &&
                 !controller.isLoading.value)
-
-
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 100),
@@ -79,20 +77,20 @@ class MatrimonySection extends StatelessWidget {
             // ),
           ],
         );
-      }
-        ),
+      }),
     );
   }
 
-
-
-  Widget _buildCompactCustomerCard(BuildContext context, MatrimonyProfileModel data) {
-    final String imageUrl = data.profilePhoto != null 
-        ? '${AppUrls.baseImageUrl}${data.profilePhoto}'
-        : '';
+  Widget _buildCompactCustomerCard(
+    BuildContext context,
+    MatrimonyProfileModel data,
+  ) {
+    final String imageUrl =
+        data.profilePhoto != null
+            ? '${AppUrls.baseImageUrl}${data.profilePhoto}'
+            : '';
 
     return GestureDetector(
-
       onTap: () {
         Navigator.push(
           context,
@@ -145,14 +143,18 @@ class MatrimonySection extends StatelessWidget {
                                 height: 70,
                                 width: 70,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryColor.withOpacity(0.1),
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.1,
+                                  ),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,
                                 child: Icon(
                                   Icons.person_rounded,
                                   size: 40,
-                                  color: AppColors.primaryColor.withOpacity(0.5),
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.5,
+                                  ),
                                 ),
                               ),
                             ),
@@ -175,7 +177,11 @@ class MatrimonySection extends StatelessWidget {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 12, color: AppColors.primaryColor),
+                          const Icon(
+                            Icons.location_on_outlined,
+                            size: 12,
+                            color: AppColors.primaryColor,
+                          ),
                           const SizedBox(width: 2),
                           SizedBox(
                             width: 70,
@@ -194,7 +200,7 @@ class MatrimonySection extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(width: 16),
-                  
+
                   // Details Column
                   Expanded(
                     child: Column(
@@ -205,7 +211,15 @@ class MatrimonySection extends StatelessWidget {
                           children: [
                             Expanded(
                               child: AppText(
-                                '${data.firstName} ${data.lastName}'.split(' ').map((word) => word.isNotEmpty ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}' : '').join(' '),
+                                '${data.firstName} ${data.lastName}'
+                                    .split(' ')
+                                    .map(
+                                      (word) =>
+                                          word.isNotEmpty
+                                              ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+                                              : '',
+                                    )
+                                    .join(' '),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: const Color(0xFF2D3142),
@@ -213,12 +227,11 @@ class MatrimonySection extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-
                           ],
                         ),
-                        
+
                         const SizedBox(height: 4),
-                        
+
                         AppText(
                           data.maritalStatus.tr,
                           fontSize: 12,
@@ -226,53 +239,71 @@ class MatrimonySection extends StatelessWidget {
                           color: const Color(0xFF7F8487),
                         ),
                         const SizedBox(height: 8),
-                        Container(height: 1, color: Colors.grey.withOpacity(0.1)),
+                        Container(
+                          height: 1,
+                          color: Colors.grey.withOpacity(0.1),
+                        ),
                         const SizedBox(height: 8),
 
                         // Secondary Details
-                        _buildDetailItem(Icons.translate, 'Mother Tongue', null), 
+                        _buildDetailItem(
+                          Icons.translate,
+                          'Mother Tongue',
+                          null,
+                        ),
 
                         const SizedBox(height: 6),
-                        _buildDetailItem(Icons.school_outlined, 'Education', data.education),
+                        _buildDetailItem(
+                          Icons.school_outlined,
+                          'Education',
+                          data.education,
+                        ),
                         const SizedBox(height: 6),
-                        _buildDetailItem(Icons.work_outline, 'Profession', data.jobTitle),
-
+                        _buildDetailItem(
+                          Icons.work_outline,
+                          'Profession',
+                          data.jobTitle,
+                        ),
 
                         const SizedBox(height: 4),
-                       Row(
-                         mainAxisAlignment: MainAxisAlignment.end,
-                         children: [
-                           CustomButton(
-                             text: AppStrings.viewProfile,
-                             height: 30,
-                             width: 100,
-                             fontSize: 10,
-                             fontWeight: FontWeight.w700,
-                             icon: Icons.chevron_right,
-                             gradient: const LinearGradient(
-                               colors: [AppColors.primaryColor, AppColors.secondaryColor],
-                               begin: Alignment.topLeft,
-                               end: Alignment.bottomRight,
-                             ),
-                             onTap: () {
-                               Navigator.push(
-                                 context,
-                                 MaterialPageRoute(
-                                   builder: (context) => MatrimonyProfileScreen(profile: data),
-                                 ),
-                               );
-                             },
-                           ),
-                         ],
-                       )
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            CustomButton(
+                              text: AppStrings.viewProfile,
+                              height: 30,
+                              width: 100,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              icon: Icons.chevron_right,
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primaryColor,
+                                  AppColors.secondaryColor,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => MatrimonyProfileScreen(
+                                          profile: data,
+                                        ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            
-
           ],
         ),
       ),
@@ -280,8 +311,13 @@ class MatrimonySection extends StatelessWidget {
   }
 
   Widget _buildDetailItem(IconData icon, String label, String? value) {
-    final displayValue = (value == null || value.isEmpty || value.toLowerCase() == 'not specified') ? 'N/A' : value;
-    
+    final displayValue =
+        (value == null ||
+                value.isEmpty ||
+                value.toLowerCase() == 'not specified')
+            ? 'N/A'
+            : value;
+
     return Row(
       children: [
         Container(
@@ -290,7 +326,11 @@ class MatrimonySection extends StatelessWidget {
             color: AppColors.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Icon(icon, size: 12, color: AppColors.primaryColor.withOpacity(0.7)),
+          child: Icon(
+            icon,
+            size: 12,
+            color: AppColors.primaryColor.withOpacity(0.7),
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(

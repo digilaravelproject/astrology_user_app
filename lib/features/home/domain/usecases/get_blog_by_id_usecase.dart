@@ -11,8 +11,10 @@ class GetBlogByIdUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
-        final Map<String, dynamic> blogJson = bodyMap['blog'] as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
+        final Map<String, dynamic> blogJson =
+            bodyMap['blog'] as Map<String, dynamic>;
         return BlogModel.fromJson(blogJson);
       } catch (e) {
         print('Error parsing blog detail: $e');

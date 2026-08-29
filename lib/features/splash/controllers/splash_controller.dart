@@ -41,7 +41,8 @@ class SplashController extends GetxController {
 
         if (cameraGranted && micGranted && notifGranted) {
           // Check if user is logged in
-          final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+          final isLoggedIn =
+              SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
 
           if (isLoggedIn) {
             Get.find<WebSocketService>().connect();
@@ -50,7 +51,8 @@ class SplashController extends GetxController {
 
             // ── Consume pending cold-start notification ──────────────────────
             // After Dashboard is loaded, navigate to the target screen.
-            final pendingSessionId = FCMNotificationService.pendingLiveSessionId;
+            final pendingSessionId =
+                FCMNotificationService.pendingLiveSessionId;
             final pendingData = FCMNotificationService.pendingNotificationData;
             if (pendingSessionId != null) {
               // Clear the pending intent so it isn't consumed again
@@ -67,11 +69,13 @@ class SplashController extends GetxController {
               // Short delay so the Dashboard widget tree is fully built
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Future.delayed(const Duration(milliseconds: 300), () {
-                  Get.to(() => LiveRoomScreen(
-                    sessionId: pendingSessionId,
-                    astrologerName: astrologerName,
-                    astrologerImage: astrologerImage,
-                  ));
+                  Get.to(
+                    () => LiveRoomScreen(
+                      sessionId: pendingSessionId,
+                      astrologerName: astrologerName,
+                      astrologerImage: astrologerImage,
+                    ),
+                  );
                 });
               });
             }

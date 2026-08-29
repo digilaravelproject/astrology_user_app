@@ -16,10 +16,10 @@ class SupportController extends GetxController {
     required GetPrivacyPolicyUseCase getPrivacyPolicyUseCase,
     required GetPaymentPolicyUseCase getPaymentPolicyUseCase,
     required GetTermsAndConditionsUseCase getTermsAndConditionsUseCase,
-  })  : _getFAQUseCase = getFAQUseCase,
-        _getPrivacyPolicyUseCase = getPrivacyPolicyUseCase,
-        _getPaymentPolicyUseCase = getPaymentPolicyUseCase,
-        _getTermsAndConditionsUseCase = getTermsAndConditionsUseCase;
+  }) : _getFAQUseCase = getFAQUseCase,
+       _getPrivacyPolicyUseCase = getPrivacyPolicyUseCase,
+       _getPaymentPolicyUseCase = getPaymentPolicyUseCase,
+       _getTermsAndConditionsUseCase = getTermsAndConditionsUseCase;
 
   final Rx<FAQModel?> faqData = Rx<FAQModel?>(null);
   final Rx<FAQModel?> privacyPolicyData = Rx<FAQModel?>(null);

@@ -2,10 +2,15 @@ import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_session.dart';
 
 abstract class IChatRepository {
-  Future<({List<ChatMessage> messages, String? startedAt, int? peerId, String? sessionStatus})> getChatHistory({
-    required int sessionId,
-    required int currentUserId,
-  });
+  Future<
+    ({
+      List<ChatMessage> messages,
+      String? startedAt,
+      int? peerId,
+      String? sessionStatus,
+    })
+  >
+  getChatHistory({required int sessionId, required int currentUserId});
   Future<int?> sendTextMessage({
     required int sessionId,
     required String text,
@@ -21,7 +26,11 @@ abstract class IChatRepository {
     required dynamic pickerResult,
   });
   Future<void> markMessagesRead(int sessionId);
-  Future<void> syncMessageStatus({required int sessionId, required List<int> messageIds, required String status});
+  Future<void> syncMessageStatus({
+    required int sessionId,
+    required List<int> messageIds,
+    required String status,
+  });
   Future<ChatSession?> endChatSession(int sessionId);
   Future<void> rejectChatSession(int sessionId);
 }

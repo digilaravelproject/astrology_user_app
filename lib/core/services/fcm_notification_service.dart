@@ -15,7 +15,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'local_notification_service.dart';
 
 class FCMNotificationService {
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
 
   // ── Pending navigation (Cold Start) ──────────────────────────────────────
   // When the app is killed and user taps a notification, Flutter routes are not
@@ -27,18 +28,20 @@ class FCMNotificationService {
 
   static Future<void> initialize() async {
     // 1. Request Notification Permission
-    _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: false,
-      provisional: false,
-    ).then((settings) {
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        debugPrint('User granted notification permission');
-      } else {
-        debugPrint('User declined notification permission');
-      }
-    });
+    _firebaseMessaging
+        .requestPermission(
+          alert: true,
+          badge: true,
+          sound: false,
+          provisional: false,
+        )
+        .then((settings) {
+          if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+            debugPrint('User granted notification permission');
+          } else {
+            debugPrint('User declined notification permission');
+          }
+        });
 
     // 2. Get & Register Device Token
     try {
@@ -62,23 +65,40 @@ class FCMNotificationService {
       debugPrint('Foreground Message Received: ${message.notification?.title}');
       if (message.notification != null || message.data.isNotEmpty) {
         final type = message.data['type']?.toString();
-        final title = message.notification?.title ?? message.data['title']?.toString() ?? '';
-        final body = message.notification?.body ?? message.data['body']?.toString() ?? '';
+        final title =
+            message.notification?.title ??
+            message.data['title']?.toString() ??
+            '';
+        final body =
+            message.notification?.body ??
+            message.data['body']?.toString() ??
+            '';
 
         // If chat accepted notification arrives while user is on waiting screen, update status to ongoing
-        if (title.contains('Accepted') || type == 'chat_accepted' || type == 'CHAT_ACCEPTED' || type == 'chat') {
-          final int sessionId = int.tryParse(message.data['session_id']?.toString() ?? message.data['id']?.toString() ?? '') ?? 0;
+        if (title.contains('Accepted') ||
+            type == 'chat_accepted' ||
+            type == 'CHAT_ACCEPTED' ||
+            type == 'chat') {
+          final int sessionId =
+              int.tryParse(
+                message.data['session_id']?.toString() ??
+                    message.data['id']?.toString() ??
+                    '',
+              ) ??
+              0;
           if (sessionId > 0) {
             WebSocketService.sessionStatusUpdates[sessionId] = 'ongoing';
             WebSocketService.sessionStatusUpdates.refresh();
           }
         }
 
-        final String rawSessionId = message.data['session_id']?.toString() ??
+        final String rawSessionId =
+            message.data['session_id']?.toString() ??
             message.data['chat_session_id']?.toString() ??
             message.data['chat_assistance_session_id']?.toString() ??
             message.data['live_session_id']?.toString() ??
-            message.data['id']?.toString() ?? '';
+            message.data['id']?.toString() ??
+            '';
         final int parsedSessionId = int.tryParse(rawSessionId) ?? 0;
 
         // If chat/call ended message arrives, immediately cancel ongoing timer notification & floating bubble
@@ -89,7 +109,6 @@ class FCMNotificationService {
             type == 'chat_summary' ||
             type == 'CHAT_MISSED' ||
             type == 'CHAT_DISMISSED') {
-          
           LocalNotificationService.cancelChatNotification();
           LocalNotificationService.cancelAll();
           FloatingChatBubble.dismiss(stopForegroundService: true);
@@ -100,37 +119,54 @@ class FCMNotificationService {
             type == 'session_completed' ||
             type == 'CALL_FAILED' ||
             type == 'CALL_DISMISSED') {
-          
           LocalNotificationService.cancelCallNotification();
           LocalNotificationService.cancelAll();
           return;
         } else if (type == 'PACKAGE_EXHAUSTED' || type == 'package') {
-          
-          
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         }
 
         // Read sound, priority, importance dynamically from backend data map
-        final String playSoundRaw = message.data['play_sound']?.toString() ?? message.data['playSound']?.toString() ?? '0';
-        final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true' || playSoundRaw == 'yes' || playSoundRaw == 'true';
+        final String playSoundRaw =
+            message.data['play_sound']?.toString() ??
+            message.data['playSound']?.toString() ??
+            '0';
+        final bool playSound =
+            playSoundRaw == '1' ||
+            playSoundRaw == 'true' ||
+            playSoundRaw == 'yes' ||
+            playSoundRaw == 'true';
 
-        final String priorityRaw = message.data['priority']?.toString().toLowerCase() ?? 'high';
+        final String priorityRaw =
+            message.data['priority']?.toString().toLowerCase() ?? 'high';
         Priority priority = Priority.high;
-        if (priorityRaw == 'max') priority = Priority.max;
-        else if (priorityRaw == 'low') priority = Priority.low;
-        else if (priorityRaw == 'min') priority = Priority.min;
-        else if (priorityRaw == 'default' || priorityRaw == 'normal') priority = Priority.defaultPriority;
+        if (priorityRaw == 'max')
+          priority = Priority.max;
+        else if (priorityRaw == 'low')
+          priority = Priority.low;
+        else if (priorityRaw == 'min')
+          priority = Priority.min;
+        else if (priorityRaw == 'default' || priorityRaw == 'normal')
+          priority = Priority.defaultPriority;
 
-        final String importanceRaw = message.data['importance']?.toString().toLowerCase() ?? 'high';
+        final String importanceRaw =
+            message.data['importance']?.toString().toLowerCase() ?? 'high';
         Importance importance = Importance.high;
-        if (importanceRaw == 'max') importance = Importance.max;
-        else if (importanceRaw == 'low') importance = Importance.low;
-        else if (importanceRaw == 'min') importance = Importance.min;
-        else if (importanceRaw == 'default' || importanceRaw == 'normal') importance = Importance.defaultImportance;
-        else if (importanceRaw == 'none') importance = Importance.none;
+        if (importanceRaw == 'max')
+          importance = Importance.max;
+        else if (importanceRaw == 'low')
+          importance = Importance.low;
+        else if (importanceRaw == 'min')
+          importance = Importance.min;
+        else if (importanceRaw == 'default' || importanceRaw == 'normal')
+          importance = Importance.defaultImportance;
+        else if (importanceRaw == 'none')
+          importance = Importance.none;
 
-        debugPrint('[FCMNotificationService] type=$type playSound=$playSound priority=$priorityRaw importance=$importanceRaw');
+        debugPrint(
+          '[FCMNotificationService] type=$type playSound=$playSound priority=$priorityRaw importance=$importanceRaw',
+        );
 
         // Build a structured payload so onDidReceiveNotificationResponse can route correctly.
         // live_ prefix  → LiveRoomScreen
@@ -139,16 +175,22 @@ class FCMNotificationService {
         String structuredPayload;
         if (type == 'live_stream' || type == 'live' || type == 'live_session') {
           structuredPayload = 'live_$rawSessionId';
-        } else if (type == 'call' || type == 'CALL_REQUEST' || type == 'CALL_ACCEPTED') {
-          structuredPayload = rawSessionId.isNotEmpty ? 'call_$rawSessionId' : message.data.toString();
+        } else if (type == 'call' ||
+            type == 'CALL_REQUEST' ||
+            type == 'CALL_ACCEPTED') {
+          structuredPayload =
+              rawSessionId.isNotEmpty
+                  ? 'call_$rawSessionId'
+                  : message.data.toString();
         } else {
-          structuredPayload = rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
+          structuredPayload =
+              rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
         }
 
         // ---- Show foreground notification ----
         String channelId;
         final upperType = type?.toUpperCase() ?? '';
-        
+
         if (upperType == 'CALL') {
           channelId = 'call';
         } else if (upperType == 'CHAT') {
@@ -157,7 +199,9 @@ class FCMNotificationService {
           channelId = 'chat_request';
         } else if (upperType == 'CALL_REQUEST') {
           channelId = 'call_request';
-        } else if (upperType == 'LIVE_STREAM' || upperType == 'LIVE' || upperType == 'LIVE_SESSION') {
+        } else if (upperType == 'LIVE_STREAM' ||
+            upperType == 'LIVE' ||
+            upperType == 'LIVE_SESSION') {
           channelId = 'live_stream';
         } else if (upperType == 'WALLET' || upperType == 'ORDER') {
           channelId = 'wallet';
@@ -188,7 +232,8 @@ class FCMNotificationService {
         // Chat/message notifications are noisy when the user is actively in the
         // chat room — WebSocket already delivers the message to the UI.
         final String lowerType = type?.toLowerCase() ?? '';
-        final bool isChatType = lowerType.contains('chat') ||
+        final bool isChatType =
+            lowerType.contains('chat') ||
             lowerType.contains('message') ||
             lowerType.contains('messagesent');
         if (isChatType) {
@@ -203,7 +248,8 @@ class FCMNotificationService {
               }
             }
             // Check support/assistance chat screen (सहायता चैट)
-            if (!userIsOnChatScreen && Get.isRegistered<ChatAssistanceController>()) {
+            if (!userIsOnChatScreen &&
+                Get.isRegistered<ChatAssistanceController>()) {
               final assistanceCtrl = Get.find<ChatAssistanceController>();
               if (assistanceCtrl.sessionId == incomingSessionId) {
                 userIsOnChatScreen = true;
@@ -212,13 +258,13 @@ class FCMNotificationService {
           } catch (_) {}
 
           if (userIsOnChatScreen) {
-            debugPrint('[FCMNotificationService] Suppressing chat notification — user is on chat screen (sessionId=$incomingSessionId)');
+            debugPrint(
+              '[FCMNotificationService] Suppressing chat notification — user is on chat screen (sessionId=$incomingSessionId)',
+            );
             return; // Skip the notification
           }
         }
         // ──────────────────────────────────────────────────────────────────────────
-
-        
       }
     });
 
@@ -235,21 +281,29 @@ class FCMNotificationService {
     // the target screen.
     _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        debugPrint('[FCMNotificationService] Cold-start notification detected: ${message.data}');
+        debugPrint(
+          '[FCMNotificationService] Cold-start notification detected: ${message.data}',
+        );
         final data = message.data;
         final type = data['type']?.toString();
         final screen = data['screen']?.toString();
         final notifType = data['notification_type']?.toString();
 
-        if (type == 'live_stream' || type == 'live' || type == 'live_session' ||
-            screen == 'LIVE_STREAM_SCREEN' || notifType == 'live_session') {
+        if (type == 'live_stream' ||
+            type == 'live' ||
+            type == 'live_session' ||
+            screen == 'LIVE_STREAM_SCREEN' ||
+            notifType == 'live_session') {
           // Store the pending live session so SplashController can navigate after boot
-          final sessionIdStr = data['session_id']?.toString() ??
+          final sessionIdStr =
+              data['session_id']?.toString() ??
               data['live_session_id']?.toString() ??
               data['id']?.toString();
           pendingLiveSessionId = int.tryParse(sessionIdStr ?? '');
           pendingNotificationData = Map<String, dynamic>.from(data);
-          debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId');
+          debugPrint(
+            '[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId',
+          );
         } else {
           // For other types try after a safe delay
           Future.delayed(const Duration(milliseconds: 2000), () {
@@ -263,30 +317,43 @@ class FCMNotificationService {
   static void _handleNotificationClick(Map<String, dynamic> data) {
     try {
       debugPrint('[FCM_SERVICE] Handling notification click with data: $data');
-      
+
       final type = data['type']?.toString();
       final screen = data['screen']?.toString();
       final notificationType = data['notification_type']?.toString();
-      
-      if (type == 'live_stream' || screen == 'LIVE_STREAM_SCREEN' || notificationType == 'live_session') {
-        final sessionIdStr = data['session_id']?.toString() ?? data['live_session_id']?.toString() ?? data['id']?.toString();
+
+      if (type == 'live_stream' ||
+          screen == 'LIVE_STREAM_SCREEN' ||
+          notificationType == 'live_session') {
+        final sessionIdStr =
+            data['session_id']?.toString() ??
+            data['live_session_id']?.toString() ??
+            data['id']?.toString();
         if (sessionIdStr != null && sessionIdStr.isNotEmpty) {
           final int? sessionId = int.tryParse(sessionIdStr);
           if (sessionId != null) {
-            final String astrologerName = data['astrologer_name']?.toString() ?? 'Astrologer';
-            final String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
-            
+            final String astrologerName =
+                data['astrologer_name']?.toString() ?? 'Astrologer';
+            final String astrologerImage =
+                data['astrologer_avatar']?.toString() ??
+                data['astrologer_image']?.toString() ??
+                '';
+
             // Navigate to LiveRoomScreen
-            Get.to(() => LiveRoomScreen(
-              sessionId: sessionId,
-              astrologerName: astrologerName,
-              astrologerImage: astrologerImage,
-            ));
+            Get.to(
+              () => LiveRoomScreen(
+                sessionId: sessionId,
+                astrologerName: astrologerName,
+                astrologerImage: astrologerImage,
+              ),
+            );
           }
         }
       }
     } catch (e, stackTrace) {
-      debugPrint('[FCM_SERVICE] Error handling notification click: $e\n$stackTrace');
+      debugPrint(
+        '[FCM_SERVICE] Error handling notification click: $e\n$stackTrace',
+      );
     }
   }
 
@@ -299,9 +366,13 @@ class FCMNotificationService {
     // Run completely in background thread context to prevent UI block (ANR)
     Future.microtask(() async {
       try {
-        debugPrint('[FCM_SERVICE] registerDeviceToken background execution started.');
+        debugPrint(
+          '[FCM_SERVICE] registerDeviceToken background execution started.',
+        );
         if (!Get.isRegistered<ApiClient>()) {
-          debugPrint('[FCM_SERVICE] ApiClient is NOT registered in GetX container!');
+          debugPrint(
+            '[FCM_SERVICE] ApiClient is NOT registered in GetX container!',
+          );
           return;
         }
 
@@ -312,17 +383,23 @@ class FCMNotificationService {
             tokenToRegister = await _firebaseMessaging.getToken().timeout(
               const Duration(seconds: 4),
               onTimeout: () {
-                debugPrint('[FCM_SERVICE] _firebaseMessaging.getToken timed out.');
+                debugPrint(
+                  '[FCM_SERVICE] _firebaseMessaging.getToken timed out.',
+                );
                 return null;
               },
             );
           } catch (tokEx) {
-            debugPrint('[FCM_SERVICE] Error fetching token with timeout: $tokEx');
+            debugPrint(
+              '[FCM_SERVICE] Error fetching token with timeout: $tokEx',
+            );
           }
         }
 
         if (tokenToRegister == null || tokenToRegister.isEmpty) {
-          debugPrint('[FCM_SERVICE] FCM token is null or empty, skipping API call.');
+          debugPrint(
+            '[FCM_SERVICE] FCM token is null or empty, skipping API call.',
+          );
           return;
         }
 
@@ -331,7 +408,10 @@ class FCMNotificationService {
 
         String deviceId = '';
         String deviceModel = '';
-        String deviceType = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown');
+        String deviceType =
+            Platform.isAndroid
+                ? 'android'
+                : (Platform.isIOS ? 'ios' : 'unknown');
 
         if (Platform.isAndroid) {
           AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
@@ -351,12 +431,23 @@ class FCMNotificationService {
           'app_version': packageInfo.version,
         };
 
-        debugPrint('[FCM_SERVICE] Sending POST to ${AppUrls.registerDeviceToken} with full payload: $payload');
+        debugPrint(
+          '[FCM_SERVICE] Sending POST to ${AppUrls.registerDeviceToken} with full payload: $payload',
+        );
         final apiClient = Get.find<ApiClient>();
-        final response = await apiClient.post(AppUrls.registerDeviceToken, data: payload, handleError: false, showToaster: false);
-        debugPrint('[FCM_SERVICE] Device token registered response | Status: ${response.statusCode} | Success: ${response.isSuccess}');
+        final response = await apiClient.post(
+          AppUrls.registerDeviceToken,
+          data: payload,
+          handleError: false,
+          showToaster: false,
+        );
+        debugPrint(
+          '[FCM_SERVICE] Device token registered response | Status: ${response.statusCode} | Success: ${response.isSuccess}',
+        );
       } catch (e, stackTrace) {
-        debugPrint('[FCM_SERVICE] Failed to register device token error: $e\n$stackTrace');
+        debugPrint(
+          '[FCM_SERVICE] Failed to register device token error: $e\n$stackTrace',
+        );
       }
     });
   }
@@ -378,15 +469,19 @@ class FCMNotificationService {
         deviceId = iosInfo.identifierForVendor ?? '';
       }
 
-      final payload = {
-        'device_id': deviceId,
-        'fcm_token': fcmToken ?? '',
-      };
+      final payload = {'device_id': deviceId, 'fcm_token': fcmToken ?? ''};
 
-      debugPrint('[FCM_SERVICE] Sending POST to ${AppUrls.removeDeviceToken} with payload: $payload');
+      debugPrint(
+        '[FCM_SERVICE] Sending POST to ${AppUrls.removeDeviceToken} with payload: $payload',
+      );
       final apiClient = Get.find<ApiClient>();
-      final response = await apiClient.post(AppUrls.removeDeviceToken, data: payload);
-      debugPrint('[FCM_SERVICE] Device token removed response: ${response.body}');
+      final response = await apiClient.post(
+        AppUrls.removeDeviceToken,
+        data: payload,
+      );
+      debugPrint(
+        '[FCM_SERVICE] Device token removed response: ${response.body}',
+      );
     } catch (e) {
       debugPrint('[FCM_SERVICE] Failed to remove device token: $e');
     }

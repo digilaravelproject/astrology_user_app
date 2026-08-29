@@ -39,12 +39,16 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                     shape: BoxShape.circle,
                     color: AppColors.fieldBackground,
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.primaryColor),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 20,
+                    color: AppColors.primaryColor,
+                  ),
                 ),
               ),
-              
+
               const SizedBox(height: 30),
-              
+
               AppText(
                 AppStrings.genderTitle,
                 style: GoogleFonts.dmSerifDisplay(
@@ -54,18 +58,18 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                   height: 1.1,
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               AppText(
                 AppStrings.genderSubtitle,
                 fontSize: 16,
                 color: AppColors.black.withOpacity(0.4),
                 fontWeight: FontWeight.w400,
               ),
-              
+
               const SizedBox(height: 50),
-              
+
               // Gender Grid
               Row(
                 children: [
@@ -100,21 +104,24 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                   ),
                 ],
               ),
-              
+
               // Error message
-              Obx(() => errorMessage.value.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: AppText(
-                        errorMessage.value,
-                        fontSize: 12,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500,
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : const SizedBox.shrink()),
-              
+              Obx(
+                () =>
+                    errorMessage.value.isNotEmpty
+                        ? Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: AppText(
+                            errorMessage.value,
+                            fontSize: 12,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                        : const SizedBox.shrink(),
+              ),
+
               const SizedBox(height: 60),
 
               Padding(
@@ -124,7 +131,8 @@ class _GenderSetupScreenState extends State<GenderSetupScreen> {
                   onTap: () {
                     if (selectedGender.isNotEmpty) {
                       errorMessage.value = '';
-                      Get.find<AuthController>().selectedGender.value = selectedGender;
+                      Get.find<AuthController>().selectedGender.value =
+                          selectedGender;
                       Get.toNamed(RouteHelper.getBirthDetailsRoute());
                     } else {
                       errorMessage.value = AppStrings.selectGenderError;

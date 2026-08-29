@@ -4,7 +4,7 @@ import '../../../utils/custom_snackbar.dart';
 
 class RazorpayService {
   late Razorpay _razorpay;
-  
+
   // Callbacks
   Function(PaymentSuccessResponse)? _onSuccess;
   Function(PaymentFailureResponse)? _onFailure;
@@ -68,13 +68,17 @@ class RazorpayService {
     print('[PCB_APP] [DEBUG] | Razorpay Options: $options');
 
     try {
-      print('[PCB_APP] [DEBUG] | Calling _razorpay.open(options) with delay...');
+      print(
+        '[PCB_APP] [DEBUG] | Calling _razorpay.open(options) with delay...',
+      );
       // Small delay ensures the UI is ready and doesn't block the main thread transition
       Future.delayed(const Duration(milliseconds: 500), () {
         try {
           _razorpay.open(options);
         } catch (e) {
-          print('[PCB_APP] [DEBUG] | Error in _razorpay.open delayed callback: $e');
+          print(
+            '[PCB_APP] [DEBUG] | Error in _razorpay.open delayed callback: $e',
+          );
           CustomSnackbar.showError('Could not open Razorpay checkout: $e');
         }
       });

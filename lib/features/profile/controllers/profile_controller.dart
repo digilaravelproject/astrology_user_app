@@ -45,18 +45,17 @@ class ProfileController extends GetxController {
     required SubmitFeedbackUseCase submitFeedbackUseCase,
     required GetAboutUsUseCase getAboutUsUseCase,
     required GetCustomerSupportUseCase getCustomerSupportUseCase,
-  })
-      : _updateProfilePhotoUseCase = updateProfilePhotoUseCase,
-        _getProfileUseCase = getProfileUseCase,
-        _updateProfileInAppUseCase = updateProfileInAppUseCase,
-        _getFollowingUseCase = getFollowingUseCase,
-        _getPlansUseCase = getPlansUseCase,
-        _getPlanByIdUseCase = getPlanByIdUseCase,
-        _upgradePlanUseCase = upgradePlanUseCase,
-        _verifyUpgradeUseCase = verifyUpgradeUseCase,
-        _submitFeedbackUseCase = submitFeedbackUseCase,
-        _getAboutUsUseCase = getAboutUsUseCase,
-        _getCustomerSupportUseCase = getCustomerSupportUseCase;
+  }) : _updateProfilePhotoUseCase = updateProfilePhotoUseCase,
+       _getProfileUseCase = getProfileUseCase,
+       _updateProfileInAppUseCase = updateProfileInAppUseCase,
+       _getFollowingUseCase = getFollowingUseCase,
+       _getPlansUseCase = getPlansUseCase,
+       _getPlanByIdUseCase = getPlanByIdUseCase,
+       _upgradePlanUseCase = upgradePlanUseCase,
+       _verifyUpgradeUseCase = verifyUpgradeUseCase,
+       _submitFeedbackUseCase = submitFeedbackUseCase,
+       _getAboutUsUseCase = getAboutUsUseCase,
+       _getCustomerSupportUseCase = getCustomerSupportUseCase;
 
   final isLoading = false.obs;
   final RxList<dynamic> followingList = <dynamic>[].obs;
@@ -120,10 +119,12 @@ class ProfileController extends GetxController {
 
   Future<void> _syncUser(UserModel updatedUser) async {
     final authController = Get.find<AuthController>();
-    print('_syncUser: planId=${updatedUser.planId}, isMatrimony=${updatedUser.isMatrimony}');
+    print(
+      '_syncUser: planId=${updatedUser.planId}, isMatrimony=${updatedUser.isMatrimony}',
+    );
     authController.currentUser.value = updatedUser;
     await Get.find<AuthService>().saveUserInfo(updatedUser);
-    
+
     // Store user data in SharedPreferences
     SharedPrefs.setInt('user_id', updatedUser.id);
     SharedPrefs.setString('user_name', updatedUser.name);
@@ -164,7 +165,8 @@ class ProfileController extends GetxController {
       final result = await astrologerService.getBlockedAstrologers();
       if (result.isSuccess && result.body != null) {
         final data = result.body as Map<String, dynamic>;
-        final blocked = data['blocked_astrologers'] as List? ?? data['data'] as List? ?? [];
+        final blocked =
+            data['blocked_astrologers'] as List? ?? data['data'] as List? ?? [];
         blockedList.assignAll(blocked);
       }
     } catch (e) {
@@ -182,11 +184,18 @@ class ProfileController extends GetxController {
         final data = result.body as Map<String, dynamic>;
         final plansList = data['plans'] as List?;
         if (plansList != null) {
-          plans.assignAll(plansList.map((e) =>
-              PlanModel.fromJson(e as Map<String, dynamic>)).toList());
+          plans.assignAll(
+            plansList
+                .map((e) => PlanModel.fromJson(e as Map<String, dynamic>))
+                .toList(),
+          );
         }
-        activePlan = data['active_plan'] != null ? PlanModel.fromJson(
-            data['active_plan'] as Map<String, dynamic>) : null;
+        activePlan =
+            data['active_plan'] != null
+                ? PlanModel.fromJson(
+                  data['active_plan'] as Map<String, dynamic>,
+                )
+                : null;
       }
     } catch (e) {
       print('Error fetching plans: $e');
@@ -203,8 +212,9 @@ class ProfileController extends GetxController {
         final data = result.body as Map<String, dynamic>;
         // The plan data is inside the 'data' field
         if (data.containsKey('data')) {
-          selectedPlan.value =
-              PlanModel.fromJson(data['data'] as Map<String, dynamic>);
+          selectedPlan.value = PlanModel.fromJson(
+            data['data'] as Map<String, dynamic>,
+          );
         } else {
           selectedPlan.value = PlanModel.fromJson(data);
         }
@@ -240,7 +250,10 @@ class ProfileController extends GetxController {
     } catch (e) {
       print('Error upgrading plan: $e');
       return ResponseModel(
-          isSuccess: false, message: e.toString(), statusCode: 500);
+        isSuccess: false,
+        message: e.toString(),
+        statusCode: 500,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -258,17 +271,20 @@ class ProfileController extends GetxController {
         providerPaymentId: providerPaymentId,
         signature: signature,
       );
-      
+
       // Refresh profile after successful upgrade
       if (result.isSuccess) {
         await refreshProfile();
       }
-      
+
       return result;
     } catch (e) {
       print('Error verifying upgrade: $e');
       return ResponseModel(
-          isSuccess: false, message: e.toString(), statusCode: 500);
+        isSuccess: false,
+        message: e.toString(),
+        statusCode: 500,
+      );
     } finally {
       isLoading.value = false;
     }
@@ -280,7 +296,9 @@ class ProfileController extends GetxController {
       final result = await _submitFeedbackUseCase.execute(rating, comment);
       if (result.isSuccess) {
         Get.back();
-        CustomSnackbar.showSuccess('Thank you! Your feedback has been submitted.');
+        CustomSnackbar.showSuccess(
+          'Thank you! Your feedback has been submitted.',
+        );
       } else {
         CustomSnackbar.showError(result.message ?? 'Failed to submit feedback');
       }
@@ -298,7 +316,7 @@ class ProfileController extends GetxController {
       if (result.isSuccess && result.body != null) {
         final body = result.body;
         print('AboutUs Body: $body');
-        
+
         dynamic findContent(dynamic obj) {
           if (obj is Map) {
             if (obj.containsKey('content') && obj['content'] != null) {
@@ -319,10 +337,10 @@ class ProfileController extends GetxController {
 
         final content = findContent(body);
         if (content != null) return content.toString();
-        
+
         // Final fallback
         if (body is Map && body.containsKey('data')) {
-           return body['data'].toString();
+          return body['data'].toString();
         }
         return body.toString();
       }
@@ -341,7 +359,7 @@ class ProfileController extends GetxController {
       final result = await _getCustomerSupportUseCase.execute();
       if (result.isSuccess && result.body != null) {
         final body = result.body;
-        
+
         dynamic findContent(dynamic obj) {
           if (obj is Map) {
             if (obj.containsKey('content') && obj['content'] != null) {

@@ -72,7 +72,6 @@ class RouteHelper {
   static String getPaymentSuccessRoute() => AppRoutes.paymentSuccess;
   static String getNotificationRoute() => AppRoutes.notification;
 
-
   static String getPanchangRoute() => AppRoutes.panchangScreen;
   static String getKundaliRoute() => AppRoutes.kundaliScreen;
   static String getKundaliMatchingRoute() => AppRoutes.kundaliMatchingScreen;
@@ -84,10 +83,7 @@ class RouteHelper {
       binding: NotificationBinding(),
       transition: Transition.rightToLeft,
     ),
-    GetPage(
-      name: AppRoutes.splash,
-      page: () => const SplashScreen(),
-    ),
+    GetPage(name: AppRoutes.splash, page: () => const SplashScreen()),
     GetPage(
       name: AppRoutes.permission,
       page: () => const PermissionScreen(),
@@ -207,13 +203,13 @@ class RouteHelper {
       name: AppRoutes.subscriptionScreen,
       page: () => const SubscriptionScreen(),
       transition: Transition.rightToLeft,
-      binding: ProfileBinding()
+      binding: ProfileBinding(),
     ),
     GetPage(
-        name: AppRoutes.subscriptionDetailScreen,
-        page: () => SubscriptionDetailScreen(planId: 0),
-        transition: Transition.rightToLeft,
-        binding: ProfileBinding(),
+      name: AppRoutes.subscriptionDetailScreen,
+      page: () => SubscriptionDetailScreen(planId: 0),
+      transition: Transition.rightToLeft,
+      binding: ProfileBinding(),
     ),
     GetPage(
       name: AppRoutes.faq,
@@ -260,15 +256,26 @@ class RouteHelper {
     GetPage(
       name: AppRoutes.kundaliScreen,
       page: () {
-        final args = Get.arguments is Map<String, dynamic> ? Get.arguments as Map<String, dynamic> : {};
+        final args =
+            Get.arguments is Map<String, dynamic>
+                ? Get.arguments as Map<String, dynamic>
+                : {};
         return KundliScreen(
           fullName: args['fullName'] ?? args['name'] ?? '',
           gender: args['gender'] ?? '',
           dob: args['dob'] ?? '',
           tob: args['tob'] ?? args['time'] ?? '',
           place: args['place'] ?? '',
-          latitude: (args['latitude'] is num) ? (args['latitude'] as num).toDouble() : (double.tryParse(args['latitude']?.toString() ?? '') ?? 0.0),
-          longitude: (args['longitude'] is num) ? (args['longitude'] as num).toDouble() : (double.tryParse(args['longitude']?.toString() ?? '') ?? 0.0),
+          latitude:
+              (args['latitude'] is num)
+                  ? (args['latitude'] as num).toDouble()
+                  : (double.tryParse(args['latitude']?.toString() ?? '') ??
+                      0.0),
+          longitude:
+              (args['longitude'] is num)
+                  ? (args['longitude'] as num).toDouble()
+                  : (double.tryParse(args['longitude']?.toString() ?? '') ??
+                      0.0),
         );
       },
       transition: Transition.fadeIn,

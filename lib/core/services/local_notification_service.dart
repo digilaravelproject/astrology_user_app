@@ -19,10 +19,11 @@ class LocalNotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: DarwinInitializationSettings(),
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: DarwinInitializationSettings(),
+        );
 
     await _notificationsPlugin.initialize(
       initializationSettings,
@@ -31,7 +32,9 @@ class LocalNotificationService {
         final payload = response.payload;
         if (payload == null) return;
 
-        debugPrint('[LocalNotificationService] Tapped notification payload: $payload');
+        debugPrint(
+          '[LocalNotificationService] Tapped notification payload: $payload',
+        );
 
         if (payload.startsWith('live_')) {
           // ── Live Stream notification ──
@@ -40,25 +43,31 @@ class LocalNotificationService {
           if (sessionId != null) {
             // Use addPostFrameCallback to ensure widget tree is ready
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Get.to(() => LiveRoomScreen(
-                sessionId: sessionId,
-                astrologerName: 'Astrologer',
-                astrologerImage: '',
-              ));
+              Get.to(
+                () => LiveRoomScreen(
+                  sessionId: sessionId,
+                  astrologerName: 'Astrologer',
+                  astrologerImage: '',
+                ),
+              );
             });
           }
         } else if (payload.startsWith('call_')) {
           // ── Ongoing / Incoming Call notification ──
           bool isValidStatus = false;
           bool isVisible = false;
-          
+
           if (Get.isRegistered<CallController>()) {
             final ctrl = Get.find<CallController>();
             isVisible = ctrl.isCallScreenVisible;
             final status = ctrl.status.value;
-            isValidStatus = (status == 'ongoing' || status == 'ringing' || status == 'dialing' || status == 'waiting');
+            isValidStatus =
+                (status == 'ongoing' ||
+                    status == 'ringing' ||
+                    status == 'dialing' ||
+                    status == 'waiting');
           }
-          
+
           if (isValidStatus) {
             if (!isVisible) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -67,13 +76,18 @@ class LocalNotificationService {
             }
           } else {
             // It's a stale notification, cancel it
-            debugPrint('[LocalNotificationService] Stale call notification tapped, cancelling...');
+            debugPrint(
+              '[LocalNotificationService] Stale call notification tapped, cancelling...',
+            );
             final sessionIdStr = payload.replaceFirst('call_', '');
             final int? sessionId = int.tryParse(sessionIdStr);
             _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
             if (sessionId != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                Get.toNamed('/session-summary', arguments: {'sessionId': sessionId});
+                Get.toNamed(
+                  '/session-summary',
+                  arguments: {'sessionId': sessionId},
+                );
               });
             }
           }
@@ -86,12 +100,14 @@ class LocalNotificationService {
           // ── Chat session notification (payload = sessionId as string) ──
           final int? sId = int.tryParse(payload);
           if (sId != null) {
-            String astroName = FloatingChatBubble.name?.isNotEmpty == true
-                ? FloatingChatBubble.name!
-                : 'Astrologer';
-            String astroStatus = FloatingChatBubble.chatStatus.value.isNotEmpty
-                ? FloatingChatBubble.chatStatus.value
-                : 'ongoing';
+            String astroName =
+                FloatingChatBubble.name?.isNotEmpty == true
+                    ? FloatingChatBubble.name!
+                    : 'Astrologer';
+            String astroStatus =
+                FloatingChatBubble.chatStatus.value.isNotEmpty
+                    ? FloatingChatBubble.chatStatus.value
+                    : 'ongoing';
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!Get.isRegistered<ChatController>()) {
@@ -114,9 +130,11 @@ class LocalNotificationService {
 
     // Pre-create notification channels explicitly
 
-
-    final androidPlugin = _notificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin =
+        _notificationsPlugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
 
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(

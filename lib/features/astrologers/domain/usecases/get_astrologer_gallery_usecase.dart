@@ -9,7 +9,7 @@ class GetAstrologerGalleryUseCase {
 
   Future<List<AstrologerGalleryModel>> execute(int id) async {
     final ResponseModel response = await service.getAstrologerGallery(id);
-    
+
     if (response.isSuccess) {
       if (response.body != null && response.body['gallery'] != null) {
         return (response.body['gallery'] as List)

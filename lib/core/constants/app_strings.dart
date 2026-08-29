@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 class AppStrings {
   // Common
   static String get appName => 'Surya Path';
@@ -10,17 +11,24 @@ class AppStrings {
   static String get oneHundredPercent => '100%'.tr;
   // Language Selection
   static String get selectLanguageTitle => 'Select\nLanguage'.tr;
-  static String get selectLanguageSubtitle => 'Choose your preferred language for better experience'.tr;
+  static String get selectLanguageSubtitle =>
+      'Choose your preferred language for better experience'.tr;
   // Intro Screen
   static String get introTitle1 => 'Professional\nAstrologer'.tr;
   static String get introSubtitle1 => 'KNOW YOUR FUTURE FROM'.tr;
-  static String get introDesc1 => 'Get accurate predictions and personalized guidance from world-class astrologers.'.tr;
+  static String get introDesc1 =>
+      'Get accurate predictions and personalized guidance from world-class astrologers.'
+          .tr;
   static String get introTitle2 => 'Daily\nHoroscope'.tr;
   static String get introSubtitle2 => 'REVEAL WHAT\'S NEXT'.tr;
-  static String get introDesc2 => 'Start your day with insights into your zodiac sign\'s health, wealth, and love life.'.tr;
+  static String get introDesc2 =>
+      'Start your day with insights into your zodiac sign\'s health, wealth, and love life.'
+          .tr;
   static String get introTitle3 => 'Consult\nExperts'.tr;
   static String get introSubtitle3 => 'TALK TO BEST'.tr;
-  static String get introDesc3 => 'Instant access to verified astrologers for detailed palmistry and face reading.'.tr;
+  static String get introDesc3 =>
+      'Instant access to verified astrologers for detailed palmistry and face reading.'
+          .tr;
   static String get getStarted => 'GET STARTED'.tr;
   // Login Screen
   static String get loginTitle => 'First talk with\nastrologer is Free'.tr;
@@ -42,13 +50,15 @@ class AppStrings {
   static String get nameMinLength => 'Name must be at least 2 characters'.tr;
   // Gender Screen
   static String get genderTitle => 'Select\nGender'.tr;
-  static String get genderSubtitle => 'Choose your gender to personalize your experience'.tr;
+  static String get genderSubtitle =>
+      'Choose your gender to personalize your experience'.tr;
   static String get male => 'Male'.tr;
   static String get female => 'Female'.tr;
   static String get selectGenderError => 'Please select your gender'.tr;
   // Birth Details Screen
   static String get birthDetailsTitle => 'Birth\nDetails'.tr;
-  static String get birthDetailsSubtitle => 'Exact details help in accurate predictions'.tr;
+  static String get birthDetailsSubtitle =>
+      'Exact details help in accurate predictions'.tr;
   static String get dateOfBirth => 'Date of Birth'.tr;
   static String get timeOfBirth => 'Time of Birth'.tr;
   static String get placeOfBirth => 'Place of Birth'.tr;
@@ -64,7 +74,9 @@ class AppStrings {
   static String get hello => 'Hello,'.tr;
   static String get guest => 'Guest'.tr;
   static String get foundersWords => "Founder's Words for Users".tr;
-  static String get founderMessage => "Welcome to our astrology app! Here, you'll find insights and advice to guide you in love, career, and life through the vedic sciences. ✨".tr;
+  static String get founderMessage =>
+      "Welcome to our astrology app! Here, you'll find insights and advice to guide you in love, career, and life through the vedic sciences. ✨"
+          .tr;
   static String get yourFounder => "- Founder".tr;
   static String get viewAll => "VIEW ALL".tr;
   static String get filter => "Filter".tr;
@@ -142,7 +154,8 @@ class AppStrings {
   // Arrival Screen
   static String get welcome => 'Welcome!'.tr;
   static String get registrationSuccessful => 'Registration Successful'.tr;
-  static String get successfullyLoggedIn => 'You have successfully logged in.'.tr;
+  static String get successfullyLoggedIn =>
+      'You have successfully logged in.'.tr;
   static String get mobile => 'Mobile'.tr;
   // Others
   static String get error => 'Error'.tr;
@@ -153,7 +166,8 @@ class AppStrings {
   static String get zodiacAquarius => 'AQUARIUS'.tr;
   // Branding & Features
   static String get suryaPathTitle => 'Surya Path Kundli'.tr;
-  static String get lifeGuidanceMatrimony => 'Life Guidance &\nAstro Verified Matrimony'.tr;
+  static String get lifeGuidanceMatrimony =>
+      'Life Guidance &\nAstro Verified Matrimony'.tr;
   static String get lifeGuidance => 'Life Guidance'.tr;
   static String get verifiedMatrimony => 'Verified\nMatrimony'.tr;
   static String get andBadge => 'and'.tr;
@@ -164,18 +178,22 @@ class AppStrings {
   static String get fullNameLabel => 'Full Name Label'.tr;
   static String get genderLabel => 'Gender Label'.tr;
   static String get birthDetailsLabel => 'Birth Details Label'.tr;
-  static String get enterValidMobile => 'Please enter a valid 10-digit mobile number'.tr;
+  static String get enterValidMobile =>
+      'Please enter a valid 10-digit mobile number'.tr;
   static String get pleaseEnterMobile => 'Please enter your mobile number'.tr;
   static String get matrimonyCustomerList => 'Matrimony Customer List'.tr;
   static String get viewProfile => 'View Profile'.tr;
   static String get more => 'More'.tr;
   static String get yrs => 'Yrs'.tr;
   static String get ordersLabel => 'orders'.tr;
-  static String get sessionCompleteGuide => 'session for 30 minute complete guide'.tr;
+  static String get sessionCompleteGuide =>
+      'session for 30 minute complete guide'.tr;
   static String get expLabelPrefix => 'Exp-'.tr;
-  static String get exploreRemedyBlogsServices => 'Explore Remedy Blogs & Services'.tr;
+  static String get exploreRemedyBlogsServices =>
+      'Explore Remedy Blogs & Services'.tr;
   static String get freePaidRemedies => 'Free & Paid Remedies'.tr;
-  static String get freeSignificanceRemedies => 'Free Significance of Remedies'.tr;
+  static String get freeSignificanceRemedies =>
+      'Free Significance of Remedies'.tr;
   static String get bookLiveRemedySession => 'Book Live Remedy Session'.tr;
   static String get checkRemedies => 'Check Remedies'.tr;
   static String get gemstones => 'Gemstones'.tr;
@@ -184,28 +202,35 @@ class AppStrings {
   static String get viewMore => 'View More'.tr;
   static String get powerfulRemedyFor => 'Powerful Remedy for'.tr;
   static String get todaysHoroscope => "Today's Horoscope".tr;
-  static String get kundaliMilanMatchMaking => "Kundali Milan & Match Making".tr;
+  static String get kundaliMilanMatchMaking =>
+      "Kundali Milan & Match Making".tr;
   static String get kundaliMilan => "Kundali Milan".tr;
   static String get kundali => "Kundali".tr;
   static String get matchMaking => "Match Making".tr;
   static String get freeKundli => "Free Kundli".tr;
   static String get dailyHoroscope => "Daily Horoscope".tr;
   static String get dailyPanchang => "Daily Panchang".tr;
-  static String get interestingAstrologyBlogs => "Interesting Astrology Blogs".tr;
+  static String get interestingAstrologyBlogs =>
+      "Interesting Astrology Blogs".tr;
   static String get payAmountPrefix => "Pay".tr;
   static String get forLiveSession => "for Live Session".tr;
   static String get attendAskQuestionsWith => "Attend & Ask Questions with".tr;
-  static String get anyAstrologerTill30Min => "Any Astrologer till 30 Minutes".tr;
+  static String get anyAstrologerTill30Min =>
+      "Any Astrologer till 30 Minutes".tr;
   static String get joinLiveSession => "Join Live Session".tr;
   static String get askUnlimitedQuestions30Min1 => "Ask Unlimited Questions".tr;
-  static String get askUnlimitedQuestions30Min2 => "through Comments for 30 Minutes".tr;
-  static String get selectAnyExpertAstrologer => "Select Any Expert Astrologer".tr;
+  static String get askUnlimitedQuestions30Min2 =>
+      "through Comments for 30 Minutes".tr;
+  static String get selectAnyExpertAstrologer =>
+      "Select Any Expert Astrologer".tr;
   static String get instantLiveReplies => "Instant Live Replies".tr;
   static String get joinLiveSessionsTitle => "Join".tr;
   static String get liveSessionsTitle => "Live Sessions".tr;
   static String get premiumAccess => "PREMIUM ACCESS".tr;
-  static String get interactiveLivePredictions => "Interactive Live Predictions".tr;
-  static String get getAnswersInstantlyFromExperts => "Get answers instantly from experts".tr;
+  static String get interactiveLivePredictions =>
+      "Interactive Live Predictions".tr;
+  static String get getAnswersInstantlyFromExperts =>
+      "Get answers instantly from experts".tr;
   static String get liveNow => "LIVE NOW".tr;
   static String get seeAll => "See All".tr;
   static String get liveBadge => "LIVE".tr;
@@ -218,19 +243,25 @@ class AppStrings {
   static String get sports => 'Sports'.tr;
   static String get smokingHabits => 'Smoking Habits'.tr;
   static String get drinkingHabits => 'Drinking Habits'.tr;
-  static String get aboutMyselfDescription => "I have a Bachelor's degree and I am employed in private Sector as a healthcare professional currently based in Mumbai City.".tr;
+  static String get aboutMyselfDescription =>
+      "I have a Bachelor's degree and I am employed in private Sector as a healthcare professional currently based in Mumbai City."
+          .tr;
   static String get lastSeenFewHoursAgo => 'Last seen few hours ago'.tr;
   static String get neverMarried => 'Never married'.tr;
-  static String get profileCreatedBySelfInfo => 'Profile created by self • 36 Yrs • 5\'0"'.tr;
-  static String get bachelorDegreeInfo => '96 Kuli Maratha • Other Bachelor Degree in'.tr;
-  static String get managementHealthcareInfo => 'Management • Health Care Professional • Mumbai'.tr;
+  static String get profileCreatedBySelfInfo =>
+      'Profile created by self • 36 Yrs • 5\'0"'.tr;
+  static String get bachelorDegreeInfo =>
+      '96 Kuli Maratha • Other Bachelor Degree in'.tr;
+  static String get managementHealthcareInfo =>
+      'Management • Health Care Professional • Mumbai'.tr;
   static String get myWallet => 'My Wallet'.tr;
   static String get walletBalance => 'Available Balance'.tr;
   static String get addMoney => 'Add Money'.tr;
   static String get rechargeNow => 'Recharge Now'.tr;
   static String get transactions => 'Transactions'.tr;
   static String get rechargeWallet => 'Recharge Wallet'.tr;
-  static String get selectAmountToAdd => 'Select amount to add to your wallet'.tr;
+  static String get selectAmountToAdd =>
+      'Select amount to add to your wallet'.tr;
   static String get popularAmounts => 'Popular Amounts'.tr;
   static String get enterCustomAmount => 'Enter custom amount'.tr;
   static String get proceedToPay => 'Proceed to Pay'.tr;
@@ -259,7 +290,8 @@ class AppStrings {
   static String get talkToAstrologer => 'Talk to Astrologer'.tr;
   static String get notifications => 'Notifications'.tr;
   static String get noNotifications => 'No Notifications'.tr;
-  static String get noNotificationsSubtitle => 'You have no notifications right now. Come back later.'.tr;
+  static String get noNotificationsSubtitle =>
+      'You have no notifications right now. Come back later.'.tr;
   // Profile Menu
   static String get myAccount => 'My Account'.tr;
   static String get manageSubscription => 'Manage Subscription'.tr;
@@ -287,7 +319,9 @@ class AppStrings {
   static String get supportLegal => 'Support & Legal'.tr;
   static String get appInfo => 'App Info'.tr;
   static String get deleteAccountTitle => deleteAccount;
-  static String get deleteAccountConfirmation => 'Are you sure you want to delete your account? This action cannot be undone.'.tr;
+  static String get deleteAccountConfirmation =>
+      'Are you sure you want to delete your account? This action cannot be undone.'
+          .tr;
   static String get delete => 'Delete'.tr;
   static String get cancel => 'Cancel'.tr;
   static String get other => "Other".tr;
@@ -301,19 +335,24 @@ class AppStrings {
   static String get gender => 'Gender'.tr;
   // Coming Soon & Error Screens
   static String get underDevelopment => 'Under Development'.tr;
-  static String get workingHardFeature => 'We are working hard to bring this feature to life. Stay tuned for updates!'.tr;
+  static String get workingHardFeature =>
+      'We are working hard to bring this feature to life. Stay tuned for updates!'
+          .tr;
   static String get goBack => 'Go Back'.tr;
   static String get somethingWentWrong => 'Something went wrong!'.tr;
-  static String get couldNotLoadData => 'We couldn\'t load the data right now. Please try again later.'.tr;
+  static String get couldNotLoadData =>
+      'We couldn\'t load the data right now. Please try again later.'.tr;
   static String get retry => 'Retry'.tr;
   // No Internet Screen
   static String get noInternetConnection => 'No Internet Connection'.tr;
-  static String get checkInternetConnection => 'Please check your internet connection and try again.'.tr;
+  static String get checkInternetConnection =>
+      'Please check your internet connection and try again.'.tr;
   static String get openSettings => 'Open Settings'.tr;
   static String get connected => 'Connected'.tr;
   static String get internetRestored => 'Internet connection restored'.tr;
   static String get noInternet => 'No Internet'.tr;
-  static String get stillNoInternet => 'Still no internet connection. Please check your network.'.tr;
+  static String get stillNoInternet =>
+      'Still no internet connection. Please check your network.'.tr;
   // Wallet Transactions
   static String get walletRecharge => 'Wallet Recharge'.tr;
   static String get consultationDrSharma => 'Consultation - Dr. Sharma'.tr;
@@ -350,8 +389,11 @@ class AppStrings {
   static String get noMatchesFound => 'No matches found'.tr;
   // Dashboard Promotional
   static String get premiumAstrology => 'PREMIUM ASTROLOGY'.tr;
-  static String get consultWithPremiumAI => 'Consult With Premium\nAI Astrologers'.tr;
-  static String get getPrecisePredictions => 'Get precise predictions about your future, career, and relationships from our verified experts.'.tr;
+  static String get consultWithPremiumAI =>
+      'Consult With Premium\nAI Astrologers'.tr;
+  static String get getPrecisePredictions =>
+      'Get precise predictions about your future, career, and relationships from our verified experts.'
+          .tr;
   static String get getYourFreeChat => 'Get Your Free Chat'.tr;
   static String get chatFreeNow => 'CHAT FREE NOW!'.tr;
   // Matrimony Registration
@@ -368,9 +410,11 @@ class AppStrings {
   static String get lastNameReq => 'Last Name *'.tr;
   static String get emailReq => 'Email Address *'.tr;
   static String get mobileReq => 'Mobile Number *'.tr;
-  static String get matchesContactInfo => 'Matches will contact you on this number'.tr;
+  static String get matchesContactInfo =>
+      'Matches will contact you on this number'.tr;
   static String get safetyFirst => 'Safety First'.tr;
-  static String get sangamSafetyMsg => 'Sangam.com is for genuine match-seekers only. Fake profiles'.tr;
+  static String get sangamSafetyMsg =>
+      'Sangam.com is for genuine match-seekers only. Fake profiles'.tr;
   static String get buildYourProfile => "Let's build your Profile".tr;
   static String get day => 'Day'.tr;
   static String get month => 'Month'.tr;
@@ -382,19 +426,24 @@ class AppStrings {
   static String get jobTitleReq => 'Job Title *'.tr;
   static String get annualIncomeReq => 'Annual Income *'.tr;
   static String get verifyYourProfile => 'Verify your profile'.tr;
-  static String get verificationMsg => 'Profile verification is crucial for safety on Sangam to ensure a trusted experience'.tr;
+  static String get verificationMsg =>
+      'Profile verification is crucial for safety on Sangam to ensure a trusted experience'
+          .tr;
   static String get panCard => 'PAN Card'.tr;
   static String get drivingLicence => 'Driving Licence'.tr;
   static String get aadhaarCard => 'Aadhaar Card'.tr;
   static String get panNumber => 'PAN Number'.tr;
   static String get drivingLicenceNumber => 'Driving Licence Number'.tr;
   static String get aadhaarCardNumber => 'Aadhaar Card Number'.tr;
-  static String get infoSafePrivate => 'Your information will be 100% safe & private.'.tr;
+  static String get infoSafePrivate =>
+      'Your information will be 100% safe & private.'.tr;
   static String get verifyNow => 'Verify Now'.tr;
-  static String get profilesWithPhotosMsg => 'Profiles with Photos get\n3x more Responses'.tr;
+  static String get profilesWithPhotosMsg =>
+      'Profiles with Photos get\n3x more Responses'.tr;
   static String get addPhoto => 'Add Photo'.tr;
   static String get photosSafeMsg => 'Your photos are 100% safe'.tr;
-  static String get photoPrivacyMsg => 'Photo Privacy controls available in Settings'.tr;
+  static String get photoPrivacyMsg =>
+      'Photo Privacy controls available in Settings'.tr;
   static String get uploadPhotos => 'Upload Photos'.tr;
   static String get skip => 'Skip'.tr;
   // Drawer
@@ -428,8 +477,5 @@ class AppStrings {
   static String get durationPrefix => "Duration: ".tr;
   static String get chatSessionEnded => "This chat session has ended.".tr;
 
-
-
   static String get panchang => 'Panchang'.tr;
-
 }

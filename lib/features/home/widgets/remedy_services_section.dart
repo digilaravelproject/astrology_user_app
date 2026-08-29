@@ -3,6 +3,7 @@ import 'package:astro_user/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 
 class RemedyServicesSection extends StatelessWidget {
   const RemedyServicesSection({super.key});
@@ -19,7 +20,8 @@ class RemedyServicesSection extends StatelessWidget {
         'isShop': false,
       },
       {
-        'image': 'https://images.pexels.com/photos/3796810/pexels-photo-3796810.jpeg?auto=compress&cs=tinysrgb&w=400',
+        'image':
+            'https://images.pexels.com/photos/3796810/pexels-photo-3796810.jpeg?auto=compress&cs=tinysrgb&w=400',
         'title': 'Paid Remedy\nSessions',
         'buttonText': 'Book Now',
         'buttonColor': const Color(0xFFFCE4EC),
@@ -50,10 +52,7 @@ class RemedyServicesSection extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFFFFF0F5),
-            Color(0xFFFCE4EC),
-          ],
+          colors: [Color(0xFFFFF0F5), Color(0xFFFCE4EC)],
         ),
       ),
       child: Column(
@@ -64,11 +63,7 @@ class RemedyServicesSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.auto_awesome,
-                  color: AppColors.goldAccent,
-                  size: 18,
-                ),
+                Icon(Icons.auto_awesome, color: AppColors.goldAccent, size: 18),
                 const SizedBox(width: 8),
                 const AppText(
                   'Explore Remedy Blogs & Services',
@@ -78,16 +73,11 @@ class RemedyServicesSection extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(width: 8),
-                Icon(
-                  Icons.auto_awesome,
-                  color: AppColors.goldAccent,
-                  size: 18,
-                ),
+                Icon(Icons.auto_awesome, color: AppColors.goldAccent, size: 18),
               ],
             ),
           ),
 
-          
           // 2x2 Grid
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -131,10 +121,7 @@ class RemedyServicesSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.5),
-          width: 2,
-        ),
+        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
         boxShadow: [
           BoxShadow(
             color: Colors.pink.withOpacity(0.1),
@@ -146,23 +133,16 @@ class RemedyServicesSection extends StatelessWidget {
       child: Column(
         children: [
           // Image
-          Container(
+          CustomImageWidget(
+            imagePath: image,
             height: 100,
-            // margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: image.startsWith('http')
-                    ? NetworkImage(image)
-                    : AssetImage(image) as ImageProvider,
-                fit: BoxFit.cover,
-              ),
-            ),
+            radius: BorderRadius.circular(16),
+            fit: BoxFit.cover,
           ),
-          
+
           // Title
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: AppText(
               title,
               fontSize: 12,
@@ -177,9 +157,9 @@ class RemedyServicesSection extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 8, left: 8, right: 8),
             child: CustomButton(
               height: 35,
-                backgroundColor: buttonColor,
-                textColor: buttonTextColor,
-                text: buttonText,
+              backgroundColor: buttonColor,
+              textColor: buttonTextColor,
+              text: buttonText,
               fontSize: 12,
             ),
           ),

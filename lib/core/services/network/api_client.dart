@@ -30,66 +30,74 @@ class ApiClient {
       connectTimeout: const Duration(milliseconds: 30000),
       receiveTimeout: const Duration(milliseconds: 30000),
       contentType: 'application/json',
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: {'Accept': 'application/json'},
       validateStatus: (status) => status! < 500,
     );
 
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        String token = await TokenManager.getToken() ?? "";
-        options.headers["Authorization"] = "Bearer $token";
-        options.headers["Accept"] = "application/json";
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          String token = await TokenManager.getToken() ?? "";
+          options.headers["Authorization"] = "Bearer $token";
+          options.headers["Accept"] = "application/json";
 
-        if (options.path.contains('/user/live/')) {
-          options.receiveTimeout = const Duration(seconds: 60);
-          Logger.d('|⏱️ ReceiveTimeout increased to 60s for live session endpoint: ${options.path}');
-        }
+          if (options.path.contains('/user/live/')) {
+            options.receiveTimeout = const Duration(seconds: 60);
+            Logger.d(
+              '|⏱️ ReceiveTimeout increased to 60s for live session endpoint: ${options.path}',
+            );
+          }
 
-        // Detailed request logging
-        Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        Logger.d('|🌐 API REQUEST');
-        Logger.d('|📍 URL: ${options.baseUrl}${options.path}');
-        Logger.d('|🔧 Method: ${options.method}');
-        Logger.d('|🔑 Token: ${token.isNotEmpty ? "${token.substring(0, token.length > 20 ? 20 : token.length)}..." : "No Token"}');
-        Logger.d('|📋 Headers: ${options.headers}');
-        if (options.queryParameters.isNotEmpty) {
-          Logger.d('|🔍 Query Parameters: ${options.queryParameters}');
-        }
-        if (options.data != null) {
-          Logger.d('|📦 Body: ${options.data}');
-        }
+          // Detailed request logging
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🌐 API REQUEST');
+          Logger.d('|📍 URL: ${options.baseUrl}${options.path}');
+          Logger.d('|🔧 Method: ${options.method}');
+          Logger.d(
+            '|🔑 Token: ${token.isNotEmpty ? "${token.substring(0, token.length > 20 ? 20 : token.length)}..." : "No Token"}',
+          );
+          Logger.d('|📋 Headers: ${options.headers}');
+          if (options.queryParameters.isNotEmpty) {
+            Logger.d('|🔍 Query Parameters: ${options.queryParameters}');
+          }
+          if (options.data != null) {
+            Logger.d('|📦 Body: ${options.data}');
+          }
 
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        // Detailed response logging
-        Logger.d('|✅ API RESPONSE');
-        Logger.d('|📍 URL: ${response.requestOptions.baseUrl}${response.requestOptions.path}');
-        Logger.d('|📊 Status Code: ${response.statusCode}');
-        Logger.d('|📨 Response1234: ${response.data}');
-        Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          // Detailed response logging
+          Logger.d('|✅ API RESPONSE');
+          Logger.d(
+            '|📍 URL: ${response.requestOptions.baseUrl}${response.requestOptions.path}',
+          );
+          Logger.d('|📊 Status Code: ${response.statusCode}');
+          Logger.d('|📨 Response1234: ${response.data}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-        return handler.next(response);
-      },
-      onError: (error, handler) {
-        // Detailed error logging
-        Logger.e('|❌ API ERROR');
-        Logger.e('|📍 URL: ${error.requestOptions.baseUrl}${error.requestOptions.path}');
-        Logger.e('|🔧 Method: ${error.requestOptions.method}');
-        Logger.e('|⚠️ Error Type: ${error.type}');
-        Logger.e('|💬 Error Message: ${error.message}');
-        Logger.e('|🔌 Underlying Error: ${error.error}');
-        if (error.response != null) {
-          Logger.e('|📊 Status Code: ${error.response?.statusCode}');
-          Logger.e('|📨 Response: ${error.response?.data}');
-        }
-        Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          return handler.next(response);
+        },
+        onError: (error, handler) {
+          // Detailed error logging
+          Logger.e('|❌ API ERROR');
+          Logger.e(
+            '|📍 URL: ${error.requestOptions.baseUrl}${error.requestOptions.path}',
+          );
+          Logger.e('|🔧 Method: ${error.requestOptions.method}');
+          Logger.e('|⚠️ Error Type: ${error.type}');
+          Logger.e('|💬 Error Message: ${error.message}');
+          Logger.e('|🔌 Underlying Error: ${error.error}');
+          if (error.response != null) {
+            Logger.e('|📊 Status Code: ${error.response?.statusCode}');
+            Logger.e('|📨 Response: ${error.response?.data}');
+          }
+          Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
-        return handler.next(error);
-      },
-    ));
+          return handler.next(error);
+        },
+      ),
+    );
   }
 
   Future<bool> _checkInternetConnection({bool showDialog = false}) async {
@@ -101,19 +109,22 @@ class ApiClient {
   }
 
   Future<ResponseModel> get(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onReceiveProgress,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onReceiveProgress,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     int maxRetries = 3;
@@ -131,7 +142,10 @@ class ApiClient {
 
         final ResponseModel result;
         if (handleError) {
-          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          final res = ApiChecker.checkResponse(
+            response,
+            showToaster: showToaster,
+          );
           result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
         } else {
           result = ApiChecker.checkApi(response, showToaster: showToaster);
@@ -139,7 +153,7 @@ class ApiClient {
         return result;
       } catch (e) {
         final isLastAttempt = attempt == maxRetries;
-        
+
         bool is429 = false;
         if (e is DioException && e.response?.statusCode == 429) {
           is429 = true;
@@ -151,38 +165,53 @@ class ApiClient {
         }
 
         int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
-        Logger.w('|⚠️ GET request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        Logger.w(
+          '|⚠️ GET request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e',
+        );
         await Future.delayed(Duration(seconds: sleepSec));
       }
     }
-    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
+    return const ResponseModel(
+      isSuccess: false,
+      message: 'Failed after retries',
+    );
   }
 
   Future<ResponseModel> post(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     if (path.contains('/watch')) {
       final now = DateTime.now();
-      if (_lastWatchTimestamp != null && now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
-        Logger.d('|🛡️ Debounced /watch call to avoid rate limit. Time since last call: ${now.difference(_lastWatchTimestamp!).inSeconds}s. Returning cached response.');
+      if (_lastWatchTimestamp != null &&
+          now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
+        Logger.d(
+          '|🛡️ Debounced /watch call to avoid rate limit. Time since last call: ${now.difference(_lastWatchTimestamp!).inSeconds}s. Returning cached response.',
+        );
         if (_lastWatchResponse != null) {
           return _lastWatchResponse!;
         } else {
-          return const ResponseModel(isSuccess: false, message: 'Request debounced to avoid rate limit');
+          return const ResponseModel(
+            isSuccess: false,
+            message: 'Request debounced to avoid rate limit',
+          );
         }
       }
       _lastWatchTimestamp = now;
@@ -205,7 +234,10 @@ class ApiClient {
 
         final ResponseModel result;
         if (handleError) {
-          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          final res = ApiChecker.checkResponse(
+            response,
+            showToaster: showToaster,
+          );
           result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
         } else {
           result = ApiChecker.checkApi(response, showToaster: showToaster);
@@ -218,7 +250,7 @@ class ApiClient {
         return result;
       } catch (e) {
         final isLastAttempt = attempt == maxRetries;
-        
+
         bool is429 = false;
         if (e is DioException && e.response?.statusCode == 429) {
           is429 = true;
@@ -230,31 +262,40 @@ class ApiClient {
         }
 
         int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
-        Logger.w('|⚠️ POST request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        Logger.w(
+          '|⚠️ POST request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e',
+        );
         await Future.delayed(Duration(seconds: sleepSec));
       }
     }
-    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
+    return const ResponseModel(
+      isSuccess: false,
+      message: 'Failed after retries',
+    );
   }
 
   Future<ResponseModel> postMultipartData(
-      String path,
-      Map<String, String> body,
-      List<MultipartBody> multipartBody,
-      List<MultipartDocument> otherFile, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-        bool fromChat = false,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path,
+    Map<String, String> body,
+    List<MultipartBody> multipartBody,
+    List<MultipartDocument> otherFile, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool fromChat = false,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     try {
@@ -270,20 +311,27 @@ class ApiClient {
         if (multipart.file != null) {
           if (kIsWeb) {
             List<int> bytes = await multipart.file!.readAsBytes();
-            formData.files.add(MapEntry(
-              multipart.key,
-              dio.MultipartFile.fromBytes(
-                bytes,
-                filename: basename(multipart.file!.path),
-                contentType: MediaType('image', 'jpg'),
+            formData.files.add(
+              MapEntry(
+                multipart.key,
+                dio.MultipartFile.fromBytes(
+                  bytes,
+                  filename: basename(multipart.file!.path),
+                  contentType: MediaType('image', 'jpg'),
+                ),
               ),
-            ));
+            );
           } else {
             File file = File(multipart.file!.path);
-            formData.files.add(MapEntry(
-              multipart.key,
-              await dio.MultipartFile.fromFile(file.path, filename: basename(file.path)),
-            ));
+            formData.files.add(
+              MapEntry(
+                multipart.key,
+                await dio.MultipartFile.fromFile(
+                  file.path,
+                  filename: basename(file.path),
+                ),
+              ),
+            );
           }
         }
       }
@@ -293,23 +341,38 @@ class ApiClient {
           if (kIsWeb) {
             if (fromChat) {
               PlatformFile platformFile = file.file!.files.first;
-              formData.files.add(MapEntry(
-                'image[]',
-                dio.MultipartFile.fromBytes(platformFile.bytes!, filename: platformFile.name),
-              ));
+              formData.files.add(
+                MapEntry(
+                  'image[]',
+                  dio.MultipartFile.fromBytes(
+                    platformFile.bytes!,
+                    filename: platformFile.name,
+                  ),
+                ),
+              );
             } else {
               var fileBytes = file.file!.files.first.bytes!;
-              formData.files.add(MapEntry(
-                file.key,
-                dio.MultipartFile.fromBytes(fileBytes, filename: file.file!.files.first.name),
-              ));
+              formData.files.add(
+                MapEntry(
+                  file.key,
+                  dio.MultipartFile.fromBytes(
+                    fileBytes,
+                    filename: file.file!.files.first.name,
+                  ),
+                ),
+              );
             }
           } else {
             File other = File(file.file!.files.single.path!);
-            formData.files.add(MapEntry(
-              file.key,
-              await dio.MultipartFile.fromFile(other.path, filename: basename(other.path)),
-            ));
+            formData.files.add(
+              MapEntry(
+                file.key,
+                await dio.MultipartFile.fromFile(
+                  other.path,
+                  filename: basename(other.path),
+                ),
+              ),
+            );
           }
         }
       }
@@ -327,13 +390,20 @@ class ApiClient {
       Logger.d('ApiClient() => POST Multipart response: ${response.data}');
 
       if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
+        final result = ApiChecker.checkResponse(
+          response,
+          showToaster: showToaster,
+        );
         if (result.data is Map<String, dynamic>) {
-          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+          return ResponseModel.fromJson(
+            result.data,
+            statusCode: result.statusCode,
+          );
         } else {
           return ResponseModel(
             isSuccess: result.statusCode == 200 || result.statusCode == 201,
-            message: 'Multipart upload completed with status ${result.statusCode}',
+            message:
+                'Multipart upload completed with status ${result.statusCode}',
             statusCode: result.statusCode,
             body: result.data,
           );
@@ -347,28 +417,28 @@ class ApiClient {
     }
   }
 
-
-
-
   Future<ResponseModel> putMultipartData(
-      String path,
-      Map<String, String> body,
-      List<MultipartBody> multipartBody,
-      List<MultipartDocument> otherFile, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-        bool fromChat = false,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path,
+    Map<String, String> body,
+    List<MultipartBody> multipartBody,
+    List<MultipartDocument> otherFile, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool fromChat = false,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     try {
@@ -386,23 +456,27 @@ class ApiClient {
         if (multipart.file != null) {
           if (kIsWeb) {
             List<int> bytes = await multipart.file!.readAsBytes();
-            formData.files.add(MapEntry(
-              multipart.key,
-              dio.MultipartFile.fromBytes(
-                bytes,
-                filename: basename(multipart.file!.path),
-                contentType: MediaType('image', 'jpg'),
+            formData.files.add(
+              MapEntry(
+                multipart.key,
+                dio.MultipartFile.fromBytes(
+                  bytes,
+                  filename: basename(multipart.file!.path),
+                  contentType: MediaType('image', 'jpg'),
+                ),
               ),
-            ));
+            );
           } else {
             File file = File(multipart.file!.path);
-            formData.files.add(MapEntry(
-              multipart.key,
-              await dio.MultipartFile.fromFile(
-                file.path,
-                filename: basename(file.path),
+            formData.files.add(
+              MapEntry(
+                multipart.key,
+                await dio.MultipartFile.fromFile(
+                  file.path,
+                  filename: basename(file.path),
+                ),
               ),
-            ));
+            );
           }
         }
       }
@@ -413,32 +487,38 @@ class ApiClient {
           if (kIsWeb) {
             if (fromChat) {
               PlatformFile platformFile = file.file!.files.first;
-              formData.files.add(MapEntry(
-                'image[]',
-                dio.MultipartFile.fromBytes(
-                  platformFile.bytes!,
-                  filename: platformFile.name,
+              formData.files.add(
+                MapEntry(
+                  'image[]',
+                  dio.MultipartFile.fromBytes(
+                    platformFile.bytes!,
+                    filename: platformFile.name,
+                  ),
                 ),
-              ));
+              );
             } else {
               var fileBytes = file.file!.files.first.bytes!;
-              formData.files.add(MapEntry(
-                file.key,
-                dio.MultipartFile.fromBytes(
-                  fileBytes,
-                  filename: file.file!.files.first.name,
+              formData.files.add(
+                MapEntry(
+                  file.key,
+                  dio.MultipartFile.fromBytes(
+                    fileBytes,
+                    filename: file.file!.files.first.name,
+                  ),
                 ),
-              ));
+              );
             }
           } else {
             File other = File(file.file!.files.single.path!);
-            formData.files.add(MapEntry(
-              file.key,
-              await dio.MultipartFile.fromFile(
-                other.path,
-                filename: basename(other.path),
+            formData.files.add(
+              MapEntry(
+                file.key,
+                await dio.MultipartFile.fromFile(
+                  other.path,
+                  filename: basename(other.path),
+                ),
               ),
-            ));
+            );
           }
         }
       }
@@ -457,14 +537,21 @@ class ApiClient {
       Logger.d('ApiClient() => PUT Multipart response: ${response.data}');
 
       if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
+        final result = ApiChecker.checkResponse(
+          response,
+          showToaster: showToaster,
+        );
 
         if (result.data is Map<String, dynamic>) {
-          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+          return ResponseModel.fromJson(
+            result.data,
+            statusCode: result.statusCode,
+          );
         } else {
           return ResponseModel(
             isSuccess: result.statusCode == 200 || result.statusCode == 201,
-            message: 'Multipart upload completed with status ${result.statusCode}',
+            message:
+                'Multipart upload completed with status ${result.statusCode}',
             statusCode: result.statusCode,
             body: result.data,
           );
@@ -472,7 +559,6 @@ class ApiClient {
       } else {
         return ApiChecker.checkApi(response, showToaster: showToaster);
       }
-
     } catch (e) {
       Logger.e('ApiClient() => PUT Multipart error: $e');
       return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
@@ -480,20 +566,24 @@ class ApiClient {
   }
 
   Future<ResponseModel> put(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        ProgressCallback? onSendProgress,
-        ProgressCallback? onReceiveProgress,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     try {
@@ -510,8 +600,14 @@ class ApiClient {
       Logger.d('ApiClient() => PUT response: ${response.data}');
 
       if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        final result = ApiChecker.checkResponse(
+          response,
+          showToaster: showToaster,
+        );
+        return ResponseModel.fromJson(
+          result.data,
+          statusCode: result.statusCode,
+        );
       } else {
         return ApiChecker.checkApi(response, showToaster: showToaster);
       }
@@ -522,18 +618,22 @@ class ApiClient {
   }
 
   Future<ResponseModel> delete(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-        bool handleError = AppConstants.handleError,
-        bool showToaster = AppConstants.showToaster,
-        bool showErrorScreen = AppConstants.isHandleErrorScreen,
-        bool showInternetScreen = AppConstants.isHandleInternetScreen,
-      }) async {
-    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
-      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+    bool handleError = AppConstants.handleError,
+    bool showToaster = AppConstants.showToaster,
+    bool showErrorScreen = AppConstants.isHandleErrorScreen,
+    bool showInternetScreen = AppConstants.isHandleInternetScreen,
+  }) async {
+    if (showInternetScreen &&
+        !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(
+        isSuccess: false,
+        message: 'No internet connection',
+      );
     }
 
     try {
@@ -548,8 +648,14 @@ class ApiClient {
       Logger.d('ApiClient() => DELETE response: ${response.data}');
 
       if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        final result = ApiChecker.checkResponse(
+          response,
+          showToaster: showToaster,
+        );
+        return ResponseModel.fromJson(
+          result.data,
+          statusCode: result.statusCode,
+        );
       } else {
         return ApiChecker.checkApi(response, showToaster: showToaster);
       }

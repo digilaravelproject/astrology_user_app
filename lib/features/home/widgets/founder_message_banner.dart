@@ -26,11 +26,13 @@ class FounderMessageBanner extends StatelessWidget {
           // Extra safety check for empty list before accessing .first
           final words = controller.founderWords;
           if (words.isEmpty) return const SizedBox.shrink();
-          
+
           final word = words.first;
-          
+
           // Debug print to help identify why the circle might be showing
-          print('[FounderBanner] Image URL: "${word.image}" | hasImage: ${word.hasImage}');
+          print(
+            '[FounderBanner] Image URL: "${word.image}" | hasImage: ${word.hasImage}',
+          );
 
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -52,10 +54,7 @@ class FounderMessageBanner extends StatelessWidget {
                   offset: const Offset(0, 8),
                 ),
               ],
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ),
+              border: Border.all(color: Colors.white, width: 2),
             ),
             child: Stack(
               children: [
@@ -63,16 +62,27 @@ class FounderMessageBanner extends StatelessWidget {
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: Icon(Icons.auto_awesome, color: AppColors.goldAccent.withOpacity(0.4), size: 40),
+                  child: Icon(
+                    Icons.auto_awesome,
+                    color: AppColors.goldAccent.withOpacity(0.4),
+                    size: 40,
+                  ),
                 ),
                 Positioned(
                   left: 10,
                   bottom: 10,
-                  child: Icon(Icons.star_rate_rounded, color: AppColors.accentColor.withOpacity(0.2), size: 30),
+                  child: Icon(
+                    Icons.star_rate_rounded,
+                    color: AppColors.accentColor.withOpacity(0.2),
+                    size: 30,
+                  ),
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -81,7 +91,10 @@ class FounderMessageBanner extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.goldAccent, width: 2),
+                            border: Border.all(
+                              color: AppColors.goldAccent,
+                              width: 2,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
@@ -91,7 +104,7 @@ class FounderMessageBanner extends StatelessWidget {
                             ],
                           ),
                           child: CustomImageWidget(
-                            imagePath: word.image, 
+                            imagePath: word.image,
                             height: 50,
                             width: 50,
                             radius: BorderRadius.circular(35),
@@ -100,7 +113,7 @@ class FounderMessageBanner extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                       ],
-                      
+
                       // Text Content
                       Expanded(
                         child: Column(
@@ -125,7 +138,8 @@ class FounderMessageBanner extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: AppText(
                                 AppStrings.yourFounder,
-                                style: GoogleFonts.dancingScript(  // Handwriting style
+                                style: GoogleFonts.dancingScript(
+                                  // Handwriting style
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primaryColor,
@@ -145,7 +159,7 @@ class FounderMessageBanner extends StatelessWidget {
           print('[FounderMessageBanner] Build Error: $e');
           return const SizedBox.shrink();
         }
-      }
+      },
     );
   }
 }

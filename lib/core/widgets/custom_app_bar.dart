@@ -14,8 +14,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool centerTitle;
   final double elevation;
 
-
-
   const CustomAppBar({
     super.key,
     required this.title,
@@ -38,18 +36,25 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
       surfaceTintColor: Colors.transparent,
-      title: titleWidget ?? AppText(
-        title,
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: titleColor,
-      ),
-      leading: showLeading
-          ? IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: iconColor ?? titleColor),
-              onPressed: onLeadingPressed ?? () => Navigator.pop(context),
-            )
-          : null,
+      title:
+          titleWidget ??
+          AppText(
+            title,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: titleColor,
+          ),
+      leading:
+          showLeading
+              ? IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 20,
+                  color: iconColor ?? titleColor,
+                ),
+                onPressed: onLeadingPressed ?? () => Navigator.pop(context),
+              )
+              : null,
       actions: actions,
     );
   }

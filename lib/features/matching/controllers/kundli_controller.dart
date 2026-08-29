@@ -39,14 +39,17 @@ class KundliController extends GetxController {
 
   // Data
   final Rx<KundliResponseModel?> kundliData = Rx<KundliResponseModel?>(null);
-  final Rx<CreateKundliResponseModel?> createdKundliData = Rx<CreateKundliResponseModel?>(null);
-  final Rx<KundliDetailResponseModel?> kundliDetailData = Rx<KundliDetailResponseModel?>(null);
+  final Rx<CreateKundliResponseModel?> createdKundliData =
+      Rx<CreateKundliResponseModel?>(null);
+  final Rx<KundliDetailResponseModel?> kundliDetailData =
+      Rx<KundliDetailResponseModel?>(null);
   final RxList<KundliItem> kundliList = <KundliItem>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isLoadingList = false.obs;
   final RxBool isLoadingDetail = false.obs;
   final RxString errorMessage = ''.obs;
-  final RxInt editingKundliId = 0.obs; // 0 means create mode, >0 means edit mode
+  final RxInt editingKundliId =
+      0.obs; // 0 means create mode, >0 means edit mode
   final RxString selectedLatitude = ''.obs;
   final RxString selectedLongitude = ''.obs;
 
@@ -84,29 +87,47 @@ class KundliController extends GetxController {
 
       print('[KUNDLI_APP] [DEBUG] Controller: Fetching kundli by id: $id');
       final result = await getKundliByIdUseCase.call(id);
-      
+
       kundliDetailData.value = result;
       editingKundliId.value = id;
       selectedLatitude.value = result.data.latitude?.toString() ?? '';
       selectedLongitude.value = result.data.longitude?.toString() ?? '';
-      
-      print('[KUNDLI_APP] [DEBUG] Controller: Data received - name: ${result.data.name}, gender: ${result.data.gender}');
-      print('[KUNDLI_APP] [DEBUG] Controller: Formatted date: ${result.data.formattedDate}');
-      print('[KUNDLI_APP] [DEBUG] Controller: Formatted time: ${result.data.formattedTime}');
-      
+
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Data received - name: ${result.data.name}, gender: ${result.data.gender}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Formatted date: ${result.data.formattedDate}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Formatted time: ${result.data.formattedTime}',
+      );
+
       // Fill the controllers with the data
       nameController.text = result.data.name;
-      genderController.text = result.data.gender.substring(0, 1).toUpperCase() + result.data.gender.substring(1);
+      genderController.text =
+          result.data.gender.substring(0, 1).toUpperCase() +
+          result.data.gender.substring(1);
       dobController.text = result.data.formattedDate;
       tobController.text = result.data.formattedTime;
       pobController.text = result.data.place;
-      
+
       print('[KUNDLI_APP] [DEBUG] Controller: Controllers filled');
-      print('[KUNDLI_APP] [DEBUG] Controller: nameController.text = ${nameController.text}');
-      print('[KUNDLI_APP] [DEBUG] Controller: genderController.text = ${genderController.text}');
-      print('[KUNDLI_APP] [DEBUG] Controller: dobController.text = ${dobController.text}');
-      print('[KUNDLI_APP] [DEBUG] Controller: tobController.text = ${tobController.text}');
-      print('[KUNDLI_APP] [DEBUG] Controller: pobController.text = ${pobController.text}');
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: nameController.text = ${nameController.text}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: genderController.text = ${genderController.text}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: dobController.text = ${dobController.text}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: tobController.text = ${tobController.text}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: pobController.text = ${pobController.text}',
+      );
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli data loaded for editing');
     } catch (e) {
       print('[KUNDLI_APP] [ERROR] Controller: Failed to fetch kundli: $e');
@@ -124,11 +145,17 @@ class KundliController extends GetxController {
 
       print('[KUNDLI_APP] [DEBUG] Controller: Fetching kundli list');
       final result = await getKundliListUseCase.call(perPage: perPage);
-      
-      print('[KUNDLI_APP] [DEBUG] Controller: Result received, data count: ${result.data.length}');
+
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Result received, data count: ${result.data.length}',
+      );
       kundliList.value = result.data;
-      print('[KUNDLI_APP] [DEBUG] Controller: kundliList.value set, length: ${kundliList.length}');
-      print('[KUNDLI_APP] [DEBUG] Controller: First item name: ${kundliList.isNotEmpty ? kundliList.first.name : "empty"}');
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: kundliList.value set, length: ${kundliList.length}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: First item name: ${kundliList.isNotEmpty ? kundliList.first.name : "empty"}',
+      );
     } catch (e) {
       print('[KUNDLI_APP] [ERROR] Controller: Failed to fetch kundli list: $e');
       errorMessage.value = 'Failed to load kundli list: $e';
@@ -165,10 +192,10 @@ class KundliController extends GetxController {
 
       print('[KUNDLI_APP] [DEBUG] Controller: Creating kundli');
       final result = await createKundliUseCase.call(request);
-      
+
       createdKundliData.value = result;
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli created successfully');
-      
+
       // Refresh the list after creating
       await fetchKundliList();
     } catch (e) {
@@ -213,10 +240,10 @@ class KundliController extends GetxController {
 
       print('[KUNDLI_APP] [DEBUG] Controller: Updating kundli id: $id');
       final result = await updateKundliUseCase.call(id, request);
-      
+
       createdKundliData.value = result;
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli updated successfully');
-      
+
       // Refresh the list after updating
       await fetchKundliList();
     } catch (e) {
@@ -240,12 +267,12 @@ class KundliController extends GetxController {
 
       print('[KUNDLI_APP] [DEBUG] Controller: Deleting kundli id: $id');
       await deleteKundliUseCase.call(id);
-      
+
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli deleted successfully');
-      
+
       // Remove from local list immediately for better UX
       kundliList.removeWhere((item) => item.id == id);
-      
+
       // Refresh the list from server
       await fetchKundliList();
     } catch (e) {
@@ -282,17 +309,27 @@ class KundliController extends GetxController {
       );
 
       print('[KUNDLI_APP] [DEBUG] Controller: Fetching kundli data');
-      print('[KUNDLI_APP] [DEBUG] Controller: Request - birthDate: $birthDate, birthTime: $birthTime');
-      print('[KUNDLI_APP] [DEBUG] Controller: Request - latitude: $latitude, longitude: $longitude');
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Request - birthDate: $birthDate, birthTime: $birthTime',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Request - latitude: $latitude, longitude: $longitude',
+      );
       print('[KUNDLI_APP] [DEBUG] Controller: Request - datetime: $datetime');
-      
+
       final result = await getBirthChartUseCase.call(request);
-      
+
       kundliData.value = result;
       print('[KUNDLI_APP] [DEBUG] Controller: Kundli data set successfully');
-      print('[KUNDLI_APP] [DEBUG] Controller: Response - date: ${result.data.birthDetails.date}');
-      print('[KUNDLI_APP] [DEBUG] Controller: Response - time: ${result.data.birthDetails.time}');
-      print('[KUNDLI_APP] [DEBUG] Controller: Response - place: ${result.data.birthDetails.place}');
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Response - date: ${result.data.birthDetails.date}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Response - time: ${result.data.birthDetails.time}',
+      );
+      print(
+        '[KUNDLI_APP] [DEBUG] Controller: Response - place: ${result.data.birthDetails.place}',
+      );
     } catch (e) {
       print('[KUNDLI_APP] [ERROR] Controller: Failed to load kundli: $e');
       errorMessage.value = 'Failed to load kundli data: $e';
@@ -309,7 +346,7 @@ class KundliController extends GetxController {
   // Get planets grouped by house for chart display
   Map<int, List<String>> getPlanetsGroupedByHouse() {
     if (kundliData.value == null) return {};
-    
+
     final Map<int, List<String>> grouped = {};
     for (var planet in kundliData.value!.data.planets) {
       if (!grouped.containsKey(planet.house)) {

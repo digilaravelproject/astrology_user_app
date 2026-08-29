@@ -18,7 +18,8 @@ class ChangeLanguageScreen extends StatefulWidget {
 }
 
 class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
-  final LocalizationController _localizationController = Get.find<LocalizationController>();
+  final LocalizationController _localizationController =
+      Get.find<LocalizationController>();
   int _selectedIndex = 0;
 
   @override
@@ -57,10 +58,7 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
     final languages = _localizationController.languages;
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.changeLanguage,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.changeLanguage, centerTitle: true),
       body: Column(
         children: [
           Expanded(
@@ -71,7 +69,7 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
               itemBuilder: (context, index) {
                 final lang = languages[index];
                 final isSelected = _selectedIndex == index;
-                
+
                 return GestureDetector(
                   onTap: () {
                     setState(() {
@@ -81,10 +79,16 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.lightPink.withOpacity(0.2) : Colors.white,
+                      color:
+                          isSelected
+                              ? AppColors.lightPink.withOpacity(0.2)
+                              : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? AppColors.deepPink : Colors.grey.shade200,
+                        color:
+                            isSelected
+                                ? AppColors.deepPink
+                                : Colors.grey.shade200,
                         width: isSelected ? 1.5 : 1,
                       ),
                     ),
@@ -92,7 +96,10 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
                       children: [
                         CircleAvatar(
                           radius: 20,
-                          backgroundColor: isSelected ? AppColors.deepPink : Colors.grey.shade100,
+                          backgroundColor:
+                              isSelected
+                                  ? AppColors.deepPink
+                                  : Colors.grey.shade100,
                           child: AppText(
                             lang.languageName.substring(0, 1),
                             fontSize: 16,
@@ -120,9 +127,17 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
                         ),
                         const Spacer(),
                         if (isSelected)
-                          const Icon(Icons.check_circle_rounded, color: AppColors.deepPink, size: 24)
+                          const Icon(
+                            Icons.check_circle_rounded,
+                            color: AppColors.deepPink,
+                            size: 24,
+                          )
                         else
-                          Icon(Icons.radio_button_off_rounded, color: Colors.grey.shade300, size: 24),
+                          Icon(
+                            Icons.radio_button_off_rounded,
+                            color: Colors.grey.shade300,
+                            size: 24,
+                          ),
                       ],
                     ),
                   ),
@@ -137,10 +152,12 @@ class _ChangeLanguageScreenState extends State<ChangeLanguageScreen> {
               onTap: () {
                 // Use LocalizationController to change language
                 _localizationController.setLanguage(languages[_selectedIndex]);
-                
+
                 // Show success message
-                CustomSnackbar.showSuccess("Language changed to ${languages[_selectedIndex].languageName}");
-                
+                CustomSnackbar.showSuccess(
+                  "Language changed to ${languages[_selectedIndex].languageName}",
+                );
+
                 // Go back to profile screen
                 Get.back();
               },

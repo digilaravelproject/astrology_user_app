@@ -36,8 +36,14 @@ class LiveSessionModel {
       status: json['status'],
       streamUrl: json['stream_url'],
       viewerCount: json['viewer_count'] ?? 0,
-      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : null,
-      astrologer: json['astrologer'] != null ? LiveAstrologerModel.fromJson(json['astrologer']) : null,
+      startedAt:
+          json['started_at'] != null
+              ? DateTime.parse(json['started_at'])
+              : null,
+      astrologer:
+          json['astrologer'] != null
+              ? LiveAstrologerModel.fromJson(json['astrologer'])
+              : null,
       isBroadcasting: json['is_broadcasting'] ?? false,
       isCameraOn: json['is_camera_on'] ?? true,
       isAudioOn: json['is_audio_on'] ?? true,
@@ -60,7 +66,6 @@ class LiveSessionModel {
       'is_audio_on': isAudioOn,
     };
   }
-
 }
 
 class LiveAstrologerModel {
@@ -127,7 +132,10 @@ class LiveCommentModel {
       userName: json['user_name'] ?? 'User',
       userAvatar: json['user_avatar'] ?? json['user_image'],
       message: json['message'] ?? '',
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.parse(json['created_at'])
+              : DateTime.now(),
       isSystem: json['is_system'] ?? false,
       giftIconUrl: json['gift'] != null ? json['gift']['icon_url'] : null,
     );

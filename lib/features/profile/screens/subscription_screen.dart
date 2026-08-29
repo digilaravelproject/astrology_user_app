@@ -18,7 +18,7 @@ class SubscriptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profileController = Get.find<ProfileController>();
-    
+
     // Fetch plans when screen is accessed
     WidgetsBinding.instance.addPostFrameCallback((_) {
       profileController.fetchPlans();
@@ -31,7 +31,8 @@ class SubscriptionScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Obx(() {
-        if (profileController.isLoading.value && profileController.plans.isEmpty) {
+        if (profileController.isLoading.value &&
+            profileController.plans.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -105,7 +106,11 @@ class SubscriptionScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Iconsax.flash_copy, color: Colors.white, size: 24),
+                child: const Icon(
+                  Iconsax.flash_copy,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ],
           ),
@@ -155,23 +160,26 @@ class SubscriptionScreen extends StatelessWidget {
     return Opacity(
       opacity: isPurchased ? 0.5 : 1.0,
       child: GestureDetector(
-        onTap: isPurchased ? null : (){
-          Get.to(() => SubscriptionDetailScreen(planId: plan.id));
-        },
+        onTap:
+            isPurchased
+                ? null
+                : () {
+                  Get.to(() => SubscriptionDetailScreen(planId: plan.id));
+                },
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-           border: Border.all(color: AppColors.deepPink, width: 1),
-           // border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
+            border: Border.all(color: AppColors.deepPink, width: 1),
+            // border: Border.all(color: isPopular ? AppColors.deepPink : Colors.grey.shade200, width: isPopular ? 2 : 1),
             boxShadow: [
               //if (isPopular)
-                BoxShadow(
-                  color: AppColors.deepPink.withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
+              BoxShadow(
+                color: AppColors.deepPink.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
             ],
           ),
           child: Column(

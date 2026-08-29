@@ -11,8 +11,8 @@ class HistoryController extends GetxController {
   HistoryController({
     required GetChatSessionsUseCase getChatSessionsUseCase,
     required GetCallSessionsUseCase getCallSessionsUseCase,
-  })  : _getChatSessionsUseCase = getChatSessionsUseCase,
-        _getCallSessionsUseCase = getCallSessionsUseCase;
+  }) : _getChatSessionsUseCase = getChatSessionsUseCase,
+       _getCallSessionsUseCase = getCallSessionsUseCase;
 
   // Chat Sessions
   final RxList<ChatSessionModel> chatSessions = <ChatSessionModel>[].obs;
@@ -49,8 +49,10 @@ class HistoryController extends GetxController {
 
     try {
       isLoading.value = true;
-      final response = await _getChatSessionsUseCase.execute(page: _currentPage);
-      
+      final response = await _getChatSessionsUseCase.execute(
+        page: _currentPage,
+      );
+
       if (response.data.isNotEmpty) {
         chatSessions.addAll(response.data);
         _currentPage++;
@@ -76,8 +78,10 @@ class HistoryController extends GetxController {
 
     try {
       isCallLoading.value = true;
-      final response = await _getCallSessionsUseCase.execute(page: _currentCallPage);
-      
+      final response = await _getCallSessionsUseCase.execute(
+        page: _currentCallPage,
+      );
+
       if (response.data.isNotEmpty) {
         callSessions.addAll(response.data);
         _currentCallPage++;
@@ -91,4 +95,3 @@ class HistoryController extends GetxController {
     }
   }
 }
-

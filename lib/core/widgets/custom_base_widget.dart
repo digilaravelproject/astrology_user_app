@@ -54,7 +54,6 @@ class CustomBaseWidget extends StatefulWidget {
     this.drawer,
     this.scaffoldKey,
     Key? key,
-
   }) : super(key: key);
 
   @override
@@ -62,57 +61,58 @@ class CustomBaseWidget extends StatefulWidget {
 }
 
 class _CustomBaseWidgetState extends State<CustomBaseWidget> {
-
-
   @override
   Widget build(BuildContext context) {
-    Color textColor =widget.appBarColor ?? Theme.of(context).primaryColor;
-
+    Color textColor = widget.appBarColor ?? Theme.of(context).primaryColor;
 
     Widget scaffold = Scaffold(
       key: widget.scaffoldKey,
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
       backgroundColor:
-      widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
+          widget.backgroundColor ?? Theme.of(context).colorScheme.surface,
       extendBodyBehindAppBar: widget.extendBodyBehindAppBar,
-      appBar: widget.showAppBar
-          ? (widget.appBar != null
-          ? PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: widget.appBar!,
-      )
-          : AppBar(
-        backgroundColor:
-        widget.appBarColor ?? Colors.transparent,
-        elevation: widget.elevation,
-        automaticallyImplyLeading:
-        widget.showLeadingAction || Navigator.canPop(context),
-        leading: widget.showLeadingAction || Navigator.canPop(context)
-            ? widget.leading ??
-            IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: widget.appBarLeadingColor ??   // 👈 priority for leading color
-                    widget.appBarItemColor ??
-                    Theme.of(context).colorScheme.onPrimary,
-              ),
-              onPressed: widget.onBackPressed != null
-                  ? () => widget.onBackPressed!()
-                  : () => Navigator.pop(context),
-            )
-            : null,
-        title: Text(
-          widget.appBarTitle ?? "",
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: widget.appBarTitleColor ?? // 👈 yaha add karo
-                widget.appBarItemColor ??
-                Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-        actions: widget.actions,
-      ))
-          : null,
-
+      appBar:
+          widget.showAppBar
+              ? (widget.appBar != null
+                  ? PreferredSize(
+                    preferredSize: const Size.fromHeight(kToolbarHeight),
+                    child: widget.appBar!,
+                  )
+                  : AppBar(
+                    backgroundColor: widget.appBarColor ?? Colors.transparent,
+                    elevation: widget.elevation,
+                    automaticallyImplyLeading:
+                        widget.showLeadingAction || Navigator.canPop(context),
+                    leading:
+                        widget.showLeadingAction || Navigator.canPop(context)
+                            ? widget.leading ??
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.arrow_back,
+                                    color:
+                                        widget
+                                            .appBarLeadingColor ?? // 👈 priority for leading color
+                                        widget.appBarItemColor ??
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                  onPressed:
+                                      widget.onBackPressed != null
+                                          ? () => widget.onBackPressed!()
+                                          : () => Navigator.pop(context),
+                                )
+                            : null,
+                    title: Text(
+                      widget.appBarTitle ?? "",
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color:
+                            widget.appBarTitleColor ?? // 👈 yaha add karo
+                            widget.appBarItemColor ??
+                            Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                    actions: widget.actions,
+                  ))
+              : null,
 
       body: Column(
         children: [
@@ -126,7 +126,6 @@ class _CustomBaseWidgetState extends State<CustomBaseWidget> {
       floatingActionButton: widget.fab,
       bottomNavigationBar: widget.bottomNavigationBar,
       drawer: widget.drawer,
-
     );
 
     // return scaffold;

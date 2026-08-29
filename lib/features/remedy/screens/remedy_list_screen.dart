@@ -16,12 +16,18 @@ class RemedyListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText('All Remedies'.tr, color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        title: AppText(
+          'All Remedies'.tr,
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
         backgroundColor: AppColors.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Obx(() {
-        if (remedyController.isLoading.value && remedyController.remedies.isEmpty) {
+        if (remedyController.isLoading.value &&
+            remedyController.remedies.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -40,15 +46,18 @@ class RemedyListScreen extends StatelessWidget {
           itemCount: remedyController.remedies.length,
           itemBuilder: (context, index) {
             final remedy = remedyController.remedies[index];
-            final imageUrl = remedy.image ?? remedyController.getRemedyImage(index);
+            final imageUrl =
+                remedy.image ?? remedyController.getRemedyImage(index);
 
             return GestureDetector(
               onTap: () {
-                Get.to(() => RemedyDetailScreen(
-                  remedyId: remedy.id,
-                  accentColor: AppColors.primaryColor,
-                  imageUrl: imageUrl,
-                ));
+                Get.to(
+                  () => RemedyDetailScreen(
+                    remedyId: remedy.id,
+                    accentColor: AppColors.primaryColor,
+                    imageUrl: imageUrl,
+                  ),
+                );
               },
               child: Container(
                 decoration: BoxDecoration(

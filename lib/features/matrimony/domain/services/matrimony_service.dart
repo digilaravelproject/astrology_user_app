@@ -4,8 +4,14 @@ import '../repositories/matrimony_repository.dart';
 import '../models/matrimony_profile_model.dart';
 
 abstract class MatrimonyServiceInterface {
-  Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo);
-  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile, XFile? photo);
+  Future<ResponseModel> saveProfile(
+    MatrimonyProfileModel profile,
+    XFile? photo,
+  );
+  Future<ResponseModel> updateProfile(
+    MatrimonyProfileModel profile,
+    XFile? photo,
+  );
   Future<ResponseModel> getMatrimonyProfile();
   Future<ResponseModel> getMatrimonyProfileDetails(int id);
   Future<ResponseModel> getMyMatrimonyProfileDetails(int userId);
@@ -14,20 +20,24 @@ abstract class MatrimonyServiceInterface {
   Future<ResponseModel> reportProfile(int id, String reason);
 }
 
-
-
 class MatrimonyService implements MatrimonyServiceInterface {
   final MatrimonyRepositoryInterface repository;
 
   MatrimonyService({required this.repository});
 
   @override
-  Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo) {
+  Future<ResponseModel> saveProfile(
+    MatrimonyProfileModel profile,
+    XFile? photo,
+  ) {
     return repository.saveProfile(profile, photo);
   }
 
   @override
-  Future<ResponseModel> updateProfile(MatrimonyProfileModel profile, XFile? photo) {
+  Future<ResponseModel> updateProfile(
+    MatrimonyProfileModel profile,
+    XFile? photo,
+  ) {
     return repository.updateProfile(profile, photo);
   }
 
@@ -61,5 +71,3 @@ class MatrimonyService implements MatrimonyServiceInterface {
     return repository.reportProfile(id, reason);
   }
 }
-
-

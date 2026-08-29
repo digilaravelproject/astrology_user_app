@@ -8,11 +8,7 @@ class HomeGreeting extends StatelessWidget {
   final String? name;
   final String? greeting;
 
-  const HomeGreeting({
-    Key? key,
-    this.name,
-    this.greeting,
-  }) : super(key: key);
+  const HomeGreeting({Key? key, this.name, this.greeting}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +53,8 @@ class WavingEmoji extends StatefulWidget {
   State<WavingEmoji> createState() => _WavingEmojiState();
 }
 
-class _WavingEmojiState extends State<WavingEmoji> with SingleTickerProviderStateMixin {
+class _WavingEmojiState extends State<WavingEmoji>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:astro_user/core/enums/session_status_enums.dart';
 import 'package:get/get.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
@@ -39,13 +40,18 @@ class _CallScreenState extends State<CallScreen> {
   void dispose() {
     controller.isCallScreenVisible = false;
     // Minimize to bubble if the call is still active
-    if (controller.status.value.name == 'ongoing' || 
-        controller.status.value.name == 'ringing' || 
-        controller.status.value.name == 'dialing' || 
+    if (controller.status.value.name == 'ongoing' ||
+        controller.status.value.name == 'ringing' ||
+        controller.status.value.name == 'dialing' ||
         controller.status.value.name == 'waiting') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (controller.sessionId != null && controller.providerName != null) {
-          controller.minimizeToBubble(Get.context!, controller.providerName!, controller.providerImage ?? "", shouldPop: false);
+          controller.minimizeToBubble(
+            Get.context!,
+            controller.providerName!,
+            controller.providerImage ?? "",
+            shouldPop: false,
+          );
         }
       });
     }
@@ -57,20 +63,26 @@ class _CallScreenState extends State<CallScreen> {
     return Scaffold(
       body: Obx(() {
         final status = controller.status.value;
-        final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
-        final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
+        final minutes = (controller.durationSeconds.value ~/ 60)
+            .toString()
+            .padLeft(2, '0');
+        final seconds = (controller.durationSeconds.value % 60)
+            .toString()
+            .padLeft(2, '0');
 
         return Stack(
           fit: StackFit.expand,
           children: [
             // Blurred profile background image
-            if (controller.providerImage != null && controller.providerImage!.isNotEmpty)
-              CachedNetworkImage(
-                imageUrl: controller.providerImage!.startsWith('http')
-                    ? controller.providerImage!
-                    : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
+            if (controller.providerImage != null &&
+                controller.providerImage!.isNotEmpty)
+              CustomImageWidget(
+                imagePath:
+                    controller.providerImage!.startsWith('http')
+                        ? controller.providerImage!
+                        : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
                 fit: BoxFit.cover,
-                errorWidget: (context, url, error) => Container(
+                fallbackWidget: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Color(0xFF2E1A47), Color(0xFF1A0E2E)],
@@ -90,13 +102,11 @@ class _CallScreenState extends State<CallScreen> {
                   ),
                 ),
               ),
-            
+
             // Soft overlay blur mapping
             BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.55),
-              ),
+              child: Container(color: Colors.black.withValues(alpha: 0.55)),
             ),
 
             // Top-down smooth dark shadow overlay
@@ -121,7 +131,10 @@ class _CallScreenState extends State<CallScreen> {
                 children: [
                   // Top Bar: Call Status / Sub-Title / Timer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                      vertical: 16.0,
+                    ),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -130,14 +143,21 @@ class _CallScreenState extends State<CallScreen> {
                           child: Column(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(30),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.15),
+                                  ),
                                 ),
                                 child: Text(
-                                  status == CallStatus.ongoing ? 'Ongoing Call' : status.name.toUpperCase(),
+                                  status == CallStatus.ongoing
+                                      ? 'Ongoing Call'
+                                      : status.name.toUpperCase(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -178,7 +198,10 @@ class _CallScreenState extends State<CallScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: LinearGradient(
-                                colors: [Colors.white.withValues(alpha: 0.4), Colors.white.withValues(alpha: 0.1)],
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.4),
+                                  Colors.white.withValues(alpha: 0.1),
+                                ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -188,16 +211,26 @@ class _CallScreenState extends State<CallScreen> {
                               backgroundColor: Colors.black26,
                               child: CircleAvatar(
                                 radius: 72,
-                                backgroundImage: controller.providerImage != null && controller.providerImage!.isNotEmpty
-                                    ? CachedNetworkImageProvider(
-                                        controller.providerImage!.startsWith('http')
-                                            ? controller.providerImage!
-                                            : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}'
-                                      )
-                                    : null,
-                                child: controller.providerImage == null || controller.providerImage!.isEmpty
-                                    ? const Icon(Icons.person, size: 68, color: Colors.white70)
-                                    : null,
+                                backgroundImage:
+                                    controller.providerImage != null &&
+                                            controller.providerImage!.isNotEmpty
+                                        ? CachedNetworkImageProvider(
+                                          controller.providerImage!.startsWith(
+                                                'http',
+                                              )
+                                              ? controller.providerImage!
+                                              : '${AppUrls.baseImageUrl}${controller.providerImage!.startsWith('/') ? controller.providerImage!.substring(1) : controller.providerImage}',
+                                        )
+                                        : null,
+                                child:
+                                    controller.providerImage == null ||
+                                            controller.providerImage!.isEmpty
+                                        ? const Icon(
+                                          Icons.person,
+                                          size: 68,
+                                          color: Colors.white70,
+                                        )
+                                        : null,
                               ),
                             ),
                           ),
@@ -215,7 +248,11 @@ class _CallScreenState extends State<CallScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        status == CallStatus.ringing ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
+                        status == CallStatus.ringing
+                            ? 'Ringing...'
+                            : (status == 'waiting'
+                                ? 'Waiting in queue...'
+                                : 'Connecting P2P...'),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 15,
@@ -228,11 +265,16 @@ class _CallScreenState extends State<CallScreen> {
                   // Bottom Controls Panel: Translucent Glassmorphic Panel
                   Container(
                     margin: const EdgeInsets.all(20),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 24,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.12),
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.25),
@@ -246,14 +288,18 @@ class _CallScreenState extends State<CallScreen> {
                       children: [
                         // Mute button
                         _buildControlButton(
-                          icon: controller.isMuted.value ? Icons.mic_off : Icons.mic,
+                          icon:
+                              controller.isMuted.value
+                                  ? Icons.mic_off
+                                  : Icons.mic,
                           label: 'Mute',
                           isActive: controller.isMuted.value,
                           onPressed: () => controller.toggleMute(),
                         ),
 
                         // Switch to Chat (visible during ongoing call)
-                        if (controller.isPackageCall && status == CallStatus.ongoing)
+                        if (controller.isPackageCall &&
+                            status == CallStatus.ongoing)
                           _buildControlButton(
                             icon: Icons.swap_calls_rounded,
                             label: 'Chat',
@@ -265,7 +311,10 @@ class _CallScreenState extends State<CallScreen> {
 
                         // Speaker button
                         _buildControlButton(
-                          icon: controller.isSpeakerOn.value ? Icons.volume_up : Icons.volume_down,
+                          icon:
+                              controller.isSpeakerOn.value
+                                  ? Icons.volume_up
+                                  : Icons.volume_down,
                           label: 'Speaker',
                           isActive: controller.isSpeakerOn.value,
                           onPressed: () => controller.toggleSpeaker(),
@@ -292,8 +341,8 @@ class _CallScreenState extends State<CallScreen> {
       }
     } else {
       // Normal (non-package) call
-      if (controller.status.value.name == 'ringing' || 
-          controller.status.value.name == 'dialing' || 
+      if (controller.status.value.name == 'ringing' ||
+          controller.status.value.name == 'dialing' ||
           controller.status.value.name == 'waiting') {
         controller.cancelCall();
       } else {
@@ -312,84 +361,103 @@ class _CallScreenState extends State<CallScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40, height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
+      builder:
+          (ctx) => Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            // Title
-            const Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
-                SizedBox(width: 8),
-                Text(
-                  'End Consultation Options',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                // Title
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.help_outline_rounded,
+                      color: Color(0xFF6B21A8),
+                      size: 22,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'End Consultation Options',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Package time remaining: $m:$s',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.orange.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Option 1: End Call Only
+                _buildEndOption(
+                  icon: Icons.call_end_rounded,
+                  iconColor: Colors.blue.shade700,
+                  bgColor: Colors.blue.shade50,
+                  title: 'End Call Only (Continue Chatting)',
+                  subtitle:
+                      'Hangs up audio and returns you to the active chat thread.',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    controller.terminateChannelOnly();
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Option 2: End Entire Session
+                _buildEndOption(
+                  icon: Icons.cancel_rounded,
+                  iconColor: Colors.red,
+                  bgColor: Colors.red.shade50,
+                  title: 'End Entire Session',
+                  subtitle:
+                      'Completes consultation and finalises package time.',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    controller.terminateEntireSession();
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Option 3: Cancel
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Package time remaining: $m:$s',
-                style: TextStyle(fontSize: 13, color: Colors.orange.shade700, fontWeight: FontWeight.w500),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Option 1: End Call Only
-            _buildEndOption(
-              icon: Icons.call_end_rounded,
-              iconColor: Colors.blue.shade700,
-              bgColor: Colors.blue.shade50,
-              title: 'End Call Only (Continue Chatting)',
-              subtitle: 'Hangs up audio and returns you to the active chat thread.',
-              onTap: () {
-                Navigator.of(ctx).pop();
-                controller.terminateChannelOnly();
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Option 2: End Entire Session
-            _buildEndOption(
-              icon: Icons.cancel_rounded,
-              iconColor: Colors.red,
-              bgColor: Colors.red.shade50,
-              title: 'End Entire Session',
-              subtitle: 'Completes consultation and finalises package time.',
-              onTap: () {
-                Navigator.of(ctx).pop();
-                controller.terminateEntireSession();
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Option 3: Cancel
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontSize: 15)),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -397,29 +465,42 @@ class _CallScreenState extends State<CallScreen> {
   void _showSingleEndDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('End Consultation', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Are you sure you want to end this consultation?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              controller.terminateEntireSession();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      builder:
+          (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text('End Session'),
+            title: const Text(
+              'End Consultation',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              'Are you sure you want to end this consultation?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  controller.terminateEntireSession();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('End Session'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -456,9 +537,19 @@ class _CallScreenState extends State<CallScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF1A1A2E))),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
                 ],
               ),
             ),
@@ -469,48 +560,60 @@ class _CallScreenState extends State<CallScreen> {
     );
   }
 
-
-
   void _showSwitchToChatDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: const [
-            Icon(Icons.chat_bubble_rounded, color: AppColors.primaryColor, size: 22),
-            SizedBox(width: 10),
-            Text('Switch to Chat', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Text(
-          'End the current call and start a chat session with ${controller.providerName ?? "Astrologer"}?',
-          style: const TextStyle(fontSize: 14, color: Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _switchToChat();
-            },
-            icon: const Icon(Icons.chat_bubble_rounded, size: 16),
-            label: const Text('Switch'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      builder:
+          (ctx) => AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
+            title: Row(
+              children: const [
+                Icon(
+                  Icons.chat_bubble_rounded,
+                  color: AppColors.primaryColor,
+                  size: 22,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Switch to Chat',
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            content: Text(
+              'End the current call and start a chat session with ${controller.providerName ?? "Astrologer"}?',
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  _switchToChat();
+                },
+                icon: const Icon(Icons.chat_bubble_rounded, size: 16),
+                label: const Text('Switch'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
-
 
   Future<void> _switchToChat() async {
     final providerId = controller.providerId;
@@ -543,15 +646,19 @@ class _CallScreenState extends State<CallScreen> {
     }
 
     // Show loader
-    Get.dialog(const Center(child: CircularProgressIndicator(color: AppColors.deepPink)), barrierDismissible: false);
-    
+    Get.dialog(
+      const Center(child: CircularProgressIndicator(color: AppColors.deepPink)),
+      barrierDismissible: false,
+    );
+
     try {
       final apiClient = Get.find<ApiClient>();
       int activeChatSessionId = 0;
       String chatInitialStatus = 'ongoing';
 
       if (subSessionId > 0 && controller.isPackageCall) {
-        activeChatSessionId = int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
+        activeChatSessionId =
+            int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
         chatInitialStatus = spawnData['chat_status']?.toString() ?? 'ongoing';
       } else {
         final response = await apiClient.post(
@@ -562,7 +669,8 @@ class _CallScreenState extends State<CallScreen> {
           final body = response.body['data'] ?? response.body;
           // API returns { data: { session: { id: 487, status: 'initiated' } } }
           final session = body['session'] ?? body;
-          activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
+          activeChatSessionId =
+              int.tryParse(session['id']?.toString() ?? '') ?? 0;
           chatInitialStatus = session['status']?.toString() ?? 'initiated';
         }
       }
@@ -659,17 +767,17 @@ class _CallScreenState extends State<CallScreen> {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.call_end,
-              color: Colors.white,
-              size: 36,
-            ),
+            child: const Icon(Icons.call_end, color: Colors.white, size: 36),
           ),
         ),
         const SizedBox(height: 8),
         const Text(
           'End',
-          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );

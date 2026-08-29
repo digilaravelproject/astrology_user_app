@@ -7,8 +7,13 @@ class AstrologerRepository {
 
   AstrologerRepository({required this.apiClient});
 
-  Future<ResponseModel> getAstrologers({Map<String, dynamic>? queryParameters}) async {
-    return await apiClient.get(AppUrls.astrologers, queryParameters: queryParameters);
+  Future<ResponseModel> getAstrologers({
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    return await apiClient.get(
+      AppUrls.astrologers,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<ResponseModel> getAstrologerById(int id) async {
@@ -20,31 +25,48 @@ class AstrologerRepository {
   }
 
   Future<ResponseModel> blockAstrologer(int id, {String? reason}) async {
-    return await apiClient.post(AppUrls.blockAstrologer(id), data: reason != null ? {'reason': reason} : null);
+    return await apiClient.post(
+      AppUrls.blockAstrologer(id),
+      data: reason != null ? {'reason': reason} : null,
+    );
   }
 
   Future<ResponseModel> unblockAstrologer(int id) async {
     return await apiClient.post(AppUrls.unblockAstrologer(id));
   }
 
-  Future<ResponseModel> getBlockedAstrologers({Map<String, dynamic>? queryParameters}) async {
-    return await apiClient.get(AppUrls.blockedAstrologers, queryParameters: queryParameters);
+  Future<ResponseModel> getBlockedAstrologers({
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    return await apiClient.get(
+      AppUrls.blockedAstrologers,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {
-    return await apiClient.post('${AppUrls.astrologers}/$id/report', data: {'reason': reason});
+    return await apiClient.post(
+      '${AppUrls.astrologers}/$id/report',
+      data: {'reason': reason},
+    );
   }
 
-  Future<ResponseModel> postReview(int astrologerId, int rating, String review) async {
-    return await apiClient.post('/api/v1/user/reviews', data: {
-      'astrologer_id': astrologerId,
-      'rating': rating,
-      'review': review,
-    });
+  Future<ResponseModel> postReview(
+    int astrologerId,
+    int rating,
+    String review,
+  ) async {
+    return await apiClient.post(
+      '/api/v1/user/reviews',
+      data: {'astrologer_id': astrologerId, 'rating': rating, 'review': review},
+    );
   }
 
   Future<ResponseModel> getReviews(int astrologerId) async {
-    return await apiClient.get('/api/v1/user/reviews', queryParameters: {'astrologer_id': astrologerId});
+    return await apiClient.get(
+      '/api/v1/user/reviews',
+      queryParameters: {'astrologer_id': astrologerId},
+    );
   }
 
   Future<ResponseModel> followAstrologer(int id) async {

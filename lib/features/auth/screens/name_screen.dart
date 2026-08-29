@@ -15,7 +15,7 @@ class NameSetupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
     final errorMessage = ''.obs;
-    
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -34,12 +34,16 @@ class NameSetupScreen extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.fieldBackground,
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.primaryColor),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 20,
+                    color: AppColors.primaryColor,
+                  ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               AppText(
                 AppStrings.nameTitle,
                 style: GoogleFonts.dmSerifDisplay(
@@ -49,16 +53,16 @@ class NameSetupScreen extends StatelessWidget {
                   height: 1.1,
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               AppText(
                 AppStrings.nameSubtitle,
                 fontSize: 16,
                 color: AppColors.black.withOpacity(0.4),
                 fontWeight: FontWeight.w400,
               ),
-              
+
               const SizedBox(height: 50),
 
               // Premium Styled TextField
@@ -82,41 +86,63 @@ class NameSetupScreen extends StatelessWidget {
                       errorMessage.value = '';
                     }
                   },
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textColorPrimary,
+                  ),
                   decoration: InputDecoration(
                     hintText: AppStrings.nameHint,
-                    hintStyle: TextStyle(color: AppColors.black.withOpacity(0.2)),
-                    prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.deepPink),
+                    hintStyle: TextStyle(
+                      color: AppColors.black.withOpacity(0.2),
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.person_outline_rounded,
+                      color: AppColors.deepPink,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(color: AppColors.black.withOpacity(0.05)),
+                      borderSide: BorderSide(
+                        color: AppColors.black.withOpacity(0.05),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(color: AppColors.black.withOpacity(0.05)),
+                      borderSide: BorderSide(
+                        color: AppColors.black.withOpacity(0.05),
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: AppColors.deepPink, width: 2.0),
+                      borderSide: const BorderSide(
+                        color: AppColors.deepPink,
+                        width: 2.0,
+                      ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
                   ),
                 ),
               ),
-              
+
               // Error message
-              Obx(() => errorMessage.value.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 8, left: 4),
-                      child: AppText(
-                        errorMessage.value,
-                        fontSize: 12,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    )
-                  : const SizedBox.shrink()),
-              
+              Obx(
+                () =>
+                    errorMessage.value.isNotEmpty
+                        ? Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 4),
+                          child: AppText(
+                            errorMessage.value,
+                            fontSize: 12,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                        : const SizedBox.shrink(),
+              ),
+
               const Spacer(),
 
               // Premium Gradient Button
@@ -130,12 +156,12 @@ class NameSetupScreen extends StatelessWidget {
                       errorMessage.value = AppStrings.pleaseEnterName;
                       return;
                     }
-                    
+
                     if (authController.nameController.text.trim().length < 2) {
                       errorMessage.value = AppStrings.nameMinLength;
                       return;
                     }
-                    
+
                     // Clear error and proceed
                     errorMessage.value = '';
                     Get.toNamed(RouteHelper.getGenderSetupRoute());

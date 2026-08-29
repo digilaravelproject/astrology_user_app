@@ -39,7 +39,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   DateTime? _lastBackPressTime;
-  final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
+  final MatrimonyController _matrimonyController =
+      Get.find<MatrimonyController>();
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -93,15 +94,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _checkCurrentActiveSession() async {
     try {
-      final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
+      final response = await Get.find<ApiClient>().get(
+        AppUrls.getCurrentSession,
+      );
       if (response.isSuccess && response.body != null) {
         final data = response.body;
-        final session = (data is Map)
-            ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
-            : null;
+        final session =
+            (data is Map)
+                ? (data['session'] ??
+                    data['data']?['session'] ??
+                    data['data'] ??
+                    data)
+                : null;
         final sessionId = session?['id'];
         final status = session?['status'];
-        final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
+        final startedAt =
+            session?['started_at'] ??
+            session?['accepted_at'] ??
+            session?['created_at'];
         // For user app, other person is provider (astrologer)
         final name = session?['provider']?['name'] ?? 'Astrologer';
 
@@ -112,43 +122,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
         DateTime? parsedStart;
         if (startedAt != null) {
           String isoUtc = startedAt.toString().replaceAll(' ', 'T');
-          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+          if (!isoUtc.endsWith('Z') &&
+              !isoUtc.contains('+') &&
+              !isoUtc.contains('-')) {
             isoUtc += 'Z';
           }
           parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
         }
         final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
 
-        if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
-          final sessionType = session?['session_type']?.toString().toLowerCase() ?? 
-                              session?['type']?.toString().toLowerCase() ?? 
-                              session?['mode']?.toString().toLowerCase() ?? '';
-          final isCall = sessionType == 'call' || sessionType == 'audio_call' || sessionType == 'video_call';
-          
+        if (status == 'ongoing' ||
+            status == 'initiated' ||
+            status == 'accepted') {
+          final sessionType =
+              session?['session_type']?.toString().toLowerCase() ??
+              session?['type']?.toString().toLowerCase() ??
+              session?['mode']?.toString().toLowerCase() ??
+              '';
+          final isCall =
+              sessionType == 'call' ||
+              sessionType == 'audio_call' ||
+              sessionType == 'video_call';
+
           if (!isCall) {
-            if (sessionId != null) {
-              
-            }
+            if (sessionId != null) {}
             FloatingChatBubble.show(
-                context: Get.context!,
-                sessionId: sessionId,
-                name: name,
-                imageUrl: '', // We don't have the image in this payload
-                status: status,
-                startedAt: startedAt,
-                onTap: () {
-                  final currentStatus = FloatingChatBubble.chatStatus.value;
-                  Get.to(
-                        () => ChatScreen(
-                      astrologerName: name,
-                      astrologerImage: '',
-                      sessionId: sessionId,
-                      initialStatus: currentStatus,
-                      startedAtString: startedAt,
-                    ),
-                    binding: ChatBinding(),
-                  );
-                }
+              context: Get.context!,
+              sessionId: sessionId,
+              name: name,
+              imageUrl: '', // We don't have the image in this payload
+              status: status,
+              startedAt: startedAt,
+              onTap: () {
+                final currentStatus = FloatingChatBubble.chatStatus.value;
+                Get.to(
+                  () => ChatScreen(
+                    astrologerName: name,
+                    astrologerImage: '',
+                    sessionId: sessionId,
+                    initialStatus: currentStatus,
+                    startedAtString: startedAt,
+                  ),
+                  binding: ChatBinding(),
+                );
+              },
             );
           }
         }
@@ -175,14 +192,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // Background Image/Gradient
               Positioned.fill(
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                   child: Image.asset(
                     "assets/images/astro.jpg",
                     // 'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
                     fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFF2E1A47),
-                    ),
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            Container(color: const Color(0xFF2E1A47)),
                   ),
                 ),
               ),
@@ -191,7 +210,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -218,7 +239,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -234,16 +259,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.3)),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star, color: Colors.yellow, size: 16),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 16,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               AppStrings.premiumAstrology,
@@ -299,7 +333,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             // For now just close, as user might want to browse
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF6F00), // Orange color
+                            backgroundColor: const Color(
+                              0xFFFF6F00,
+                            ), // Orange color
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -364,7 +400,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           // Double tap to exit logic on Home tab
           final now = DateTime.now();
-          if (_lastBackPressTime == null || now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+          if (_lastBackPressTime == null ||
+              now.difference(_lastBackPressTime!) >
+                  const Duration(seconds: 2)) {
             _lastBackPressTime = now;
             CustomSnackbar.showInfo('Press back again to exit app');
             return;
@@ -393,16 +431,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     name: FloatingChatBubble.name!,
                     imageUrl: '',
                   );
-                } else if (WebSocketService.isPackageBannerActive.value && !FloatingChatBubble.isActive && !FloatingCallBubble.isActive) {
+                } else if (WebSocketService.isPackageBannerActive.value &&
+                    !FloatingChatBubble.isActive &&
+                    !FloatingCallBubble.isActive) {
                   return const FloatingPackageBannerWidget();
                 }
                 return const SizedBox.shrink();
               }),
               Expanded(
-                child: IndexedStack(
-                  index: _selectedIndex,
-                  children: _screens,
-                ),
+                child: IndexedStack(index: _selectedIndex, children: _screens),
               ),
             ],
           ),

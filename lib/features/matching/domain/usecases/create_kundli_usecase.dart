@@ -7,7 +7,9 @@ class CreateKundliUseCase {
 
   CreateKundliUseCase({required this.repository});
 
-  Future<CreateKundliResponseModel> call(CreateKundliRequestModel request) async {
+  Future<CreateKundliResponseModel> call(
+    CreateKundliRequestModel request,
+  ) async {
     return await repository.createKundli(request);
   }
 }

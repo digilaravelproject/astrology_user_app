@@ -60,7 +60,9 @@ class WalletController extends GetxController {
       print('[PCB_APP] [DEBUG] | fetchWallet result: ${result?.balance}');
       if (result != null) {
         wallet.value = result;
-        print('[PCB_APP] [DEBUG] | wallet.value updated: ${wallet.value?.balance}');
+        print(
+          '[PCB_APP] [DEBUG] | wallet.value updated: ${wallet.value?.balance}',
+        );
       }
     } catch (e) {
       print('[PCB_APP] [DEBUG] | Error fetching wallet in Controller: $e');
@@ -87,8 +89,10 @@ class WalletController extends GetxController {
       final result = await topUpWalletUseCase.execute(amount);
       print("[PCB_APP] [DEBUG] | startTopUp called with result: $result");
       if (result != null) {
-        print('[PCB_APP] [DEBUG] | Top-up order created successfully. Provider Order ID: ${result.data.transaction.providerOrderId}');
-        
+        print(
+          '[PCB_APP] [DEBUG] | Top-up order created successfully. Provider Order ID: ${result.data.transaction.providerOrderId}',
+        );
+
         // Refresh to show the pending transaction immediately
         fetchWallet();
         fetchTransactions();
@@ -96,7 +100,9 @@ class WalletController extends GetxController {
         final user = await authService.getUserInfo();
         final rzpKey = result.data.razorpayKey;
         if (rzpKey == null || rzpKey.isEmpty) {
-          print('[PCB_APP] [DEBUG] | Failed to start checkout: Razorpay Key missing from backend');
+          print(
+            '[PCB_APP] [DEBUG] | Failed to start checkout: Razorpay Key missing from backend',
+          );
           CustomSnackbar.showError('Payment configuration missing from server');
           return;
         }
@@ -107,12 +113,15 @@ class WalletController extends GetxController {
           orderId: result.data.transaction.providerOrderId,
           name: AppConstants.appName,
           description: 'Wallet Top-up',
-          email: 'user@example.com', // UserModel doesn't have email, using placeholder or name
+          email:
+              'user@example.com', // UserModel doesn't have email, using placeholder or name
           contact: user?.mobile ?? '',
           razorpayKey: rzpKey,
         );
       } else {
-        print('[PCB_APP] [DEBUG] | Failed to create top-up order: result is null');
+        print(
+          '[PCB_APP] [DEBUG] | Failed to create top-up order: result is null',
+        );
         CustomSnackbar.showError('Failed to create top-up order');
       }
     } catch (e) {
@@ -146,7 +155,9 @@ class WalletController extends GetxController {
           },
         );
       } else {
-        CustomSnackbar.showError(result?.message ?? 'Payment verification failed');
+        CustomSnackbar.showError(
+          result?.message ?? 'Payment verification failed',
+        );
       }
     } catch (e) {
       print('Error verifying payment: $e');
@@ -157,11 +168,17 @@ class WalletController extends GetxController {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    CustomSnackbar.showError(response.message ?? 'Unknown error', title: 'Payment Failed');
+    CustomSnackbar.showError(
+      response.message ?? 'Unknown error',
+      title: 'Payment Failed',
+    );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    CustomSnackbar.showInfo(response.walletName ?? '', title: 'External Wallet');
+    CustomSnackbar.showInfo(
+      response.walletName ?? '',
+      title: 'External Wallet',
+    );
   }
 
   String get balance => wallet.value?.balance ?? '0.00';

@@ -71,54 +71,141 @@ class AstrologerModel {
 
   factory AstrologerModel.fromJson(Map<String, dynamic> json) {
     final userData = json['user'] as Map<String, dynamic>? ?? {};
-    
+
     return AstrologerModel(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       userId: int.tryParse(json['user_id']?.toString() ?? '') ?? 0,
-      yearsOfExperience: int.tryParse(json['years_of_experience']?.toString() ?? json['experience']?.toString() ?? '') ?? 0,
+      yearsOfExperience:
+          int.tryParse(
+            json['years_of_experience']?.toString() ??
+                json['experience']?.toString() ??
+                '',
+          ) ??
+          0,
       areasOfExpertise: List<String>.from(json['areas_of_expertise'] ?? []),
       languages: List<String>.from(json['languages'] ?? []),
       profilePhoto: json['profile_photo'],
       bio: json['bio'] ?? '',
       chatRate: json['chat_rate_per_minute']?.toString(),
       callRate: json['call_rate_per_minute']?.toString(),
-      videoCallRate: (json['video_call_rate_per_minute'] ?? json['video_call_rate'])?.toString(),
-      name: (userData['name']?.toString() ?? 'Unknown').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
+      videoCallRate:
+          (json['video_call_rate_per_minute'] ?? json['video_call_rate'])
+              ?.toString(),
+      name: (userData['name']?.toString() ?? 'Unknown')
+          .split(' ')
+          .map(
+            (str) =>
+                str.isNotEmpty
+                    ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}'
+                    : '',
+          )
+          .join(' '),
       phone: userData['phone'],
       email: userData['email'],
-      isChatEnabled: json['is_chat_enabled'] == true || json['is_chat_enabled'] == 1 || json['is_chat_enabled']?.toString() == '1' || json['is_chat_enabled']?.toString() == 'true' || json['chat_enabled'] == true || json['chat_enabled'] == 1 || json['chat_enabled']?.toString() == '1' || json['chat_enabled']?.toString() == 'true',
-      isCallEnabled: json['is_call_enabled'] == true || json['is_call_enabled'] == 1 || json['is_call_enabled']?.toString() == '1' || json['is_call_enabled']?.toString() == 'true' || json['call_enabled'] == true || json['call_enabled'] == 1 || json['call_enabled']?.toString() == '1' || json['call_enabled']?.toString() == 'true',
-      isOnline: json['is_online'] == 1 || json['is_online'] == true || json['is_online']?.toString() == '1' || json['is_online']?.toString() == 'true',
-      totalOrders: int.tryParse(json['total_orders']?.toString() ?? json['orders_count']?.toString() ?? json['completed_orders_count']?.toString() ?? '0') ?? 0,
-      isFollowed: json['is_followed'] == 1 || json['is_followed'] == true || json['is_followed']?.toString() == '1' || json['is_followed']?.toString() == 'true',
-      isBlocked: json['is_blocked'] == 1 || json['is_blocked'] == true || json['is_blocked']?.toString() == '1' || json['is_blocked']?.toString() == 'true',
-      isReviewEligible: json['is_review_eligible'] == 1 || json['is_review_eligible'] == true || json['is_review_eligible']?.toString() == '1' || json['is_review_eligible']?.toString() == 'true',
-      originalChatRatePerMinute: json['original_chat_rate_per_minute']?.toString(),
-      originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
+      isChatEnabled:
+          json['is_chat_enabled'] == true ||
+          json['is_chat_enabled'] == 1 ||
+          json['is_chat_enabled']?.toString() == '1' ||
+          json['is_chat_enabled']?.toString() == 'true' ||
+          json['chat_enabled'] == true ||
+          json['chat_enabled'] == 1 ||
+          json['chat_enabled']?.toString() == '1' ||
+          json['chat_enabled']?.toString() == 'true',
+      isCallEnabled:
+          json['is_call_enabled'] == true ||
+          json['is_call_enabled'] == 1 ||
+          json['is_call_enabled']?.toString() == '1' ||
+          json['is_call_enabled']?.toString() == 'true' ||
+          json['call_enabled'] == true ||
+          json['call_enabled'] == 1 ||
+          json['call_enabled']?.toString() == '1' ||
+          json['call_enabled']?.toString() == 'true',
+      isOnline:
+          json['is_online'] == 1 ||
+          json['is_online'] == true ||
+          json['is_online']?.toString() == '1' ||
+          json['is_online']?.toString() == 'true',
+      totalOrders:
+          int.tryParse(
+            json['total_orders']?.toString() ??
+                json['orders_count']?.toString() ??
+                json['completed_orders_count']?.toString() ??
+                '0',
+          ) ??
+          0,
+      isFollowed:
+          json['is_followed'] == 1 ||
+          json['is_followed'] == true ||
+          json['is_followed']?.toString() == '1' ||
+          json['is_followed']?.toString() == 'true',
+      isBlocked:
+          json['is_blocked'] == 1 ||
+          json['is_blocked'] == true ||
+          json['is_blocked']?.toString() == '1' ||
+          json['is_blocked']?.toString() == 'true',
+      isReviewEligible:
+          json['is_review_eligible'] == 1 ||
+          json['is_review_eligible'] == true ||
+          json['is_review_eligible']?.toString() == '1' ||
+          json['is_review_eligible']?.toString() == 'true',
+      originalChatRatePerMinute:
+          json['original_chat_rate_per_minute']?.toString(),
+      originalCallRatePerMinute:
+          json['original_call_rate_per_minute']?.toString(),
       hasOffer: json['has_offer'] == true,
-      discountPercentage: json['offer_details']?['discount_percentage']?.toString(),
-      packagePrice: json['package_details']?['price'] != null ? int.tryParse(json['package_details']['price'].toString()) : null,
-      packageDuration: json['package_details']?['duration'] != null ? int.tryParse(json['package_details']['duration'].toString()) : null,
+      discountPercentage:
+          json['offer_details']?['discount_percentage']?.toString(),
+      packagePrice:
+          json['package_details']?['price'] != null
+              ? int.tryParse(json['package_details']['price'].toString())
+              : null,
+      packageDuration:
+          json['package_details']?['duration'] != null
+              ? int.tryParse(json['package_details']['duration'].toString())
+              : null,
       isPurchase: json['package_details']?['is_purchase'] == true,
-      remainingTime: json['package_details']?['remaining_time'] != null ? int.tryParse(json['package_details']['remaining_time'].toString()) : null,
+      remainingTime:
+          json['package_details']?['remaining_time'] != null
+              ? int.tryParse(
+                json['package_details']['remaining_time'].toString(),
+              )
+              : null,
       isBusy: json['is_busy'] == 1 || json['is_busy'] == true,
-      availabilityStatus: json['availability_status'] ?? (json['is_online'] == 1 || json['is_online'] == true ? 'Online' : 'Offline'),
+      availabilityStatus:
+          json['availability_status'] ??
+          (json['is_online'] == 1 || json['is_online'] == true
+              ? 'Online'
+              : 'Offline'),
     );
   }
 
-  String get fullProfilePhoto => profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
+  String get fullProfilePhoto =>
+      profilePhoto != null ? '${AppUrls.baseImageUrl}$profilePhoto' : '';
 
-  bool get isAvailableOnline => !isBusy && isOnline && (isChatEnabled || isCallEnabled);
+  bool get isAvailableOnline =>
+      !isBusy && isOnline && (isChatEnabled || isCallEnabled);
 
   Map<String, dynamic> get statusBadge {
     switch (availabilityStatus) {
       case 'Engaged':
-        return { 'text': 'Engaged', 'color': Colors.orange, 'buttonText': 'Busy' };
+        return {
+          'text': 'Engaged',
+          'color': Colors.orange,
+          'buttonText': 'Busy',
+        };
       case 'Online':
-        return { 'text': 'Online', 'color': Colors.green, 'buttonText': 'Call / Chat' };
+        return {
+          'text': 'Online',
+          'color': Colors.green,
+          'buttonText': 'Call / Chat',
+        };
       case 'Offline':
       default:
-        return { 'text': 'Offline', 'color': Colors.grey, 'buttonText': 'Offline' };
+        return {
+          'text': 'Offline',
+          'color': Colors.grey,
+          'buttonText': 'Offline',
+        };
     }
   }
 
@@ -177,8 +264,10 @@ class AstrologerModel {
       isFollowed: isFollowed ?? this.isFollowed,
       isBlocked: isBlocked ?? this.isBlocked,
       isReviewEligible: isReviewEligible ?? this.isReviewEligible,
-      originalChatRatePerMinute: originalChatRatePerMinute ?? this.originalChatRatePerMinute,
-      originalCallRatePerMinute: originalCallRatePerMinute ?? this.originalCallRatePerMinute,
+      originalChatRatePerMinute:
+          originalChatRatePerMinute ?? this.originalChatRatePerMinute,
+      originalCallRatePerMinute:
+          originalCallRatePerMinute ?? this.originalCallRatePerMinute,
       hasOffer: hasOffer ?? this.hasOffer,
       discountPercentage: discountPercentage ?? this.discountPercentage,
       packagePrice: packagePrice ?? this.packagePrice,
@@ -207,7 +296,7 @@ class AstrologerModel {
         final int remDays = remainingMinutes ~/ 1440;
         final int remHours = (remainingMinutes % 1440) ~/ 60;
         final int remMins = remainingMinutes % 60;
-        
+
         if (remDays > 0) {
           if (remHours > 0) {
             remainingTimeStr = '$remDays d $remHours hr';
@@ -227,7 +316,7 @@ class AstrologerModel {
     final int seconds = packageDuration!;
     final int hours = seconds ~/ 3600;
     final int minutes = (seconds % 3600) ~/ 60;
-    
+
     String durationStr;
     if (hours > 0 && minutes > 0) {
       durationStr = '$hours ${"hr".tr} $minutes ${"min".tr}';
@@ -236,7 +325,7 @@ class AstrologerModel {
     } else {
       durationStr = '$minutes ${"min".tr}';
     }
-    
+
     return '${'Session'.tr} ($durationStr) @ ₹$packagePrice';
   }
 
@@ -247,7 +336,7 @@ class AstrologerModel {
     }
     return text;
   }
-  
+
   String? get packageSessionPriceOnly {
     final text = packageSessionText;
     if (text.contains(' @ ')) {
@@ -285,8 +374,12 @@ class PackageSubSession {
       mode: json['mode'] ?? '',
       chatSessionId: json['chat_session_id'],
       callSessionId: json['call_session_id'],
-      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : DateTime.now(),
-      endedAt: json['ended_at'] != null ? DateTime.parse(json['ended_at']) : null,
+      startedAt:
+          json['started_at'] != null
+              ? DateTime.parse(json['started_at'])
+              : DateTime.now(),
+      endedAt:
+          json['ended_at'] != null ? DateTime.parse(json['ended_at']) : null,
       durationUsed: json['duration_used'] ?? 0,
     );
   }
@@ -408,5 +501,3 @@ class PackagePurchase {
     );
   }
 }
-
-

@@ -20,13 +20,12 @@ class PaymentPolicyScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.paymentPolicy,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.paymentPolicy, centerTitle: true),
       body: Obx(() {
         if (controller.isPaymentLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: Colors.pink));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.pink),
+          );
         }
 
         final policyData = controller.paymentPolicyData.value;

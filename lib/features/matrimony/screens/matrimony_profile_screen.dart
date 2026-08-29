@@ -12,13 +12,10 @@ import '../controllers/matrimony_controller.dart';
 import 'package:get/get.dart';
 import '../../../core/widgets/custom_image_widget.dart';
 
-
-
 class MatrimonyProfileScreen extends StatefulWidget {
   final MatrimonyProfileModel profile;
 
   const MatrimonyProfileScreen({super.key, required this.profile});
-
 
   @override
   State<MatrimonyProfileScreen> createState() => _MatrimonyProfileScreenState();
@@ -31,47 +28,47 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   final PageController _pageController = PageController();
   Timer? _autoSlideTimer;
 
-  
   List<String> _getImages(MatrimonyProfileModel profile) {
     final baseUrl = AppUrls.baseImageUrl;
     if (profile.profilePhoto != null) {
       return ['$baseUrl${profile.profilePhoto}'];
     }
     return [
-      profile.gender.toLowerCase() == 'male' 
-          ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
-          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png'
+      profile.gender.toLowerCase() == 'male'
+          ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+          : 'https://cdn-icons-png.flaticon.com/512/3135/3135768.png',
     ];
   }
-
-
 
   @override
   void initState() {
     super.initState();
     _startAutoSlide();
-    
+
     // Clear previous profile data to avoid showing stale data
     _controller.selectedProfile.value = null;
-    
+
     if (widget.profile.userId != null) {
-      print('MatrimonyProfileScreen: Loading profile for userId: ${widget.profile.userId}');
+      print(
+        'MatrimonyProfileScreen: Loading profile for userId: ${widget.profile.userId}',
+      );
       _controller.getMyMatrimonyProfileDetails(widget.profile.userId!);
     } else {
       print('MatrimonyProfileScreen: userId is null!');
     }
   }
 
-
   void _startAutoSlide() {
     final profile = _controller.selectedProfile.value ?? widget.profile;
     final images = _getImages(profile);
-    
+
     if (images.length <= 1) return;
 
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_pageController.hasClients) {
-        final currentImages = _getImages(_controller.selectedProfile.value ?? widget.profile);
+        final currentImages = _getImages(
+          _controller.selectedProfile.value ?? widget.profile,
+        );
         if (currentImages.length <= 1) {
           timer.cancel();
           return;
@@ -85,7 +82,6 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       }
     });
   }
-
 
   void _stopAutoSlide() {
     _autoSlideTimer?.cancel();
@@ -103,19 +99,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => _FullScreenImageViewer(
-          images: images,
-          initialIndex: index,
-        ),
+        builder:
+            (context) =>
+                _FullScreenImageViewer(images: images, initialIndex: index),
       ),
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFCF8F9), // Soft, warm off-white background
+      backgroundColor: const Color(
+        0xFFFCF8F9,
+      ), // Soft, warm off-white background
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -156,64 +152,74 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(Icons.more_vert, color: AppColors.primaryColor),
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: AppColors.primaryColor,
+                ),
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
                     backgroundColor: Colors.transparent,
-                    builder: (context) => Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const SizedBox(height: 12),
-                          Container(
-                            width: 40,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(2),
+                    builder:
+                        (context) => Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          _buildMenuOption(
-                            context,
-                            Icons.bookmark_border,
-                            'Save Profile'.tr,
-                            () {
-                              Navigator.pop(context);
-                              _saveProfile();
-                            },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              _buildMenuOption(
+                                context,
+                                Icons.bookmark_border,
+                                'Save Profile'.tr,
+                                () {
+                                  Navigator.pop(context);
+                                  _saveProfile();
+                                },
+                              ),
+                              _buildMenuOption(
+                                context,
+                                (_controller.selectedProfile.value?.isBlocked ??
+                                        widget.profile.isBlocked)
+                                    ? Icons.check_circle_outline
+                                    : Icons.block_outlined,
+                                (_controller.selectedProfile.value?.isBlocked ??
+                                        widget.profile.isBlocked)
+                                    ? 'Unblock User'.tr
+                                    : 'Block User'.tr,
+                                () {
+                                  Navigator.pop(context);
+                                  _blockUser(context);
+                                },
+                              ),
+                              _buildMenuOption(
+                                context,
+                                Icons.report_outlined,
+                                'Report Profile'.tr,
+                                () {
+                                  Navigator.pop(context);
+                                  _reportProfile(context);
+                                },
+                                isLast: true,
+                              ),
+                              const SizedBox(height: 20),
+                            ],
                           ),
-                          _buildMenuOption(
-                            context,
-                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Icons.check_circle_outline : Icons.block_outlined,
-                            (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User'.tr : 'Block User'.tr,
-                            () {
-                              Navigator.pop(context);
-                              _blockUser(context);
-                            },
-                          ),
-                          _buildMenuOption(
-                            context,
-                            Icons.report_outlined,
-                            'Report Profile'.tr,
-                            () {
-                              Navigator.pop(context);
-                              _reportProfile(context);
-                            },
-                            isLast: true,
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
+                        ),
                   );
                 },
               ),
@@ -222,35 +228,37 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         ],
       ),
       body: Obx(() {
-        if (_controller.isLoading.value && _controller.selectedProfile.value == null) {
+        if (_controller.isLoading.value &&
+            _controller.selectedProfile.value == null) {
           return const Center(
             child: CircularProgressIndicator(color: AppColors.primaryColor),
           );
         }
 
         final profile = _controller.selectedProfile.value ?? widget.profile;
-        
+
         return SingleChildScrollView(
-          child: _showDetails
-              ? Column(
-                  children: [
-                    _buildProfileHeader(profile),
-                    const SizedBox(height: 16),
-                    _buildPersonalInformation(profile),
-                    const SizedBox(height: 16),
-                    _buildContactInformation(profile),
-                    const SizedBox(height: 16),
-                    _buildAboutMyself(profile),
-                    const SizedBox(height: 16),
-                    _buildLifestyle(profile),
-                    const SizedBox(height: 16),
-                    _buildPartnerPreferencesHeader(profile),
-                    const SizedBox(height: 16),
-                    _buildIgnoredSection(),
-                    const SizedBox(height: 32),
-                  ],
-                )
-              : _buildProfileHeader(profile),
+          child:
+              _showDetails
+                  ? Column(
+                    children: [
+                      _buildProfileHeader(profile),
+                      const SizedBox(height: 16),
+                      _buildPersonalInformation(profile),
+                      const SizedBox(height: 16),
+                      _buildContactInformation(profile),
+                      const SizedBox(height: 16),
+                      _buildAboutMyself(profile),
+                      const SizedBox(height: 16),
+                      _buildLifestyle(profile),
+                      const SizedBox(height: 16),
+                      _buildPartnerPreferencesHeader(profile),
+                      const SizedBox(height: 16),
+                      _buildIgnoredSection(),
+                      const SizedBox(height: 32),
+                    ],
+                  )
+                  : _buildProfileHeader(profile),
         );
       }),
     );
@@ -269,34 +277,35 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
-                child: _getImages(profile).length > 1
-                    ? PageView.builder(
-                        controller: _pageController,
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentImageIndex = index;
-                          });
-                        },
-                        itemCount: _getImages(profile).length,
-                        itemBuilder: (context, index) {
-                          return CustomImageWidget(
-                            imagePath: _getImages(profile)[index],
+                  child:
+                      _getImages(profile).length > 1
+                          ? PageView.builder(
+                            controller: _pageController,
+                            onPageChanged: (index) {
+                              setState(() {
+                                _currentImageIndex = index;
+                              });
+                            },
+                            itemCount: _getImages(profile).length,
+                            itemBuilder: (context, index) {
+                              return CustomImageWidget(
+                                imagePath: _getImages(profile)[index],
+                                fit: BoxFit.cover,
+                                radius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(30),
+                                  bottomRight: Radius.circular(30),
+                                ),
+                              );
+                            },
+                          )
+                          : CustomImageWidget(
+                            imagePath: _getImages(profile)[0],
                             fit: BoxFit.cover,
                             radius: const BorderRadius.only(
                               bottomLeft: Radius.circular(30),
                               bottomRight: Radius.circular(30),
                             ),
-                          );
-                        },
-                      )
-                    : CustomImageWidget(
-                        imagePath: _getImages(profile)[0],
-                        fit: BoxFit.cover,
-                        radius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                      ),
+                          ),
                 ),
               ),
               // Story-style segmented progress indicators at the top
@@ -313,9 +322,10 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           height: 3,
                           margin: const EdgeInsets.symmetric(horizontal: 2),
                           decoration: BoxDecoration(
-                            color: _currentImageIndex == index
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.3),
+                            color:
+                                _currentImageIndex == index
+                                    ? Colors.white
+                                    : Colors.white.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(2),
                             boxShadow: [
                               if (_currentImageIndex == index)
@@ -342,11 +352,16 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                         ),
                         child: AppText(
                           '${_currentImageIndex + 1} / ${_getImages(profile).length}',
@@ -382,7 +397,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               // ),
             ],
           ),
-          
+
           // Profile Details Card
           Transform.translate(
             offset: const Offset(0, -20),
@@ -414,9 +429,8 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                           color: AppColors.primaryColor,
                           height: 1.3,
                         ),
-
                       ),
-                       Image.asset(
+                      Image.asset(
                         'assets/icons/verify.png',
                         width: 24,
                         height: 24,
@@ -428,8 +442,11 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                         decoration: BoxDecoration(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
                           color: AppColors.primaryColor.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -447,9 +464,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   const SizedBox(height: 16),
                   Divider(color: Colors.grey[200], thickness: 1),
                   const SizedBox(height: 16),
-                  _buildQuickInfo(Icons.favorite_border, profile.maritalStatus.tr),
+                  _buildQuickInfo(
+                    Icons.favorite_border,
+                    profile.maritalStatus.tr,
+                  ),
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.cake_outlined, '${profile.age} ${"Years".tr}  • ${profile.height} ${"Feet".tr}'),
+                  _buildQuickInfo(
+                    Icons.cake_outlined,
+                    '${profile.age} ${"Years".tr}  • ${profile.height} ${"Feet".tr}',
+                  ),
 
                   const SizedBox(height: 10),
                   _buildQuickInfo(Icons.school_outlined, profile.education.tr),
@@ -457,22 +480,30 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                   _buildQuickInfo(Icons.work_outline, profile.jobTitle.tr),
 
                   const SizedBox(height: 10),
-                  _buildQuickInfo(Icons.location_on_outlined, profile.location.tr),
+                  _buildQuickInfo(
+                    Icons.location_on_outlined,
+                    profile.location.tr,
+                  ),
 
-
-                   const SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   CustomButton(
                     fontSize: 15,
                     height: 50,
                     borderRadius: 25,
-                    text: (_showDetails ? 'Collapse Details' : 'Show Full Profile').tr,
+                    text:
+                        (_showDetails
+                                ? 'Collapse Details'
+                                : 'Show Full Profile')
+                            .tr,
                     onTap: () {
                       setState(() {
                         _showDetails = !_showDetails;
                       });
                     },
-                    backgroundColor: _showDetails ? Colors.white : AppColors.primaryColor,
-                    textColor: _showDetails ? AppColors.primaryColor : Colors.white,
+                    backgroundColor:
+                        _showDetails ? Colors.white : AppColors.primaryColor,
+                    textColor:
+                        _showDetails ? AppColors.primaryColor : Colors.white,
                   ),
                 ],
               ),
@@ -483,7 +514,11 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required Color color, required VoidCallback onTap}) {
+  Widget _buildActionButton({
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -504,35 +539,35 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       ),
     );
   }
-  
-    Widget _buildQuickInfo(IconData icon, String text) {
-     if (text.isEmpty || text == 'Not specified') return const SizedBox.shrink();
-     
-     return Padding(
-       padding: const EdgeInsets.only(bottom: 12),
-       child: Row(
-         children: [
-           Container(
-             padding: const EdgeInsets.all(8),
-             decoration: BoxDecoration(
-               color:  AppColors.primaryColor.withOpacity(0.05),
-               shape: BoxShape.circle,
-             ),
-             child: Icon(icon, size: 16, color: AppColors.primaryColor),
-           ),
-           const SizedBox(width: 12),
-           Expanded(
-             child: AppText(
-               text,
-               fontSize: 14,
-               fontWeight: FontWeight.w500,
-               color: const Color(0xFF424242),
-             ),
-           ),
-         ],
-       ),
-     );
-   }
+
+  Widget _buildQuickInfo(IconData icon, String text) {
+    if (text.isEmpty || text == 'Not specified') return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor.withOpacity(0.05),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 16, color: AppColors.primaryColor),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: AppText(
+              text,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF424242),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _saveProfile() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -554,57 +589,75 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
   void _blockUser(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: AppText(
-          (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock User' : 'Block User',
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: AppColors.primaryColor,
-        ),
-        content: AppText(
-          (_controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) 
-              ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'.tr
-              : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.'.tr,
-          fontSize: 14,
-          color: Colors.black87,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: AppText(
-              'Cancel'.tr,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-               final profileId = widget.profile.id;
-               final isBlocked = _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked;
-               
-               if (profileId != null) {
-                  if (isBlocked) {
-                    _controller.unblockProfile(profileId);
-                  } else {
-                    _controller.blockProfile(profileId);
-                  }
-                  Navigator.pop(context);
-               } else {
-                  Navigator.pop(context);
-                  CustomSnackbar.showError('Invalid profile ID');
-               }
-            },
-            child: AppText(
-              ( _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? 'Unblock' : 'Block',
-              fontSize: 14,
+            title: AppText(
+              (_controller.selectedProfile.value?.isBlocked ??
+                      widget.profile.isBlocked)
+                  ? 'Unblock User'
+                  : 'Block User',
+              fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: ( _controller.selectedProfile.value?.isBlocked ?? widget.profile.isBlocked) ? Colors.green : Colors.red,
+              color: AppColors.primaryColor,
             ),
+            content: AppText(
+              (_controller.selectedProfile.value?.isBlocked ??
+                      widget.profile.isBlocked)
+                  ? 'Are you sure you want to unblock this user? You will be able to see their profile and message them again.'
+                      .tr
+                  : 'Are you sure you want to block this user? You won\'t be able to see their profile or receive messages from them.'
+                      .tr,
+              fontSize: 14,
+              color: Colors.black87,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: AppText(
+                  'Cancel'.tr,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  final profileId = widget.profile.id;
+                  final isBlocked =
+                      _controller.selectedProfile.value?.isBlocked ??
+                      widget.profile.isBlocked;
+
+                  if (profileId != null) {
+                    if (isBlocked) {
+                      _controller.unblockProfile(profileId);
+                    } else {
+                      _controller.blockProfile(profileId);
+                    }
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.pop(context);
+                    CustomSnackbar.showError('Invalid profile ID');
+                  }
+                },
+                child: AppText(
+                  (_controller.selectedProfile.value?.isBlocked ??
+                          widget.profile.isBlocked)
+                      ? 'Unblock'
+                      : 'Block',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color:
+                      (_controller.selectedProfile.value?.isBlocked ??
+                              widget.profile.isBlocked)
+                          ? Colors.green
+                          : Colors.red,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -613,52 +666,53 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
-                ),
+      builder:
+          (context) => Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
-            const SizedBox(height: 20),
-            const AppText(
-              'Report Profile',
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.primaryColor,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const AppText(
+                  'Report Profile',
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primaryColor,
+                ),
+                const SizedBox(height: 8),
+                AppText(
+                  'Please select a reason for reporting this profile'.tr,
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 20),
+                _buildReportOption(context, 'Fake Profile'.tr),
+                _buildReportOption(context, 'Inappropriate Content'.tr),
+                _buildReportOption(context, 'Harassment'.tr),
+                _buildReportOption(context, 'Spam'.tr),
+                _buildReportOption(context, 'Other'.tr),
+                const SizedBox(height: 20),
+              ],
             ),
-            const SizedBox(height: 8),
-            AppText(
-              'Please select a reason for reporting this profile'.tr,
-              fontSize: 13,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 20),
-            _buildReportOption(context, 'Fake Profile'.tr),
-            _buildReportOption(context, 'Inappropriate Content'.tr),
-            _buildReportOption(context, 'Harassment'.tr),
-            _buildReportOption(context, 'Spam'.tr),
-            _buildReportOption(context, 'Other'.tr),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -710,14 +764,12 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          border: isLast
-              ? null
-              : Border(
-                  bottom: BorderSide(
-                    color: Colors.grey[200]!,
-                    width: 1,
+          border:
+              isLast
+                  ? null
+                  : Border(
+                    bottom: BorderSide(color: Colors.grey[200]!, width: 1),
                   ),
-                ),
         ),
         child: Row(
           children: [
@@ -751,7 +803,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 
-   Widget _buildPersonalInformation(MatrimonyProfileModel profile) {
+  Widget _buildPersonalInformation(MatrimonyProfileModel profile) {
     return _buildSectionCard(
       icon: Icons.person_outline_rounded,
       title: AppStrings.personalInformation,
@@ -766,14 +818,19 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         _buildDetailRow(AppStrings.religion, 'Not specified'.tr),
         _buildDetailRow(AppStrings.subcaste, 'Not specified'.tr),
         _buildDetailRow(AppStrings.manglik, 'Not specified'.tr),
-        _buildDetailRow(AppStrings.employment, profile.jobTitle.tr, isLink: true),
+        _buildDetailRow(
+          AppStrings.employment,
+          profile.jobTitle.tr,
+          isLink: true,
+        ),
       ],
     );
   }
 
   Widget _buildDetailRow(String label, String value, {bool isLink = false}) {
-    if (value.isEmpty || value == 'Not specified') return const SizedBox.shrink();
-    
+    if (value.isEmpty || value == 'Not specified')
+      return const SizedBox.shrink();
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -830,7 +887,11 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.stars_rounded, size: 16, color: AppColors.primaryColor),
+              const Icon(
+                Icons.stars_rounded,
+                size: 16,
+                color: AppColors.primaryColor,
+              ),
               const SizedBox(width: 6),
               AppText(
                 AppStrings.upgradeToView,
@@ -838,7 +899,11 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryColor,
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primaryColor),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: AppColors.primaryColor,
+              ),
             ],
           ),
         ),
@@ -848,7 +913,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
 
   Widget _buildAboutMyself(MatrimonyProfileModel profile) {
     if (profile.about.isEmpty) return const SizedBox.shrink();
-    
+
     return _buildSectionCard(
       icon: Icons.notes_rounded,
       title: AppStrings.aboutMyself,
@@ -935,11 +1000,15 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.star, color: AppColors.secondaryColor, size: 20), // Placeholder for sparkles
+          const Icon(
+            Icons.star,
+            color: AppColors.secondaryColor,
+            size: 20,
+          ), // Placeholder for sparkles
           const SizedBox(width: 8),
           AppText(
-            profile.gender.toLowerCase() == 'male' 
-                ? AppStrings.hisPartnerPreferences 
+            profile.gender.toLowerCase() == 'male'
+                ? AppStrings.hisPartnerPreferences
                 : AppStrings.herPartnerPreferences,
             fontSize: 18,
             fontWeight: FontWeight.w700,
@@ -951,7 +1020,6 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
       ),
     );
   }
-
 
   Widget _buildIgnoredSection() {
     return Container(
@@ -975,7 +1043,9 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.5)),
+              border: Border.all(
+                color: const Color(0xFFE91E63).withOpacity(0.5),
+              ),
               borderRadius: BorderRadius.circular(24),
             ),
             alignment: Alignment.center,
@@ -991,7 +1061,6 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
     );
   }
 }
-
 
 // Full Screen Image Viewer
 class _FullScreenImageViewer extends StatefulWidget {
@@ -1043,8 +1112,8 @@ class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
                 minScale: 0.5,
                 maxScale: 4.0,
                 child: Center(
-                  child: Image.network(
-                    widget.images[index],
+                  child: CustomImageWidget(
+                    imagePath: widget.images[index],
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -1098,9 +1167,10 @@ class _FullScreenImageViewerState extends State<_FullScreenImageViewer> {
                   width: _currentIndex == index ? 24 : 8,
                   height: 8,
                   decoration: BoxDecoration(
-                    color: _currentIndex == index
-                        ? Colors.white
-                        : Colors.white.withOpacity(0.5),
+                    color:
+                        _currentIndex == index
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),

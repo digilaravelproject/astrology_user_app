@@ -16,7 +16,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _floatController;
   late Animation<double> _floatAnimation;
 
@@ -28,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
-    
+
     _floatAnimation = Tween<double>(begin: -5.0, end: 5.0).animate(
       CurvedAnimation(parent: _floatController, curve: Curves.easeInOut),
     );
@@ -54,7 +55,6 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           children: [
             CosmicBackground(),
 
-
             SafeArea(
               child: Center(
                 child: TweenAnimationBuilder<double>(
@@ -71,7 +71,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           offset: Offset(
                             0,
                             (-30 * (1 - entryValue)) +
-                                (entryValue >= 0.99 ? _floatAnimation.value : 0),
+                                (entryValue >= 0.99
+                                    ? _floatAnimation.value
+                                    : 0),
                           ),
                           child: Opacity(
                             opacity: opacity,
@@ -275,7 +277,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               alignment: Alignment.topCenter,
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 22,
+                  horizontal: 20,
+                ),
                 decoration: const BoxDecoration(
                   color: Color(0xFFB3261E),
                   borderRadius: BorderRadius.only(

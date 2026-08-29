@@ -18,7 +18,12 @@ class BlogListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText('All Blogs'.tr, color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        title: AppText(
+          'All Blogs'.tr,
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
         backgroundColor: AppColors.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -36,17 +41,20 @@ class BlogListScreen extends StatelessWidget {
           itemCount: blogController.blogs.length,
           itemBuilder: (context, index) {
             final blog = blogController.blogs[index];
-            final imageUrl = blog.blogImage != null && blog.blogImage!.isNotEmpty
-                ? "${AppUrls.baseImageUrl}${blog.blogImage}"
-                : "";
-            
+            final imageUrl =
+                blog.blogImage != null && blog.blogImage!.isNotEmpty
+                    ? "${AppUrls.baseImageUrl}${blog.blogImage}"
+                    : "";
+
             return GestureDetector(
               onTap: () {
-                Get.to(() => BlogDetailScreen(
-                  blogId: blog.id,
-                  blogColor: AppColors.primaryColor,
-                  imageUrl: imageUrl,
-                ));
+                Get.to(
+                  () => BlogDetailScreen(
+                    blogId: blog.id,
+                    blogColor: AppColors.primaryColor,
+                    imageUrl: imageUrl,
+                  ),
+                );
               },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
@@ -100,12 +108,18 @@ class BlogListScreen extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey),
+                                  const Icon(
+                                    Icons.calendar_today_rounded,
+                                    size: 14,
+                                    color: Colors.grey,
+                                  ),
                                   const SizedBox(width: 4),
                                   AppText(
-                                    blog.createdAt != null 
-                                      ? DateFormat('dd MMM yyyy').format(blog.createdAt!) 
-                                      : 'Recently',
+                                    blog.createdAt != null
+                                        ? DateFormat(
+                                          'dd MMM yyyy',
+                                        ).format(blog.createdAt!)
+                                        : 'Recently',
                                     fontSize: 12,
                                     color: Colors.grey.shade600,
                                   ),
@@ -120,9 +134,13 @@ class BlogListScreen extends StatelessWidget {
                                     color: AppColors.primaryColor,
                                   ),
                                   const SizedBox(width: 4),
-                                  const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.primaryColor),
+                                  const Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 10,
+                                    color: AppColors.primaryColor,
+                                  ),
                                 ],
-                              )
+                              ),
                             ],
                           ),
                         ],

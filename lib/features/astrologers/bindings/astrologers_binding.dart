@@ -35,18 +35,20 @@ class AstrologersBinding extends Bindings {
     Get.lazyPut(() => SendGiftUseCase(service: Get.find()));
     Get.lazyPut(() => GetGiftHistoryUseCase(service: Get.find()));
     Get.lazyPut(() => GetAstrologerGalleryUseCase(service: Get.find()));
-    Get.lazyPut(() => AstrologerController(
-      getAstrologersUseCase: Get.find(),
-      getAstrologerByIdUseCase: Get.find(),
-      blockAstrologerUseCase: Get.find(),
-      reportAstrologerUseCase: Get.find(),
-      postReviewUseCase: Get.find(),
-      getReviewsUseCase: Get.find(),
-      followAstrologerUseCase: Get.find(),
-      getGiftsUseCase: Get.find(),
-      sendGiftUseCase: Get.find(),
-      getGiftHistoryUseCase: Get.find(),
-      getAstrologerGalleryUseCase: Get.find(),
-    ));
+    Get.lazyPut(
+      () => AstrologerController(
+        getAstrologersUseCase: Get.find(),
+        getAstrologerByIdUseCase: Get.find(),
+        blockAstrologerUseCase: Get.find(),
+        reportAstrologerUseCase: Get.find(),
+        postReviewUseCase: Get.find(),
+        getReviewsUseCase: Get.find(),
+        followAstrologerUseCase: Get.find(),
+        getGiftsUseCase: Get.find(),
+        sendGiftUseCase: Get.find(),
+        getGiftHistoryUseCase: Get.find(),
+        getAstrologerGalleryUseCase: Get.find(),
+      ),
+    );
   }
 }

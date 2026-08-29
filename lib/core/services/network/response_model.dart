@@ -19,21 +19,22 @@ class ResponseModel {
   factory ResponseModel.fromJson(Map<String, dynamic> json, {int? statusCode}) {
     final res = json['res']?.toString().toLowerCase();
     final status = json['status']?.toString().toLowerCase();
-    final success = (statusCode == 200 || statusCode == 201 || statusCode == null) &&
+    final success =
+        (statusCode == 200 || statusCode == 201 || statusCode == null) &&
         (res == 'success' ||
-         status == 'success' ||
-         status == 'true' ||
-         json['status'] == true ||
-         json['status'] == 1 ||
-         json['status'] == 200 ||
-         json['success'] == true ||
-         json['success'] == 1 ||
-         json.containsKey('auth') ||
-         json.containsKey('astrologers') ||
-         json.containsKey('data') ||
-         json.containsKey('wallet') ||
-         json.containsKey('user') ||
-         json.containsKey('token'));
+            status == 'success' ||
+            status == 'true' ||
+            json['status'] == true ||
+            json['status'] == 1 ||
+            json['status'] == 200 ||
+            json['success'] == true ||
+            json['success'] == 1 ||
+            json.containsKey('auth') ||
+            json.containsKey('astrologers') ||
+            json.containsKey('data') ||
+            json.containsKey('wallet') ||
+            json.containsKey('user') ||
+            json.containsKey('token'));
 
     List<ErrorDetail>? errors;
     if (json['errors'] is Map) {
@@ -46,18 +47,23 @@ class ResponseModel {
         }
       });
     } else if (json['errors'] is List) {
-      errors = (json['errors'] as List)
-          .map((e) => ErrorDetail.fromJson(e))
-          .toList();
+      errors =
+          (json['errors'] as List).map((e) => ErrorDetail.fromJson(e)).toList();
     }
 
     return ResponseModel(
-      isSuccess: success && (statusCode == 200 || statusCode == 201 || statusCode == null),
-      message: json['msg']?.toString() ??
+      isSuccess:
+          success &&
+          (statusCode == 200 || statusCode == 201 || statusCode == null),
+      message:
+          json['msg']?.toString() ??
           json['message']?.toString() ??
           json['Message']?.toString() ??
           (success ? 'Success' : 'Something went wrong'),
-      body: json['data'] ?? json['body'] ?? json, // Fallback to full json if no data key
+      body:
+          json['data'] ??
+          json['body'] ??
+          json, // Fallback to full json if no data key
       statusCode: statusCode,
       errors: errors,
       token: json['token']?.toString(),
@@ -117,10 +123,7 @@ class ErrorDetail {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'code': code,
-    'message': message,
-  };
+  Map<String, dynamic> toJson() => {'code': code, 'message': message};
 
   @override
   String toString() => 'ErrorDetail(code: $code, message: $message)';

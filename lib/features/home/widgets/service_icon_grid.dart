@@ -10,10 +10,22 @@ class ServiceIconGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final services = [
-      {"name": AppStrings.dailyHoroscope, "path": "assets/images/services/daily_horoscope.png"},
-      {"name": AppStrings.freeKundli, "path": "assets/images/services/free_kundli.png"},
-      {"name": AppStrings.matchMaking, "path": "assets/images/services/match_making.png"},
-      {"name": AppStrings.dailyPanchang, "path": "assets/images/services/daily_panchang.png"},
+      {
+        "name": AppStrings.dailyHoroscope,
+        "path": "assets/images/services/daily_horoscope.png",
+      },
+      {
+        "name": AppStrings.freeKundli,
+        "path": "assets/images/services/free_kundli.png",
+      },
+      {
+        "name": AppStrings.matchMaking,
+        "path": "assets/images/services/match_making.png",
+      },
+      {
+        "name": AppStrings.dailyPanchang,
+        "path": "assets/images/services/daily_panchang.png",
+      },
     ];
 
     return Padding(
@@ -21,12 +33,17 @@ class ServiceIconGrid extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: services.map((s) => Expanded(
-          child: _buildServiceItem(
-            s['name'] as String,
-            s['path'] as String,
-          ),
-        )).toList(),
+        children:
+            services
+                .map(
+                  (s) => Expanded(
+                    child: _buildServiceItem(
+                      s['name'] as String,
+                      s['path'] as String,
+                    ),
+                  ),
+                )
+                .toList(),
       ),
     );
   }
@@ -38,10 +55,7 @@ class ServiceIconGrid extends StatelessWidget {
         SizedBox(
           width: 65,
           height: 65,
-          child: CustomImageWidget(
-            imagePath: assetPath,
-            fit: BoxFit.contain,
-          ),
+          child: CustomImageWidget(imagePath: assetPath, fit: BoxFit.contain),
         ),
         const SizedBox(height: 10),
         AppText(

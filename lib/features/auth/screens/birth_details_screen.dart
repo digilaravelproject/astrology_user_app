@@ -30,7 +30,8 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime now = DateTime.now();
-    DateTime tempDate = selectedDate ?? now.subtract(const Duration(days: 365 * 20));
+    DateTime tempDate =
+        selectedDate ?? now.subtract(const Duration(days: 365 * 20));
     if (tempDate.isAfter(now)) {
       tempDate = now;
     }
@@ -39,9 +40,12 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final formattedHeader = "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
+            final formattedHeader =
+                "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -54,10 +58,15 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -68,7 +77,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -135,7 +148,8 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
 
   Future<void> _selectTime(BuildContext context) async {
     final now = DateTime.now();
-    final bool isSelectedDateToday = selectedDate != null &&
+    final bool isSelectedDateToday =
+        selectedDate != null &&
         selectedDate!.year == now.year &&
         selectedDate!.month == now.month &&
         selectedDate!.day == now.day;
@@ -157,12 +171,17 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final hour = tempTime.hour == 0 ? 12 : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
+            final hour =
+                tempTime.hour == 0
+                    ? 12
+                    : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
             final minute = tempTime.minute.toString().padLeft(2, '0');
             final period = tempTime.hour >= 12 ? 'PM' : 'AM';
             final formattedHeader = "$hour:$minute $period";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -175,10 +194,15 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -189,7 +213,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -208,10 +236,12 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.time,
                           initialDateTime: tempTime,
-                          maximumDate: isSelectedDateToday ? DateTime.now() : null,
+                          maximumDate:
+                              isSelectedDateToday ? DateTime.now() : null,
                           onDateTimeChanged: (DateTime newTime) {
                             setModalState(() {
-                              if (isSelectedDateToday && newTime.isAfter(DateTime.now())) {
+                              if (isSelectedDateToday &&
+                                  newTime.isAfter(DateTime.now())) {
                                 tempTime = DateTime.now();
                               } else {
                                 tempTime = newTime;
@@ -226,7 +256,8 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                     InkWell(
                       onTap: () {
                         final currentNow = DateTime.now();
-                        if (isSelectedDateToday && tempTime.isAfter(currentNow)) {
+                        if (isSelectedDateToday &&
+                            tempTime.isAfter(currentNow)) {
                           tempTime = currentNow;
                         }
                         Navigator.of(context).pop(tempTime);
@@ -254,7 +285,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       },
     );
     if (result != null) {
-      setState(() => selectedTime = TimeOfDay(hour: result.hour, minute: result.minute));
+      setState(
+        () =>
+            selectedTime = TimeOfDay(hour: result.hour, minute: result.minute),
+      );
     }
   }
 
@@ -264,7 +298,20 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   }
 
   String _getMonthShort(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[(month - 1) % 12];
   }
 
@@ -287,7 +334,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                     shape: BoxShape.circle,
                     color: AppColors.fieldBackground,
                   ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: AppColors.primaryColor),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 20,
+                    color: AppColors.primaryColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 30),
@@ -312,9 +363,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
               // DOB Input
               _buildInputLabel(AppStrings.dateOfBirth),
               _buildReadOnlyField(
-                hint: selectedDate != null
-                    ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                    : AppStrings.selectDate,
+                hint:
+                    selectedDate != null
+                        ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                        : AppStrings.selectDate,
                 icon: Icons.calendar_today_rounded,
                 onTap: () => _selectDate(context),
               ),
@@ -324,9 +376,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
               // TOB Input
               _buildInputLabel(AppStrings.timeOfBirth),
               _buildReadOnlyField(
-                hint: selectedTime != null
-                    ? selectedTime!.format(context)
-                    : AppStrings.selectTime,
+                hint:
+                    selectedTime != null
+                        ? selectedTime!.format(context)
+                        : AppStrings.selectTime,
                 icon: Icons.access_time_rounded,
                 onTap: () => _selectTime(context),
               ),
@@ -359,7 +412,7 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
                         CustomSnackbar.showError('Please enter Place of Birth');
                         return;
                       }
-                      
+
                       authController.updateProfile(
                         dob: selectedDate!,
                         tob: selectedTime!,
@@ -392,7 +445,11 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
     );
   }
 
-  Widget _buildReadOnlyField({required String hint, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildReadOnlyField({
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -411,13 +468,20 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
           enabled: false,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.w600, fontSize: 16),
+            hintStyle: const TextStyle(
+              color: AppColors.textColorPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
             prefixIcon: Icon(icon, color: AppColors.deepPink),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
               borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 18,
+            ),
           ),
         ),
       ),
@@ -427,9 +491,14 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
   Widget _buildPlaceField() {
     return GestureDetector(
       onTap: () async {
-        final result = await Navigator.of(context, rootNavigator: true).push<LocationResult>(
+        final result = await Navigator.of(
+          context,
+          rootNavigator: true,
+        ).push<LocationResult>(
           MaterialPageRoute(
-            builder: (_) => const LocationSearchScreen(title: "Select Place of Birth"),
+            builder:
+                (_) =>
+                    const LocationSearchScreen(title: "Select Place of Birth"),
             fullscreenDialog: true,
           ),
         );
@@ -460,7 +529,10 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
             decoration: InputDecoration(
               hintText: AppStrings.enterCity,
               hintStyle: TextStyle(color: Colors.black.withOpacity(0.2)),
-              prefixIcon: const Icon(Icons.location_on_outlined, color: AppColors.deepPink),
+              prefixIcon: const Icon(
+                Icons.location_on_outlined,
+                color: AppColors.deepPink,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide(color: Colors.black.withOpacity(0.05)),
@@ -471,9 +543,15 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: const BorderSide(color: AppColors.deepPink, width: 2.0),
+                borderSide: const BorderSide(
+                  color: AppColors.deepPink,
+                  width: 2.0,
+                ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 18,
+              ),
             ),
           ),
         ),
@@ -486,13 +564,45 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
 
     return Stack(
       children: [
-        Positioned(top: 100, left: 40, child: Icon(Icons.brightness_5_outlined, size: 35, color: iconColor)),
-        Positioned(top: 250, right: 60, child: Icon(Icons.nightlight_round_outlined, size: 28, color: iconColor)),
-        Positioned(top: 500, left: 80, child: Icon(Icons.auto_awesome_outlined, size: 32, color: iconColor)),
-        Positioned(bottom: 200, right: 40, child: Icon(Icons.star_border_rounded, size: 40, color: iconColor)),
-        Positioned(bottom: 350, left: 30, child: Icon(Icons.wb_twilight_rounded, size: 24, color: iconColor)),
-        Positioned(top: 150, right: 120, child: Icon(Icons.flare_rounded, size: 20, color: iconColor)),
-        Positioned(bottom: 100, left: 150, child: Icon(Icons.blur_on_rounded, size: 45, color: iconColor)),
+        Positioned(
+          top: 100,
+          left: 40,
+          child: Icon(Icons.brightness_5_outlined, size: 35, color: iconColor),
+        ),
+        Positioned(
+          top: 250,
+          right: 60,
+          child: Icon(
+            Icons.nightlight_round_outlined,
+            size: 28,
+            color: iconColor,
+          ),
+        ),
+        Positioned(
+          top: 500,
+          left: 80,
+          child: Icon(Icons.auto_awesome_outlined, size: 32, color: iconColor),
+        ),
+        Positioned(
+          bottom: 200,
+          right: 40,
+          child: Icon(Icons.star_border_rounded, size: 40, color: iconColor),
+        ),
+        Positioned(
+          bottom: 350,
+          left: 30,
+          child: Icon(Icons.wb_twilight_rounded, size: 24, color: iconColor),
+        ),
+        Positioned(
+          top: 150,
+          right: 120,
+          child: Icon(Icons.flare_rounded, size: 20, color: iconColor),
+        ),
+        Positioned(
+          bottom: 100,
+          left: 150,
+          child: Icon(Icons.blur_on_rounded, size: 45, color: iconColor),
+        ),
       ],
     );
   }

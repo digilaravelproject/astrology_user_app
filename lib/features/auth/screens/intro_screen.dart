@@ -14,7 +14,8 @@ class IntroScreen extends StatefulWidget {
   State<IntroScreen> createState() => _IntroScreenState();
 }
 
-class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStateMixin {
+class _IntroScreenState extends State<IntroScreen>
+    with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
   late AnimationController _rotationController;
   int _currentPage = 0;
@@ -96,15 +97,23 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                     }
                   },
                   child: Transform.rotate(
-                    angle: (_currentPage == _pages.length - 1 ? 0 : 45) * 3.14159 / 180,
+                    angle:
+                        (_currentPage == _pages.length - 1 ? 0 : 45) *
+                        3.14159 /
+                        180,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 400),
                       width: _currentPage == _pages.length - 1 ? 160 : 50,
                       height: 50,
                       decoration: BoxDecoration(
                         color: AppColors.white,
-                        borderRadius: BorderRadius.circular(_currentPage == _pages.length - 1 ? 25 : 12),
-                        border: Border.all(color: AppColors.primaryColor, width: 2.2),
+                        borderRadius: BorderRadius.circular(
+                          _currentPage == _pages.length - 1 ? 25 : 12,
+                        ),
+                        border: Border.all(
+                          color: AppColors.primaryColor,
+                          width: 2.2,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primaryColor.withOpacity(0.12),
@@ -114,30 +123,31 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                         ],
                       ),
                       child: Center(
-                        child: _currentPage == _pages.length - 1
-                            ? Text(
-                                AppStrings.getStarted,
-                                style: GoogleFonts.poppins(
-                                  color: AppColors.primaryColor,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                  letterSpacing: 1.2,
+                        child:
+                            _currentPage == _pages.length - 1
+                                ? Text(
+                                  AppStrings.getStarted,
+                                  style: GoogleFonts.poppins(
+                                    color: AppColors.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    letterSpacing: 1.2,
+                                  ),
+                                )
+                                : Transform.rotate(
+                                  angle: -45 * 3.14159 / 180,
+                                  child: const Icon(
+                                    Icons.arrow_forward_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 28,
+                                  ),
                                 ),
-                              )
-                            : Transform.rotate(
-                                angle: -45 * 3.14159 / 180,
-                                child: const Icon(
-                                  Icons.arrow_forward_rounded,
-                                  color: AppColors.primaryColor,
-                                  size: 28,
-                                ),
-                              ),
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 30),
-                
+
                 // Indicators
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -148,9 +158,10 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: _currentPage == index 
-                            ? AppColors.primaryColor 
-                            : AppColors.primaryColor.withOpacity(0.15),
+                        color:
+                            _currentPage == index
+                                ? AppColors.primaryColor
+                                : AppColors.primaryColor.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -159,7 +170,7 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
               ],
             ),
           ),
-          
+
           // SKIP Button
           Positioned(
             top: MediaQuery.of(context).padding.top + 20,
@@ -182,7 +193,6 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
     );
   }
 
-
   Widget _buildPage(OnboardingData data) {
     final size = MediaQuery.of(context).size;
     return Column(
@@ -200,16 +210,14 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                   clipper: FullArchClipper(),
                   child: Container(
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF030A29),
-                    ),
+                    decoration: const BoxDecoration(color: Color(0xFF030A29)),
                     child: Stack(
                       children: [
                         CustomPaint(
                           painter: DualArchBorderPainter(),
                           size: Size.infinite,
                         ),
-                        
+
                         // Rotating Zodiac Wheel (With Bhagwa-Red Gradient)
                         Positioned(
                           top: 30,
@@ -220,7 +228,9 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                             child: Padding(
                               padding: const EdgeInsets.all(25.0),
                               child: ShaderMask(
-                                shaderCallback: (bounds) => AppColors.primaryGradient.createShader(bounds),
+                                shaderCallback:
+                                    (bounds) => AppColors.primaryGradient
+                                        .createShader(bounds),
                                 blendMode: BlendMode.srcIn,
                                 child: CustomImageWidget(
                                   imagePath: data.image,
@@ -252,9 +262,21 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
-                                Icon(Icons.auto_awesome_rounded, color: Colors.white.withValues(alpha: 0.1), size: 60),
-                                Icon(Icons.star_rounded, color: Colors.white.withValues(alpha: 0.05), size: 40),
+                                Icon(
+                                  Icons.star_rounded,
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  size: 40,
+                                ),
+                                Icon(
+                                  Icons.auto_awesome_rounded,
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  size: 60,
+                                ),
+                                Icon(
+                                  Icons.star_rounded,
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  size: 40,
+                                ),
                               ],
                             ),
                           ),
@@ -264,14 +286,17 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
                   ),
                 ),
               ),
-              
+
               // DEEP Concave transition (The semi-circle white cutout pushing UP)
               Positioned(
                 bottom: -1,
                 left: 0,
                 right: 0,
                 child: CustomPaint(
-                  size: Size(size.width, 150), // Increased height for deeper curve
+                  size: Size(
+                    size.width,
+                    150,
+                  ), // Increased height for deeper curve
                   painter: ConcaveCutoutPainter(),
                 ),
               ),
@@ -282,7 +307,10 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
         // Bottom Content Section (Typography centered in white arch area)
         Expanded(
           child: Transform.translate(
-            offset: const Offset(0, -95), // Pull text UP into the circular cutout
+            offset: const Offset(
+              0,
+              -95,
+            ), // Pull text UP into the circular cutout
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
@@ -341,6 +369,7 @@ class FullArchClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
@@ -355,9 +384,27 @@ class DualArchBorderPainter extends CustomPainter {
     path.quadraticBezierTo(size.width, 0, size.width, 160);
     path.lineTo(size.width, size.height);
 
-    canvas.drawPath(path, Paint()..color = AppColors.primaryColor..style = PaintingStyle.stroke..strokeWidth = 6);
-    canvas.drawPath(path, Paint()..color = const Color(0xFF030A29)..style = PaintingStyle.stroke..strokeWidth = 3);
-    canvas.drawPath(path, Paint()..color = AppColors.white.withOpacity(0.1)..style = PaintingStyle.stroke..strokeWidth = 1);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = AppColors.primaryColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFF030A29)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3,
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = AppColors.white.withOpacity(0.1)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
   }
 
   @override
@@ -381,6 +428,7 @@ class ConcaveCutoutPainter extends CustomPainter {
     path.close();
     canvas.drawPath(path, paint);
   }
+
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

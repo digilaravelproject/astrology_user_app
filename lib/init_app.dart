@@ -21,16 +21,15 @@ import 'core/services/fcm_notification_service.dart';
 Future<void> initApp() async {
   // Set environment configuration
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize Crashlytics
   FlutterError.onError = (FlutterErrorDetails details) {
     final bool isImageError = details.library == 'image resource service';
-    final bool isHttpError = details.exception.toString().contains('HttpException') || 
-                             details.exception.toString().contains('SocketException');
-    
+    final bool isHttpError =
+        details.exception.toString().contains('HttpException') ||
+        details.exception.toString().contains('SocketException');
+
     if (isImageError || isHttpError) {
       FirebaseCrashlytics.instance.recordFlutterError(details);
     } else {
@@ -46,10 +45,8 @@ Future<void> initApp() async {
   await EnvConfig.load();
   // EnvConfig.setEnvironment(Environment.development); // Change as needed
 
-
   // Initialize dynamic app icon manager
   // await DynamicAppIconManager.init();
-
 
   // Initialize shared preferences
   await SharedPrefs.init();

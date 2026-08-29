@@ -7,7 +7,10 @@ class UpdateKundliUseCase {
 
   UpdateKundliUseCase({required this.repository});
 
-  Future<CreateKundliResponseModel> call(int id, CreateKundliRequestModel request) async {
+  Future<CreateKundliResponseModel> call(
+    int id,
+    CreateKundliRequestModel request,
+  ) async {
     return await repository.updateKundli(id, request);
   }
 }

@@ -17,9 +17,7 @@ class WalletScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.myWallet,
-      ),
+      appBar: CustomAppBar(title: AppStrings.myWallet),
       body: RefreshIndicator(
         onRefresh: () async {
           await walletController.fetchWallet();
@@ -48,10 +46,7 @@ class WalletScreen extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2E1A47),
-            AppColors.primaryColor,
-          ],
+          colors: [Color(0xFF2E1A47), AppColors.primaryColor],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
@@ -77,13 +72,15 @@ class WalletScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
-                child: Obx(() => AppText(
-                  "₹${controller.balance}",
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w900,
-                  overflow: TextOverflow.ellipsis,
-                )),
+                child: Obx(
+                  () => AppText(
+                    "₹${controller.balance}",
+                    color: Colors.white,
+                    fontSize: 25,
+                    fontWeight: FontWeight.w900,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               GestureDetector(
@@ -96,7 +93,10 @@ class WalletScreen extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -105,7 +105,11 @@ class WalletScreen extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 14),
+                      const Icon(
+                        Icons.add_circle_outline_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                       const SizedBox(width: 6),
                       AppText(
                         AppStrings.addMoney,
@@ -124,7 +128,10 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionHistory(BuildContext context, WalletController controller) {
+  Widget _buildTransactionHistory(
+    BuildContext context,
+    WalletController controller,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +146,7 @@ class WalletScreen extends StatelessWidget {
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF2E1A47),
               ),
-            //  const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2E1A47)),
+              //  const Icon(Icons.sort_rounded, size: 20, color: Color(0xFF2E1A47)),
             ],
           ),
         ),
@@ -150,7 +157,11 @@ class WalletScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 40),
                 child: Column(
                   children: [
-                    Icon(Icons.history_rounded, size: 64, color: Colors.grey.shade300),
+                    Icon(
+                      Icons.history_rounded,
+                      size: 64,
+                      color: Colors.grey.shade300,
+                    ),
                     const SizedBox(height: 16),
                     AppText(
                       "No transactions found",
@@ -174,7 +185,10 @@ class WalletScreen extends StatelessWidget {
               return GestureDetector(
                 onTap: () => _showTransactionDetailsBottomSheet(context, tx),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 6,
+                  ),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -195,17 +209,23 @@ class WalletScreen extends StatelessWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: (isCredit ? Colors.green : AppColors.primaryColor).withOpacity(0.1),
+                          color: (isCredit
+                                  ? Colors.green
+                                  : AppColors.primaryColor)
+                              .withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          isCredit ? Icons.south_west_rounded : Icons.north_east_rounded,
-                          color: isCredit ? Colors.green : AppColors.primaryColor,
+                          isCredit
+                              ? Icons.south_west_rounded
+                              : Icons.north_east_rounded,
+                          color:
+                              isCredit ? Colors.green : AppColors.primaryColor,
                           size: 18,
                         ),
                       ),
                       const SizedBox(width: 14),
-                      
+
                       // Transaction details
                       Expanded(
                         child: Column(
@@ -214,7 +234,9 @@ class WalletScreen extends StatelessWidget {
                             AppText(
                               tx.description.isNotEmpty
                                   ? tx.description
-                                  : (isCredit ? "Wallet Recharge" : "Consultation"),
+                                  : (isCredit
+                                      ? "Wallet Recharge"
+                                      : "Consultation"),
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFF2E1A47),
@@ -231,7 +253,7 @@ class WalletScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
+
                       // Amount & Info Icon
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -243,7 +265,10 @@ class WalletScreen extends StatelessWidget {
                                 "${isCredit ? '+' : '-'} ₹${tx.amount}",
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: isCredit ? Colors.green : const Color(0xFF2E1A47),
+                                color:
+                                    isCredit
+                                        ? Colors.green
+                                        : const Color(0xFF2E1A47),
                               ),
                               if (tx.status.toLowerCase() != 'completed')
                                 AppText(
@@ -255,7 +280,11 @@ class WalletScreen extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.info_outline_rounded, size: 18, color: Colors.grey),
+                          const Icon(
+                            Icons.info_outline_rounded,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
                         ],
                       ),
                     ],
@@ -274,7 +303,20 @@ class WalletScreen extends StatelessWidget {
     try {
       if (dateString.isEmpty) return "";
       final dateTime = DateTime.parse(dateString);
-      final months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      final months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       return "${dateTime.day} ${months[dateTime.month - 1]}, ${dateTime.year}";
     } catch (e) {
       return dateString.split('T')[0];
@@ -295,10 +337,17 @@ class WalletScreen extends StatelessWidget {
   }
 
   void _showTransactionDetailsBottomSheet(BuildContext context, dynamic tx) {
-    final double baseAmount = double.tryParse(tx.baseAmount?.toString() ?? '') ?? double.tryParse(tx.amount?.toString() ?? '') ?? 0.0;
-    final double gstAmount = double.tryParse(tx.gstAmount?.toString() ?? '') ?? 0.0;
-    final double totalAmount = double.tryParse(tx.totalAmount?.toString() ?? '') ?? (baseAmount + gstAmount);
-    final double gstPercent = double.tryParse(tx.gstPercent?.toString() ?? '') ?? 18.0;
+    final double baseAmount =
+        double.tryParse(tx.baseAmount?.toString() ?? '') ??
+        double.tryParse(tx.amount?.toString() ?? '') ??
+        0.0;
+    final double gstAmount =
+        double.tryParse(tx.gstAmount?.toString() ?? '') ?? 0.0;
+    final double totalAmount =
+        double.tryParse(tx.totalAmount?.toString() ?? '') ??
+        (baseAmount + gstAmount);
+    final double gstPercent =
+        double.tryParse(tx.gstPercent?.toString() ?? '') ?? 18.0;
 
     showModalBottomSheet(
       context: context,
@@ -334,7 +383,11 @@ class WalletScreen extends StatelessWidget {
                       color: AppColors.primaryColor.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.receipt_long_rounded, color: AppColors.primaryColor, size: 24),
+                    child: const Icon(
+                      Icons.receipt_long_rounded,
+                      color: AppColors.primaryColor,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Column(
@@ -346,7 +399,8 @@ class WalletScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF2E1A47),
                       ),
-                      if (tx.invoiceNumber != null && tx.invoiceNumber.toString().isNotEmpty)
+                      if (tx.invoiceNumber != null &&
+                          tx.invoiceNumber.toString().isNotEmpty)
                         AppText(
                           tx.invoiceNumber.toString(),
                           fontSize: 12,
@@ -371,11 +425,23 @@ class WalletScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    _buildBreakdownRow("Recharge Base Amount (Credited)", "₹${baseAmount.toStringAsFixed(2)}", isBold: true),
+                    _buildBreakdownRow(
+                      "Recharge Base Amount (Credited)",
+                      "₹${baseAmount.toStringAsFixed(2)}",
+                      isBold: true,
+                    ),
                     const SizedBox(height: 10),
-                    _buildBreakdownRow("${"GST Applied".tr} (${gstPercent.toStringAsFixed(0)}%)", "₹${gstAmount.toStringAsFixed(2)}", color: AppColors.deepPink),
+                    _buildBreakdownRow(
+                      "${"GST Applied".tr} (${gstPercent.toStringAsFixed(0)}%)",
+                      "₹${gstAmount.toStringAsFixed(2)}",
+                      color: AppColors.deepPink,
+                    ),
                     const Divider(height: 24),
-                    _buildBreakdownRow("Total Amount Paid via Gateway", "₹${totalAmount.toStringAsFixed(2)}", isTotal: true),
+                    _buildBreakdownRow(
+                      "Total Amount Paid via Gateway",
+                      "₹${totalAmount.toStringAsFixed(2)}",
+                      isTotal: true,
+                    ),
                   ],
                 ),
               ),
@@ -383,12 +449,21 @@ class WalletScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Meta Details
-              if (tx.providerOrderId != null && tx.providerOrderId.toString().isNotEmpty)
+              if (tx.providerOrderId != null &&
+                  tx.providerOrderId.toString().isNotEmpty)
                 _buildMetaRow("Order ID", tx.providerOrderId.toString()),
-              if (tx.providerPaymentId != null && tx.providerPaymentId.toString().isNotEmpty)
+              if (tx.providerPaymentId != null &&
+                  tx.providerPaymentId.toString().isNotEmpty)
                 _buildMetaRow("Payment ID", tx.providerPaymentId.toString()),
-              _buildMetaRow("Payment Mode", (tx.paymentProvider?.toString() ?? "Razorpay").toUpperCase()),
-              _buildMetaRow("Status", (tx.status?.toString() ?? "Completed").toUpperCase(), statusColor: _getStatusColor(tx.status)),
+              _buildMetaRow(
+                "Payment Mode",
+                (tx.paymentProvider?.toString() ?? "Razorpay").toUpperCase(),
+              ),
+              _buildMetaRow(
+                "Status",
+                (tx.status?.toString() ?? "Completed").toUpperCase(),
+                statusColor: _getStatusColor(tx.status),
+              ),
               _buildMetaRow("Date & Time", _formatDate(tx.createdAt)),
 
               const SizedBox(height: 24),
@@ -398,7 +473,9 @@ class WalletScreen extends StatelessWidget {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   onPressed: () => Navigator.pop(context),
@@ -418,7 +495,13 @@ class WalletScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBreakdownRow(String title, String value, {bool isBold = false, bool isTotal = false, Color? color}) {
+  Widget _buildBreakdownRow(
+    String title,
+    String value, {
+    bool isBold = false,
+    bool isTotal = false,
+    Color? color,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -436,7 +519,9 @@ class WalletScreen extends StatelessWidget {
           value,
           fontSize: isTotal ? 15 : 14,
           fontWeight: isTotal || isBold ? FontWeight.w900 : FontWeight.w700,
-          color: color ?? (isTotal ? AppColors.primaryColor : const Color(0xFF2E1A47)),
+          color:
+              color ??
+              (isTotal ? AppColors.primaryColor : const Color(0xFF2E1A47)),
         ),
       ],
     );

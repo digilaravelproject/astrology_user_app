@@ -35,9 +35,7 @@ class OtpScreen extends StatelessWidget {
       child: Stack(
         children: [
           // Fixed white background layer
-          Positioned.fill(
-            child: Container(color: Colors.white),
-          ),
+          Positioned.fill(child: Container(color: Colors.white)),
           // Background image - Fixed
           Positioned.fill(
             child: Opacity(
@@ -54,15 +52,15 @@ class OtpScreen extends StatelessWidget {
             body: SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(
-                  left: 25, 
+                  left: 25,
                   right: 25,
                   bottom: MediaQuery.of(context).viewInsets.bottom + 20,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                     SizedBox(height: size.height * 0.06),
-    
+                    SizedBox(height: size.height * 0.06),
+
                     AppText(
                       AppStrings.verification,
                       fontSize: 25,
@@ -71,64 +69,71 @@ class OtpScreen extends StatelessWidget {
                       height: 1.1,
                       letterSpacing: -1,
                     ),
-                    
+
                     const SizedBox(height: 15),
-                    
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Obx(() => AppText(
-                        '${AppStrings.enterOtpSent}\n${AppStrings.countryCodePrefix} ${authController.currentMobile.value}',
-                        textAlign: TextAlign.center,
-                        fontSize: 14,
-                        color: AppColors.black.withOpacity(0.3),
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.5,
-                      )),
+                      child: Obx(
+                        () => AppText(
+                          '${AppStrings.enterOtpSent}\n${AppStrings.countryCodePrefix} ${authController.currentMobile.value}',
+                          textAlign: TextAlign.center,
+                          fontSize: 14,
+                          color: AppColors.black.withOpacity(0.3),
+                          fontWeight: FontWeight.w400,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ),
-    
+
                     SizedBox(height: size.height * 0.08),
-    
+
                     _buildOtpInput(context, authController, errorMessage),
-    
+
                     // Error message
-                    Obx(() => errorMessage.value.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.only(top: 12),
-                            child: AppText(
-                              errorMessage.value,
-                              fontSize: 12,
-                              color: Colors.red,
-                              fontWeight: FontWeight.w500,
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        : const SizedBox.shrink()),
-    
+                    Obx(
+                      () =>
+                          errorMessage.value.isNotEmpty
+                              ? Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: AppText(
+                                  errorMessage.value,
+                                  fontSize: 12,
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w500,
+                                  textAlign: TextAlign.center,
+                                ),
+                              )
+                              : const SizedBox.shrink(),
+                    ),
+
                     SizedBox(height: size.height * 0.08),
-    
-                    Obx(() => CustomButton(
-                      text: AppStrings.verify,
-                      onTap: () {
-                        // Validate OTP before proceeding
-                        if (authController.otpController.text.isEmpty) {
-                          errorMessage.value = AppStrings.pleaseEnterOtp;
-                          return;
-                        }
-                        
-                        if (authController.otpController.text.length != 4) {
-                          errorMessage.value = AppStrings.enterValidOtp;
-                          return;
-                        }
-                        
-                        // Clear error and proceed
-                        errorMessage.value = '';
-                        authController.verifyOtp();
-                      },
-                      isLoading: authController.isLoading.value,
-                    )),
-    
+
+                    Obx(
+                      () => CustomButton(
+                        text: AppStrings.verify,
+                        onTap: () {
+                          // Validate OTP before proceeding
+                          if (authController.otpController.text.isEmpty) {
+                            errorMessage.value = AppStrings.pleaseEnterOtp;
+                            return;
+                          }
+
+                          if (authController.otpController.text.length != 4) {
+                            errorMessage.value = AppStrings.enterValidOtp;
+                            return;
+                          }
+
+                          // Clear error and proceed
+                          errorMessage.value = '';
+                          authController.verifyOtp();
+                        },
+                        isLoading: authController.isLoading.value,
+                      ),
+                    ),
+
                     const SizedBox(height: 40),
-    
+
                     _buildResendSection(authController),
                   ],
                 ),
@@ -141,8 +146,11 @@ class OtpScreen extends StatelessWidget {
     );
   }
 
-
-  Widget _buildOtpInput(BuildContext context, AuthController authController, RxString errorMessage) {
+  Widget _buildOtpInput(
+    BuildContext context,
+    AuthController authController,
+    RxString errorMessage,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: List.generate(
@@ -191,7 +199,7 @@ class OtpScreen extends StatelessWidget {
                 if (errorMessage.value.isNotEmpty) {
                   errorMessage.value = '';
                 }
-                
+
                 if (value.isNotEmpty) {
                   if (index < 3) FocusScope.of(context).nextFocus();
 
@@ -247,7 +255,11 @@ class OtpScreen extends StatelessWidget {
       top: 50,
       left: 20,
       child: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: AppColors.black),
+        icon: const Icon(
+          Icons.arrow_back_ios_new,
+          size: 20,
+          color: AppColors.black,
+        ),
         onPressed: () => Get.back(),
       ),
     );

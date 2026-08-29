@@ -10,8 +10,8 @@ class BlogController extends GetxController {
   BlogController({
     required GetBlogsUseCase getBlogsUseCase,
     required GetBlogByIdUseCase getBlogByIdUseCase,
-  })  : _getBlogsUseCase = getBlogsUseCase,
-        _getBlogByIdUseCase = getBlogByIdUseCase;
+  }) : _getBlogsUseCase = getBlogsUseCase,
+       _getBlogByIdUseCase = getBlogByIdUseCase;
 
   static const List<String> blogImages = [
     'https://cdn-icons-png.flaticon.com/512/2917/2917995.png',

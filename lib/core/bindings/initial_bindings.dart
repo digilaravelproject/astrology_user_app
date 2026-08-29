@@ -30,7 +30,7 @@ class InitialBindings extends Bindings {
     Get.put(Connectivity(), permanent: true);
     Get.put(NetworkInfo(Get.find<Connectivity>()), permanent: true);
     Get.put(RazorpayService(), permanent: true);
-    
+
     // Presence & WebSockets
     Get.put(PresenceController(), permanent: true);
     final wsService = Get.put(WebSocketService(), permanent: true);
@@ -40,10 +40,22 @@ class InitialBindings extends Bindings {
     });
 
     // Chat global dependencies (needed by WebSocketService)
-    Get.put<IChatRemoteDataSource>(ChatRemoteDataSourceImpl(apiClient: Get.find<ApiClient>()), permanent: true);
+    Get.put<IChatRemoteDataSource>(
+      ChatRemoteDataSourceImpl(apiClient: Get.find<ApiClient>()),
+      permanent: true,
+    );
     Get.put<IChatLocalDataSource>(ChatLocalDataSourceImpl(), permanent: true);
-    Get.put<IChatRepository>(ChatRepositoryImpl(remoteDataSource: Get.find<IChatRemoteDataSource>(), localDataSource: Get.find<IChatLocalDataSource>()), permanent: true);
-    Get.put(SyncMessageStatusUseCase(Get.find<IChatRepository>()), permanent: true);
+    Get.put<IChatRepository>(
+      ChatRepositoryImpl(
+        remoteDataSource: Get.find<IChatRemoteDataSource>(),
+        localDataSource: Get.find<IChatLocalDataSource>(),
+      ),
+      permanent: true,
+    );
+    Get.put(
+      SyncMessageStatusUseCase(Get.find<IChatRepository>()),
+      permanent: true,
+    );
 
     // Splash
     Get.put(SplashRepository(Get.find<ApiClient>()), permanent: true);
@@ -55,7 +67,7 @@ class InitialBindings extends Bindings {
     final authService = AuthService(Get.find<AuthRepository>());
     Get.put<AuthService>(authService, permanent: true);
     Get.put<AuthServiceInterface>(authService, permanent: true);
-    
+
     Get.put(LoginUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(RegisterUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(VerifyOtpUseCase(Get.find<AuthService>()), permanent: true);
@@ -66,7 +78,7 @@ class InitialBindings extends Bindings {
     Get.put(ResendOtpUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(UpdateProfileUseCase(Get.find<AuthService>()), permanent: true);
     Get.put(DeleteAccountUseCase(Get.find<AuthService>()), permanent: true);
-    
+
     Get.put(
       AuthController(
         loginUseCase: Get.find<LoginUseCase>(),

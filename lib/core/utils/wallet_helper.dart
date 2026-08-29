@@ -27,9 +27,11 @@ class WalletHelper {
   }) async {
     // Overlay permission check removed to rely on system notifications
     // Simulated wallet balance
-    final double walletBalance = simulatedBalance ?? 10.0; // Default to low balance if not provided
+    final double walletBalance =
+        simulatedBalance ?? 10.0; // Default to low balance if not provided
     final double perMinuteRate = double.tryParse(price) ?? 0.0;
-    final double requiredAmount = perMinuteRate * 5; // Minimum 5 minutes required to start
+    final double requiredAmount =
+        perMinuteRate * 5; // Minimum 5 minutes required to start
     final bool hasSufficientBalance = walletBalance >= requiredAmount;
 
     if (!hasSufficientBalance) {
@@ -37,10 +39,11 @@ class WalletHelper {
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => RechargeBottomSheet(
-          neededAmount: requiredAmount,
-          serviceType: type,
-        ),
+        builder:
+            (context) => RechargeBottomSheet(
+              neededAmount: requiredAmount,
+              serviceType: type,
+            ),
       );
       return;
     }
@@ -65,14 +68,16 @@ class WalletHelper {
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Balance Info
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.lightPink.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                  border: Border.all(
+                    color: AppColors.deepPink.withOpacity(0.3),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,15 +105,22 @@ class WalletHelper {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.account_balance_wallet, color: AppColors.deepPink),
+                      child: const Icon(
+                        Icons.account_balance_wallet,
+                        color: AppColors.deepPink,
+                      ),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
-              const Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 32),
+
+              const Icon(
+                Icons.check_circle_outline_rounded,
+                color: Colors.green,
+                size: 32,
+              ),
               const SizedBox(height: 8),
               AppText(
                 "Ready to Connect".tr,
@@ -131,9 +143,11 @@ class WalletHelper {
                   backgroundColor: Colors.green,
                   textColor: Colors.white,
                   onTap: () async {
-
                     if (type == 'chat') {
-                      Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+                      Get.dialog(
+                        const Center(child: CircularProgressIndicator()),
+                        barrierDismissible: false,
+                      );
                       try {
                         final apiClient = Get.find<ApiClient>();
                         final response = await apiClient.post(
@@ -144,23 +158,33 @@ class WalletHelper {
                         if (response.isSuccess) {
                           Get.back(); // close bottom sheet
                           CustomSnackbar.showSuccess(response.message);
-                          
+
                           int sessionId = 0;
                           if (response.body != null && response.body is Map) {
                             final sessionData = response.body['session'];
                             if (sessionData != null && sessionData is Map) {
-                              sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+                              sessionId =
+                                  int.tryParse(
+                                    sessionData['id']?.toString() ?? '',
+                                  ) ??
+                                  0;
                             }
                           }
-                          
-                          Get.to(() => ChatScreen(
-                            astrologerName: name,
-                            astrologerImage: imageUrl,
-                            sessionId: sessionId,
-                            initialStatus: 'initiated',
-                          ), binding: ChatBinding());
+
+                          Get.to(
+                            () => ChatScreen(
+                              astrologerName: name,
+                              astrologerImage: imageUrl,
+                              sessionId: sessionId,
+                              initialStatus: 'initiated',
+                            ),
+                            binding: ChatBinding(),
+                          );
                         } else {
-                          if (response.statusCode == 400 && response.message.toLowerCase().contains("pending or waiting request")) {
+                          if (response.statusCode == 400 &&
+                              response.message.toLowerCase().contains(
+                                "pending or waiting request",
+                              )) {
                             _handlePendingSession(context, apiClient);
                           } else {
                             CustomSnackbar.showError(response.message);
@@ -174,25 +198,28 @@ class WalletHelper {
                       // Request Microphone Permission
                       var permissionStatus = await Permission.microphone.status;
                       if (!permissionStatus.isGranted) {
-                        permissionStatus = await Permission.microphone.request();
+                        permissionStatus =
+                            await Permission.microphone.request();
                       }
-                      
-                      if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+
+                      if (permissionStatus.isDenied ||
+                          permissionStatus.isPermanentlyDenied) {
                         await openAppSettings();
                         return;
                       }
 
                       if (permissionStatus.isGranted) {
                         Get.back(); // close bottom sheet
-                        
+
                         // Find or put CallController
-                        final callController = Get.isRegistered<CallController>()
-                            ? Get.find<CallController>()
-                            : Get.put(CallController());
-                            
+                        final callController =
+                            Get.isRegistered<CallController>()
+                                ? Get.find<CallController>()
+                                : Get.put(CallController());
+
                         // Navigate to webrtc CallScreen
                         Get.to(() => const CallScreen());
-                        
+
                         // Start the call
                         callController.initiateCall(
                           providerId: providerId,
@@ -211,8 +238,15 @@ class WalletHelper {
       },
     );
   }
-  static Future<void> _handlePendingSession(BuildContext context, ApiClient apiClient) async {
-    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+
+  static Future<void> _handlePendingSession(
+    BuildContext context,
+    ApiClient apiClient,
+  ) async {
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
     try {
       final sessionRes = await apiClient.get(AppUrls.currentSession);
       Get.back(); // close loader
@@ -222,7 +256,8 @@ class WalletHelper {
         if (data != null && data is Map) {
           final sessionData = data['session'];
           if (sessionData != null && sessionData is Map) {
-            final int pendingSessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+            final int pendingSessionId =
+                int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
             if (pendingSessionId > 0) {
               // Show popup to cancel
               _showCancelSessionDialog(context, pendingSessionId, apiClient);
@@ -238,10 +273,15 @@ class WalletHelper {
     }
   }
 
-  static void _showCancelSessionDialog(BuildContext context, int sessionId, ApiClient apiClient) {
+  static void _showCancelSessionDialog(
+    BuildContext context,
+    int sessionId,
+    ApiClient apiClient,
+  ) {
     Get.defaultDialog(
       title: "Pending Request",
-      middleText: "You already have a pending chat request. Would you like to cancel it to start a new one?",
+      middleText:
+          "You already have a pending chat request. Would you like to cancel it to start a new one?",
       textCancel: "No",
       textConfirm: "Yes, Cancel It",
       confirmTextColor: Colors.white,
@@ -249,12 +289,19 @@ class WalletHelper {
       cancelTextColor: AppColors.deepPink,
       onConfirm: () async {
         Get.back(); // close dialog
-        Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+        Get.dialog(
+          const Center(child: CircularProgressIndicator()),
+          barrierDismissible: false,
+        );
         try {
-          final cancelRes = await apiClient.post(AppUrls.rejectChatSession(sessionId));
+          final cancelRes = await apiClient.post(
+            AppUrls.rejectChatSession(sessionId),
+          );
           Get.back(); // close loader
           if (cancelRes.isSuccess) {
-            CustomSnackbar.showSuccess("Pending request cancelled. You can now start a new chat.");
+            CustomSnackbar.showSuccess(
+              "Pending request cancelled. You can now start a new chat.",
+            );
           } else {
             CustomSnackbar.showError(cancelRes.message);
           }

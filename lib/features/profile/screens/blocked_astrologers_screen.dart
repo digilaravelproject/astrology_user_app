@@ -20,19 +20,21 @@ class BlockedAstrologersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profileController = Get.find<ProfileController>();
-    final astrologerController = Get.put(AstrologerController(
-      getAstrologersUseCase: Get.find(),
-      getAstrologerByIdUseCase: Get.find(),
-      blockAstrologerUseCase: Get.find(),
-      reportAstrologerUseCase: Get.find(),
-      postReviewUseCase: Get.find(),
-      getReviewsUseCase: Get.find(),
-      followAstrologerUseCase: Get.find(),
-      getGiftsUseCase: Get.find(),
-      sendGiftUseCase: Get.find(),
-      getGiftHistoryUseCase: Get.find(),
-      getAstrologerGalleryUseCase: Get.find(),
-    ));
+    final astrologerController = Get.put(
+      AstrologerController(
+        getAstrologersUseCase: Get.find(),
+        getAstrologerByIdUseCase: Get.find(),
+        blockAstrologerUseCase: Get.find(),
+        reportAstrologerUseCase: Get.find(),
+        postReviewUseCase: Get.find(),
+        getReviewsUseCase: Get.find(),
+        followAstrologerUseCase: Get.find(),
+        getGiftsUseCase: Get.find(),
+        sendGiftUseCase: Get.find(),
+        getGiftHistoryUseCase: Get.find(),
+        getAstrologerGalleryUseCase: Get.find(),
+      ),
+    );
 
     // Fetch blocked list when screen is accessed
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -47,7 +49,8 @@ class BlockedAstrologersScreen extends StatelessWidget {
         backgroundColor: Colors.white,
       ),
       body: Obx(() {
-        if (profileController.isLoading.value && profileController.blockedList.isEmpty) {
+        if (profileController.isLoading.value &&
+            profileController.blockedList.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -95,36 +98,82 @@ class BlockedAstrologersScreen extends StatelessWidget {
           itemCount: blockedList.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
-            return _buildAstrologerCard(context, blockedList[index], profileController, astrologerController);
+            return _buildAstrologerCard(
+              context,
+              blockedList[index],
+              profileController,
+              astrologerController,
+            );
           },
         );
       }),
     );
   }
 
-  Widget _buildAstrologerCard(BuildContext context, dynamic astro, ProfileController profileController, AstrologerController astrologerController) {
+  Widget _buildAstrologerCard(
+    BuildContext context,
+    dynamic astro,
+    ProfileController profileController,
+    AstrologerController astrologerController,
+  ) {
     final astrologer = astro['astrologer'] ?? astro;
     final userData = astrologer['user'] as Map<String, dynamic>? ?? {};
-    
-    final int id = astrologer['id'] ?? astrologer['astrologer_id'] ?? astrologer['user_id'] ?? 0;
-    final String name = userData['name']?.toString() ?? astrologer['name']?.toString() ?? '';
-    final String profilePhoto = astrologer['profile_photo']?.toString() ?? userData['profile_photo']?.toString() ?? '';
-    final String imageUrl = profilePhoto.isNotEmpty ? AppUrls.baseImageUrl + profilePhoto : '';
-    
-    final double rating = double.tryParse(astrologer['rating']?.toString() ?? astrologer['avg_rating']?.toString() ?? '0') ?? 0.0;
-    final int totalOrders = int.tryParse(astrologer['total_orders']?.toString() ?? astrologer['orders_count']?.toString() ?? astrologer['completed_orders_count']?.toString() ?? '0') ?? 0;
-    final int experience = int.tryParse(astrologer['years_of_experience']?.toString() ?? astrologer['experience']?.toString() ?? '0') ?? 0;
-    
+
+    final int id =
+        astrologer['id'] ??
+        astrologer['astrologer_id'] ??
+        astrologer['user_id'] ??
+        0;
+    final String name =
+        userData['name']?.toString() ?? astrologer['name']?.toString() ?? '';
+    final String profilePhoto =
+        astrologer['profile_photo']?.toString() ??
+        userData['profile_photo']?.toString() ??
+        '';
+    final String imageUrl =
+        profilePhoto.isNotEmpty ? AppUrls.baseImageUrl + profilePhoto : '';
+
+    final double rating =
+        double.tryParse(
+          astrologer['rating']?.toString() ??
+              astrologer['avg_rating']?.toString() ??
+              '0',
+        ) ??
+        0.0;
+    final int totalOrders =
+        int.tryParse(
+          astrologer['total_orders']?.toString() ??
+              astrologer['orders_count']?.toString() ??
+              astrologer['completed_orders_count']?.toString() ??
+              '0',
+        ) ??
+        0;
+    final int experience =
+        int.tryParse(
+          astrologer['years_of_experience']?.toString() ??
+              astrologer['experience']?.toString() ??
+              '0',
+        ) ??
+        0;
+
     // Expertise & Languages
-    final List<dynamic> expertiseList = astrologer['areas_of_expertise'] is List 
-        ? astrologer['areas_of_expertise'] 
-        : (astrologer['areas_of_expertise']?.toString().split(',') ?? []);
-    final String expertise = expertiseList.map((e) => e.toString().trim().tr).where((e) => e.isNotEmpty).join(', ');
-    
-    final List<dynamic> languagesList = astrologer['languages'] is List 
-        ? astrologer['languages'] 
-        : (astrologer['languages']?.toString().split(',') ?? []);
-    final String languages = languagesList.map((l) => l.toString().trim().tr).where((l) => l.isNotEmpty).join(', ');
+    final List<dynamic> expertiseList =
+        astrologer['areas_of_expertise'] is List
+            ? astrologer['areas_of_expertise']
+            : (astrologer['areas_of_expertise']?.toString().split(',') ?? []);
+    final String expertise = expertiseList
+        .map((e) => e.toString().trim().tr)
+        .where((e) => e.isNotEmpty)
+        .join(', ');
+
+    final List<dynamic> languagesList =
+        astrologer['languages'] is List
+            ? astrologer['languages']
+            : (astrologer['languages']?.toString().split(',') ?? []);
+    final String languages = languagesList
+        .map((l) => l.toString().trim().tr)
+        .where((l) => l.isNotEmpty)
+        .join(', ');
 
     return GestureDetector(
       onTap: () {
@@ -175,19 +224,20 @@ class BlockedAstrologersScreen extends StatelessWidget {
                         ),
                       ),
                       child: ClipOval(
-                        child: imageUrl.isNotEmpty
-                            ? CustomImageWidget(
-                                imagePath: imageUrl,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                color: AppColors.lightPink,
-                                child: const Icon(
-                                  Icons.person,
-                                  color: AppColors.primaryColor,
-                                  size: 50,
+                        child:
+                            imageUrl.isNotEmpty
+                                ? CustomImageWidget(
+                                  imagePath: imageUrl,
+                                  fit: BoxFit.cover,
+                                )
+                                : Container(
+                                  color: AppColors.lightPink,
+                                  child: const Icon(
+                                    Icons.person,
+                                    color: AppColors.primaryColor,
+                                    size: 50,
+                                  ),
                                 ),
-                              ),
                       ),
                     ),
                     Positioned(
@@ -197,22 +247,20 @@ class BlockedAstrologersScreen extends StatelessWidget {
                         width: 14,
                         height: 14,
                         decoration: BoxDecoration(
-                          color: (astrologer['is_online'] == true || astrologer['is_online'] == 1) ? Colors.green : Colors.grey,
+                          color:
+                              (astrologer['is_online'] == true ||
+                                      astrologer['is_online'] == 1)
+                                  ? Colors.green
+                                  : Colors.grey,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
-                CustomRatingBar(
-                  rating: rating,
-                  size: 12,
-                ),
+                CustomRatingBar(rating: rating, size: 12),
                 const SizedBox(height: 4),
                 AppText(
                   _formatOrdersCount(totalOrders),
@@ -223,7 +271,7 @@ class BlockedAstrologersScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 12),
-            
+
             // Middle/Right Column: Text Details and Unblock Button
             Expanded(
               child: Column(
@@ -238,7 +286,15 @@ class BlockedAstrologersScreen extends StatelessWidget {
                           children: [
                             Flexible(
                               child: AppText(
-                                name.split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
+                                name
+                                    .split(' ')
+                                    .map(
+                                      (str) =>
+                                          str.isNotEmpty
+                                              ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}'
+                                              : '',
+                                    )
+                                    .join(' '),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.black,
@@ -254,17 +310,19 @@ class BlockedAstrologersScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      
+
                       // Unblock Action Button
                       GestureDetector(
                         onTap: () async {
                           if (id != 0) {
-                            final response = await astrologerController.unblockAstrologer(id);
+                            final response = await astrologerController
+                                .unblockAstrologer(id);
                             if (response.isSuccess) {
                               CustomSnackbar.showSuccess(response.message);
                               profileController.fetchBlocked(showLoader: false);
                               if (Get.isRegistered<AstrologerController>()) {
-                                Get.find<AstrologerController>().fetchAstrologers(showLoader: false);
+                                Get.find<AstrologerController>()
+                                    .fetchAstrologers(showLoader: false);
                               }
                             } else {
                               CustomSnackbar.showError(response.message);
@@ -272,7 +330,10 @@ class BlockedAstrologersScreen extends StatelessWidget {
                           }
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(24),

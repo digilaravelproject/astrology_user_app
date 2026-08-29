@@ -35,21 +35,21 @@ class ProfileBinding extends Bindings {
     Get.lazyPut(() => SubmitFeedbackUseCase(Get.find<ProfileService>()));
     Get.lazyPut(() => GetAboutUsUseCase(Get.find<ProfileService>()));
     Get.lazyPut(() => GetCustomerSupportUseCase(Get.find<ProfileService>()));
-    
-    Get.lazyPut(() =>
-        ProfileController(
-          updateProfilePhotoUseCase: Get.find<UpdateProfilePhotoUseCase>(),
-          getProfileUseCase: Get.find<GetProfileUseCase>(),
-          updateProfileInAppUseCase: Get.find<UpdateProfileInAppUseCase>(),
-          getFollowingUseCase: Get.find<GetFollowingUseCase>(),
-          getPlansUseCase: Get.find<GetPlansUseCase>(),
-          getPlanByIdUseCase: Get.find<GetPlanByIdUseCase>(),
-          upgradePlanUseCase: Get.find<UpgradePlanUseCase>(),
-          verifyUpgradeUseCase: Get.find<VerifyUpgradeUseCase>(),
-          submitFeedbackUseCase: Get.find<SubmitFeedbackUseCase>(),
-          getAboutUsUseCase: Get.find<GetAboutUsUseCase>(),
-          getCustomerSupportUseCase: Get.find<GetCustomerSupportUseCase>(),
-        ),
+
+    Get.lazyPut(
+      () => ProfileController(
+        updateProfilePhotoUseCase: Get.find<UpdateProfilePhotoUseCase>(),
+        getProfileUseCase: Get.find<GetProfileUseCase>(),
+        updateProfileInAppUseCase: Get.find<UpdateProfileInAppUseCase>(),
+        getFollowingUseCase: Get.find<GetFollowingUseCase>(),
+        getPlansUseCase: Get.find<GetPlansUseCase>(),
+        getPlanByIdUseCase: Get.find<GetPlanByIdUseCase>(),
+        upgradePlanUseCase: Get.find<UpgradePlanUseCase>(),
+        verifyUpgradeUseCase: Get.find<VerifyUpgradeUseCase>(),
+        submitFeedbackUseCase: Get.find<SubmitFeedbackUseCase>(),
+        getAboutUsUseCase: Get.find<GetAboutUsUseCase>(),
+        getCustomerSupportUseCase: Get.find<GetCustomerSupportUseCase>(),
+      ),
     );
   }
 }

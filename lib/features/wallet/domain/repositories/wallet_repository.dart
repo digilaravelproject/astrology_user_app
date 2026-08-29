@@ -52,9 +52,12 @@ class WalletRepository implements WalletRepositoryInterface {
   @override
   Future<WalletTopUpResponseModel?> topUpWallet(double amount) async {
     try {
-      final response = await apiClient.post(AppUrls.walletTopup, data: {
-        'amount': amount,
-      }, handleError: false, showToaster: false);
+      final response = await apiClient.post(
+        AppUrls.walletTopup,
+        data: {'amount': amount},
+        handleError: false,
+        showToaster: false,
+      );
       print('[PCB_APP] [DEBUG] | topUpWallet Status: ${response.statusCode}');
       print('[PCB_APP] [DEBUG] | topUpWallet isSuccess: ${response.isSuccess}');
 
@@ -79,13 +82,16 @@ class WalletRepository implements WalletRepositoryInterface {
     required String signature,
   }) async {
     try {
-      final response = await apiClient.post(AppUrls.walletTopupVerify, data: {
-        'razorpay_order_id': providerOrderId,
-        'razorpay_payment_id': providerPaymentId,
-        'razorpay_signature': signature,
-      });
+      final response = await apiClient.post(
+        AppUrls.walletTopupVerify,
+        data: {
+          'razorpay_order_id': providerOrderId,
+          'razorpay_payment_id': providerPaymentId,
+          'razorpay_signature': signature,
+        },
+      );
       print('[PCB_APP] [DEBUG] | verifyTopUp Status: ${response.statusCode}');
-      
+
       if (response.isSuccess && response.body != null) {
         return WalletTopUpResponseModel(
           status: 'success',
@@ -115,8 +121,3 @@ class WalletRepository implements WalletRepositoryInterface {
     return null;
   }
 }
-
-
-
-
-

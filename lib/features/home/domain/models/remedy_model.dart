@@ -22,7 +22,7 @@ class RemedyModel {
   factory RemedyModel.fromJson(Map<String, dynamic> json) {
     String? imagePath = json['image_path']?.toString();
     String? fullImageUrl;
-    
+
     if (imagePath != null && imagePath.isNotEmpty) {
       if (imagePath.startsWith('http')) {
         fullImageUrl = imagePath;
@@ -32,16 +32,26 @@ class RemedyModel {
     }
 
     return RemedyModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id:
+          json['id'] is int
+              ? json['id']
+              : int.tryParse(json['id'].toString()) ?? 0,
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
       image: fullImageUrl,
       isActive: json['is_active'] == true || json['is_active'] == 1,
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now() : DateTime.now(),
-      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) ?? DateTime.now() : DateTime.now(),
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.tryParse(json['created_at'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
+      updatedAt:
+          json['updated_at'] != null
+              ? DateTime.tryParse(json['updated_at'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
     );
   }
-
 
   Map<String, dynamic> toJson() {
     return {
@@ -55,4 +65,3 @@ class RemedyModel {
     };
   }
 }
-

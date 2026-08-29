@@ -33,7 +33,11 @@ class LiveRepositoryImpl implements LiveRepository {
   }
 
   @override
-  Future<ResponseModel> sendSuperChat(int id, int giftId, String? message) async {
+  Future<ResponseModel> sendSuperChat(
+    int id,
+    int giftId,
+    String? message,
+  ) async {
     return await dataSource.sendSuperChat(id, giftId, message);
   }
 
@@ -47,4 +51,3 @@ class LiveRepositoryImpl implements LiveRepository {
     return await dataSource.watchLiveSession(id);
   }
 }
-

@@ -24,10 +24,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.feedback,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.feedback, centerTitle: true),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -60,8 +57,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         child: Icon(
-                          index < _rating ? Iconsax.star_1_copy : Iconsax.star_1,
-                          color: index < _rating ? Colors.amber : Colors.grey.shade300,
+                          index < _rating
+                              ? Iconsax.star_1_copy
+                              : Iconsax.star_1,
+                          color:
+                              index < _rating
+                                  ? Colors.amber
+                                  : Colors.grey.shade300,
                           size: 40,
                         ),
                       ),
@@ -79,7 +81,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     controller: _feedbackController,
                     maxLines: 6,
                     decoration: InputDecoration(
-                      hintText: "Tell us what you liked or how we can improve...".tr,
+                      hintText:
+                          "Tell us what you liked or how we can improve...".tr,
                       hintStyle: TextStyle(color: Colors.grey.shade400),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.all(20),
@@ -91,25 +94,41 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                   text: "Submit Feedback".tr,
                   onTap: () {
                     if (_rating == 0) {
-                      Get.snackbar("Error", "Please provide a rating", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                      Get.snackbar(
+                        "Error",
+                        "Please provide a rating",
+                        backgroundColor: Colors.redAccent,
+                        colorText: Colors.white,
+                      );
                       return;
                     }
                     if (_feedbackController.text.trim().isEmpty) {
-                      Get.snackbar("Error", "Please enter your feedback", backgroundColor: Colors.redAccent, colorText: Colors.white);
+                      Get.snackbar(
+                        "Error",
+                        "Please enter your feedback",
+                        backgroundColor: Colors.redAccent,
+                        colorText: Colors.white,
+                      );
                       return;
                     }
-                    _controller.submitFeedback(_rating, _feedbackController.text.trim());
+                    _controller.submitFeedback(
+                      _rating,
+                      _feedbackController.text.trim(),
+                    );
                   },
                 ),
               ],
             ),
           ),
-          Obx(() => _controller.isLoading.value
-              ? Container(
-                  color: Colors.black26,
-                  child: const Center(child: CircularProgressIndicator()),
-                )
-              : const SizedBox.shrink()),
+          Obx(
+            () =>
+                _controller.isLoading.value
+                    ? Container(
+                      color: Colors.black26,
+                      child: const Center(child: CircularProgressIndicator()),
+                    )
+                    : const SizedBox.shrink(),
+          ),
         ],
       ),
     );

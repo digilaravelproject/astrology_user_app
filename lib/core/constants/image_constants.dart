@@ -11,10 +11,11 @@ class ImageConstants {
   static const String suryaChariot = '${imagePath}surya_chariot_premium.png';
   static const String appLogo = '${imagePath}app_logo.png';
   static const String app_Logo = '${imagePath}SURYAPATH.jpeg';
-  static const String astroMatrimony = '${imagePath}astro_matrimony_premium.png';
+  static const String astroMatrimony =
+      '${imagePath}astro_matrimony_premium.png';
 
   // Auth Images
- // static const String loginBackground = '${imagePath}bg_login.jpeg';
+  // static const String loginBackground = '${imagePath}bg_login.jpeg';
   static const String loginBackground = '${imagePath}background.png';
   static const String otpVerification = '${imagePath}otp_verification.png';
 

@@ -10,4 +10,3 @@ abstract class LiveRepository {
   Future<ResponseModel> getLiveComments(int id, {int perPage = 50});
   Future<ResponseModel> watchLiveSession(int id);
 }
-

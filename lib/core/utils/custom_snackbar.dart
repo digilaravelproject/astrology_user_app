@@ -3,7 +3,8 @@ import '../theme/app_colors.dart';
 import '../widgets/app_text.dart';
 
 class CustomSnackbar {
-  static final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
+  static final GlobalKey<ScaffoldMessengerState> messengerKey =
+      GlobalKey<ScaffoldMessengerState>();
 
   static void _show({
     required String title,
@@ -14,9 +15,9 @@ class CustomSnackbar {
   }) {
     final Color effectiveTextColor =
         textColor ??
-            (backgroundColor.computeLuminance() > 0.5
-                ? Colors.black
-                : Colors.white);
+        (backgroundColor.computeLuminance() > 0.5
+            ? Colors.black
+            : Colors.white);
 
     final snackBar = SnackBar(
       content: Row(
@@ -28,7 +29,12 @@ class CustomSnackbar {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText(title.toUpperCase(), fontSize: 12, fontWeight: FontWeight.bold, color: effectiveTextColor),
+                AppText(
+                  title.toUpperCase(),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: effectiveTextColor,
+                ),
                 AppText(message, fontSize: 13, color: effectiveTextColor),
               ],
             ),

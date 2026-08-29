@@ -23,29 +23,57 @@ class MatrimonyBinding extends Bindings {
     Get.lazyPut(() => ProfileService(Get.find<ProfileRepository>()));
     Get.lazyPut(() => GetProfileUseCase(Get.find<ProfileService>()));
 
-    Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
-    Get.lazyPut<MatrimonyServiceInterface>(() => MatrimonyService(repository: Get.find()));
+    Get.lazyPut<MatrimonyRepositoryInterface>(
+      () => MatrimonyRepository(apiClient: Get.find()),
+    );
+    Get.lazyPut<MatrimonyServiceInterface>(
+      () => MatrimonyService(repository: Get.find()),
+    );
     Get.lazyPut(() => SaveMatrimonyProfileUseCase(service: Get.find()));
     Get.lazyPut(() => UpdateMatrimonyProfileUseCase(service: Get.find()));
     Get.lazyPut(() => GetMatrimonyProfileUseCase(service: Get.find()));
-    Get.lazyPut(() => GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut(() => GetMyMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut(() => SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut(() => BlockMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
-    Get.lazyPut(() => ReportMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
-    
-    Get.lazyPut(() => MatrimonyController(
-      saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
-      updateMatrimonyProfileUseCase: Get.find<UpdateMatrimonyProfileUseCase>(),
-      getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
-      getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
-      getMyMatrimonyProfileDetailsUseCase: Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
-      searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
-      blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
-      reportMatrimonyProfileUseCase: Get.find<ReportMatrimonyProfileUseCase>(),
-      getProfileUseCase: Get.find<GetProfileUseCase>(),
-    ));
+    Get.lazyPut(
+      () => GetMatrimonyProfileDetailsUseCase(
+        Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+    Get.lazyPut(
+      () => GetMyMatrimonyProfileDetailsUseCase(
+        Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+    Get.lazyPut(
+      () =>
+          SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()),
+    );
+    Get.lazyPut(
+      () => BlockMatrimonyProfileUseCase(
+        service: Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+    Get.lazyPut(
+      () => ReportMatrimonyProfileUseCase(
+        service: Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+
+    Get.lazyPut(
+      () => MatrimonyController(
+        saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
+        updateMatrimonyProfileUseCase:
+            Get.find<UpdateMatrimonyProfileUseCase>(),
+        getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
+        getMatrimonyProfileDetailsUseCase:
+            Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        getMyMatrimonyProfileDetailsUseCase:
+            Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
+        searchMatrimonyProfilesUseCase:
+            Get.find<SearchMatrimonyProfilesUseCase>(),
+        blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
+        reportMatrimonyProfileUseCase:
+            Get.find<ReportMatrimonyProfileUseCase>(),
+        getProfileUseCase: Get.find<GetProfileUseCase>(),
+      ),
+    );
   }
 }
-
-

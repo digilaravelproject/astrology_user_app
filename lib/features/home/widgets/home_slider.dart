@@ -14,13 +14,16 @@ class _HomeSliderState extends State<HomeSlider> {
 
   final List<Map<String, String>> _slides = [
     {
-      "image": "https://astromanch.com/public/storage/images/blog_1191728388807.webp",
+      "image":
+          "https://astromanch.com/public/storage/images/blog_1191728388807.webp",
     },
     {
-      "image": "https://previews.123rf.com/images/nastasijamal/nastasijamal2107/nastasijamal210700063/171748454-your-personal-horoscope-chart-and-glow-zodiac-sign-astrology-prediction-banner-poster-with-shiny.jpg",
+      "image":
+          "https://previews.123rf.com/images/nastasijamal/nastasijamal2107/nastasijamal210700063/171748454-your-personal-horoscope-chart-and-glow-zodiac-sign-astrology-prediction-banner-poster-with-shiny.jpg",
     },
     {
-      "image": "https://astromanch.com/public/storage/images/blog_1221728391750.webp",
+      "image":
+          "https://astromanch.com/public/storage/images/blog_1221728391750.webp",
     },
   ];
 
@@ -76,20 +79,23 @@ class _HomeSliderState extends State<HomeSlider> {
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _slides.asMap().entries.map((entry) {
-            return Container(
-              width: 8.0,
-              height: 8.0,
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: (Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : const Color(0xFF2E1A47))
-                    .withValues(alpha: _currentPage == entry.key ? 0.9 : 0.2),
-              ),
-            );
-          }).toList(),
+          children:
+              _slides.asMap().entries.map((entry) {
+                return Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : const Color(0xFF2E1A47))
+                        .withValues(
+                          alpha: _currentPage == entry.key ? 0.9 : 0.2,
+                        ),
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );

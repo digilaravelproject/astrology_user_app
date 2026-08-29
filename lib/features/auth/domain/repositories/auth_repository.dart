@@ -13,30 +13,20 @@ class AuthRepository implements AuthRepositoryInterface {
 
   @override
   Future<ResponseModel> sendOtp(String phone) async {
-    return await _apiClient.post(
-      AppUrls.sendOtp,
-      data: {
-        "phone": phone,
-      },
-    );
+    return await _apiClient.post(AppUrls.sendOtp, data: {"phone": phone});
   }
 
   @override
   Future<ResponseModel> resendOtp(String phone) async {
-    return await _apiClient.post(
-      AppUrls.resendOtp,
-      data: {
-        "phone": phone,
-      },
-    );
+    return await _apiClient.post(AppUrls.resendOtp, data: {"phone": phone});
   }
 
   @override
-  Future<ResponseModel> updateProfile(int userId, Map<String, dynamic> data) async {
-    return await _apiClient.put(
-      AppUrls.updateProfile(userId),
-      data: data,
-    );
+  Future<ResponseModel> updateProfile(
+    int userId,
+    Map<String, dynamic> data,
+  ) async {
+    return await _apiClient.put(AppUrls.updateProfile(userId), data: data);
   }
 
   @override
@@ -53,10 +43,7 @@ class AuthRepository implements AuthRepositoryInterface {
   Future<ResponseModel> verifyOtp(String mobile, String otp) async {
     return await _apiClient.post(
       AppUrls.verifyOtp,
-      data: {
-        "phone": mobile,
-        "otp": otp,
-      },
+      data: {"phone": mobile, "otp": otp},
     );
   }
 
@@ -70,6 +57,3 @@ class AuthRepository implements AuthRepositoryInterface {
     return await _apiClient.delete(AppUrls.deleteAccount);
   }
 }
-
-
-

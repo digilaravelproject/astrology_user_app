@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../home/widgets/astrologers_preview_section.dart';
 import 'astrologer_detail_screen.dart';
 
@@ -183,15 +184,11 @@ class AstrologersListScreen extends StatelessWidget {
                     ],
                   ),
                   padding: const EdgeInsets.all(2.5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2.5),
-                      image: DecorationImage(
-                        image: NetworkImage(imageUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  child: CustomImageWidget(
+                    imagePath: imageUrl,
+                    fit: BoxFit.cover,
+                    radius: BorderRadius.circular(100),
+                    border: Border.all(color: Colors.white, width: 2.5),
                   ),
                 ),
                 Positioned(

@@ -20,7 +20,7 @@ class ChatAssistanceListController extends GetxController {
     if (!isRefresh) isLoading.value = true;
     hasError.value = false;
     errorMsg.value = '';
-    
+
     try {
       final response = await _apiClient.get(AppUrls.chatAssistanceSessions);
       if (response.isSuccess) {

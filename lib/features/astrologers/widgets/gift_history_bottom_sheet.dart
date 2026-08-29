@@ -74,22 +74,24 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // History List
           SizedBox(
             height: Get.height * 0.5,
             child: Obx(() {
-              if (controller.isHistoryLoading.value && controller.giftHistory.isEmpty) {
+              if (controller.isHistoryLoading.value &&
+                  controller.giftHistory.isEmpty) {
                 return _buildShimmerList();
               }
-              
+
               if (controller.giftHistory.isEmpty) {
                 return _buildEmptyState();
               }
-              
+
               return ListView.separated(
                 itemCount: controller.giftHistory.length,
-                separatorBuilder: (context, index) => Divider(color: Colors.grey[100]),
+                separatorBuilder:
+                    (context, index) => Divider(color: Colors.grey[100]),
                 itemBuilder: (context, index) {
                   final item = controller.giftHistory[index];
                   return _buildHistoryItem(item);
@@ -104,7 +106,7 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
 
   Widget _buildHistoryItem(GiftHistoryItem item) {
     final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(item.createdAt);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -123,11 +125,15 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
               height: 30,
               width: 30,
               fit: BoxFit.contain,
-              fallbackWidget: const Icon(Icons.card_giftcard, color: Colors.pink, size: 20),
+              fallbackWidget: const Icon(
+                Icons.card_giftcard,
+                color: Colors.pink,
+                size: 20,
+              ),
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Details
           Expanded(
             child: Column(
@@ -148,7 +154,7 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
               ],
             ),
           ),
-          
+
           // Amount
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -163,7 +169,10 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
                 item.status.capitalizeFirst ?? '',
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: item.status.toLowerCase() == 'completed' ? Colors.green : Colors.orange,
+                color:
+                    item.status.toLowerCase() == 'completed'
+                        ? Colors.green
+                        : Colors.orange,
               ),
             ],
           ),
@@ -175,26 +184,27 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
   Widget _buildShimmerList() {
     return ListView.builder(
       itemCount: 5,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            const ShimmerWidget.circular(height: 50, width: 50),
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ShimmerWidget.rectangular(height: 15, width: 100),
-                  SizedBox(height: 8),
-                  ShimmerWidget.rectangular(height: 12, width: 150),
-                ],
-              ),
+      itemBuilder:
+          (context, index) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                const ShimmerWidget.circular(height: 50, width: 50),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerWidget.rectangular(height: 15, width: 100),
+                      SizedBox(height: 8),
+                      ShimmerWidget.rectangular(height: 12, width: 150),
+                    ],
+                  ),
+                ),
+                const ShimmerWidget.rectangular(height: 15, width: 50),
+              ],
             ),
-            const ShimmerWidget.rectangular(height: 15, width: 50),
-          ],
-        ),
-      ),
+          ),
     );
   }
 

@@ -8,12 +8,20 @@ import 'package:astro_user/features/history/controllers/history_controller.dart'
 class HistoryBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<HistoryRepository>(() => HistoryRepositoryImpl(apiClient: Get.find<ApiClient>()));
-    Get.lazyPut<GetChatSessionsUseCase>(() => GetChatSessionsUseCase(Get.find<HistoryRepository>()));
-    Get.lazyPut<GetCallSessionsUseCase>(() => GetCallSessionsUseCase(Get.find<HistoryRepository>()));
-    Get.lazyPut<HistoryController>(() => HistoryController(
-      getChatSessionsUseCase: Get.find<GetChatSessionsUseCase>(),
-      getCallSessionsUseCase: Get.find<GetCallSessionsUseCase>(),
-    ));
+    Get.lazyPut<HistoryRepository>(
+      () => HistoryRepositoryImpl(apiClient: Get.find<ApiClient>()),
+    );
+    Get.lazyPut<GetChatSessionsUseCase>(
+      () => GetChatSessionsUseCase(Get.find<HistoryRepository>()),
+    );
+    Get.lazyPut<GetCallSessionsUseCase>(
+      () => GetCallSessionsUseCase(Get.find<HistoryRepository>()),
+    );
+    Get.lazyPut<HistoryController>(
+      () => HistoryController(
+        getChatSessionsUseCase: Get.find<GetChatSessionsUseCase>(),
+        getCallSessionsUseCase: Get.find<GetCallSessionsUseCase>(),
+      ),
+    );
   }
 }

@@ -83,7 +83,8 @@ class MatrimonyProfileModel {
       final dob = DateTime.parse(dateOfBirth);
       final now = DateTime.now();
       int age = now.year - dob.year;
-      if (now.month < dob.month || (now.month == dob.month && now.day < dob.day)) {
+      if (now.month < dob.month ||
+          (now.month == dob.month && now.day < dob.day)) {
         age--;
       }
       return age;
@@ -109,9 +110,9 @@ class MatrimonyProfileModel {
       'annual_income': annualIncome,
       'about': about,
       if (panCardNumber != null) 'pan_card_number': panCardNumber!,
-      if (drivingLicenceNumber != null) 'driving_licence_number': drivingLicenceNumber!,
+      if (drivingLicenceNumber != null)
+        'driving_licence_number': drivingLicenceNumber!,
       if (aadhaarCardNumber != null) 'aadhar_card_number': aadhaarCardNumber!,
     };
   }
 }
-

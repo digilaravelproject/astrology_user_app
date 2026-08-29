@@ -91,14 +91,24 @@ class TransactionModel {
       walletId: json['wallet_id'] ?? 0,
       transactionType: json['transaction_type'] ?? '',
       amount: json['amount']?.toString() ?? '0.00',
-      baseAmount: json['base_amount']?.toString() ?? json['amount']?.toString() ?? '0.00',
+      baseAmount:
+          json['base_amount']?.toString() ??
+          json['amount']?.toString() ??
+          '0.00',
       gstPercent: json['gst_percent']?.toString() ?? '18.00',
       gstAmount: json['gst_amount']?.toString() ?? '0.00',
-      totalAmount: json['total_amount']?.toString() ?? json['amount']?.toString() ?? '0.00',
+      totalAmount:
+          json['total_amount']?.toString() ??
+          json['amount']?.toString() ??
+          '0.00',
       invoiceNumber: json['invoice_number']?.toString() ?? '',
       status: json['status'] ?? '',
       paymentProvider: json['payment_provider'] ?? '',
-      providerOrderId: json['provider_order_id'] ?? json['razorpay_order_id'] ?? json['order_id'] ?? '',
+      providerOrderId:
+          json['provider_order_id'] ??
+          json['razorpay_order_id'] ??
+          json['order_id'] ??
+          '',
       providerPaymentId: json['provider_payment_id']?.toString() ?? '',
       description: json['description'] ?? '',
       updatedAt: json['updated_at'] ?? '',
@@ -111,10 +121,7 @@ class WalletTransactionsResponseModel {
   final String status;
   final WalletTransactionsData data;
 
-  WalletTransactionsResponseModel({
-    required this.status,
-    required this.data,
-  });
+  WalletTransactionsResponseModel({required this.status, required this.data});
 
   factory WalletTransactionsResponseModel.fromJson(Map<String, dynamic> json) {
     return WalletTransactionsResponseModel(
@@ -128,16 +135,14 @@ class WalletTransactionsData {
   final WalletModel wallet;
   final List<TransactionModel> transactions;
 
-  WalletTransactionsData({
-    required this.wallet,
-    required this.transactions,
-  });
+  WalletTransactionsData({required this.wallet, required this.transactions});
 
   factory WalletTransactionsData.fromJson(Map<String, dynamic> json) {
     var list = json['transactions'] as List?;
-    List<TransactionModel> transactionsList = list != null
-        ? list.map((i) => TransactionModel.fromJson(i)).toList()
-        : [];
+    List<TransactionModel> transactionsList =
+        list != null
+            ? list.map((i) => TransactionModel.fromJson(i)).toList()
+            : [];
     return WalletTransactionsData(
       wallet: WalletModel.fromJson(json['wallet'] ?? {}),
       transactions: transactionsList,

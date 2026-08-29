@@ -19,7 +19,7 @@ class CosmicBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final bubbleColor = AppColors.softPink.withOpacity(opacity);
     final iconColor = AppColors.softPink.withOpacity(opacity * 1.5);
-    
+
     return Stack(
       children: [
         // 1. Primary atmospheric soft glows for "Wow" factor foundation
@@ -67,7 +67,7 @@ class CosmicBackground extends StatelessWidget {
             Icons.flare_rounded,
             Icons.circle,
           ];
-          
+
           // Deterministic "randomness" for performance
           final top = (index * 173.0) % 800;
           final left = (index * 137.0) % 400;
@@ -95,18 +95,16 @@ class CosmicBackground extends StatelessWidget {
     );
   }
 
-  Widget _buildDecorativeIcon(IconData icon, double iconSize, Color iconColor, Color bubbleColor) {
+  Widget _buildDecorativeIcon(
+    IconData icon,
+    double iconSize,
+    Color iconColor,
+    Color bubbleColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bubbleColor,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        icon,
-        size: iconSize,
-        color: iconColor,
-      ),
+      decoration: BoxDecoration(color: bubbleColor, shape: BoxShape.circle),
+      child: Icon(icon, size: iconSize, color: iconColor),
     );
   }
 }

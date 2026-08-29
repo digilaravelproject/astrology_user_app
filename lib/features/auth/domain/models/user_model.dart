@@ -104,9 +104,6 @@ import 'dart:convert';
   }
 }*/
 
-
-
-
 class SendOtpModel {
   final String phone;
   final int userId;
@@ -125,13 +122,13 @@ class SendOtpModel {
       phone: json['phone']?.toString() ?? '',
       userId: int.tryParse(json['user_id']?.toString() ?? '') ?? 0,
       otp: json['otp']?.toString() ?? '',
-      expiresAt: json['expires_at'] != null ? DateTime.parse(json['expires_at'].toString()) : DateTime.now(),
+      expiresAt:
+          json['expires_at'] != null
+              ? DateTime.parse(json['expires_at'].toString())
+              : DateTime.now(),
     );
   }
 }
-
-
-
 
 bool _parseBool(dynamic value) {
   print('_parseBool: value=$value (type: ${value?.runtimeType})');
@@ -238,9 +235,10 @@ class UserModel {
       profileCompleted: _parseBool(json['profile_completed']),
       isMatrimony: _parseBool(json['isMatrimony']),
 
-      languages: json['languages'] is List
-          ? List<String>.from(json['languages'].map((e) => e.toString()))
-          : null,
+      languages:
+          json['languages'] is List
+              ? List<String>.from(json['languages'].map((e) => e.toString()))
+              : null,
 
       planId: int.tryParse(json['plan_id']?.toString() ?? ''),
       planStartedAt: json['plan_started_at']?.toString(),

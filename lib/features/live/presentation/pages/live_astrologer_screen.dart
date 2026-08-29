@@ -11,6 +11,7 @@ import '../../data/models/live_session_model.dart';
 import 'live_room_screen.dart';
 import '../../../../core/constants/app_urls.dart';
 import '../../../../core/constants/image_constants.dart';
+
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
 
@@ -70,85 +71,102 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         ),
         Scaffold(
           backgroundColor: Colors.transparent,
-      body: SafeArea(
-        child: RefreshIndicator(
-        onRefresh: () => _controller.fetchActiveSessions(),
-        color: AppColors.primaryColor,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildLiveBanner(),
-              _buildSectionTitle(),
-              
-              Obx(() {
-                if (_controller.isLoadingSessions.value) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: CircularProgressIndicator(color: AppColors.primaryColor),
-                    ),
-                  );
-                }
-                
-                if (_controller.activeSessions.isEmpty) {
-                  return SizedBox(
-                    height: 250,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.video_camera_back_outlined, size: 48, color: Colors.grey.shade300),
-                          const SizedBox(height: 12),
-                          AppText(
-                            'No active streams currently.',
-                            fontSize: 14,
-                            color: Colors.grey.shade400,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () => _controller.fetchActiveSessions(),
+              color: AppColors.primaryColor,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(context),
+                    _buildLiveBanner(),
+                    _buildSectionTitle(),
 
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 18,
-                    crossAxisSpacing: 18,
-                    childAspectRatio: 0.78,
-                  ),
-                  itemCount: _controller.activeSessions.length,
-                  itemBuilder: (context, index) {
-                    final session = _controller.activeSessions[index];
-                    return GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => LiveRoomScreen(
-                            sessionId: session.id,
-                            astrologerName: session.astrologer?.name ?? 'Astrologer',
-                            astrologerImage: session.astrologer?.profilePhoto ?? '',
+                    Obx(() {
+                      if (_controller.isLoadingSessions.value) {
+                        return const SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryColor,
+                            ),
                           ),
-                        ),
-                      ),
-                      child: _buildLiveCard(session),
-                    );
-                  },
-                );
-              }),
-              const SizedBox(height: 280),
-            ],
+                        );
+                      }
+
+                      if (_controller.activeSessions.isEmpty) {
+                        return SizedBox(
+                          height: 250,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.video_camera_back_outlined,
+                                  size: 48,
+                                  color: Colors.grey.shade300,
+                                ),
+                                const SizedBox(height: 12),
+                                AppText(
+                                  'No active streams currently.',
+                                  fontSize: 14,
+                                  color: Colors.grey.shade400,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 18,
+                              crossAxisSpacing: 18,
+                              childAspectRatio: 0.78,
+                            ),
+                        itemCount: _controller.activeSessions.length,
+                        itemBuilder: (context, index) {
+                          final session = _controller.activeSessions[index];
+                          return GestureDetector(
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => LiveRoomScreen(
+                                          sessionId: session.id,
+                                          astrologerName:
+                                              session.astrologer?.name ??
+                                              'Astrologer',
+                                          astrologerImage:
+                                              session
+                                                  .astrologer
+                                                  ?.profilePhoto ??
+                                              '',
+                                        ),
+                                  ),
+                                ),
+                            child: _buildLiveCard(session),
+                          );
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 280),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
-      ),
         ),
       ],
     );
@@ -199,7 +217,11 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               opacity: 0.2,
               child: Transform.rotate(
                 angle: -0.2,
-                child: const Icon(Icons.live_tv_rounded, size: 140, color: Colors.white),
+                child: const Icon(
+                  Icons.live_tv_rounded,
+                  size: 140,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
@@ -210,7 +232,10 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -314,11 +339,13 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         child: Stack(
           children: [
             CustomImageWidget(
-              imagePath: (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
-                  ? (session.astrologer!.profilePhoto!.startsWith('http')
-                      ? session.astrologer!.profilePhoto!
-                      : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
-                  : '',
+              imagePath:
+                  (session.astrologer?.profilePhoto != null &&
+                          session.astrologer!.profilePhoto!.isNotEmpty)
+                      ? (session.astrologer!.profilePhoto!.startsWith('http')
+                          ? session.astrologer!.profilePhoto!
+                          : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
+                      : '',
               height: double.infinity,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -341,7 +368,10 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               top: 12,
               left: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(8),
@@ -349,7 +379,7 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
                       blurRadius: 4,
-                    )
+                    ),
                   ],
                 ),
                 child: Row(
@@ -370,14 +400,21 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               top: 12,
               right: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.4),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.visibility_rounded, color: Colors.white, size: 12),
+                    const Icon(
+                      Icons.visibility_rounded,
+                      color: Colors.white,
+                      size: 12,
+                    ),
                     const SizedBox(width: 5),
                     AppText(
                       '${session.viewerCount}',

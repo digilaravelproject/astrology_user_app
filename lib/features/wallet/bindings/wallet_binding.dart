@@ -13,19 +13,25 @@ import '../../../core/services/payment/razorpay/razorpay_service.dart';
 class WalletBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<WalletRepositoryInterface>(() => WalletRepository(apiClient: Get.find()));
-    Get.lazyPut<WalletServiceInterface>(() => WalletService(repository: Get.find()));
+    Get.lazyPut<WalletRepositoryInterface>(
+      () => WalletRepository(apiClient: Get.find()),
+    );
+    Get.lazyPut<WalletServiceInterface>(
+      () => WalletService(repository: Get.find()),
+    );
     Get.lazyPut(() => GetWalletUseCase(service: Get.find()));
     Get.lazyPut(() => TopUpWalletUseCase(service: Get.find()));
     Get.lazyPut(() => VerifyTopUpUseCase(service: Get.find()));
     Get.lazyPut(() => GetTransactionsUseCase(service: Get.find()));
-    Get.lazyPut(() => WalletController(
-      getWalletUseCase: Get.find(),
-      topUpWalletUseCase: Get.find(),
-      verifyTopUpUseCase: Get.find(),
-      getTransactionsUseCase: Get.find(),
-      authService: Get.find<AuthServiceInterface>(),
-      razorpayService: Get.find<RazorpayService>(),
-    ));
+    Get.lazyPut(
+      () => WalletController(
+        getWalletUseCase: Get.find(),
+        topUpWalletUseCase: Get.find(),
+        verifyTopUpUseCase: Get.find(),
+        getTransactionsUseCase: Get.find(),
+        authService: Get.find<AuthServiceInterface>(),
+        razorpayService: Get.find<RazorpayService>(),
+      ),
+    );
   }
 }

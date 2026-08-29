@@ -12,12 +12,9 @@ class ProfileRepository {
   Future<ResponseModel> updateProfilePhoto(XFile imageFile) async {
     MultipartBody multipartBody = MultipartBody('profile_photo', imageFile);
 
-    return await apiClient.postMultipartData(
-      AppUrls.updateProfilePhoto,
-      {},
-      [multipartBody],
-      [],
-    );
+    return await apiClient.postMultipartData(AppUrls.updateProfilePhoto, {}, [
+      multipartBody,
+    ], []);
   }
 
   Future<ResponseModel> getProfile(int id) async {
@@ -33,10 +30,10 @@ class ProfileRepository {
   }
 
   Future<ResponseModel> submitFeedback(int rating, String comment) async {
-    return await apiClient.post(AppUrls.feedback, data: {
-      'rating': rating,
-      'comment': comment,
-    });
+    return await apiClient.post(
+      AppUrls.feedback,
+      data: {'rating': rating, 'comment': comment},
+    );
   }
 
   Future<ResponseModel> getAboutUs() async {

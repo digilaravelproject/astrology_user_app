@@ -42,7 +42,7 @@ class LiveSessionSection extends StatelessWidget {
                 color: AppColors.primaryColor,
               ),
             ),
-            
+
             // Content
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -71,12 +71,16 @@ class LiveSessionSection extends StatelessWidget {
                         color: Color(0xFF8BC34A), // Lime green
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.star, color: Colors.white, size: 14),
+                      child: const Icon(
+                        Icons.star,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Horizontal list of avatars
                 SizedBox(
                   height: 160,
@@ -86,12 +90,16 @@ class LiveSessionSection extends StatelessWidget {
                     itemCount: liveController.activeSessions.length,
                     itemBuilder: (context, index) {
                       final session = liveController.activeSessions[index];
-                      final imageUrl = (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
-                          ? (session.astrologer!.profilePhoto!.startsWith('http')
-                              ? session.astrologer!.profilePhoto!
-                              : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
-                          : 'https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg';
-                          
+                      final imageUrl =
+                          (session.astrologer?.profilePhoto != null &&
+                                  session.astrologer!.profilePhoto!.isNotEmpty)
+                              ? (session.astrologer!.profilePhoto!.startsWith(
+                                    'http',
+                                  )
+                                  ? session.astrologer!.profilePhoto!
+                                  : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
+                              : 'https://theblunttimes.in/wp-content/uploads/2024/02/astro-1.jpg';
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: GestureDetector(
@@ -99,22 +107,24 @@ class LiveSessionSection extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => LiveRoomScreen(
-                                  sessionId: session.id,
-                                  astrologerName: session.astrologer?.name ?? 'Astrologer',
-                                  astrologerImage: session.astrologer?.profilePhoto ?? '',
-                                ),
+                                builder:
+                                    (_) => LiveRoomScreen(
+                                      sessionId: session.id,
+                                      astrologerName:
+                                          session.astrologer?.name ??
+                                          'Astrologer',
+                                      astrologerImage:
+                                          session.astrologer?.profilePhoto ??
+                                          '',
+                                    ),
                               ),
                             );
                           },
                           child: Column(
                             children: [
                               Container(
-                                width: 80,
-                                height: 80,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 3),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black.withOpacity(0.15),
@@ -122,10 +132,17 @@ class LiveSessionSection extends StatelessWidget {
                                       offset: const Offset(0, 4),
                                     ),
                                   ],
-                                  image: DecorationImage(
-                                    image: NetworkImage(imageUrl),
-                                    fit: BoxFit.cover,
+                                ),
+                                child: CustomImageWidget(
+                                  imagePath: imageUrl,
+                                  height: 75,
+                                  width: 75,
+                                  radius: BorderRadius.circular(37.5),
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 3,
                                   ),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -163,15 +180,28 @@ class _WaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     var path = Path();
     path.lineTo(0, size.height - 40);
-    
+
     // Create a gentle wave
     var firstControlPoint = Offset(size.width / 4, size.height);
     var firstEndPoint = Offset(size.width / 2, size.height - 20);
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy, firstEndPoint.dx, firstEndPoint.dy);
+    path.quadraticBezierTo(
+      firstControlPoint.dx,
+      firstControlPoint.dy,
+      firstEndPoint.dx,
+      firstEndPoint.dy,
+    );
 
-    var secondControlPoint = Offset(size.width - (size.width / 4), size.height - 40);
+    var secondControlPoint = Offset(
+      size.width - (size.width / 4),
+      size.height - 40,
+    );
     var secondEndPoint = Offset(size.width, size.height - 10);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy, secondEndPoint.dx, secondEndPoint.dy);
+    path.quadraticBezierTo(
+      secondControlPoint.dx,
+      secondControlPoint.dy,
+      secondEndPoint.dx,
+      secondEndPoint.dy,
+    );
 
     path.lineTo(size.width, 0);
     path.close();

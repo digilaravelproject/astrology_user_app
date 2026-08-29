@@ -10,7 +10,9 @@ class FounderRepository {
   FounderRepository(this.apiClient);
 
   Future<ResponseModel> getFounderWords() async {
-    final languageCode = SharedPrefs.getString(AppConstants.language) ?? AppConstants.defaultLanguage;
+    final languageCode =
+        SharedPrefs.getString(AppConstants.language) ??
+        AppConstants.defaultLanguage;
     return await apiClient.get(
       AppUrls.foundersWords,
       queryParameters: {'language': languageCode},

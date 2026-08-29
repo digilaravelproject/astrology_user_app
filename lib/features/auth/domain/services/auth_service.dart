@@ -12,7 +12,10 @@ class AuthService implements AuthServiceInterface {
   AuthService(this._authRepository);
 
   @override
-  Future<ResponseModel> updateProfile(int userId, Map<String, dynamic> data) async {
+  Future<ResponseModel> updateProfile(
+    int userId,
+    Map<String, dynamic> data,
+  ) async {
     return await _authRepository.updateProfile(userId, data);
   }
 

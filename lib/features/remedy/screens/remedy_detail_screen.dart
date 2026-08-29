@@ -54,101 +54,109 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
         iconColor: Colors.black,
         elevation: 0.5,
       ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-              color: widget.accentColor,
-              strokeWidth: 2,
-            ))
-          : _remedy == null
+      body:
+          _isLoading
+              ? Center(
+                child: CircularProgressIndicator(
+                  color: widget.accentColor,
+                  strokeWidth: 2,
+                ),
+              )
+              : _remedy == null
               ? const Center(
-                  child: AppText(
-                    'Could not load remedy detail.',
-                    fontSize: 15,
-                    color: Colors.black45,
-                  ),
-                )
+                child: AppText(
+                  'Could not load remedy detail.',
+                  fontSize: 15,
+                  color: Colors.black45,
+                ),
+              )
               : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
 
-                      // Image Header
-                      if (widget.imageUrl.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: CustomImageWidget(
-                              imagePath: widget.imageUrl,
-                              width: double.infinity,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
+                    // Image Header
+                    if (widget.imageUrl.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: CustomImageWidget(
+                            imagePath: widget.imageUrl,
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
                           ),
                         ),
-
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Remedy Title
-                            AppText(
-                              _remedy!.title,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF2E1A47),
-                              height: 1.3,
-                            ),
-
-                            const SizedBox(height: 16),
-                            
-                            const Divider(height: 1),
-                            
-                            const SizedBox(height: 20),
-
-                            // Remedy Description
-                            AppText(
-                              _remedy!.description,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black87,
-                              height: 1.6,
-                            ),
-
-                            const SizedBox(height: 40),
-
-                            // Disclaimer
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF9FAFB),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black.withOpacity(0.05)),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.info_outline, color: Colors.blueGrey, size: 20),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: AppText(
-                                      'Consult with an expert astrologer for personalized remedies based on your birth chart.',
-                                      fontSize: 12,
-                                      color: Colors.blueGrey,
-                                      fontStyle: FontStyle.italic,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ],
-                  ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Remedy Title
+                          AppText(
+                            _remedy!.title,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF2E1A47),
+                            height: 1.3,
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          const Divider(height: 1),
+
+                          const SizedBox(height: 20),
+
+                          // Remedy Description
+                          AppText(
+                            _remedy!.description,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black87,
+                            height: 1.6,
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // Disclaimer
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF9FAFB),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.black.withOpacity(0.05),
+                              ),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blueGrey,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: AppText(
+                                    'Consult with an expert astrologer for personalized remedies based on your birth chart.',
+                                    fontSize: 12,
+                                    color: Colors.blueGrey,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
     );
   }
 }

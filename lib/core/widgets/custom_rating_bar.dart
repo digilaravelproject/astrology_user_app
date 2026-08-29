@@ -24,7 +24,10 @@ class CustomRatingBar extends StatelessWidget {
         return Icon(
           Icons.star,
           size: size,
-          color: index < rating.floor() ? activeColor : inactiveColor.withOpacity(0.3),
+          color:
+              index < rating.floor()
+                  ? activeColor
+                  : inactiveColor.withOpacity(0.3),
         );
       }),
     );

@@ -70,7 +70,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
                     ),
                     const Spacer(),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20),
@@ -134,7 +137,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.white.withOpacity(0.2),
                                   borderRadius: BorderRadius.circular(20),
@@ -161,7 +167,10 @@ class SubscriptionDetailScreen extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.goldAccent,
                             borderRadius: BorderRadius.circular(20),
@@ -225,41 +234,45 @@ class SubscriptionDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
                 child: Column(
-                  children: plan.features.map((feature) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardColor,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.deepPink.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                  children:
+                      plan.features.map((feature) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
                           ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle_rounded,
-                            color: AppColors.primaryColor,
-                            size: 18,
+                          decoration: BoxDecoration(
+                            color: AppColors.cardColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.deepPink.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: AppText(
-                              feature,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textColorPrimary,
-                            ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                color: AppColors.primaryColor,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: AppText(
+                                  feature,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textColorPrimary,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 ),
               ),
 
@@ -317,14 +330,14 @@ class SubscriptionDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
                 child: CustomButton(
                   text: 'Subscribe Now',
-                  onTap: () => _handleSubscribe(context, profileController, plan),
+                  onTap:
+                      () => _handleSubscribe(context, profileController, plan),
                   backgroundColor: AppColors.primaryColor,
                   textColor: AppColors.white,
                   height: 56,
                   fontSize: 18,
                 ),
               ),
-
 
               /*Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
@@ -368,22 +381,24 @@ class SubscriptionDetailScreen extends StatelessWidget {
     try {
       controller.isLoading.value = true;
       final result = await controller.upgradePlan(plan.id);
-      
+
       if (result.isSuccess && result.body != null) {
         final data = result.body as Map<String, dynamic>;
 
         CustomSnackbar.showSuccess(result.message);
-        
+
         // Show success message
-        CustomSnackbar.showSuccess(data['message'] ?? 'Razorpay order created successfully');
-        
+        CustomSnackbar.showSuccess(
+          data['message'] ?? 'Razorpay order created successfully',
+        );
+
         // Handle Razorpay order if present
         if (data.containsKey('razorpay_order')) {
           final razorpayOrder = data['razorpay_order'] as Map<String, dynamic>;
           final orderId = razorpayOrder['id'] as String?;
           final amount = razorpayOrder['amount'] as int?;
           final keyId = razorpayOrder['key_id'] as String?;
-          
+
           if (orderId != null && amount != null && keyId != null) {
             _openRazorpayPayment(
               context: context,
@@ -418,7 +433,9 @@ class SubscriptionDetailScreen extends StatelessWidget {
     // Get user email and contact from auth controller
     final authController = Get.find<AuthController>();
     final user = authController.currentUser.value;
-    final email = "" '';
+    final email =
+        ""
+        '';
     final contact = user?.mobile ?? '';
 
     _razorpayService.init(
@@ -470,7 +487,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
       if (result.isSuccess) {
         // Refresh profile to update plan_id and isMatrimony status
         await controller.refreshProfile();
-        
+
         // Navigate to success screen instead of dialog
         Get.toNamed(
           AppRoutes.subscriptionSuccess,
@@ -481,7 +498,9 @@ class SubscriptionDetailScreen extends StatelessWidget {
           },
         );
       } else {
-        CustomSnackbar.showError(result.message ?? 'Payment verification failed');
+        CustomSnackbar.showError(
+          result.message ?? 'Payment verification failed',
+        );
       }
     } catch (e) {
       CustomSnackbar.showError(e.toString());

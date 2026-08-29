@@ -44,11 +44,7 @@ class GenderSelectionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 70,
-              color: primaryColor,
-            ),
+            Icon(icon, size: 70, color: primaryColor),
             const SizedBox(height: 15),
             AppText(
               label,

@@ -20,7 +20,8 @@ class HistoryScreen extends StatefulWidget {
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProviderStateMixin {
+class _HistoryScreenState extends State<HistoryScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late final HistoryController _historyController;
 
@@ -28,10 +29,12 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     if (!Get.isRegistered<HistoryController>()) {
       if (!Get.isRegistered<HistoryRepository>()) {
-        Get.put<HistoryRepository>(HistoryRepositoryImpl(apiClient: Get.find()));
+        Get.put<HistoryRepository>(
+          HistoryRepositoryImpl(apiClient: Get.find()),
+        );
       }
       if (!Get.isRegistered<GetChatSessionsUseCase>()) {
         Get.put(GetChatSessionsUseCase(Get.find<HistoryRepository>()));
@@ -39,14 +42,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
       if (!Get.isRegistered<GetCallSessionsUseCase>()) {
         Get.put(GetCallSessionsUseCase(Get.find<HistoryRepository>()));
       }
-      Get.put(HistoryController(
-        getChatSessionsUseCase: Get.find(),
-        getCallSessionsUseCase: Get.find(),
-      ));
+      Get.put(
+        HistoryController(
+          getChatSessionsUseCase: Get.find(),
+          getCallSessionsUseCase: Get.find(),
+        ),
+      );
     }
     _historyController = Get.find<HistoryController>();
   }
-
 
   @override
   void dispose() {
@@ -136,13 +140,18 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   Widget _buildHistoryList(String type) {
     if (type == "Chat") {
       return Obx(() {
-        if (_historyController.isLoading.value && _historyController.chatSessions.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+        if (_historyController.isLoading.value &&
+            _historyController.chatSessions.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
         }
-        
-        if (_historyController.error.value.isNotEmpty && _historyController.chatSessions.isEmpty) {
+
+        if (_historyController.error.value.isNotEmpty &&
+            _historyController.chatSessions.isEmpty) {
           return RefreshIndicator(
-            onRefresh: () => _historyController.fetchChatSessions(isRefresh: true),
+            onRefresh:
+                () => _historyController.fetchChatSessions(isRefresh: true),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
@@ -156,7 +165,8 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
 
         if (_historyController.chatSessions.isEmpty) {
           return RefreshIndicator(
-            onRefresh: () => _historyController.fetchChatSessions(isRefresh: true),
+            onRefresh:
+                () => _historyController.fetchChatSessions(isRefresh: true),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
@@ -172,7 +182,8 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
         }
 
         return RefreshIndicator(
-          onRefresh: () => _historyController.fetchChatSessions(isRefresh: true),
+          onRefresh:
+              () => _historyController.fetchChatSessions(isRefresh: true),
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: _historyController.chatSessions.length,
@@ -180,17 +191,21 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
               final session = _historyController.chatSessions[index];
               final isCompleted = session.status == "completed";
               final astrologerName = session.provider?.name ?? "Astrologer";
-              
+
               DateTime? date;
               try {
                 date = DateTime.parse(session.createdAt);
               } catch (_) {}
-              
-              final dateStr = date != null ? DateFormat('dd MMM, yyyy').format(date) : "N/A";
-              final timeStr = date != null ? DateFormat('hh:mm a').format(date) : "N/A";
-              
+
+              final dateStr =
+                  date != null
+                      ? DateFormat('dd MMM, yyyy').format(date)
+                      : "N/A";
+              final timeStr =
+                  date != null ? DateFormat('hh:mm a').format(date) : "N/A";
+
               final durationMins = (session.durationSeconds / 60).ceil();
-              
+
               return GestureDetector(
                 onTap: () {
                   Get.to(
@@ -231,7 +246,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ),
                         child: Center(
                           child: AppText(
-                            astrologerName.isNotEmpty ? astrologerName[0].toUpperCase() : 'A',
+                            astrologerName.isNotEmpty
+                                ? astrologerName[0].toUpperCase()
+                                : '',
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                             color: AppColors.deepPink,
@@ -239,7 +256,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ),
                       ),
                       const SizedBox(width: 12),
-                      
+
                       // Details
                       Expanded(
                         child: Column(
@@ -267,7 +284,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                           ],
                         ),
                       ),
-                      
+
                       // Status & Price
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -280,9 +297,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              color:
+                                  isCompleted
+                                      ? Colors.green.withOpacity(0.1)
+                                      : Colors.red.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: AppText(
@@ -306,13 +329,18 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
 
     if (type == "Call") {
       return Obx(() {
-        if (_historyController.isCallLoading.value && _historyController.callSessions.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+        if (_historyController.isCallLoading.value &&
+            _historyController.callSessions.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
         }
-        
-        if (_historyController.callError.value.isNotEmpty && _historyController.callSessions.isEmpty) {
+
+        if (_historyController.callError.value.isNotEmpty &&
+            _historyController.callSessions.isEmpty) {
           return RefreshIndicator(
-            onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+            onRefresh:
+                () => _historyController.fetchCallSessions(isRefresh: true),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
@@ -326,7 +354,8 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
 
         if (_historyController.callSessions.isEmpty) {
           return RefreshIndicator(
-            onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+            onRefresh:
+                () => _historyController.fetchCallSessions(isRefresh: true),
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
@@ -342,7 +371,8 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
         }
 
         return RefreshIndicator(
-          onRefresh: () => _historyController.fetchCallSessions(isRefresh: true),
+          onRefresh:
+              () => _historyController.fetchCallSessions(isRefresh: true),
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: _historyController.callSessions.length,
@@ -350,19 +380,23 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
               final session = _historyController.callSessions[index];
               final isCompleted = session.status == "completed";
               final astrologerName = session.provider?.name ?? "Astrologer";
-              
+
               DateTime? date;
               if (session.createdAt != null) {
                 try {
                   date = DateTime.parse(session.createdAt!);
                 } catch (_) {}
               }
-              
-              final dateStr = date != null ? DateFormat('dd MMM, yyyy').format(date) : "N/A";
-              final timeStr = date != null ? DateFormat('hh:mm a').format(date) : "N/A";
-              
+
+              final dateStr =
+                  date != null
+                      ? DateFormat('dd MMM, yyyy').format(date)
+                      : "N/A";
+              final timeStr =
+                  date != null ? DateFormat('hh:mm a').format(date) : "N/A";
+
               final durationMins = (session.durationSeconds / 60).ceil();
-              
+
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
@@ -390,7 +424,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                       ),
                       child: Center(
                         child: AppText(
-                          astrologerName.isNotEmpty ? astrologerName[0].toUpperCase() : 'A',
+                          astrologerName.isNotEmpty
+                              ? astrologerName[0].toUpperCase()
+                              : '',
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColors.deepPink,
@@ -398,7 +434,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Details
                     Expanded(
                       child: Column(
@@ -426,7 +462,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ],
                       ),
                     ),
-                    
+
                     // Status & Price
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -439,9 +475,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ),
                         const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                            color:
+                                isCompleted
+                                    ? Colors.green.withOpacity(0.1)
+                                    : Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: AppText(
@@ -481,14 +523,16 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
       itemBuilder: (context, index) {
         final item = historyItems[index];
         final isCompleted = item['status'] == "Completed";
-        
+
         return GestureDetector(
           onTap: () {
             if (type == "Chat") {
-              Get.to(() => ChatHistoryDetailScreen(
-                astrologerName: item['name']!,
-                date: item['date']!,
-              ));
+              Get.to(
+                () => ChatHistoryDetailScreen(
+                  astrologerName: item['name']!,
+                  date: item['date']!,
+                ),
+              );
             }
           },
           child: Container(
@@ -526,7 +570,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                   ),
                 ),
                 const SizedBox(width: 12),
-                
+
                 // Details
                 Expanded(
                   child: Column(
@@ -546,7 +590,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                       ),
                       const SizedBox(height: 2),
                       AppText(
-                        type == "Live" ? "Joined Live Session" : "$type Duration: ${item['duration']}",
+                        type == "Live"
+                            ? "Joined Live Session"
+                            : "$type Duration: ${item['duration']}",
                         fontSize: 12,
                         color: Colors.grey.shade600,
                         fontWeight: FontWeight.w500,
@@ -554,7 +600,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                     ],
                   ),
                 ),
-                
+
                 // Status & Price
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -567,9 +613,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: isCompleted ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                        color:
+                            isCompleted
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: AppText(

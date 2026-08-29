@@ -26,7 +26,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   final MatrimonyController _controller = Get.find<MatrimonyController>();
   final TextEditingController _searchController = TextEditingController();
   final RxBool _isSearching = false.obs;
-  
+
   // Filter state
   String _selectedAgeRange = 'All';
   String _selectedReligion = 'All';
@@ -51,223 +51,259 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
 
   void _showFilterBottomSheet(BuildContext context) {
     String selectedCategory = 'Age Range';
-    
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setModalState) => Container(
+                  height: MediaQuery.of(context).size.height * 0.85,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const AppText(
-                      'Filters',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            setModalState(() {
-                              _selectedAgeRange = 'All';
-                              _selectedReligion = 'All';
-                              _selectedEducation = 'All';
-                              _selectedMaritalStatus = 'All';
-                              _selectedLocation = 'All';
-                            });
-                            _controller.getMatrimonyProfile();
-
-                          },
-                          child: const AppText(
-                            'CLEAR ALL',
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryColor,
-                          ),
+                  child: Column(
+                    children: [
+                      // Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 22),
-                          onPressed: () => Navigator.pop(context),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Body with sidebar and content
-              Expanded(
-                child: Row(
-                  children: [
-                    // Left Sidebar - Categories
-                    Container(
-                      width: 120,
-                      color: const Color(0xFFF5F5F5),
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: [
-                          _buildCategoryItem(
-                            'Age Range'.tr,
-                            selectedCategory,
-                            () => setModalState(() => selectedCategory = 'Age Range'),
-                          ),
-                          _buildCategoryItem(
-                            'Religion'.tr,
-                            selectedCategory,
-                            () => setModalState(() => selectedCategory = 'Religion'),
-                          ),
-                          _buildCategoryItem(
-                            'Education'.tr,
-                            selectedCategory,
-                            () => setModalState(() => selectedCategory = 'Education'),
-                          ),
-                          _buildCategoryItem(
-                            'Marital Status'.tr,
-                            selectedCategory,
-                            () => setModalState(() => selectedCategory = 'Marital Status'),
-                          ),
-                          _buildCategoryItem(
-                            'Location'.tr,
-                            selectedCategory,
-                            () => setModalState(() => selectedCategory = 'Location'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // Right Content - Options
-                    Expanded(
-                      child: Container(
-                        color: Colors.white,
-                        child: _buildFilterOptions(selectedCategory, setModalState),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Bottom Apply Button
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          side: const BorderSide(color: AppColors.primaryColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: const AppText(
-                          'CLOSE',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          
-                          // Construct query string
-                          List<String> queries = [];
-                          if (_selectedAgeRange != 'All') queries.add(_selectedAgeRange);
-                          if (_selectedReligion != 'All') queries.add(_selectedReligion);
-                          if (_selectedEducation != 'All') queries.add(_selectedEducation);
-                          if (_selectedMaritalStatus != 'All') queries.add(_selectedMaritalStatus);
-                          if (_selectedLocation != 'All') queries.add(_selectedLocation);
-                          
-                          String queryString = queries.join(' ');
-                          if (queryString.isEmpty) {
-                            _controller.getMatrimonyProfile();
-                          } else {
-                            _controller.searchMatrimonyProfiles(queryString);
-                          }
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Filters applied successfully!'),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              margin: EdgeInsets.all(20),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryColor,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: const AppText(
-                          'APPLY',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                        decoration: BoxDecoration(
                           color: Colors.white,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const AppText(
+                              'Filters',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    setModalState(() {
+                                      _selectedAgeRange = 'All';
+                                      _selectedReligion = 'All';
+                                      _selectedEducation = 'All';
+                                      _selectedMaritalStatus = 'All';
+                                      _selectedLocation = 'All';
+                                    });
+                                    _controller.getMatrimonyProfile();
+                                  },
+                                  child: const AppText(
+                                    'CLEAR ALL',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 22),
+                                  onPressed: () => Navigator.pop(context),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+
+                      // Body with sidebar and content
+                      Expanded(
+                        child: Row(
+                          children: [
+                            // Left Sidebar - Categories
+                            Container(
+                              width: 120,
+                              color: const Color(0xFFF5F5F5),
+                              child: ListView(
+                                padding: EdgeInsets.zero,
+                                children: [
+                                  _buildCategoryItem(
+                                    'Age Range'.tr,
+                                    selectedCategory,
+                                    () => setModalState(
+                                      () => selectedCategory = 'Age Range',
+                                    ),
+                                  ),
+                                  _buildCategoryItem(
+                                    'Religion'.tr,
+                                    selectedCategory,
+                                    () => setModalState(
+                                      () => selectedCategory = 'Religion',
+                                    ),
+                                  ),
+                                  _buildCategoryItem(
+                                    'Education'.tr,
+                                    selectedCategory,
+                                    () => setModalState(
+                                      () => selectedCategory = 'Education',
+                                    ),
+                                  ),
+                                  _buildCategoryItem(
+                                    'Marital Status'.tr,
+                                    selectedCategory,
+                                    () => setModalState(
+                                      () => selectedCategory = 'Marital Status',
+                                    ),
+                                  ),
+                                  _buildCategoryItem(
+                                    'Location'.tr,
+                                    selectedCategory,
+                                    () => setModalState(
+                                      () => selectedCategory = 'Location',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Right Content - Options
+                            Expanded(
+                              child: Container(
+                                color: Colors.white,
+                                child: _buildFilterOptions(
+                                  selectedCategory,
+                                  setModalState,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Bottom Apply Button
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, -2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  side: const BorderSide(
+                                    color: AppColors.primaryColor,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                child: const AppText(
+                                  'CLOSE',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+
+                                  // Construct query string
+                                  List<String> queries = [];
+                                  if (_selectedAgeRange != 'All')
+                                    queries.add(_selectedAgeRange);
+                                  if (_selectedReligion != 'All')
+                                    queries.add(_selectedReligion);
+                                  if (_selectedEducation != 'All')
+                                    queries.add(_selectedEducation);
+                                  if (_selectedMaritalStatus != 'All')
+                                    queries.add(_selectedMaritalStatus);
+                                  if (_selectedLocation != 'All')
+                                    queries.add(_selectedLocation);
+
+                                  String queryString = queries.join(' ');
+                                  if (queryString.isEmpty) {
+                                    _controller.getMatrimonyProfile();
+                                  } else {
+                                    _controller.searchMatrimonyProfiles(
+                                      queryString,
+                                    );
+                                  }
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Filters applied successfully!',
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      behavior: SnackBarBehavior.floating,
+                                      margin: EdgeInsets.all(20),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                child: const AppText(
+                                  'APPLY',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 
-  Widget _buildCategoryItem(String title, String selectedCategory, VoidCallback onTap) {
+  Widget _buildCategoryItem(
+    String title,
+    String selectedCategory,
+    VoidCallback onTap,
+  ) {
     final isSelected = selectedCategory == title;
     return GestureDetector(
       onTap: onTap,
@@ -295,10 +331,40 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   Widget _buildFilterOptions(String category, StateSetter setModalState) {
     Map<String, List<String>> options = {
       'Age Range': ['All', '21-25', '26-30', '31-35', '36-40', '40+'],
-      'Religion': ['All', 'Hindu', 'Muslim', 'Christian', 'Sikh', 'Buddhist', 'Jain', 'Other'],
-      'Education': ['All', 'Graduate', 'Post Graduate', 'Doctorate', 'Diploma', 'High School'],
-      'Marital Status': ['All', 'Never Married', 'Divorced', 'Widowed', 'Separated'],
-      'Location': ['All', 'Mumbai', 'Delhi', 'Bangalore', 'Pune', 'Hyderabad', 'Chennai'],
+      'Religion': [
+        'All',
+        'Hindu',
+        'Muslim',
+        'Christian',
+        'Sikh',
+        'Buddhist',
+        'Jain',
+        'Other',
+      ],
+      'Education': [
+        'All',
+        'Graduate',
+        'Post Graduate',
+        'Doctorate',
+        'Diploma',
+        'High School',
+      ],
+      'Marital Status': [
+        'All',
+        'Never Married',
+        'Divorced',
+        'Widowed',
+        'Separated',
+      ],
+      'Location': [
+        'All',
+        'Mumbai',
+        'Delhi',
+        'Bangalore',
+        'Pune',
+        'Hyderabad',
+        'Chennai',
+      ],
     };
 
     String selectedValue = '';
@@ -319,7 +385,8 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
         break;
       case 'Marital Status':
         selectedValue = _selectedMaritalStatus;
-        onSelect = (value) => setModalState(() => _selectedMaritalStatus = value);
+        onSelect =
+            (value) => setModalState(() => _selectedMaritalStatus = value);
         break;
       case 'Location':
         selectedValue = _selectedLocation;
@@ -329,42 +396,52 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
 
     return ListView(
       padding: const EdgeInsets.all(16),
-      children: options[category]!.map((option) {
-        final isSelected = selectedValue == option;
-        return GestureDetector(
-          onTap: () => onSelect(option),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            margin: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFFFF0F5) : Colors.transparent,
-              border: Border.all(
-                color: isSelected ? AppColors.primaryColor : Colors.grey[300]!,
-                width: 1,
-              ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  isSelected ? Icons.check_circle : Icons.circle_outlined,
-                  color: isSelected ? AppColors.primaryColor : Colors.grey[400],
-                  size: 20,
+      children:
+          options[category]!.map((option) {
+            final isSelected = selectedValue == option;
+            return GestureDetector(
+              onTap: () => onSelect(option),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 12,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText(
-                    option.tr,
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? Colors.black87 : Colors.grey[700],
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected ? const Color(0xFFFFF0F5) : Colors.transparent,
+                  border: Border.all(
+                    color:
+                        isSelected ? AppColors.primaryColor : Colors.grey[300]!,
+                    width: 1,
                   ),
+                  borderRadius: BorderRadius.circular(4),
                 ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+                child: Row(
+                  children: [
+                    Icon(
+                      isSelected ? Icons.check_circle : Icons.circle_outlined,
+                      color:
+                          isSelected
+                              ? AppColors.primaryColor
+                              : Colors.grey[400],
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: AppText(
+                        option.tr,
+                        fontSize: 14,
+                        fontWeight:
+                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected ? Colors.black87 : Colors.grey[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
     );
   }
 
@@ -372,9 +449,15 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
   Widget build(BuildContext context) {
     return Obx(() {
       // isRegistered is now set based on plan_id and isMatrimony from shared preferences
-      debugPrint("MatrimonyScreen: isRegistered = ${_controller.isRegistered.value}");
-      debugPrint("MatrimonyScreen: pref isMatrimony = ${SharedPrefs.getBool("isMatrimony")}");
-      debugPrint("MatrimonyScreen: pref plan_id = ${SharedPrefs.getInt("plan_id")}");
+      debugPrint(
+        "MatrimonyScreen: isRegistered = ${_controller.isRegistered.value}",
+      );
+      debugPrint(
+        "MatrimonyScreen: pref isMatrimony = ${SharedPrefs.getBool("isMatrimony")}",
+      );
+      debugPrint(
+        "MatrimonyScreen: pref plan_id = ${SharedPrefs.getInt("plan_id")}",
+      );
 
       if (!_controller.isRegistered.value) {
         return _buildLandingUI();
@@ -383,8 +466,6 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
       if (!_controller.hasPlan.value) {
         return _buildPurchaseUI();
       }
-
-
 
       // If both plan and matrimony registration are complete, show data screen
       return Stack(
@@ -405,128 +486,149 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
               elevation: 0,
               toolbarHeight: 70, // Slightly taller for better spacing
               automaticallyImplyLeading: false,
-              title: _isSearching.value
-              ? Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    textAlignVertical: TextAlignVertical.center,
-                    controller: _searchController,
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                    decoration: InputDecoration(
-                      hintText: AppStrings.findYourSoulmatch,
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primaryColor, size: 18),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                    ),
-                    onChanged: (value) {
-                      _controller.updateSearchQuery(value);
-                      if (value.length > 2) {
-                        _controller.searchMatrimonyProfiles(value);
-                      } else if (value.isEmpty) {
-                        _controller.getMatrimonyProfile();
-                      }
-                    },
-                    onSubmitted: (value) {
-                      if (value.isNotEmpty) {
-                        _controller.searchMatrimonyProfiles(value);
-                      } else {
-                        _controller.getMatrimonyProfile();
-                      }
-                    },
+              title:
+                  _isSearching.value
+                      ? Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
 
-                  ),
-                )
-              : Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.primaryColor, AppColors.secondaryColor],
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primaryColor.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                        child: TextField(
+                          textAlignVertical: TextAlignVertical.center,
+                          controller: _searchController,
+                          autofocus: true,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: AppStrings.findYourSoulmatch,
+                            hintStyle: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 13,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.search_rounded,
+                              color: AppColors.primaryColor,
+                              size: 18,
+                            ),
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 16,
+                            ),
+                          ),
+                          onChanged: (value) {
+                            _controller.updateSearchQuery(value);
+                            if (value.length > 2) {
+                              _controller.searchMatrimonyProfiles(value);
+                            } else if (value.isEmpty) {
+                              _controller.getMatrimonyProfile();
+                            }
+                          },
+                          onSubmitted: (value) {
+                            if (value.isNotEmpty) {
+                              _controller.searchMatrimonyProfiles(value);
+                            } else {
+                              _controller.getMatrimonyProfile();
+                            }
+                          },
+                        ),
+                      )
+                      : Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.primaryColor,
+                                  AppColors.secondaryColor,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.2,
+                                  ),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                Get.toNamed(AppRoutes.myMatrimonyProfile);
+                              },
+                              child: const Icon(
+                                Icons.favorite_rounded,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: AppText(
+                              AppStrings.matrimony,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: const Color(0xFF2D3142),
+                              letterSpacing: -0.5,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
-                      child: InkWell(
-                        onTap: () {
-                          Get.toNamed(AppRoutes.myMatrimonyProfile);
-                        },
-                        child: const Icon(Icons.favorite_rounded, color: Colors.white, size: 18),
-                      ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.tune_rounded,
+                      color: AppColors.primaryColor,
+                      size: 26,
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppText(
-                        AppStrings.matrimony,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: const Color(0xFF2D3142),
-                        letterSpacing: -0.5,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    onPressed: () => _showFilterBottomSheet(context),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    icon: Icon(
+                      _isSearching.value
+                          ? Icons.close_rounded
+                          : Icons.search_rounded,
+                      color: AppColors.primaryColor,
+                      size: 26,
                     ),
-                  ],
+                    onPressed: () {
+                      _isSearching.value = !_isSearching.value;
+                      if (!_isSearching.value) {
+                        _searchController.clear();
+                        _controller.updateSearchQuery('');
+                        _controller.getMatrimonyProfile();
+                      }
+                    },
+                  ),
                 ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 4),
-              child: IconButton(
-                icon: Icon(
-                  Icons.tune_rounded,
-                  color: AppColors.primaryColor,
-                  size: 26,
-                ),
-                onPressed: () => _showFilterBottomSheet(context),
-              ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                icon: Icon(
-                  _isSearching.value ? Icons.close_rounded : Icons.search_rounded,
-                  color: AppColors.primaryColor,
-                  size: 26,
-                ),
-                onPressed: () {
-                  _isSearching.value = !_isSearching.value;
-                  if (!_isSearching.value) {
-                    _searchController.clear();
-                    _controller.updateSearchQuery('');
-                    _controller.getMatrimonyProfile();
-                  }
-
-                },
-              ),
-            ),
-          ],
-        ),
-        body: const SingleChildScrollView(
-          child: MatrimonySection(),
-        ),
-      ),
+            body: const SingleChildScrollView(child: MatrimonySection()),
+          ),
         ],
       );
     });
@@ -538,10 +640,8 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
       child: Stack(
         children: [
           // Full-screen background color
-          Positioned.fill(
-            child: Container(color: Colors.white),
-          ),
-          
+          Positioned.fill(child: Container(color: Colors.white)),
+
           // Background Floral Pattern
           Positioned(
             top: -50,
@@ -561,7 +661,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
               color: AppColors.secondaryColor.withOpacity(0.1),
             ),
           ),
-          
+
           // Content
           SingleChildScrollView(
             child: ConstrainedBox(
@@ -574,8 +674,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       children: [
-                        const SizedBox(height: 100), // Top spacing instead of Spacer for consistency
-                        
+                        const SizedBox(
+                          height: 100,
+                        ), // Top spacing instead of Spacer for consistency
                         // Overlapping Profile Images
                         SizedBox(
                           height: 220,
@@ -597,19 +698,23 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                               Positioned(
                                 top: 0,
                                 left: 0,
-                                child: _buildCircularProfile('https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                                child: _buildCircularProfile(
+                                  'https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                                ),
                               ),
                               Positioned(
                                 bottom: 0,
                                 right: 0,
-                                child: _buildCircularProfile('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                                child: _buildCircularProfile(
+                                  'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(height: 40),
-                        
+
                         AppText(
                           AppStrings.soulMatesTitle,
                           fontSize: 24,
@@ -617,18 +722,21 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           color: AppColors.secondaryColor,
                           textAlign: TextAlign.center,
                         ),
-                        
+
                         const SizedBox(height: 60),
-                        
+
                         // Gradient "Get Started" Button
                         GestureDetector(
                           onTap: () {
-                            Get.to(() => MatrimonyRegistrationScreen(
-                              onComplete: () {
-                                _controller.checkRegistrationStatus(); // Refresh status properly
-                                Get.back();
-                              },
-                            ));
+                            Get.to(
+                              () => MatrimonyRegistrationScreen(
+                                onComplete: () {
+                                  _controller
+                                      .checkRegistrationStatus(); // Refresh status properly
+                                  Get.back();
+                                },
+                              ),
+                            );
                           },
                           child: Container(
                             width: double.infinity,
@@ -637,7 +745,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                               gradient: const LinearGradient(
                                 colors: [
                                   AppColors.primaryColor,
-                                  AppColors.secondaryColor
+                                  AppColors.secondaryColor,
                                   // Color(0xFFE940BE),
                                   // Color(0xFFFF5E5E),
                                 ],
@@ -647,7 +755,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFFF5E5E).withOpacity(0.3),
+                                  color: const Color(
+                                    0xFFFF5E5E,
+                                  ).withOpacity(0.3),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -663,7 +773,9 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 150), // Increased space for floating bottom nav
+                        const SizedBox(
+                          height: 150,
+                        ), // Increased space for floating bottom nav
                       ],
                     ),
                   ),
@@ -704,7 +816,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                     ),
                   ],
                 ),
-                child:  Icon(
+                child: Icon(
                   Icons.stars_rounded,
                   size: 80,
                   color: AppColors.primaryColor,
@@ -736,7 +848,10 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                   height: 56,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppColors.primaryColor, AppColors.secondaryColor],
+                      colors: [
+                        AppColors.primaryColor,
+                        AppColors.secondaryColor,
+                      ],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
@@ -753,7 +868,11 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 20),
+                        Icon(
+                          Icons.workspace_premium_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                         SizedBox(width: 10),
                         AppText(
                           'Buy Membership Now',

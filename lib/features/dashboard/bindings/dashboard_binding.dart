@@ -29,7 +29,6 @@ import '../../profile/domain/repositories/profile_repository.dart';
 import '../../profile/domain/services/profile_service.dart';
 import '../../profile/domain/usecases/get_profile_usecase.dart';
 
-
 import '../../home/domain/repositories/remedy_repository.dart';
 import '../../home/domain/services/remedy_service.dart';
 import '../../home/domain/usecases/get_remedies_usecase.dart';
@@ -81,50 +80,80 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => GetProfileUseCase(Get.find<ProfileService>()));
 
     // Matrimony
-    Get.lazyPut<MatrimonyRepositoryInterface>(() => MatrimonyRepository(apiClient: Get.find()));
-    Get.put<MatrimonyRepositoryInterface>(MatrimonyRepository(apiClient: Get.find()));
-    Get.put<MatrimonyServiceInterface>(MatrimonyService(repository: Get.find()));
+    Get.lazyPut<MatrimonyRepositoryInterface>(
+      () => MatrimonyRepository(apiClient: Get.find()),
+    );
+    Get.put<MatrimonyRepositoryInterface>(
+      MatrimonyRepository(apiClient: Get.find()),
+    );
+    Get.put<MatrimonyServiceInterface>(
+      MatrimonyService(repository: Get.find()),
+    );
     Get.put(SaveMatrimonyProfileUseCase(service: Get.find()));
     Get.put(UpdateMatrimonyProfileUseCase(service: Get.find()));
     Get.put(GetMatrimonyProfileUseCase(service: Get.find()));
-    Get.put<GetMatrimonyProfileDetailsUseCase>(GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.put<GetMyMatrimonyProfileDetailsUseCase>(GetMyMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.put<SearchMatrimonyProfilesUseCase>(SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()));
-    Get.put<BlockMatrimonyProfileUseCase>(BlockMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
-    Get.put<ReportMatrimonyProfileUseCase>(ReportMatrimonyProfileUseCase(service: Get.find<MatrimonyServiceInterface>()));
+    Get.put<GetMatrimonyProfileDetailsUseCase>(
+      GetMatrimonyProfileDetailsUseCase(Get.find<MatrimonyServiceInterface>()),
+    );
+    Get.put<GetMyMatrimonyProfileDetailsUseCase>(
+      GetMyMatrimonyProfileDetailsUseCase(
+        Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+    Get.put<SearchMatrimonyProfilesUseCase>(
+      SearchMatrimonyProfilesUseCase(Get.find<MatrimonyServiceInterface>()),
+    );
+    Get.put<BlockMatrimonyProfileUseCase>(
+      BlockMatrimonyProfileUseCase(
+        service: Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
+    Get.put<ReportMatrimonyProfileUseCase>(
+      ReportMatrimonyProfileUseCase(
+        service: Get.find<MatrimonyServiceInterface>(),
+      ),
+    );
     Get.put<MatrimonyController>(
       MatrimonyController(
         saveMatrimonyProfileUseCase: Get.find<SaveMatrimonyProfileUseCase>(),
-        updateMatrimonyProfileUseCase: Get.find<UpdateMatrimonyProfileUseCase>(),
+        updateMatrimonyProfileUseCase:
+            Get.find<UpdateMatrimonyProfileUseCase>(),
         getMatrimonyProfileUseCase: Get.find<GetMatrimonyProfileUseCase>(),
-        getMatrimonyProfileDetailsUseCase: Get.find<GetMatrimonyProfileDetailsUseCase>(),
-        getMyMatrimonyProfileDetailsUseCase: Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
-        searchMatrimonyProfilesUseCase: Get.find<SearchMatrimonyProfilesUseCase>(),
+        getMatrimonyProfileDetailsUseCase:
+            Get.find<GetMatrimonyProfileDetailsUseCase>(),
+        getMyMatrimonyProfileDetailsUseCase:
+            Get.find<GetMyMatrimonyProfileDetailsUseCase>(),
+        searchMatrimonyProfilesUseCase:
+            Get.find<SearchMatrimonyProfilesUseCase>(),
         blockMatrimonyProfileUseCase: Get.find<BlockMatrimonyProfileUseCase>(),
-        reportMatrimonyProfileUseCase: Get.find<ReportMatrimonyProfileUseCase>(),
+        reportMatrimonyProfileUseCase:
+            Get.find<ReportMatrimonyProfileUseCase>(),
         getProfileUseCase: Get.find<GetProfileUseCase>(),
       ),
     );
-
 
     // Home (Remedy & Blog)
     Get.lazyPut(() => RemedyRepository(Get.find<ApiClient>()));
     Get.lazyPut(() => RemedyService(Get.find<RemedyRepository>()));
     Get.lazyPut(() => GetRemediesUseCase(Get.find<RemedyService>()));
     Get.lazyPut(() => GetRemedyByIdUseCase(Get.find<RemedyService>()));
-    Get.lazyPut(() => RemedyController(
-      getRemediesUseCase: Get.find<GetRemediesUseCase>(),
-      getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
-    ));
+    Get.lazyPut(
+      () => RemedyController(
+        getRemediesUseCase: Get.find<GetRemediesUseCase>(),
+        getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
+      ),
+    );
 
     Get.lazyPut(() => BlogRepository(Get.find<ApiClient>()));
     Get.lazyPut(() => BlogService(Get.find<BlogRepository>()));
     Get.lazyPut(() => GetBlogsUseCase(Get.find<BlogService>()));
     Get.lazyPut(() => GetBlogByIdUseCase(Get.find<BlogService>()));
-    Get.lazyPut(() => BlogController(
-      getBlogsUseCase: Get.find<GetBlogsUseCase>(),
-      getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
-    ));
+    Get.lazyPut(
+      () => BlogController(
+        getBlogsUseCase: Get.find<GetBlogsUseCase>(),
+        getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
+      ),
+    );
 
     // Astrologers
     Get.lazyPut(() => AstrologerRepository(apiClient: Get.find()));
@@ -142,35 +171,43 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => SendGiftUseCase(service: Get.find()));
     Get.lazyPut(() => GetGiftHistoryUseCase(service: Get.find()));
     Get.lazyPut(() => GetAstrologerGalleryUseCase(service: Get.find()));
-    Get.lazyPut(() => AstrologerController(
-      getAstrologersUseCase: Get.find(),
-      getAstrologerByIdUseCase: Get.find(),
-      blockAstrologerUseCase: Get.find(),
-      reportAstrologerUseCase: Get.find(),
-      postReviewUseCase: Get.find(),
-      getReviewsUseCase: Get.find(),
-      followAstrologerUseCase: Get.find(),
-      getGiftsUseCase: Get.find(),
-      sendGiftUseCase: Get.find(),
-      getGiftHistoryUseCase: Get.find(),
-      getAstrologerGalleryUseCase: Get.find(),
-    ));
+    Get.lazyPut(
+      () => AstrologerController(
+        getAstrologersUseCase: Get.find(),
+        getAstrologerByIdUseCase: Get.find(),
+        blockAstrologerUseCase: Get.find(),
+        reportAstrologerUseCase: Get.find(),
+        postReviewUseCase: Get.find(),
+        getReviewsUseCase: Get.find(),
+        followAstrologerUseCase: Get.find(),
+        getGiftsUseCase: Get.find(),
+        sendGiftUseCase: Get.find(),
+        getGiftHistoryUseCase: Get.find(),
+        getAstrologerGalleryUseCase: Get.find(),
+      ),
+    );
 
     // Wallet
-    Get.lazyPut<WalletRepositoryInterface>(() => WalletRepository(apiClient: Get.find()));
-    Get.lazyPut<WalletServiceInterface>(() => WalletService(repository: Get.find()));
+    Get.lazyPut<WalletRepositoryInterface>(
+      () => WalletRepository(apiClient: Get.find()),
+    );
+    Get.lazyPut<WalletServiceInterface>(
+      () => WalletService(repository: Get.find()),
+    );
     Get.lazyPut(() => GetWalletUseCase(service: Get.find()));
     Get.lazyPut(() => TopUpWalletUseCase(service: Get.find()));
     Get.lazyPut(() => VerifyTopUpUseCase(service: Get.find()));
     Get.lazyPut(() => GetTransactionsUseCase(service: Get.find()));
-    Get.lazyPut(() => WalletController(
-      getWalletUseCase: Get.find(),
-      topUpWalletUseCase: Get.find(),
-      verifyTopUpUseCase: Get.find(),
-      getTransactionsUseCase: Get.find(),
-      authService: Get.find<AuthServiceInterface>(),
-      razorpayService: Get.find<RazorpayService>(),
-    ));
+    Get.lazyPut(
+      () => WalletController(
+        getWalletUseCase: Get.find(),
+        topUpWalletUseCase: Get.find(),
+        verifyTopUpUseCase: Get.find(),
+        getTransactionsUseCase: Get.find(),
+        authService: Get.find<AuthServiceInterface>(),
+        razorpayService: Get.find<RazorpayService>(),
+      ),
+    );
 
     // Notifications
     Get.lazyPut(() => NotificationRepository(apiClient: Get.find()));
@@ -180,36 +217,57 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => FounderRepository(Get.find<ApiClient>()));
     Get.lazyPut(() => FounderService(Get.find<FounderRepository>()));
     Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
-    Get.lazyPut(() => FounderController(
-      getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
-    ));
+    Get.lazyPut(
+      () => FounderController(
+        getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
+      ),
+    );
 
     // Matching (Kundli Matching)
     Get.lazyPut<MatchingRepository>(() => MatchingRepositoryImpl());
-    Get.lazyPut(() => GetMatchingUseCase(repository: Get.find<MatchingRepository>()));
-    Get.lazyPut(() => MatchingController(
-      getMatchingUseCase: Get.find<GetMatchingUseCase>(),
-    ));
+    Get.lazyPut(
+      () => GetMatchingUseCase(repository: Get.find<MatchingRepository>()),
+    );
+    Get.lazyPut(
+      () => MatchingController(
+        getMatchingUseCase: Get.find<GetMatchingUseCase>(),
+      ),
+    );
 
     // Kundli (Birth Chart)
-    Get.lazyPut<KundliRepository>(() => KundliRepositoryImpl(apiClient: Get.find<ApiClient>()));
-    Get.lazyPut(() => GetBirthChartUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => CreateKundliUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => GetKundliListUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => GetKundliByIdUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => UpdateKundliUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => DeleteKundliUseCase(repository: Get.find<KundliRepository>()));
-    Get.lazyPut(() => KundliController(
-      getBirthChartUseCase: Get.find<GetBirthChartUseCase>(),
-      createKundliUseCase: Get.find<CreateKundliUseCase>(),
-      getKundliListUseCase: Get.find<GetKundliListUseCase>(),
-      getKundliByIdUseCase: Get.find<GetKundliByIdUseCase>(),
-      updateKundliUseCase: Get.find<UpdateKundliUseCase>(),
-      deleteKundliUseCase: Get.find<DeleteKundliUseCase>(),
-    ));
+    Get.lazyPut<KundliRepository>(
+      () => KundliRepositoryImpl(apiClient: Get.find<ApiClient>()),
+    );
+    Get.lazyPut(
+      () => GetBirthChartUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => CreateKundliUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => GetKundliListUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => GetKundliByIdUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => UpdateKundliUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => DeleteKundliUseCase(repository: Get.find<KundliRepository>()),
+    );
+    Get.lazyPut(
+      () => KundliController(
+        getBirthChartUseCase: Get.find<GetBirthChartUseCase>(),
+        createKundliUseCase: Get.find<CreateKundliUseCase>(),
+        getKundliListUseCase: Get.find<GetKundliListUseCase>(),
+        getKundliByIdUseCase: Get.find<GetKundliByIdUseCase>(),
+        updateKundliUseCase: Get.find<UpdateKundliUseCase>(),
+        deleteKundliUseCase: Get.find<DeleteKundliUseCase>(),
+      ),
+    );
 
     // Live Session Dependencies
     LiveBinding().dependencies();
   }
 }
-

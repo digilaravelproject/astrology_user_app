@@ -6,7 +6,9 @@ class AstrologerService {
 
   AstrologerService({required this.repository});
 
-  Future<ResponseModel> getAstrologers({Map<String, dynamic>? queryParameters}) async {
+  Future<ResponseModel> getAstrologers({
+    Map<String, dynamic>? queryParameters,
+  }) async {
     return await repository.getAstrologers(queryParameters: queryParameters);
   }
 
@@ -26,15 +28,23 @@ class AstrologerService {
     return await repository.unblockAstrologer(id);
   }
 
-  Future<ResponseModel> getBlockedAstrologers({Map<String, dynamic>? queryParameters}) async {
-    return await repository.getBlockedAstrologers(queryParameters: queryParameters);
+  Future<ResponseModel> getBlockedAstrologers({
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    return await repository.getBlockedAstrologers(
+      queryParameters: queryParameters,
+    );
   }
 
   Future<ResponseModel> reportAstrologer(int id, String reason) async {
     return await repository.reportAstrologer(id, reason);
   }
 
-  Future<ResponseModel> postReview(int astrologerId, int rating, String review) async {
+  Future<ResponseModel> postReview(
+    int astrologerId,
+    int rating,
+    String review,
+  ) async {
     return await repository.postReview(astrologerId, rating, review);
   }
 

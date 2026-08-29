@@ -6,7 +6,7 @@ class FounderController extends GetxController {
   final GetFounderWordsUseCase _getFounderWordsUseCase;
 
   FounderController({required GetFounderWordsUseCase getFounderWordsUseCase})
-      : _getFounderWordsUseCase = getFounderWordsUseCase;
+    : _getFounderWordsUseCase = getFounderWordsUseCase;
 
   final isLoading = false.obs;
   final founderWords = <FounderModel>[].obs;

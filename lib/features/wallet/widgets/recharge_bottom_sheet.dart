@@ -11,11 +11,7 @@ class RechargeBottomSheet extends StatefulWidget {
   final double? neededAmount;
   final String? serviceType;
 
-  const RechargeBottomSheet({
-    super.key,
-    this.neededAmount,
-    this.serviceType,
-  });
+  const RechargeBottomSheet({super.key, this.neededAmount, this.serviceType});
 
   @override
   State<RechargeBottomSheet> createState() => _RechargeBottomSheetState();
@@ -56,31 +52,33 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
           _buildCustomInput(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Obx(() => CustomButton(
-              text: AppStrings.proceedToPay,
-              fontSize: 16,
-              height: 55,
-              isLoading: walletController.isLoading.value,
-              borderRadius: 15,
-              onTap: () async {
-                if (_amountController.text.isEmpty) {
-                  CustomSnackbar.showError('Please enter an amount');
-                  return;
-                }
-                double? amount = double.tryParse(_amountController.text);
-                if (amount == null || amount <= 0) {
-                  CustomSnackbar.showError('Please enter a valid amount');
-                  return;
-                }
+            child: Obx(
+              () => CustomButton(
+                text: AppStrings.proceedToPay,
+                fontSize: 16,
+                height: 55,
+                isLoading: walletController.isLoading.value,
+                borderRadius: 15,
+                onTap: () async {
+                  if (_amountController.text.isEmpty) {
+                    CustomSnackbar.showError('Please enter an amount');
+                    return;
+                  }
+                  double? amount = double.tryParse(_amountController.text);
+                  if (amount == null || amount <= 0) {
+                    CustomSnackbar.showError('Please enter a valid amount');
+                    return;
+                  }
 
-                await walletController.startTopUp(amount);
-                // The bottom sheet can stay open or close based on success callback in controller
-                // If you want it to close here, you can, but it's better handled in controller or after verification
-                if (!walletController.isLoading.value) {
-                  Navigator.pop(context);
-                }
-              },
-            )),
+                  await walletController.startTopUp(amount);
+                  // The bottom sheet can stay open or close based on success callback in controller
+                  // If you want it to close here, you can, but it's better handled in controller or after verification
+                  if (!walletController.isLoading.value) {
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 30),
         ],
@@ -118,8 +116,11 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
                   color: AppColors.deepPink.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.warning_amber_rounded,
-                    color: AppColors.deepPink, size: 20),
+                child: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: AppColors.deepPink,
+                  size: 20,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -173,12 +174,14 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF2E1A47),
               ),
-              Obx(() => AppText(
-                '₹${walletController.balance}',
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppColors.deepPink,
-              )),
+              Obx(
+                () => AppText(
+                  '₹${walletController.balance}',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.deepPink,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -212,45 +215,56 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: amounts.map((amount) {
-              final isSelected = selectedAmount == amount;
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedAmount = amount;
-                    _amountController.text = amount;
-                  });
-                },
-                child: Container(
-                  width: (MediaQuery.of(context).size.width - 72) / 3,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primaryColor : Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: isSelected ? AppColors.primaryColor : Colors.grey.shade200,
+            children:
+                amounts.map((amount) {
+                  final isSelected = selectedAmount == amount;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedAmount = amount;
+                        _amountController.text = amount;
+                      });
+                    },
+                    child: Container(
+                      width: (MediaQuery.of(context).size.width - 72) / 3,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? AppColors.primaryColor : Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color:
+                              isSelected
+                                  ? AppColors.primaryColor
+                                  : Colors.grey.shade200,
+                        ),
+                        boxShadow:
+                            isSelected
+                                ? [
+                                  BoxShadow(
+                                    color: AppColors.primaryColor.withOpacity(
+                                      0.25,
+                                    ),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                                : null,
+                      ),
+                      child: Center(
+                        child: AppText(
+                          '₹$amount',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color:
+                              isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF2E1A47),
+                        ),
+                      ),
                     ),
-                    boxShadow: isSelected
-                        ? [
-                            BoxShadow(
-                              color: AppColors.primaryColor.withOpacity(0.25),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            )
-                          ]
-                        : null,
-                  ),
-                  child: Center(
-                    child: AppText(
-                      '₹$amount',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: isSelected ? Colors.white : const Color(0xFF2E1A47),
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
           ),
         ],
       ),
@@ -285,7 +299,10 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
             borderRadius: BorderRadius.circular(15),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 14,
+          ),
         ),
         style: const TextStyle(
           color: Color(0xFF2E1A47),

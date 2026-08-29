@@ -13,7 +13,8 @@ class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({Key? key}) : super(key: key);
 
   @override
-  State<LanguageSelectionScreen> createState() => _LanguageSelectionScreenState();
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
@@ -42,12 +43,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                               shape: BoxShape.circle,
                               color: const Color(0xFFFF9933).withOpacity(0.05),
                             ),
-                            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 20, color: Color(0xFF2E1A47)),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              size: 20,
+                              color: Color(0xFF2E1A47),
+                            ),
                           ),
                         ),
-                        
+
                         const SizedBox(height: 30),
-                        
+
                         AppText(
                           AppStrings.selectLanguageTitle,
                           style: GoogleFonts.dmSerifDisplay(
@@ -57,16 +62,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                             height: 1.1,
                           ),
                         ),
-                        
+
                         const SizedBox(height: 12),
-                        
+
                         AppText(
                           AppStrings.selectLanguageSubtitle,
                           fontSize: 16,
                           color: Colors.black.withOpacity(0.4),
                           fontWeight: FontWeight.w400,
                         ),
-                        
+
                         const SizedBox(height: 40),
 
                         // Language Grid
@@ -75,28 +80,37 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                             return GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 1.45,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 25,
-                              ),
-                              itemCount: localizationController.languages.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: 1.45,
+                                    crossAxisSpacing: 20,
+                                    mainAxisSpacing: 25,
+                                  ),
+                              itemCount:
+                                  localizationController.languages.length,
                               itemBuilder: (context, index) {
-                                final language = localizationController.languages[index];
-                                final isSelected = localizationController.selectedIndex == index;
-                                return _buildLanguageCard(language, isSelected, localizationController);
+                                final language =
+                                    localizationController.languages[index];
+                                final isSelected =
+                                    localizationController.selectedIndex ==
+                                    index;
+                                return _buildLanguageCard(
+                                  language,
+                                  isSelected,
+                                  localizationController,
+                                );
                               },
                             );
-                          }
+                          },
                         ),
-                        
+
                         const SizedBox(height: 120), // Space for bottom button
                       ],
                     ),
                   ),
                 ),
-                
+
                 // Bottom Button
                 Container(
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 30),
@@ -123,9 +137,14 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     );
   }
 
-  Widget _buildLanguageCard(LanguageModel language, bool isSelected, LocalizationController controller) {
-    final String firstChar = language.languageName.isNotEmpty ? language.languageName[0] : "";
-    
+  Widget _buildLanguageCard(
+    LanguageModel language,
+    bool isSelected,
+    LocalizationController controller,
+  ) {
+    final String firstChar =
+        language.languageName.isNotEmpty ? language.languageName[0] : "";
+
     return GestureDetector(
       onTap: () => controller.setLanguage(language),
       child: Stack(
@@ -141,14 +160,18 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               color: isSelected ? Colors.white : Colors.white,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isSelected ? AppColors.deepPink : Colors.black.withOpacity(0.06),
+                color:
+                    isSelected
+                        ? AppColors.deepPink
+                        : Colors.black.withOpacity(0.06),
                 width: isSelected ? 2.5 : 1.2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: isSelected 
-                      ? AppColors.deepPink.withOpacity(0.12)
-                      : Colors.black.withOpacity(0.02),
+                  color:
+                      isSelected
+                          ? AppColors.deepPink.withOpacity(0.12)
+                          : Colors.black.withOpacity(0.02),
                   blurRadius: isSelected ? 15 : 5,
                   offset: isSelected ? const Offset(0, 8) : const Offset(0, 2),
                 ),
@@ -174,7 +197,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       ),
                     ),
                   ),
-                
+
                 // Language Name
                 Center(
                   child: Column(
@@ -183,8 +206,12 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       AppText(
                         language.languageName,
                         fontSize: 18,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                        color: isSelected ? const Color(0xFF2D2D2D) : Colors.black54,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w600,
+                        color:
+                            isSelected
+                                ? const Color(0xFF2D2D2D)
+                                : Colors.black54,
                         letterSpacing: 0.2,
                       ),
                       if (isSelected)
@@ -233,11 +260,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       right: -100,
       child: Opacity(
         opacity: 0.05,
-        child: Icon(
-          Icons.language,
-          size: 400,
-          color: AppColors.primaryColor,
-        ),
+        child: Icon(Icons.language, size: 400, color: AppColors.primaryColor),
       ),
     );
   }

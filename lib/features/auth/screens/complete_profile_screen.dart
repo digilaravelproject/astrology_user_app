@@ -37,7 +37,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime now = DateTime.now();
-    DateTime tempDate = selectedDate ?? now.subtract(const Duration(days: 365 * 20));
+    DateTime tempDate =
+        selectedDate ?? now.subtract(const Duration(days: 365 * 20));
     if (tempDate.isAfter(now)) {
       tempDate = now;
     }
@@ -46,9 +47,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final formattedHeader = "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
+            final formattedHeader =
+                "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -61,10 +65,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -75,7 +84,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -142,7 +155,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _selectTime(BuildContext context) async {
     final now = DateTime.now();
-    final bool isSelectedDateToday = selectedDate != null &&
+    final bool isSelectedDateToday =
+        selectedDate != null &&
         selectedDate!.year == now.year &&
         selectedDate!.month == now.month &&
         selectedDate!.day == now.day;
@@ -164,12 +178,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final hour = tempTime.hour == 0 ? 12 : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
+            final hour =
+                tempTime.hour == 0
+                    ? 12
+                    : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
             final minute = tempTime.minute.toString().padLeft(2, '0');
             final period = tempTime.hour >= 12 ? 'PM' : 'AM';
             final formattedHeader = "$hour:$minute $period";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -182,10 +201,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -196,7 +220,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -215,10 +243,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.time,
                           initialDateTime: tempTime,
-                          maximumDate: isSelectedDateToday ? DateTime.now() : null,
+                          maximumDate:
+                              isSelectedDateToday ? DateTime.now() : null,
                           onDateTimeChanged: (DateTime newTime) {
                             setModalState(() {
-                              if (isSelectedDateToday && newTime.isAfter(DateTime.now())) {
+                              if (isSelectedDateToday &&
+                                  newTime.isAfter(DateTime.now())) {
                                 tempTime = DateTime.now();
                               } else {
                                 tempTime = newTime;
@@ -233,7 +263,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     InkWell(
                       onTap: () {
                         final currentNow = DateTime.now();
-                        if (isSelectedDateToday && tempTime.isAfter(currentNow)) {
+                        if (isSelectedDateToday &&
+                            tempTime.isAfter(currentNow)) {
                           tempTime = currentNow;
                         }
                         Navigator.of(context).pop(tempTime);
@@ -261,7 +292,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       },
     );
     if (result != null) {
-      setState(() => selectedTime = TimeOfDay(hour: result.hour, minute: result.minute));
+      setState(
+        () =>
+            selectedTime = TimeOfDay(hour: result.hour, minute: result.minute),
+      );
     }
   }
 
@@ -271,7 +305,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   String _getMonthShort(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[(month - 1) % 12];
   }
 
@@ -294,7 +341,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               const SizedBox(height: 30),
               _buildHeader(),
               const SizedBox(height: 35),
-              
+
               _buildLabel(AppStrings.fullNameLabel),
               const SizedBox(height: 8),
               _buildTextField(
@@ -302,14 +349,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 hint: AppStrings.nameHint,
                 icon: Icons.person_outline_rounded,
               ),
-              
+
               const SizedBox(height: 25),
-              
+
               _buildLabel(AppStrings.genderLabel),
               const SizedBox(height: 10),
               Row(
                 children: [
-                   Expanded(
+                  Expanded(
                     child: GenderSelectionCard(
                       label: AppStrings.male,
                       icon: Icons.male_rounded,
@@ -328,18 +375,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 30),
-              
+
               _buildLabel(AppStrings.birthDetailsLabel),
               const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: _buildReadOnlyField(
-                      hint: selectedDate != null
-                          ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                          : AppStrings.dateOfBirth,
+                      hint:
+                          selectedDate != null
+                              ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                              : AppStrings.dateOfBirth,
                       icon: Icons.calendar_today_rounded,
                       isFilled: selectedDate != null,
                       onTap: () => _selectDate(context),
@@ -348,9 +396,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   const SizedBox(width: 15),
                   Expanded(
                     child: _buildReadOnlyField(
-                      hint: selectedTime != null
-                          ? selectedTime!.format(context)
-                          : AppStrings.timeOfBirth,
+                      hint:
+                          selectedTime != null
+                              ? selectedTime!.format(context)
+                              : AppStrings.timeOfBirth,
                       icon: Icons.access_time_rounded,
                       isFilled: selectedTime != null,
                       onTap: () => _selectTime(context),
@@ -364,7 +413,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 hint: AppStrings.placeOfBirth,
                 icon: Icons.location_on_outlined,
               ),
-              
+
               const SizedBox(height: 50),
 
               CustomButton(
@@ -387,7 +436,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       children: [
         GestureDetector(
           onTap: () => Get.back(),
-          child: const Icon(Icons.arrow_back_ios_new_rounded, size: 22, color: AppColors.primaryColor),
+          child: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 22,
+            color: AppColors.primaryColor,
+          ),
         ),
         const SizedBox(height: 25),
         AppText(
@@ -410,37 +463,67 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildTextField({required TextEditingController controller, required String hint, required IconData icon}) {
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+  }) {
     final bool isFilled = controller.text.isNotEmpty;
-    
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.fieldBackground,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: isFilled ? AppColors.deepPink : AppColors.borderColor.withOpacity(0.5),
+          color:
+              isFilled
+                  ? AppColors.deepPink
+                  : AppColors.borderColor.withOpacity(0.5),
           width: 1.2,
         ),
       ),
       child: TextField(
         controller: controller,
         onChanged: (value) => setState(() {}),
-        style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+        style: GoogleFonts.poppins(
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textColorPrimary,
+        ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: GoogleFonts.poppins(color: Colors.black38, fontSize: 15, fontWeight: FontWeight.w400),
-          prefixIcon: Icon(icon, color: isFilled ? AppColors.deepPink : AppColors.black.withOpacity(0.26), size: 20),
+          hintStyle: GoogleFonts.poppins(
+            color: Colors.black38,
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: Icon(
+            icon,
+            color:
+                isFilled
+                    ? AppColors.deepPink
+                    : AppColors.black.withOpacity(0.26),
+            size: 20,
+          ),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
           filled: false,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildReadOnlyField({required String hint, required IconData icon, required VoidCallback onTap, bool isFilled = false}) {
+  Widget _buildReadOnlyField({
+    required String hint,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isFilled = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -448,7 +531,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           color: AppColors.fieldBackground,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isFilled ? AppColors.deepPink : AppColors.borderColor.withOpacity(0.5),
+            color:
+                isFilled
+                    ? AppColors.deepPink
+                    : AppColors.borderColor.withOpacity(0.5),
             width: 1.2,
           ),
         ),
@@ -457,20 +543,29 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: GoogleFonts.poppins(
-                color: isFilled ? AppColors.textColorPrimary : AppColors.black.withOpacity(0.38), 
-                fontWeight: isFilled ? FontWeight.w600 : FontWeight.w500, 
+                color:
+                    isFilled
+                        ? AppColors.textColorPrimary
+                        : AppColors.black.withOpacity(0.38),
+                fontWeight: isFilled ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 14,
               ),
               prefixIcon: Icon(
-                icon, 
-                color: isFilled ? AppColors.deepPink : AppColors.black.withOpacity(0.26), 
+                icon,
+                color:
+                    isFilled
+                        ? AppColors.deepPink
+                        : AppColors.black.withOpacity(0.26),
                 size: 18,
               ),
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               filled: false,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
             ),
           ),
         ),
@@ -501,6 +596,4 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       ),
     );
   }
-
-
 }

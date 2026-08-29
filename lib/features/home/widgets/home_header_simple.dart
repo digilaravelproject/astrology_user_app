@@ -38,18 +38,18 @@ class HomeHeaderSimple extends StatelessWidget {
                 color: AppColors.primaryColor,
                 letterSpacing: -0.5,
               ),
-              const AppText(
-                "👋",
-                fontSize: 24,
-              ),
+              const AppText("👋", fontSize: 24),
             ],
           ),
-          
+
           Container(
             padding: const EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primaryColor.withOpacity(0.2), width: 2),
+              border: Border.all(
+                color: AppColors.primaryColor.withOpacity(0.2),
+                width: 2,
+              ),
             ),
             child: CustomImageWidget(
               imagePath: profileImageUrl,

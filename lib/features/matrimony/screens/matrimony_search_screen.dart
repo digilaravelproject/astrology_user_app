@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_button.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 
 class MatrimonySearchScreen extends StatefulWidget {
   const MatrimonySearchScreen({super.key});
@@ -47,10 +48,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFFFC0CB),
-              Color(0xFFFFE4E9),
-            ],
+            colors: [Color(0xFFFFC0CB), Color(0xFFFFE4E9)],
           ),
         ),
         child: SafeArea(
@@ -67,24 +65,16 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                   ),
                 ),
               ),
-              
+
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
                       // Family Image
                       Container(
-                        height: 350,
-                        width: double.infinity,
                         margin: const EdgeInsets.symmetric(horizontal: 20),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?auto=compress&cs=tinysrgb&w=800',
-                            ),
-                            fit: BoxFit.cover,
-                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
@@ -93,9 +83,16 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                             ),
                           ],
                         ),
+                        child: CustomImageWidget(
+                          imagePath: 'https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg?auto=compress&cs=tinysrgb&w=800',
+                          height: 350,
+                          width: double.infinity,
+                          radius: BorderRadius.circular(20),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       const SizedBox(height: 30),
-                      
+
                       // Form Container
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -121,7 +118,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               color: Color(0xFF4A4A4A),
                             ),
                             const SizedBox(height: 20),
-                            
+
                             // Mother Tongue Dropdown
                             Container(
                               decoration: BoxDecoration(
@@ -150,16 +147,17 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                                   color: Color(0xFF9E9E9E),
                                 ),
                                 dropdownColor: Colors.white,
-                                items: motherTongues.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: AppText(
-                                      value,
-                                      fontSize: 15,
-                                      color: const Color(0xFF4A4A4A),
-                                    ),
-                                  );
-                                }).toList(),
+                                items:
+                                    motherTongues.map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: AppText(
+                                          value,
+                                          fontSize: 15,
+                                          color: const Color(0xFF4A4A4A),
+                                        ),
+                                      );
+                                    }).toList(),
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     selectedMotherTongue = newValue;
@@ -168,7 +166,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            
+
                             const AppText(
                               'and belong to',
                               fontSize: 18,
@@ -176,7 +174,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               color: Color(0xFF4A4A4A),
                             ),
                             const SizedBox(height: 20),
-                            
+
                             // Community Dropdown
                             Container(
                               decoration: BoxDecoration(
@@ -205,16 +203,17 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                                   color: Color(0xFF9E9E9E),
                                 ),
                                 dropdownColor: Colors.white,
-                                items: communities.map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: AppText(
-                                      value,
-                                      fontSize: 15,
-                                      color: const Color(0xFF4A4A4A),
-                                    ),
-                                  );
-                                }).toList(),
+                                items:
+                                    communities.map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: AppText(
+                                          value,
+                                          fontSize: 15,
+                                          color: const Color(0xFF4A4A4A),
+                                        ),
+                                      );
+                                    }).toList(),
                                 onChanged: (String? newValue) {
                                   setState(() {
                                     selectedCommunity = newValue;
@@ -223,7 +222,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               ),
                             ),
                             const SizedBox(height: 30),
-                            
+
                             // Let's Begin Button
                             CustomButton(
                               text: "Let's Begin",
@@ -233,7 +232,8 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               borderRadius: 12,
                               gradient: AppColors.primaryGradient,
                               onTap: () {
-                                if (selectedMotherTongue != null && selectedCommunity != null) {
+                                if (selectedMotherTongue != null &&
+                                    selectedCommunity != null) {
                                   // Handle search
                                   Get.snackbar(
                                     'Search Started',

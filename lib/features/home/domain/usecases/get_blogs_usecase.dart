@@ -11,9 +11,12 @@ class GetBlogsUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
         final List<dynamic> list = bodyMap['blogs'] ?? [];
-        return list.map((e) => BlogModel.fromJson(e as Map<String, dynamic>)).toList();
+        return list
+            .map((e) => BlogModel.fromJson(e as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         print('Error parsing blogs: $e');
       }

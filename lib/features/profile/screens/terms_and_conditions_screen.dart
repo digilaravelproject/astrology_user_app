@@ -12,7 +12,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SupportController>();
-    
+
     // Fetch terms and conditions when screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchTermsAndConditions();
@@ -26,7 +26,9 @@ class TermsAndConditionsScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isTermsLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: Colors.pink));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.pink),
+          );
         }
 
         final termsData = controller.termsAndConditionsData.value;

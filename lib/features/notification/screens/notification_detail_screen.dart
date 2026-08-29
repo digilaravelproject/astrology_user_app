@@ -12,7 +12,8 @@ class NotificationDetailScreen extends StatefulWidget {
   const NotificationDetailScreen({super.key, required this.notification});
 
   @override
-  State<NotificationDetailScreen> createState() => _NotificationDetailScreenState();
+  State<NotificationDetailScreen> createState() =>
+      _NotificationDetailScreenState();
 }
 
 class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
@@ -42,7 +43,11 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
+            color: Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
       ),
@@ -75,9 +80,9 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Title
             AppText(
               widget.notification.title ?? '',
@@ -86,11 +91,11 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
               color: Colors.black87,
               height: 1.3,
             ),
-            
+
             const SizedBox(height: 16),
             const Divider(color: Color(0xFFEEEEEE)),
             const SizedBox(height: 16),
-            
+
             // Message Body
             AppText(
               widget.notification.message ?? '',

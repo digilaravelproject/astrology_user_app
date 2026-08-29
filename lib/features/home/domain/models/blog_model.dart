@@ -27,7 +27,10 @@ class BlogModel {
 
   factory BlogModel.fromJson(Map<String, dynamic> json) {
     return BlogModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
+      id:
+          json['id'] is int
+              ? json['id']
+              : int.tryParse(json['id'].toString()) ?? 0,
       title: json['title']?.toString() ?? '',
       subtitle: json['subtitle']?.toString() ?? '',
       content: json['content']?.toString() ?? '',
@@ -35,8 +38,16 @@ class BlogModel {
       isActive: json['is_active'] == true || json['is_active'] == 1,
       blogImage: json['blog_image']?.toString(),
       type: json['type']?.toString(),
-      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now() : DateTime.now(),
-      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) ?? DateTime.now() : DateTime.now(),
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.tryParse(json['created_at'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
+      updatedAt:
+          json['updated_at'] != null
+              ? DateTime.tryParse(json['updated_at'].toString()) ??
+                  DateTime.now()
+              : DateTime.now(),
     );
   }
 

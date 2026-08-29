@@ -21,7 +21,8 @@ class GetAstrologersUseCase {
             dataList = body['astrologers'];
           } else if (body['data'] is List) {
             dataList = body['data'];
-          } else if (body['data'] is Map && body['data']['astrologers'] is List) {
+          } else if (body['data'] is Map &&
+              body['data']['astrologers'] is List) {
             dataList = body['data']['astrologers'];
           } else if (body['data'] is Map && body['data']['data'] is List) {
             dataList = body['data']['data'];
@@ -31,7 +32,9 @@ class GetAstrologersUseCase {
         }
 
         if (dataList != null) {
-          return dataList.map((json) => AstrologerModel.fromJson(json)).toList();
+          return dataList
+              .map((json) => AstrologerModel.fromJson(json))
+              .toList();
         }
       }
     } catch (e) {

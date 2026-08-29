@@ -26,18 +26,17 @@ class LiveController extends GetxController {
     this._watchSessionUseCase,
   );
 
-
   final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
   final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
   final RxList<LiveCommentModel> comments = <LiveCommentModel>[].obs;
   final RxBool isCameraOn = true.obs;
   final RxBool isAudioOn = true.obs;
-  
+
   final RxBool isLoadingSessions = false.obs;
   final RxBool isLoadingDetail = false.obs;
   final RxBool isSendingComment = false.obs;
   final RxBool isSendingSuperChat = false.obs;
-  
+
   Timer? _commentsPollTimer;
 
   Future<void> fetchActiveSessions() async {
@@ -49,11 +48,15 @@ class LiveController extends GetxController {
         if (result.body is List) {
           data = result.body;
         } else if (result.body is Map) {
-          data = result.body['data'] is List ? result.body['data'] : (result.body['body'] is List ? result.body['body'] : []);
+          data =
+              result.body['data'] is List
+                  ? result.body['data']
+                  : (result.body['body'] is List ? result.body['body'] : []);
         } else {
           data = [];
         }
-        activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        activeSessions.value =
+            data.map((json) => LiveSessionModel.fromJson(json)).toList();
         print('[LIVE] Loaded ${activeSessions.length} active live sessions');
       }
     } catch (e) {
@@ -101,10 +104,11 @@ class LiveController extends GetxController {
         print('[LIVE] Successfully joined session $id');
         final dynamic body = result.body;
         if (body is Map<String, dynamic>) {
-          final sessionData = body['session'] ?? body['data']?['session'] ?? body['data'];
+          final sessionData =
+              body['session'] ?? body['data']?['session'] ?? body['data'];
           if (sessionData != null) {
             currentSession.value = LiveSessionModel.fromJson(sessionData);
-            
+
             // Set initial camera/audio state
             isCameraOn.value = currentSession.value!.isCameraOn;
             isAudioOn.value = currentSession.value!.isAudioOn;
@@ -113,13 +117,17 @@ class LiveController extends GetxController {
               isAudioOn.value = false;
             }
           }
-          
-          final lastComments = body['last_comments'] ?? body['data']?['last_comments'];
+
+          final lastComments =
+              body['last_comments'] ?? body['data']?['last_comments'];
           if (lastComments is List) {
-            comments.value = lastComments.map((json) => LiveCommentModel.fromJson(json)).toList();
+            comments.value =
+                lastComments
+                    .map((json) => LiveCommentModel.fromJson(json))
+                    .toList();
           }
         }
-        
+
         // Start polling comments periodically
         _startCommentsPolling(id);
       }
@@ -161,8 +169,9 @@ class LiveController extends GetxController {
         } else {
           data = [];
         }
-        final newComments = data.map((json) => LiveCommentModel.fromJson(json)).toList();
-        
+        final newComments =
+            data.map((json) => LiveCommentModel.fromJson(json)).toList();
+
         comments.value = newComments;
       }
     } catch (e) {
@@ -174,7 +183,7 @@ class LiveController extends GetxController {
     if (message.trim().isEmpty) return;
     try {
       isSendingComment.value = true;
-      
+
       // Optimistic Update
       final tempComment = LiveCommentModel(
         id: DateTime.now().millisecondsSinceEpoch,
@@ -205,7 +214,11 @@ class LiveController extends GetxController {
   Future<bool> sendSuperChat(int sessionId, int giftId, String? message) async {
     try {
       isSendingSuperChat.value = true;
-      final result = await _sendSuperChatUseCase.call(sessionId, giftId, message);
+      final result = await _sendSuperChatUseCase.call(
+        sessionId,
+        giftId,
+        message,
+      );
       if (result.isSuccess) {
         CustomSnackbar.showSuccess('Super Chat sent successfully! 🎉');
         await fetchComments(sessionId);
@@ -260,4 +273,3 @@ class LiveController extends GetxController {
     super.onClose();
   }
 }
-

@@ -24,19 +24,25 @@ class CallController extends GetxController with WidgetsBindingObserver {
   final ApiClient _apiClient = Get.find<ApiClient>();
   final WebRTCService webrtcService = WebRTCService();
 
-  final Rx<CallStatus> status = CallStatus.idle.obs; // idle, dialing, waiting, ongoing, completed, rejected, cancelled, missed
+  final Rx<CallStatus> status =
+      CallStatus
+          .idle
+          .obs; // idle, dialing, waiting, ongoing, completed, rejected, cancelled, missed
   final RxInt durationSeconds = 0.obs;
   final RxBool isMuted = false.obs;
   final RxBool isSpeakerOn = false.obs;
   bool isCallScreenVisible = false;
   bool isPackageCall = false;
+
   /// True when the package sub-session also has an active chat channel (used for granular end modal)
   bool isChatAlsoActive = false;
+
   /// Active package chat session ID (used when switching back to chat after "End Call Only")
   int? activeChatSessionId;
 
   /// Master package countdown in seconds — server-driven via WebSocket
-  int get packageMasterSeconds => WebSocketService.packageRemainingSeconds.value;
+  int get packageMasterSeconds =>
+      WebSocketService.packageRemainingSeconds.value;
 
   int? sessionId;
   int? providerId;
@@ -60,7 +66,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     _setupWebSocketListeners();
-    _packageTerminatedSub = WebSocketService.isPackageSessionTerminated.listen((isTerminated) {
+    _packageTerminatedSub = WebSocketService.isPackageSessionTerminated.listen((
+      isTerminated,
+    ) {
       if (isTerminated && isPackageCall) {
         _handlePackageTerminated();
       }
@@ -68,38 +76,67 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void _setupWebSocketListeners() {
-    _acceptedSubscription = WebSocketService.callAcceptedData.listen((data) async {
+    _acceptedSubscription = WebSocketService.callAcceptedData.listen((
+      data,
+    ) async {
       Logger.d('CallController: WebSocket callAcceptedData received: $data');
-      Logger.d('CallController: Current status: ${status.value.name}, sessionId: $sessionId');
-      if (data.isNotEmpty && (status.value == CallStatus.dialing || status.value == CallStatus.ringing)) {
+      Logger.d(
+        'CallController: Current status: ${status.value.name}, sessionId: $sessionId',
+      );
+      if (data.isNotEmpty &&
+          (status.value == CallStatus.dialing ||
+              status.value == CallStatus.ringing)) {
         final session = data['session'];
         if (session != null) {
-          final incomingSessionId = int.tryParse(session['id']?.toString() ?? '');
-          Logger.d('CallController: Matching session: incomingSessionId = $incomingSessionId, expected = $sessionId');
+          final incomingSessionId = int.tryParse(
+            session['id']?.toString() ?? '',
+          );
+          Logger.d(
+            'CallController: Matching session: incomingSessionId = $incomingSessionId, expected = $sessionId',
+          );
           if (incomingSessionId == sessionId) {
-            String? answer = data['answer']?.toString() ?? session['answer']?.toString();
-            Logger.d('CallController: Found answer in WS (checking root and session): ${answer != null ? "length: ${answer.length}" : "NULL"}');
-            
+            String? answer =
+                data['answer']?.toString() ?? session['answer']?.toString();
+            Logger.d(
+              'CallController: Found answer in WS (checking root and session): ${answer != null ? "length: ${answer.length}" : "NULL"}',
+            );
+
             if (answer == null || answer.isEmpty) {
-              Logger.d('CallController: Answer is null/empty in WS. Fetching from currentCallSession API...');
+              Logger.d(
+                'CallController: Answer is null/empty in WS. Fetching from currentCallSession API...',
+              );
               try {
-                final response = await _apiClient.get(AppUrls.currentCallSession, handleError: false, showErrorScreen: false);
-                Logger.d('CallController: currentCallSession API response body: ${response.body}');
+                final response = await _apiClient.get(
+                  AppUrls.currentCallSession,
+                  handleError: false,
+                  showErrorScreen: false,
+                );
+                Logger.d(
+                  'CallController: currentCallSession API response body: ${response.body}',
+                );
                 if (response.isSuccess && response.body != null) {
                   final dataMap = response.body['data'] ?? response.body;
                   final activeSession = dataMap['session'] ?? dataMap;
-                  answer = activeSession['answer']?.toString() ?? activeSession['answer_sdp']?.toString();
-                  Logger.d('CallController: Answer from API: ${answer != null ? "length: ${answer.length}" : "NULL"}');
+                  answer =
+                      activeSession['answer']?.toString() ??
+                      activeSession['answer_sdp']?.toString();
+                  Logger.d(
+                    'CallController: Answer from API: ${answer != null ? "length: ${answer.length}" : "NULL"}',
+                  );
                 }
               } catch (e) {
-                Logger.e('CallController: Error fetching current call session -> $e');
+                Logger.e(
+                  'CallController: Error fetching current call session -> $e',
+                );
               }
             }
 
             if (answer != null && answer.isNotEmpty) {
               _handleCallAccepted(answer);
             } else {
-              Logger.e('CallController: Answer SDP is still NULL. Cannot establish WebRTC connection.');
+              Logger.e(
+                'CallController: Answer SDP is still NULL. Cannot establish WebRTC connection.',
+              );
             }
           }
         }
@@ -112,7 +149,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
         final session = data['session'];
         if (session != null) {
           final incomingId = int.tryParse(session['id']?.toString() ?? '');
-          Logger.d('CallController: callDismissed match check: incoming=$incomingId, expected=$sessionId');
+          Logger.d(
+            'CallController: callDismissed match check: incoming=$incomingId, expected=$sessionId',
+          );
           if (incomingId == sessionId) {
             final reason = data['reason']?.toString() ?? 'dismissed';
             _handleCallDismissed(reason);
@@ -130,7 +169,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
             final candidate = data['candidate']?.toString();
             final receiverId = data['receiverId'];
             // Only add candidate if it is meant for us (receiverId matches current user ID)
-            if (candidate != null && receiverId == WebSocketService.currentUserId) {
+            if (candidate != null &&
+                receiverId == WebSocketService.currentUserId) {
               webrtcService.addRemoteCandidate(candidate);
             }
           }
@@ -166,7 +206,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       isPackageCall = isPackageSession;
 
       status.value = CallStatus.dialing;
-      Logger.d('CallController: Dialing astrologer $providerName (ID: $providerId)...');
+      Logger.d(
+        'CallController: Dialing astrologer $providerName (ID: $providerId)...',
+      );
 
       // 1. Create SDP Offer
       // We pass a temporary sessionId (0) first since we don't have the real ID yet
@@ -175,16 +217,14 @@ class CallController extends GetxController with WidgetsBindingObserver {
       // 2. Post to Initiate API
       final response = await _apiClient.post(
         isPackageSession ? AppUrls.packageSessionStart : AppUrls.initiateCall,
-        data: isPackageSession
-            ? {
-                'astrologer_id': providerId,
-                'mode': 'call',
-                'offer': offerDescription.sdp,
-              }
-            : {
-                'provider_id': providerId,
-                'offer': offerDescription.sdp,
-              },
+        data:
+            isPackageSession
+                ? {
+                  'astrologer_id': providerId,
+                  'mode': 'call',
+                  'offer': offerDescription.sdp,
+                }
+                : {'provider_id': providerId, 'offer': offerDescription.sdp},
         handleError: true,
         showErrorScreen: false,
       );
@@ -192,26 +232,39 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (response.isSuccess) {
         final bodyMap = response.body;
         // Since response.body already points to the 'data' map from ResponseModel.fromJson (json['data'] ?? json)
-        final sessionData = bodyMap is Map 
-            ? (bodyMap['session'] ?? bodyMap['call_session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']?['call_session']) 
-            : null;
+        final sessionData =
+            bodyMap is Map
+                ? (bodyMap['session'] ??
+                    bodyMap['call_session'] ??
+                    bodyMap['data']?['session'] ??
+                    bodyMap['data']?['call_session'])
+                : null;
         if (isPackageSession) {
-          final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
+          final subSessionData =
+              bodyMap is Map
+                  ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session'])
+                  : null;
           if (subSessionData != null) {
-            SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
+            SessionBottomSheetHelper.activeSubSessionId = int.tryParse(
+              subSessionData['id']?.toString() ?? '',
+            );
           }
           // Immediately sync the master countdown from REST API response
-          final remainingSecs = bodyMap is Map
-              ? (bodyMap['remaining_duration'] ?? bodyMap['data']?['remaining_duration'])
-              : null;
+          final remainingSecs =
+              bodyMap is Map
+                  ? (bodyMap['remaining_duration'] ??
+                      bodyMap['data']?['remaining_duration'])
+                  : null;
           if (remainingSecs != null) {
-            WebSocketService.packageRemainingSeconds.value = int.tryParse(remainingSecs.toString()) ?? 0;
+            WebSocketService.packageRemainingSeconds.value =
+                int.tryParse(remainingSecs.toString()) ?? 0;
           }
         }
         if (sessionData != null) {
           sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
           webrtcService.activeSessionId = sessionId;
-          final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
+          final sessionStatus =
+              sessionData['status']?.toString() ?? 'initiated';
 
           if (sessionStatus == 'waiting') {
             status.value = CallStatus.waiting;
@@ -225,7 +278,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
         }
       } else {
         status.value = CallStatus.idle;
-        CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate call.');
+        CustomSnackbar.showError(
+          response.body?['message']?.toString() ?? 'Failed to initiate call.',
+        );
         cleanUp();
       }
     } catch (e) {
@@ -263,41 +318,61 @@ class CallController extends GetxController with WidgetsBindingObserver {
     if (sessionId == null) return;
     _isEndingCall = true;
     try {
-      final response = isPackageCall && SessionBottomSheetHelper.activeSubSessionId != null
-          ? await _apiClient.post(
-              AppUrls.packageSessionEnd,
-              data: {'sub_session_id': SessionBottomSheetHelper.activeSubSessionId},
-            )
-          : await _apiClient.post(
-              AppUrls.endCallSession(sessionId!),
-              handleError: true,
-              showErrorScreen: false,
-            );
+      final response =
+          isPackageCall && SessionBottomSheetHelper.activeSubSessionId != null
+              ? await _apiClient.post(
+                AppUrls.packageSessionEnd,
+                data: {
+                  'sub_session_id': SessionBottomSheetHelper.activeSubSessionId,
+                },
+              )
+              : await _apiClient.post(
+                AppUrls.endCallSession(sessionId!),
+                handleError: true,
+                showErrorScreen: false,
+              );
       if (response.isSuccess) {
         if (_isSummaryShown) return;
         _isSummaryShown = true;
-        
+
         status.value = CallStatus.completed;
         CustomSnackbar.showSuccess('Call ended successfully.');
-        
+
         final bodyMap = response.body;
-        final sessionData = bodyMap is Map 
-            ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['sub_session'] ?? bodyMap['data']?['sub_session'] ?? bodyMap['data']) 
-            : null;
+        final sessionData =
+            bodyMap is Map
+                ? (bodyMap['session'] ??
+                    bodyMap['data']?['session'] ??
+                    bodyMap['sub_session'] ??
+                    bodyMap['data']?['sub_session'] ??
+                    bodyMap['data'])
+                : null;
         int duration = 0;
         double cost = 0.0;
         if (sessionData != null && sessionData is Map) {
-          duration = int.tryParse((sessionData['duration_seconds'] ?? sessionData['duration_used'])?.toString() ?? '') ?? 0;
-          cost = double.tryParse(sessionData['total_cost']?.toString() ?? '') ?? 0.0;
+          duration =
+              int.tryParse(
+                (sessionData['duration_seconds'] ??
+                            sessionData['duration_used'])
+                        ?.toString() ??
+                    '',
+              ) ??
+              0;
+          cost =
+              double.tryParse(sessionData['total_cost']?.toString() ?? '') ??
+              0.0;
         }
-        
+
         final sId = sessionId ?? 0;
         cleanUp();
         if (isCallScreenVisible) {
           Get.back();
         }
       } else {
-        CustomSnackbar.showError(response.message ?? 'Failed to end call properly, but cleaning up locally.');
+        CustomSnackbar.showError(
+          response.message ??
+              'Failed to end call properly, but cleaning up locally.',
+        );
         cleanUp();
         if (isCallScreenVisible) {
           Get.back();
@@ -319,10 +394,14 @@ class CallController extends GetxController with WidgetsBindingObserver {
   /// End Call Only — keeps chat alive, navigates back to chat screen
   Future<void> terminateChannelOnly() async {
     if (!isPackageCall) return;
-    
-    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+
+    final subId =
+        PackageSessionService.activeSubSessionId ??
+        SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
-      Logger.e('CallController: terminateChannelOnly — no activeSubSessionId found');
+      Logger.e(
+        'CallController: terminateChannelOnly — no activeSubSessionId found',
+      );
       return;
     }
     try {
@@ -331,7 +410,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
         channelType: 'call',
         action: 'channel_only',
       );
-      Logger.d('CallController: terminateChannelOnly success. Returning to chat...');
+      Logger.d(
+        'CallController: terminateChannelOnly success. Returning to chat...',
+      );
 
       final chatSessId = activeChatSessionId ?? 0;
       final pName = providerName ?? 'Astrologer';
@@ -371,16 +452,18 @@ class CallController extends GetxController with WidgetsBindingObserver {
       await endCall();
       return;
     }
-    
-    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
+
+    final subId =
+        PackageSessionService.activeSubSessionId ??
+        SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
       // Fallback to regular endCall
       await endCall();
       return;
     }
-    
+
     isManualEnd = true;
-    
+
     try {
       await PackageSessionService.terminateChannel(
         subSessionId: subId,
@@ -420,7 +503,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
     durationSeconds.value = 0;
 
     final acceptedMillis = DateTime.now().millisecondsSinceEpoch;
-    
+
     _startCallTimer();
     _showOngoingNotification(startedAtMillis: acceptedMillis);
 
@@ -451,21 +534,22 @@ class CallController extends GetxController with WidgetsBindingObserver {
   void _handleCallEnded(Map<String, dynamic> data) {
     if (_isSummaryShown) return;
     _isSummaryShown = true;
-    
+
     status.value = CallStatus.completed;
     CustomSnackbar.showInfo('Call ended.');
-    
+
     final session = data['session'];
     int sId = sessionId ?? 0;
     int duration = 0;
     double cost = 0.0;
-    
+
     if (session != null) {
       sId = int.tryParse(session['id']?.toString() ?? '') ?? sId;
-      duration = int.tryParse(session['duration_seconds']?.toString() ?? '') ?? 0;
+      duration =
+          int.tryParse(session['duration_seconds']?.toString() ?? '') ?? 0;
       cost = double.tryParse(session['total_cost']?.toString() ?? '') ?? 0.0;
     }
-    
+
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
 
@@ -480,7 +564,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
   void _startRingingTimeout() {
     _ringingTimer?.cancel();
     _ringingTimer = Timer(const Duration(seconds: 60), () {
-      if (status.value == CallStatus.ringing || status.value == CallStatus.dialing || status.value == CallStatus.waiting) {
+      if (status.value == CallStatus.ringing ||
+          status.value == CallStatus.dialing ||
+          status.value == CallStatus.waiting) {
         status.value = CallStatus.missed;
         CustomSnackbar.showError('Call unanswered.');
         cleanUp();
@@ -497,14 +583,26 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   void _showOngoingNotification({int? startedAtMillis}) {
     if (sessionId != null) {
-      
+      final effectiveStart =
+          startedAtMillis != null
+              ? DateTime.fromMillisecondsSinceEpoch(startedAtMillis)
+              : DateTime.now();
+      ForegroundTaskService.startActiveSessionNotification(
+        title: 'Call in progress',
+        type: 'Call',
+        startedAt: effectiveStart,
+      );
     }
   }
 
   void _startRingtone({required bool isIncoming}) {
     // Play user app sound for outgoing call
     if (!isIncoming) {
-      SoundVibrationService().startRingtone('audio/user_app_sound.mp3', loop: true, vibrate: true);
+      SoundVibrationService().startRingtone(
+        'audio/user_app_sound.mp3',
+        loop: true,
+        vibrate: true,
+      );
       Logger.d('[CallController] Ringtone started → user_app_sound.mp3');
     }
   }
@@ -521,9 +619,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _callTimer = null;
     _ringingTimer?.cancel();
     _ringingTimer = null;
-    if (sessionId != null) {
-      
-    }
+    if (sessionId != null) {}
     try {
       LocalNotificationService.cancelCallNotification();
       ForegroundTaskService.stopService();
@@ -547,23 +643,51 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if ((status.value == CallStatus.ongoing || status.value == CallStatus.ringing || status.value == CallStatus.dialing || status.value == CallStatus.waiting) && sessionId != null && providerName != null) {
-        minimizeToBubble(Get.context!, providerName!, providerImage ?? "", shouldPop: false);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      if ((status.value == CallStatus.ongoing ||
+              status.value == CallStatus.ringing ||
+              status.value == CallStatus.dialing ||
+              status.value == CallStatus.waiting) &&
+          sessionId != null &&
+          providerName != null) {
+        minimizeToBubble(
+          Get.context!,
+          providerName!,
+          providerImage ?? "",
+          shouldPop: false,
+        );
       }
     } else if (state == AppLifecycleState.resumed) {
       checkCurrentActiveCallSession();
     }
   }
 
-  void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
+  void minimizeToBubble(
+    BuildContext context,
+    String name,
+    String image, {
+    bool shouldPop = true,
+  }) {
     if (_isEndingCall) return;
-    debugPrint("==== [CALL_DEBUG] CallController.minimizeToBubble called! sessionId=$sessionId, status=${status.value.name}, shouldPop=$shouldPop ====");
-    if (sessionId == null || (status.value != CallStatus.ongoing && status.value != CallStatus.ringing && status.value != CallStatus.dialing && status.value != CallStatus.waiting)) {
-      debugPrint("==== [CALL_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====");
+    debugPrint(
+      "==== [CALL_DEBUG] CallController.minimizeToBubble called! sessionId=$sessionId, status=${status.value.name}, shouldPop=$shouldPop ====",
+    );
+    if (sessionId == null ||
+        (status.value != CallStatus.ongoing &&
+            status.value != CallStatus.ringing &&
+            status.value != CallStatus.dialing &&
+            status.value != CallStatus.waiting)) {
+      debugPrint(
+        "==== [CALL_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====",
+      );
       return;
     }
-    final startStr = WebSocketService.sessionStartTimes[sessionId!] ?? DateTime.now().subtract(Duration(seconds: durationSeconds.value)).toIso8601String();
+    final startStr =
+        WebSocketService.sessionStartTimes[sessionId!] ??
+        DateTime.now()
+            .subtract(Duration(seconds: durationSeconds.value))
+            .toIso8601String();
     WebSocketService.sessionStartTimes[sessionId!] = startStr;
 
     FloatingCallBubble.show(
@@ -574,7 +698,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       startedAt: status.value == CallStatus.ongoing ? startStr : null,
       status: status.value.name,
       onTap: () {
-        debugPrint("==== [CALL_DEBUG] FloatingCallBubble tapped! Returning to CallScreen ====");
+        debugPrint(
+          "==== [CALL_DEBUG] FloatingCallBubble tapped! Returning to CallScreen ====",
+        );
         FloatingCallBubble.dismiss(stopForegroundService: false);
         Get.to(() => const CallScreen());
       },
@@ -586,18 +712,30 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   Future<void> checkCurrentActiveCallSession() async {
     try {
-      final response = await _apiClient.get(AppUrls.currentCallSession, handleError: false, showErrorScreen: false);
+      final response = await _apiClient.get(
+        AppUrls.currentCallSession,
+        handleError: false,
+        showErrorScreen: false,
+      );
       if (response.isSuccess && response.body != null) {
         final bodyMap = response.body;
-        final session = bodyMap is Map 
-            ? (bodyMap['session'] ?? bodyMap['data']?['session'] ?? bodyMap['data'] ?? bodyMap)
-            : null;
+        final session =
+            bodyMap is Map
+                ? (bodyMap['session'] ??
+                    bodyMap['data']?['session'] ??
+                    bodyMap['data'] ??
+                    bodyMap)
+                : null;
         if (session != null) {
           final sessionStatus = session['status']?.toString();
-          if (sessionStatus == 'ongoing' || sessionStatus == 'ringing' || sessionStatus == 'dialing' || sessionStatus == 'waiting') {
-            
+          if (sessionStatus == 'ongoing' ||
+              sessionStatus == 'ringing' ||
+              sessionStatus == 'dialing' ||
+              sessionStatus == 'waiting') {
             // Prevent race condition: if call is already ended locally, ignore stale API response
-            if (status.value == CallStatus.completed || status.value == CallStatus.cancelled || status.value == CallStatus.completed) {
+            if (status.value == CallStatus.completed ||
+                status.value == CallStatus.cancelled ||
+                status.value == CallStatus.completed) {
               return;
             }
 
@@ -608,47 +746,58 @@ class CallController extends GetxController with WidgetsBindingObserver {
               (e) => e.name == sessionStatus,
               orElse: () => CallStatus.ongoing,
             );
-            
+
             // Dynamically set isPackageCall based on prepaid/package session flags
-            isPackageCall = (session['is_prepaid'] == true ||
-                session['is_package_session'] == true ||
-                session['billing_mode'] == 'prepaid' ||
-                (bodyMap is Map && (
-                  bodyMap['is_prepaid'] == true ||
-                  bodyMap['is_package_session'] == true ||
-                  bodyMap['billing_mode'] == 'prepaid' ||
-                  bodyMap['data']?['is_prepaid'] == true ||
-                  bodyMap['data']?['is_package_session'] == true ||
-                  bodyMap['data']?['billing_mode'] == 'prepaid'
-                )));
-            
+            isPackageCall =
+                (session['is_prepaid'] == true ||
+                    session['is_package_session'] == true ||
+                    session['billing_mode'] == 'prepaid' ||
+                    (bodyMap is Map &&
+                        (bodyMap['is_prepaid'] == true ||
+                            bodyMap['is_package_session'] == true ||
+                            bodyMap['billing_mode'] == 'prepaid' ||
+                            bodyMap['data']?['is_prepaid'] == true ||
+                            bodyMap['data']?['is_package_session'] == true ||
+                            bodyMap['data']?['billing_mode'] == 'prepaid')));
+
             providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];
             providerName = provider?['name']?.toString() ?? 'Astrologer';
-            providerImage = provider?['image']?.toString() ?? provider?['profile_image']?.toString() ?? '';
-            
+            providerImage =
+                provider?['image']?.toString() ??
+                provider?['profile_image']?.toString() ??
+                '';
+
             if (sessionStatus == 'ongoing') {
               final startedAtStr = session['started_at']?.toString();
               if (startedAtStr != null) {
                 final startedAt = DateTime.tryParse(startedAtStr)?.toLocal();
                 if (startedAt != null) {
-                  durationSeconds.value = DateTime.now().difference(startedAt).inSeconds;
+                  durationSeconds.value =
+                      DateTime.now().difference(startedAt).inSeconds;
                   _startCallTimer();
                 }
               }
-              
-              final answer = session['answer']?.toString() ?? session['answer_sdp']?.toString();
+
+              final answer =
+                  session['answer']?.toString() ??
+                  session['answer_sdp']?.toString();
               if (answer != null && answer.isNotEmpty) {
                 await webrtcService.createOffer(sessionId!);
                 await webrtcService.setRemoteAnswer(answer);
               }
-            } else if (sessionStatus == 'ringing' || sessionStatus == 'dialing') {
+            } else if (sessionStatus == 'ringing' ||
+                sessionStatus == 'dialing') {
               _startRingtone(isIncoming: false);
               _startRingingTimeout();
             }
-            
+
             // Double check before showing notification in case status changed during async operations
-            if (status.value == CallStatus.completed || status.value == CallStatus.cancelled || status.value == CallStatus.completed || status.value == CallStatus.idle || _isEndingCall) {
+            if (status.value == CallStatus.completed ||
+                status.value == CallStatus.cancelled ||
+                status.value == CallStatus.completed ||
+                status.value == CallStatus.idle ||
+                _isEndingCall) {
               return;
             }
 
@@ -680,13 +829,15 @@ class CallController extends GetxController with WidgetsBindingObserver {
         cleanUp();
       }
     } catch (e) {
-      Logger.e('CallController: Error checking current active call session -> $e');
+      Logger.e(
+        'CallController: Error checking current active call session -> $e',
+      );
     }
   }
 
   void _handlePackageTerminated() {
     if (isManualEnd) return;
-    
+
     _stopRingtone();
     status.value = CallStatus.completed;
     cleanUp();
@@ -696,12 +847,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
     Get.dialog(
       AlertDialog(
         title: const Text("Session Expired"),
-        content: const Text("Your prepaid package session has expired. Conversation has ended."),
+        content: const Text(
+          "Your prepaid package session has expired. Conversation has ended.",
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text("OK"),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text("OK")),
         ],
       ),
     );
@@ -709,7 +859,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
-    debugPrint("==== [CALL_DEBUG] CallController.onClose invoked! sessionId=$sessionId, status=${status.value.name} ====");
+    debugPrint(
+      "==== [CALL_DEBUG] CallController.onClose invoked! sessionId=$sessionId, status=${status.value.name} ====",
+    );
     WidgetsBinding.instance.removeObserver(this);
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();

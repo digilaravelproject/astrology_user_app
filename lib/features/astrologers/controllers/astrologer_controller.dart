@@ -47,17 +47,17 @@ class AstrologerController extends GetxController {
     required SendGiftUseCase sendGiftUseCase,
     required GetGiftHistoryUseCase getGiftHistoryUseCase,
     required GetAstrologerGalleryUseCase getAstrologerGalleryUseCase,
-  })  : _getAstrologersUseCase = getAstrologersUseCase,
-        _getAstrologerByIdUseCase = getAstrologerByIdUseCase,
-        _blockAstrologerUseCase = blockAstrologerUseCase,
-        _reportAstrologerUseCase = reportAstrologerUseCase,
-        _postReviewUseCase = postReviewUseCase,
-        _getReviewsUseCase = getReviewsUseCase,
-        _followAstrologerUseCase = followAstrologerUseCase,
-        _getGiftsUseCase = getGiftsUseCase,
-        _sendGiftUseCase = sendGiftUseCase,
-        _getGiftHistoryUseCase = getGiftHistoryUseCase,
-        _getAstrologerGalleryUseCase = getAstrologerGalleryUseCase;
+  }) : _getAstrologersUseCase = getAstrologersUseCase,
+       _getAstrologerByIdUseCase = getAstrologerByIdUseCase,
+       _blockAstrologerUseCase = blockAstrologerUseCase,
+       _reportAstrologerUseCase = reportAstrologerUseCase,
+       _postReviewUseCase = postReviewUseCase,
+       _getReviewsUseCase = getReviewsUseCase,
+       _followAstrologerUseCase = followAstrologerUseCase,
+       _getGiftsUseCase = getGiftsUseCase,
+       _sendGiftUseCase = sendGiftUseCase,
+       _getGiftHistoryUseCase = getGiftHistoryUseCase,
+       _getAstrologerGalleryUseCase = getAstrologerGalleryUseCase;
 
   final RxList<AstrologerModel> astrologers = <AstrologerModel>[].obs;
   final RxBool isLoading = false.obs;
@@ -70,18 +70,18 @@ class AstrologerController extends GetxController {
   final RxList<GiftHistoryItem> giftHistory = <GiftHistoryItem>[].obs;
   final RxBool isHistoryLoading = false.obs;
   final RxnInt sendingGiftId = RxnInt();
-  
+
   final RxList<AstrologerGalleryModel> gallery = <AstrologerGalleryModel>[].obs;
   final RxBool isGalleryLoading = false.obs;
-  
+
   // Isolated lists for Listing Screens to avoid affecting Home
   final RxList<AstrologerModel> filteredAstrologers = <AstrologerModel>[].obs;
   final RxBool isFilteredLoading = false.obs;
-  
+
   // Isolated search results
   final RxList<AstrologerModel> searchResults = <AstrologerModel>[].obs;
   final RxBool isSearchLoading = false.obs;
-  
+
   // Separate list for Top Astrologers (Stories)
   final RxList<AstrologerModel> topAstrologers = <AstrologerModel>[].obs;
   final RxBool isTopLoading = false.obs;
@@ -104,9 +104,13 @@ class AstrologerController extends GetxController {
     // Fetch astrologers when controller is initialized
     fetchAstrologers();
     fetchGifts();
-    
+
     // Setup debouncer for search
-    debounce(searchQuery, (_) => fetchAstrologers(), time: const Duration(milliseconds: 500));
+    debounce(
+      searchQuery,
+      (_) => fetchAstrologers(),
+      time: const Duration(milliseconds: 500),
+    );
   }
 
   Future<void> fetchTopAstrologers({String? serviceType}) async {
@@ -118,7 +122,7 @@ class AstrologerController extends GetxController {
       } else if (serviceType == 'all') {
         params['service_type'] = 'all';
       }
-      
+
       final result = await _getAstrologersUseCase.execute(params: params);
       topAstrologers.assignAll(result);
     } catch (e) {
@@ -128,15 +132,20 @@ class AstrologerController extends GetxController {
     }
   }
 
-  Future<void> fetchFilteredAstrologers({String? type, String? serviceType, List<String>? skills, bool? online}) async {
+  Future<void> fetchFilteredAstrologers({
+    String? type,
+    String? serviceType,
+    List<String>? skills,
+    bool? online,
+  }) async {
     try {
       isFilteredLoading.value = true;
-      
+
       // Sync global states so UI chips update
       if (serviceType != null) selectedServiceType.value = serviceType;
       if (online != null) isOnlineOnly.value = online;
-      
-      // Ensure type is 'all' when filtering by skill if not specified, 
+
+      // Ensure type is 'all' when filtering by skill if not specified,
       // as per user requirement: {type: all, service_type: chat, skills: ...}
       if (type != null) {
         selectedType.value = type;
@@ -156,16 +165,18 @@ class AstrologerController extends GetxController {
 
       final Map<String, dynamic> params = {};
       params['type'] = selectedType.value;
-      if (selectedServiceType.value != 'all') params['service_type'] = selectedServiceType.value;
+      if (selectedServiceType.value != 'all')
+        params['service_type'] = selectedServiceType.value;
       if (isOnlineOnly.value) params['is_online'] = 1;
-      if (selectedSkills.isNotEmpty) params['skills'] = selectedSkills.join(',');
-      
+      if (selectedSkills.isNotEmpty)
+        params['skills'] = selectedSkills.join(',');
+
       print('--- Astrologer Filter Debug ---');
       print('Params: $params');
       print('Selected Type: ${selectedType.value}');
       print('Selected Skills: $selectedSkills');
       print('-------------------------------');
-      
+
       final result = await _getAstrologersUseCase.execute(params: params);
       filteredAstrologers.assignAll(result);
       filteredAstrologers.refresh();
@@ -176,14 +187,15 @@ class AstrologerController extends GetxController {
     }
   }
 
-  Future<void> searchAstrologers({required String query, String? serviceType}) async {
+  Future<void> searchAstrologers({
+    required String query,
+    String? serviceType,
+  }) async {
     try {
       isSearchLoading.value = true;
-      final Map<String, dynamic> params = {
-        'search_query': query,
-      };
+      final Map<String, dynamic> params = {'search_query': query};
       if (serviceType != null) params['service_type'] = serviceType;
-      
+
       final result = await _getAstrologersUseCase.execute(params: params);
       searchResults.assignAll(result);
     } catch (e) {
@@ -206,11 +218,11 @@ class AstrologerController extends GetxController {
       if (selectedServiceType.value != 'all') {
         params['service_type'] = selectedServiceType.value;
       }
-      
+
       if (minPrice.value > 0) {
         params['min_price'] = minPrice.value;
       }
-      
+
       if (maxPrice.value < 1000) {
         params['max_price'] = maxPrice.value;
       }
@@ -276,7 +288,7 @@ class AstrologerController extends GetxController {
     if (rating != null) minRating.value = rating;
     if (online != null) isOnlineOnly.value = online;
     if (sort != null) sortBy.value = sort;
-    
+
     fetchAstrologers();
   }
 
@@ -287,9 +299,13 @@ class AstrologerController extends GetxController {
       if (!selectedSkills.contains(skill)) {
         newSkills = [skill];
       }
-      
+
       // Update state and fetch via the unified filter method
-      fetchFilteredAstrologers(type: 'all', serviceType: serviceType, skills: newSkills);
+      fetchFilteredAstrologers(
+        type: 'all',
+        serviceType: serviceType,
+        skills: newSkills,
+      );
     } else {
       // Multiple selection for general filters
       if (selectedSkills.contains(skill)) {
@@ -348,7 +364,11 @@ class AstrologerController extends GetxController {
     return await _reportAstrologerUseCase.execute(id, reason);
   }
 
-  Future<ResponseModel> postReview(int astrologerId, int rating, String review) async {
+  Future<ResponseModel> postReview(
+    int astrologerId,
+    int rating,
+    String review,
+  ) async {
     return await _postReviewUseCase.execute(astrologerId, rating, review);
   }
 
@@ -368,7 +388,7 @@ class AstrologerController extends GetxController {
   Future<ResponseModel> followAstrologer(int id) async {
     return await _followAstrologerUseCase.execute(id);
   }
-  
+
   Future<void> fetchGifts() async {
     try {
       isGiftsLoading.value = true;
@@ -395,17 +415,18 @@ class AstrologerController extends GetxController {
     try {
       sendingGiftId.value = gift.id;
       final response = await _sendGiftUseCase.execute(gift.id, astrologerId);
-      
+
       if (response.isSuccess) {
         CustomSnackbar.showSuccess('Gift sent successfully!');
         // Refresh wallet balance after sending gift
         walletController.fetchWallet();
       } else {
         // If API returns insufficient balance error (e.g. 422 or specific message)
-        if (response.message.toLowerCase().contains('balance') || response.message.toLowerCase().contains('funds')) {
-           _showInsufficientBalanceSheet();
+        if (response.message.toLowerCase().contains('balance') ||
+            response.message.toLowerCase().contains('funds')) {
+          _showInsufficientBalanceSheet();
         } else {
-           CustomSnackbar.showError(response.message);
+          CustomSnackbar.showError(response.message);
         }
       }
     } catch (e) {
@@ -474,8 +495,10 @@ class AstrologerController extends GetxController {
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,
-          isChatEnabled: isChatEnabled ?? (isOnline ? true : current.isChatEnabled),
-          isCallEnabled: isCallEnabled ?? (isOnline ? true : current.isCallEnabled),
+          isChatEnabled:
+              isChatEnabled ?? (isOnline ? true : current.isChatEnabled),
+          isCallEnabled:
+              isCallEnabled ?? (isOnline ? true : current.isCallEnabled),
         );
       }
     }
@@ -490,8 +513,12 @@ class AstrologerController extends GetxController {
         isOnline: isOnline,
         isBusy: isBusy,
         availabilityStatus: availabilityStatus,
-        isChatEnabled: isChatEnabled ?? (isOnline ? true : selectedAstrologer.value!.isChatEnabled),
-        isCallEnabled: isCallEnabled ?? (isOnline ? true : selectedAstrologer.value!.isCallEnabled),
+        isChatEnabled:
+            isChatEnabled ??
+            (isOnline ? true : selectedAstrologer.value!.isChatEnabled),
+        isCallEnabled:
+            isCallEnabled ??
+            (isOnline ? true : selectedAstrologer.value!.isCallEnabled),
       );
     }
   }

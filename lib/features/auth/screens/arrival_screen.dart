@@ -19,11 +19,11 @@ class ArrivalScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-               // Large Success Icon with Glow
+              // Large Success Icon with Glow
               _buildSuccessIcon(),
-              
+
               const SizedBox(height: 40),
-              
+
               Text(
                 AppStrings.welcome,
                 style: GoogleFonts.poppins(
@@ -32,9 +32,9 @@ class ArrivalScreen extends StatelessWidget {
                   color: AppColors.primaryColor,
                 ),
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               Text(
                 AppStrings.registrationSuccessful,
                 style: GoogleFonts.poppins(
@@ -44,14 +44,16 @@ class ArrivalScreen extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              
+
               const SizedBox(height: 80),
 
               // Premium Gradient Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: GestureDetector(
-                  onTap: () => Get.offNamed(RouteHelper.getLanguageSelectionRoute()),
+                  onTap:
+                      () =>
+                          Get.offNamed(RouteHelper.getLanguageSelectionRoute()),
                   child: Container(
                     width: double.infinity,
                     height: 58,
@@ -93,7 +95,10 @@ class ArrivalScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primaryColor.withOpacity(0.05),
         shape: BoxShape.circle,
-        border: Border.all(color: AppColors.primaryColor.withOpacity(0.1), width: 1.5),
+        border: Border.all(
+          color: AppColors.primaryColor.withOpacity(0.1),
+          width: 1.5,
+        ),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -122,7 +127,6 @@ class ArrivalScreen extends StatelessWidget {
       ),
     );
   }
-
 }
 
 // Minimal stub for AppRoutes inside this file or use full Import if needed

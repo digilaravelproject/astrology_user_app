@@ -58,9 +58,7 @@ ThemeData lightTheme = ThemeData(
       backgroundColor: AppColors.primaryColor,
       foregroundColor: Colors.white,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
       textStyle: const TextStyle(
         fontWeight: FontWeight.w700,
@@ -79,9 +77,7 @@ ThemeData lightTheme = ThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: AppColors.primaryColor,
       side: const BorderSide(color: AppColors.primaryColor, width: 2.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   ),
 );

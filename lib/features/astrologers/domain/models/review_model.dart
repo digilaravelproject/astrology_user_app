@@ -25,7 +25,7 @@ class ReviewModel {
 
   factory ReviewModel.fromJson(Map<String, dynamic> json) {
     final userData = json['user'] as Map<String, dynamic>? ?? {};
-    
+
     return ReviewModel(
       id: json['id'] ?? 0,
       astrologerId: json['astrologer_id'] ?? 0,
@@ -33,9 +33,16 @@ class ReviewModel {
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       review: json['review'] ?? '',
       reply: json['reply'],
-      replyAt: json['reply_at'] != null ? DateTime.parse(json['reply_at']!) : null,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']!) : DateTime.now(),
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']!) : DateTime.now(),
+      replyAt:
+          json['reply_at'] != null ? DateTime.parse(json['reply_at']!) : null,
+      createdAt:
+          json['created_at'] != null
+              ? DateTime.parse(json['created_at']!)
+              : DateTime.now(),
+      updatedAt:
+          json['updated_at'] != null
+              ? DateTime.parse(json['updated_at']!)
+              : DateTime.now(),
       user: userData.isNotEmpty ? UserModel.fromJson(userData) : null,
     );
   }

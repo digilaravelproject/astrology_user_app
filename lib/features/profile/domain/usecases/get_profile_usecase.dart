@@ -11,13 +11,15 @@ class GetProfileUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
         print('GetProfileUseCase: bodyMap=$bodyMap');
-        
+
         // Handle nesting: {data: {user: {...}}} OR {user: {...}}
         Map<String, dynamic> userJson;
         if (bodyMap.containsKey('data') && bodyMap['data'] is Map) {
-          final Map<String, dynamic> data = bodyMap['data'] as Map<String, dynamic>;
+          final Map<String, dynamic> data =
+              bodyMap['data'] as Map<String, dynamic>;
           userJson = data['user'] as Map<String, dynamic>;
         } else if (bodyMap.containsKey('user') && bodyMap['user'] is Map) {
           userJson = bodyMap['user'] as Map<String, dynamic>;

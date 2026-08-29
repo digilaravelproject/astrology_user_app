@@ -12,7 +12,8 @@ class AstrologyApiClient {
     _dio.options.connectTimeout = const Duration(seconds: 30);
     _dio.options.receiveTimeout = const Duration(seconds: 30);
     _dio.options.headers = AstrologyApiConstants.authHeaders;
-    _dio.options.headers['User-Agent'] = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36';
+    _dio.options.headers['User-Agent'] =
+        'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36';
 
     _dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
@@ -75,7 +76,10 @@ class AstrologyApiClient {
     try {
       final sign = timezone.startsWith('-') ? -1 : 1;
       final parts = timezone.replaceAll('+', '').replaceAll('-', '').split(':');
-      tzOffset = sign * (double.parse(parts[0]) + (parts.length > 1 ? double.parse(parts[1]) / 60 : 0));
+      tzOffset =
+          sign *
+          (double.parse(parts[0]) +
+              (parts.length > 1 ? double.parse(parts[1]) / 60 : 0));
     } catch (_) {}
 
     return {
@@ -92,23 +96,39 @@ class AstrologyApiClient {
 
   // SDK Methods
   Future<Response> getMatching(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.matchingAshtakootaEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.matchingAshtakootaEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getBirthChart(Map<String, dynamic> payload) {
     return _dio.post(AstrologyApiConstants.birthChartEndpoint, data: payload);
   }
 
-  Future<Response> getHoroChartImage(String chartId, Map<String, dynamic> payload, {String chartType = 'north'}) {
+  Future<Response> getHoroChartImage(
+    String chartId,
+    Map<String, dynamic> payload, {
+    String chartType = 'north',
+  }) {
     final body = Map<String, dynamic>.from(payload);
     body['chartType'] = chartType;
     body['image_type'] = 'svg';
     body['theme_name'] = 'detailed';
-    return _dio.post('${AstrologyApiConstants.horoChartImageEndpoint}/${chartId.toLowerCase()}', data: body);
+    return _dio.post(
+      '${AstrologyApiConstants.horoChartImageEndpoint}/${chartId.toLowerCase()}',
+      data: body,
+    );
   }
 
-  Future<Response> getDivisionalChart(String chartType, Map<String, dynamic> payload) {
-    return _dio.post('${AstrologyApiConstants.divisionalChartEndpoint}/${chartType.toLowerCase()}', data: payload);
+  Future<Response> getDivisionalChart(
+    String chartType,
+    Map<String, dynamic> payload,
+  ) {
+    return _dio.post(
+      '${AstrologyApiConstants.divisionalChartEndpoint}/${chartType.toLowerCase()}',
+      data: payload,
+    );
   }
 
   Future<Response> getPanchang(Map<String, dynamic> payload) {
@@ -116,11 +136,17 @@ class AstrologyApiClient {
   }
 
   Future<Response> getVimshottariDasha(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.vimshottariDashaEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.vimshottariDashaEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getPlanetPositions(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.planetPositionsEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.planetPositionsEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getShadbala(Map<String, dynamic> payload) {
@@ -128,7 +154,10 @@ class AstrologyApiClient {
   }
 
   Future<Response> getGemstoneRemedies(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.remediesGemstoneEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.remediesGemstoneEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getKpHouseCusps(Map<String, dynamic> payload) {
@@ -140,11 +169,17 @@ class AstrologyApiClient {
   }
 
   Future<Response> getSadhesatiStatus(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.sadeSatiAdvancedEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.sadeSatiAdvancedEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getSadhesatiLifeDetails(Map<String, dynamic> payload) {
-    return _dio.post(AstrologyApiConstants.sadeSatiLifeDetailsEndpoint, data: payload);
+    return _dio.post(
+      AstrologyApiConstants.sadeSatiLifeDetailsEndpoint,
+      data: payload,
+    );
   }
 
   Future<Response> getManglikReport(Map<String, dynamic> payload) {
@@ -152,18 +187,45 @@ class AstrologyApiClient {
   }
 
   Future<Response> getSubVdasha(Map<String, dynamic> payload, String md) {
-    return _dio.post('${AstrologyApiConstants.subVdashaEndpoint}/$md', data: payload);
+    return _dio.post(
+      '${AstrologyApiConstants.subVdashaEndpoint}/$md',
+      data: payload,
+    );
   }
 
-  Future<Response> getSubSubVdasha(Map<String, dynamic> payload, String md, String ad) {
-    return _dio.post('${AstrologyApiConstants.subSubVdashaEndpoint}/$md/$ad', data: payload);
+  Future<Response> getSubSubVdasha(
+    Map<String, dynamic> payload,
+    String md,
+    String ad,
+  ) {
+    return _dio.post(
+      '${AstrologyApiConstants.subSubVdashaEndpoint}/$md/$ad',
+      data: payload,
+    );
   }
 
-  Future<Response> getSubSubSubVdasha(Map<String, dynamic> payload, String md, String ad, String pd) {
-    return _dio.post('${AstrologyApiConstants.subSubSubVdashaEndpoint}/$md/$ad/$pd', data: payload);
+  Future<Response> getSubSubSubVdasha(
+    Map<String, dynamic> payload,
+    String md,
+    String ad,
+    String pd,
+  ) {
+    return _dio.post(
+      '${AstrologyApiConstants.subSubSubVdashaEndpoint}/$md/$ad/$pd',
+      data: payload,
+    );
   }
 
-  Future<Response> getSubSubSubSubVdasha(Map<String, dynamic> payload, String md, String ad, String pd, String sd) {
-    return _dio.post('${AstrologyApiConstants.subSubSubSubVdashaEndpoint}/$md/$ad/$pd/$sd', data: payload);
+  Future<Response> getSubSubSubSubVdasha(
+    Map<String, dynamic> payload,
+    String md,
+    String ad,
+    String pd,
+    String sd,
+  ) {
+    return _dio.post(
+      '${AstrologyApiConstants.subSubSubSubVdashaEndpoint}/$md/$ad/$pd/$sd',
+      data: payload,
+    );
   }
 }

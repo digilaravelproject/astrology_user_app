@@ -16,13 +16,12 @@ class FaqScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.faq,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.faq, centerTitle: true),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: Colors.pink));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.pink),
+          );
         }
 
         final faqData = controller.faqData.value;
@@ -41,10 +40,7 @@ class FaqScreen extends StatelessWidget {
           itemCount: faqData.items.length,
           itemBuilder: (context, index) {
             final item = faqData.items[index];
-            return _FaqItem(
-              question: item.question,
-              answer: item.answer,
-            );
+            return _FaqItem(question: item.question, answer: item.answer);
           },
         );
       }),

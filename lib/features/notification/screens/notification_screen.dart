@@ -33,7 +33,11 @@ class NotificationScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20, color: Colors.black),
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 20,
+            color: Colors.black,
+          ),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -49,7 +53,9 @@ class NotificationScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.notifications.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: AppColors.primaryColor));
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
         }
 
         if (controller.notifications.isEmpty) {
@@ -62,11 +68,17 @@ class NotificationScreen extends StatelessWidget {
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             itemCount: controller.notifications.length,
-            separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            separatorBuilder:
+                (context, index) =>
+                    const Divider(height: 1, color: Color(0xFFEEEEEE)),
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
               return GestureDetector(
-                onTap: () => Get.to(() => NotificationDetailScreen(notification: notification)),
+                onTap:
+                    () => Get.to(
+                      () =>
+                          NotificationDetailScreen(notification: notification),
+                    ),
                 child: _buildNotificationItem(notification),
               );
             },
@@ -118,7 +130,7 @@ class NotificationScreen extends StatelessWidget {
 
   Widget _buildNotificationItem(NotificationModel notification) {
     bool isRead = notification.isRead;
-    
+
     IconData getIconForType(String? type) {
       switch (type?.toLowerCase()) {
         case 'live':
@@ -146,7 +158,10 @@ class NotificationScreen extends StatelessWidget {
               color: isRead ? const Color(0xFFF5F5F5) : AppColors.white,
               shape: BoxShape.circle,
               border: Border.all(
-                color: isRead ? Colors.transparent : AppColors.deepPink.withOpacity(0.2),
+                color:
+                    isRead
+                        ? Colors.transparent
+                        : AppColors.deepPink.withOpacity(0.2),
               ),
             ),
             child: Icon(
@@ -191,7 +206,7 @@ class NotificationScreen extends StatelessWidget {
               ],
             ),
           ),
-           if (!isRead)
+          if (!isRead)
             Padding(
               padding: const EdgeInsets.only(left: 8, top: 20),
               child: Container(

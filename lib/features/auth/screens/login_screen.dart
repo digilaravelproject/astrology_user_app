@@ -28,9 +28,7 @@ class LoginScreen extends StatelessWidget {
       child: Stack(
         children: [
           // Fixed white background layer
-          Positioned.fill(
-            child: Container(color: Colors.white),
-          ),
+          Positioned.fill(child: Container(color: Colors.white)),
           // Background image - Stays fixed behind everything
           Positioned.fill(
             child: Opacity(
@@ -60,7 +58,7 @@ class LoginScreen extends StatelessWidget {
                           height: 170,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 30),
 
                       Column(
@@ -84,9 +82,8 @@ class LoginScreen extends StatelessWidget {
                         ],
                       ),
 
-
                       const SizedBox(height: 20),
-                      
+
                       // Login using OTP text
                       AppText(
                         AppStrings.loginWithOtp,
@@ -94,55 +91,66 @@ class LoginScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         color: AppColors.errorColor,
                       ),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // Phone Input
                       _buildPhoneInput(authController, errorMessage),
-                      
+
                       // Error message
-                      Obx(() => errorMessage.value.isNotEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 8, left: 20),
-                              child: AppText(
-                                errorMessage.value,
-                                fontSize: 12,
-                                color: Colors.red,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                          : const SizedBox.shrink()),
-                      
+                      Obx(
+                        () =>
+                            errorMessage.value.isNotEmpty
+                                ? Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 8,
+                                    left: 20,
+                                  ),
+                                  child: AppText(
+                                    errorMessage.value,
+                                    fontSize: 12,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                                : const SizedBox.shrink(),
+                      ),
+
                       const SizedBox(height: 30),
-                      
+
                       // Send OTP Button
-                      Obx(() => CustomButton(
-                        text: AppStrings.sendOtp,
-                        isLoading: authController.isLoading.value,
-                        onTap: () {
-                          // Validate mobile number before proceeding
-                          if (authController.mobileController.text.isEmpty) {
-                            errorMessage.value = AppStrings.pleaseEnterMobile;
-                            return;
-                          }
-                          
-                          if (authController.mobileController.text.length != 10) {
-                            errorMessage.value = AppStrings.enterValidMobile;
-                            return;
-                          }
-                          
-                          // Clear error and proceed
-                          errorMessage.value = '';
-                          authController.login();
-                        },
-                      )),
-                      
+                      Obx(
+                        () => CustomButton(
+                          text: AppStrings.sendOtp,
+                          isLoading: authController.isLoading.value,
+                          onTap: () {
+                            // Validate mobile number before proceeding
+                            if (authController.mobileController.text.isEmpty) {
+                              errorMessage.value = AppStrings.pleaseEnterMobile;
+                              return;
+                            }
+
+                            if (authController.mobileController.text.length !=
+                                10) {
+                              errorMessage.value = AppStrings.enterValidMobile;
+                              return;
+                            }
+
+                            // Clear error and proceed
+                            errorMessage.value = '';
+                            authController.login();
+                          },
+                        ),
+                      ),
+
                       const SizedBox(height: 15),
 
                       // OR with lines
                       Row(
                         children: [
-                          const Expanded(child: Divider(thickness: 1, color: Colors.black12)),
+                          const Expanded(
+                            child: Divider(thickness: 1, color: Colors.black12),
+                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: AppText(
@@ -153,20 +161,22 @@ class LoginScreen extends StatelessWidget {
                               letterSpacing: 1,
                             ),
                           ),
-                          const Expanded(child: Divider(thickness: 1, color: Colors.black12)),
+                          const Expanded(
+                            child: Divider(thickness: 1, color: Colors.black12),
+                          ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 15),
-                      
+
                       // Continue with Google Button
                       _buildGoogleButton(),
-                      
+
                       const SizedBox(height: 30),
-                      
+
                       // Bottom Features
                       _buildBottomFeatures(),
-                      
+
                       const SizedBox(height: 30),
                     ],
                   ),
@@ -174,11 +184,9 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
           ),
-
         ],
       ),
     );
-
   }
 
   Widget _buildZodiacSymbol(String symbol, double size) {
@@ -193,7 +201,10 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneInput(AuthController authController, RxString errorMessage) {
+  Widget _buildPhoneInput(
+    AuthController authController,
+    RxString errorMessage,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 20),
@@ -244,11 +255,7 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Container(
-            height: 1,
-            width: double.infinity,
-            color: Colors.black12,
-          ),
+          Container(height: 1, width: double.infinity, color: Colors.black12),
         ],
       ),
     );
@@ -262,10 +269,7 @@ class LoginScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: Colors.black12,
-          width: 0.5,
-        ),
+        border: Border.all(color: Colors.black12, width: 0.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -277,11 +281,7 @@ class LoginScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            ImageConstants.googleIcon,
-            width: 28,
-            height: 28,
-          ),
+          Image.asset(ImageConstants.googleIcon, width: 28, height: 28),
           const SizedBox(width: 12),
           AppText(
             AppStrings.continueWithGoogle,
@@ -313,12 +313,10 @@ class LoginScreen extends StatelessWidget {
             ],
           ),
           borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.3),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
         ),
-        child: IntrinsicHeight( // Important
+        child: IntrinsicHeight(
+          // Important
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -359,17 +357,10 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-// Center Divider
+  // Center Divider
   Widget _buildDivider() {
-    return VerticalDivider(
-      width: 20,
-      thickness: 1,
-      color: Colors.black12,
-    );
+    return VerticalDivider(width: 20, thickness: 1, color: Colors.black12);
   }
-
-
-
 
   Widget _buildFeatureItem({
     required IconData icon,
@@ -390,11 +381,7 @@ class LoginScreen extends StatelessWidget {
                 color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 32,
-              ),
+              child: Icon(icon, color: color, size: 32),
             ),
             Positioned(
               bottom: -2,
@@ -405,11 +392,7 @@ class LoginScreen extends StatelessWidget {
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: color,
-                  size: 16,
-                ),
+                child: Icon(Icons.check_circle_rounded, color: color, size: 16),
               ),
             ),
           ],

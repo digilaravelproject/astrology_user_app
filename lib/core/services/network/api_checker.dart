@@ -20,7 +20,9 @@ class ApiChecker {
           if (response.data.containsKey('auth')) return response;
           final res = response.data['res']?.toString().toLowerCase();
           final status = response.data['status']?.toString().toLowerCase();
-          if (res == 'success' || status == 'success' || response.data['success'] == true) {
+          if (res == 'success' ||
+              status == 'success' ||
+              response.data['success'] == true) {
             return response;
           } else {
             if (showToaster) _showErrorMessage(response);
@@ -28,7 +30,10 @@ class ApiChecker {
               requestOptions: response.requestOptions,
               response: response,
               type: DioExceptionType.badResponse,
-              error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
+              error:
+                  response.data['msg'] ??
+                  response.data['message'] ??
+                  'Something went wrong',
             );
           }
         } else {
@@ -86,7 +91,10 @@ class ApiChecker {
     }
   }
 
-  static ResponseModel handleError(dynamic error, {bool showErrorScreen = false}) {
+  static ResponseModel handleError(
+    dynamic error, {
+    bool showErrorScreen = false,
+  }) {
     if (error is DioException) {
       switch (error.type) {
         case DioExceptionType.connectionTimeout:
@@ -138,7 +146,8 @@ class ApiChecker {
           if (showErrorScreen) {
             _showErrorScreen(
               title: 'Security Error',
-              message: 'There was a security certificate error. Please try again.',
+              message:
+                  'There was a security certificate error. Please try again.',
             );
           } else {
             CustomSnackbar.showError('Bad certificate');
@@ -174,15 +183,20 @@ class ApiChecker {
               if (showErrorScreen) {
                 _showErrorScreen(
                   title: 'Error',
-                  message: responseModel.errors != null && responseModel.errors!.isNotEmpty
-                      ? responseModel.errors!.first.message ?? responseModel.message
-                      : responseModel.message,
+                  message:
+                      responseModel.errors != null &&
+                              responseModel.errors!.isNotEmpty
+                          ? responseModel.errors!.first.message ??
+                              responseModel.message
+                          : responseModel.message,
                 );
               } else {
                 if (error.response?.statusCode != 422) {
-                  if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
+                  if (responseModel.errors != null &&
+                      responseModel.errors!.isNotEmpty) {
                     CustomSnackbar.showError(
-                      responseModel.errors!.first.message ?? 'Something went wrong',
+                      responseModel.errors!.first.message ??
+                          'Something went wrong',
                     );
                   } else {
                     CustomSnackbar.showError(responseModel.message);
@@ -238,8 +252,8 @@ class ApiChecker {
           );
 
         case DioExceptionType.connectionError:
-        // Don't show error screen for connection errors,
-        // NoInternetScreen handles this
+          // Don't show error screen for connection errors,
+          // NoInternetScreen handles this
           CustomSnackbar.showError('No internet connection');
           return const ResponseModel(
             isSuccess: false,
@@ -316,7 +330,10 @@ class ApiChecker {
     if (statusCode == 201) {
       if (response.data != null) {
         try {
-          final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
+          final responseModel = ResponseModel.fromJson(
+            response.data,
+            statusCode: statusCode,
+          );
           return responseModel;
         } catch (e) {
           if (showToaster) {
@@ -343,10 +360,14 @@ class ApiChecker {
     if (statusCode != 200) {
       if (response.data != null && response.data is Map<String, dynamic>) {
         try {
-          final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
+          final responseModel = ResponseModel.fromJson(
+            response.data,
+            statusCode: statusCode,
+          );
 
           if (showToaster) {
-            if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
+            if (responseModel.errors != null &&
+                responseModel.errors!.isNotEmpty) {
               CustomSnackbar.showError(
                 responseModel.errors!.first.message ?? 'Something went wrong',
               );
@@ -381,10 +402,17 @@ class ApiChecker {
     if (response.data is Map) {
       final res = response.data['res']?.toString().toLowerCase();
       final status = response.data['status']?.toString().toLowerCase();
-      final isSuccess = res == 'success' || status == 'success' || response.data['success'] == true || response.data.containsKey('auth');
-      
+      final isSuccess =
+          res == 'success' ||
+          status == 'success' ||
+          response.data['success'] == true ||
+          response.data.containsKey('auth');
+
       if (!isSuccess) {
-        final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
+        final message =
+            response.data['msg']?.toString() ??
+            response.data['message']?.toString() ??
+            'Something went wrong';
         if (showToaster) CustomSnackbar.showError(message);
 
         return ResponseModel(
@@ -401,7 +429,10 @@ class ApiChecker {
     } else {
       return ResponseModel(
         isSuccess: statusCode == 200 || statusCode == 201,
-        message: statusCode == 200 || statusCode == 201 ? 'Success' : 'Something went wrong',
+        message:
+            statusCode == 200 || statusCode == 201
+                ? 'Success'
+                : 'Something went wrong',
         statusCode: statusCode,
         body: response.data,
       );
@@ -413,15 +444,22 @@ class ApiChecker {
     if (response.data is Map) {
       message = response.data['msg'] ?? response.data['message'];
     }
-    CustomSnackbar.showError(message ?? defaultMessage ?? 'Something went wrong');
+    CustomSnackbar.showError(
+      message ?? defaultMessage ?? 'Something went wrong',
+    );
   }
 
   static void _showValidationErrors(Response response) {
     if (response.data != null && response.data is Map<String, dynamic>) {
       try {
-        final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
+        final responseModel = ResponseModel.fromJson(
+          response.data,
+          statusCode: response.statusCode,
+        );
         if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-          CustomSnackbar.showError(responseModel.errors!.first.message ?? 'Validation Error');
+          CustomSnackbar.showError(
+            responseModel.errors!.first.message ?? 'Validation Error',
+          );
         } else if (response.data['msg'] != null) {
           CustomSnackbar.showError(response.data['msg']);
         } else {
@@ -445,7 +483,7 @@ class ApiChecker {
     VoidCallback? onRetry,
   }) {
     getx.Get.to(
-          () => ErrorScreen(
+      () => ErrorScreen(
         title: title,
         message: message,
         onRetry: onRetry ?? () => getx.Get.back(),

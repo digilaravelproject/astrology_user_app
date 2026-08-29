@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../../core/widgets/custom_rating_bar.dart';
 import '../../astrologers/controllers/astrologer_controller.dart';
 import '../../astrologers/domain/models/review_model.dart';
@@ -12,10 +13,8 @@ import 'astrologer_detail_screen.dart';
 class AllReviewsScreen extends StatefulWidget {
   final int astrologerId;
 
-  const AllReviewsScreen({
-    Key? key,
-    required this.astrologerId,
-  }) : super(key: key);
+  const AllReviewsScreen({Key? key, required this.astrologerId})
+    : super(key: key);
 
   @override
   State<AllReviewsScreen> createState() => _AllReviewsScreenState();
@@ -55,11 +54,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
 
         if (reviews.isEmpty) {
           return const Center(
-            child: AppText(
-              'No reviews yet',
-              fontSize: 16,
-              color: Colors.grey,
-            ),
+            child: AppText('No reviews yet', fontSize: 16, color: Colors.grey),
           );
         }
 
@@ -96,11 +91,12 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundImage: NetworkImage(
-                  AppUrls.baseImageUrl + (review.user?.profilePhoto ?? ''),
-                ),              ),
+              CustomImageWidget(
+                imagePath: AppUrls.baseImageUrl + (review.user?.profilePhoto ?? ''),
+                height: 36,
+                width: 36,
+                radius: BorderRadius.circular(18),
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: AppText(
@@ -129,12 +125,19 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
               padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
               margin: const EdgeInsets.only(left: 4, top: 4),
               decoration: BoxDecoration(
-                border: Border(left: BorderSide(color: Colors.grey.shade300, width: 2)),
+                border: Border(
+                  left: BorderSide(color: Colors.grey.shade300, width: 2),
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText('Reply from Astrologer', fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87),
+                  AppText(
+                    'Reply from Astrologer',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,

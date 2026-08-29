@@ -14,7 +14,9 @@ class GetGiftHistoryUseCase {
         // The ApiClient already unwraps the 'data' field, so body is the data map
         if (body is Map && body['gifts'] != null) {
           final List<dynamic> giftsData = body['gifts'];
-          return giftsData.map((json) => GiftHistoryItem.fromJson(json)).toList();
+          return giftsData
+              .map((json) => GiftHistoryItem.fromJson(json))
+              .toList();
         }
       } catch (e, stack) {
         print('Error parsing gift history: $e');

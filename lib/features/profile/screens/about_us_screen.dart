@@ -35,10 +35,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.aboutUs,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.aboutUs, centerTitle: true),
       body: Obx(() {
         if (_controller.isLoading.value && _content == null) {
           return const Center(child: CircularProgressIndicator());

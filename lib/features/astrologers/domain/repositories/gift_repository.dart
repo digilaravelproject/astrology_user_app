@@ -11,12 +11,19 @@ class GiftRepository {
     return await apiClient.get(AppUrls.gifts);
   }
 
-  Future<ResponseModel> sendGift(int giftId, int astrologerId, String paymentMethod) async {
-    return await apiClient.post(AppUrls.sendGift, data: {
-      'gift_id': giftId,
-      'astrologer_id': astrologerId,
-      'payment_method': paymentMethod,
-    });
+  Future<ResponseModel> sendGift(
+    int giftId,
+    int astrologerId,
+    String paymentMethod,
+  ) async {
+    return await apiClient.post(
+      AppUrls.sendGift,
+      data: {
+        'gift_id': giftId,
+        'astrologer_id': astrologerId,
+        'payment_method': paymentMethod,
+      },
+    );
   }
 
   Future<ResponseModel> getGiftHistory(int astrologerId) async {

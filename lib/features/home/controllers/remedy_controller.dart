@@ -17,8 +17,8 @@ class RemedyController extends GetxController {
   RemedyController({
     required GetRemediesUseCase getRemediesUseCase,
     required GetRemedyByIdUseCase getRemedyByIdUseCase,
-  })  : _getRemediesUseCase = getRemediesUseCase,
-        _getRemedyByIdUseCase = getRemedyByIdUseCase;
+  }) : _getRemediesUseCase = getRemediesUseCase,
+       _getRemedyByIdUseCase = getRemedyByIdUseCase;
 
   String getRemedyImage(int index) {
     return remedyImages[index % remedyImages.length];

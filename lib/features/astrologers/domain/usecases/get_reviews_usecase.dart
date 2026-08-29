@@ -13,7 +13,9 @@ class GetReviewsUseCase {
       // Try to get reviews from data.reviews or directly from response.body
       final data = response.body['data'] as Map<String, dynamic>? ?? {};
       final reviews = data['reviews'] ?? response.body['reviews'] ?? [];
-      return (reviews as List).map((json) => ReviewModel.fromJson(json)).toList();
+      return (reviews as List)
+          .map((json) => ReviewModel.fromJson(json))
+          .toList();
     }
     return [];
   }

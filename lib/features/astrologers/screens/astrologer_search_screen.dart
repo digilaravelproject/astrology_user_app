@@ -41,8 +41,11 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Colors.black, size: 20),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+            size: 20,
+          ),
           onPressed: () => Get.back(),
         ),
         titleSpacing: 0,
@@ -52,10 +55,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
           decoration: BoxDecoration(
             color: const Color(0xFFF5F5F5),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: Colors.grey.shade300,
-              width: 1,
-            ),
+            border: Border.all(color: Colors.grey.shade300, width: 1),
           ),
           child: Row(
             children: [
@@ -68,7 +68,9 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   onChanged: (value) {
                     if (value.length > 2) {
                       controller.searchAstrologers(
-                          query: value, serviceType: widget.serviceType);
+                        query: value,
+                        serviceType: widget.serviceType,
+                      );
                     } else {
                       controller.searchResults.clear();
                     }
@@ -88,14 +90,19 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   ),
                 ),
               ),
-              Obx(() => controller.isSearchLoading.value
-                  ? const SizedBox(
-                      width: 15,
-                      height: 15,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppColors.primaryColor),
-                    )
-                  : const SizedBox.shrink()),
+              Obx(
+                () =>
+                    controller.isSearchLoading.value
+                        ? const SizedBox(
+                          width: 15,
+                          height: 15,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primaryColor,
+                          ),
+                        )
+                        : const SizedBox.shrink(),
+              ),
             ],
           ),
         ),
@@ -108,11 +115,17 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Iconsax.search_status_copy,
-                    size: 64, color: Colors.grey.shade300),
+                Icon(
+                  Iconsax.search_status_copy,
+                  size: 64,
+                  color: Colors.grey.shade300,
+                ),
                 const SizedBox(height: 16),
-                AppText('No astrologers found'.tr,
-                    color: Colors.grey.shade500, fontSize: 16),
+                AppText(
+                  'No astrologers found'.tr,
+                  color: Colors.grey.shade500,
+                  fontSize: 16,
+                ),
               ],
             ),
           );
@@ -123,11 +136,17 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Iconsax.message_search_copy,
-                    size: 64, color: Colors.grey.shade200),
+                Icon(
+                  Iconsax.message_search_copy,
+                  size: 64,
+                  color: Colors.grey.shade200,
+                ),
                 const SizedBox(height: 16),
-                AppText('Start typing to search...'.tr,
-                    color: Colors.grey.shade400, fontSize: 14),
+                AppText(
+                  'Start typing to search...'.tr,
+                  color: Colors.grey.shade400,
+                  fontSize: 14,
+                ),
               ],
             ),
           );
@@ -138,7 +157,9 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
           itemCount: controller.searchResults.length,
           itemBuilder: (context, index) {
             return _buildAstrologerCard(
-                context, controller.searchResults[index]);
+              context,
+              controller.searchResults[index],
+            );
           },
         );
       }),
@@ -194,13 +215,14 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                         ),
                       ),
                       child: ClipOval(
-                        child: astro.profilePhoto != null &&
-                                astro.profilePhoto!.isNotEmpty
-                            ? CustomImageWidget(
-                                imagePath: astro.fullProfilePhoto,
-                                fit: BoxFit.cover,
-                              )
-                            : _buildPlaceholderLarge(),
+                        child:
+                            astro.profilePhoto != null &&
+                                    astro.profilePhoto!.isNotEmpty
+                                ? CustomImageWidget(
+                                  imagePath: astro.fullProfilePhoto,
+                                  fit: BoxFit.cover,
+                                )
+                                : _buildPlaceholderLarge(),
                       ),
                     ),
                     Positioned(
@@ -212,20 +234,14 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                         decoration: BoxDecoration(
                           color: astro.statusBadge['color'],
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 2,
-                          ),
+                          border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                CustomRatingBar(
-                  rating: astro.rating,
-                  size: 15,
-                ),
+                CustomRatingBar(rating: astro.rating, size: 15),
                 const SizedBox(width: 12),
                 AppText(
                   _formatOrdersCount(astro.totalOrders),
@@ -250,11 +266,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                         color: Colors.black,
                       ),
                       const SizedBox(width: 4),
-                      const Icon(
-                        Icons.verified,
-                        color: Colors.green,
-                        size: 16,
-                      ),
+                      const Icon(Icons.verified, color: Colors.green, size: 16),
                     ],
                   ),
                   const SizedBox(height: 6),
@@ -282,23 +294,37 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                   ),
                   const SizedBox(height: 8),
                   CustomButton(
-                    text: astro.isBusy
-                        ? 'Busy'
-                        : (!astro.isOnline
-                            ? 'Offline'
-                            : (isCall
-                                ? '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min'
-                                : '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min')),
+                    text:
+                        astro.isBusy
+                            ? 'Busy'
+                            : (!astro.isOnline
+                                ? 'Offline'
+                                : (isCall
+                                    ? '${AppStrings.call} - ₹${astro.callRate ?? '0'}/min'
+                                    : '${AppStrings.chat} - ₹${astro.chatRate ?? '0'}/min')),
                     icon: isCall ? Icons.call : Icons.chat,
                     fontSize: 11,
                     height: 32,
                     borderRadius: 8,
-                    backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : Colors.transparent,
-                    textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
-                    borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
+                    backgroundColor:
+                        (!astro.isOnline || astro.isBusy)
+                            ? Colors.grey.withOpacity(0.2)
+                            : Colors.transparent,
+                    textColor:
+                        (!astro.isOnline || astro.isBusy)
+                            ? Colors.grey
+                            : const Color(0xFF4CAF50),
+                    borderColor:
+                        (!astro.isOnline || astro.isBusy)
+                            ? Colors.grey
+                            : const Color(0xFF4CAF50),
                     onTap: () {
                       if (!astro.isOnline || astro.isBusy) {
-                        CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                        CustomSnackbar.showInfo(
+                          astro.isBusy
+                              ? 'Astrologer is currently engaged.'
+                              : 'Astrologer is offline.',
+                        );
                         return;
                       }
                       WalletHelper.checkBalanceAndProceed(
@@ -306,7 +332,8 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                         type: isCall ? 'call' : 'chat',
                         name: astro.name,
                         imageUrl: astro.fullProfilePhoto,
-                        price: (isCall ? astro.callRate : astro.chatRate) ?? '0',
+                        price:
+                            (isCall ? astro.callRate : astro.chatRate) ?? '0',
                         providerId: astro.userId,
                         simulatedBalance: 10.0,
                       );
@@ -324,13 +351,10 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
   Widget _buildPlaceholderLarge() {
     return Container(
       color: AppColors.lightPink,
-      child: const Icon(
-        Icons.person,
-        color: AppColors.primaryColor,
-        size: 50,
-      ),
+      child: const Icon(Icons.person, color: AppColors.primaryColor, size: 50),
     );
   }
+
   String _formatOrdersCount(int count) {
     if (count >= 1000) {
       final double inK = count / 1000.0;

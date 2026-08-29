@@ -6,7 +6,11 @@ class SendGiftUseCase {
 
   SendGiftUseCase({required this.service});
 
-  Future<ResponseModel> execute(int giftId, int astrologerId, {String paymentMethod = 'wallet'}) async {
+  Future<ResponseModel> execute(
+    int giftId,
+    int astrologerId, {
+    String paymentMethod = 'wallet',
+  }) async {
     return await service.sendGift(giftId, astrologerId, paymentMethod);
   }
 }

@@ -31,7 +31,11 @@ class AstrologerRegistrationScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  Icon(Iconsax.user_add_copy, size: 48, color: AppColors.deepPink),
+                  Icon(
+                    Iconsax.user_add_copy,
+                    size: 48,
+                    color: AppColors.deepPink,
+                  ),
                   const SizedBox(height: 16),
                   AppText(
                     "Join our Team of Experts",
@@ -50,23 +54,28 @@ class AstrologerRegistrationScreen extends StatelessWidget {
                 ],
               ),
             ),
-             const SizedBox(height: 30),
+            const SizedBox(height: 30),
             _buildTextField("Full Name", Iconsax.user_copy),
             const SizedBox(height: 16),
             _buildTextField("Email Address", Iconsax.sms_copy),
             const SizedBox(height: 16),
             _buildTextField("Mobile Number", Iconsax.call_copy),
             const SizedBox(height: 16),
-            _buildTextField("Specialization (e.g. Vedic, Tarot)", Iconsax.magic_star_copy),
+            _buildTextField(
+              "Specialization (e.g. Vedic, Tarot)",
+              Iconsax.magic_star_copy,
+            ),
             const SizedBox(height: 16),
             _buildTextField("Experience (Years)", Iconsax.timer_1_copy),
-            
+
             const SizedBox(height: 40),
             CustomButton(
               text: "Submit Application",
               onTap: () {
-                 Get.back();
-                 CustomSnackbar.showSuccess("Application Submitted Successfully");
+                Get.back();
+                CustomSnackbar.showSuccess(
+                  "Application Submitted Successfully",
+                );
               },
             ),
           ],
@@ -76,22 +85,30 @@ class AstrologerRegistrationScreen extends StatelessWidget {
   }
 
   Widget _buildTextField(String label, IconData icon) {
-     return Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(label, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]!),
+        AppText(
+          label,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[700]!,
+        ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-             color: Colors.white,
-             borderRadius: BorderRadius.circular(12),
-             border: Border.all(color: Colors.grey[300]!),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[300]!),
           ),
           child: TextField(
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
             ),
           ),
         ),

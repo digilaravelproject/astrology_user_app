@@ -22,6 +22,7 @@ import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/features/kundli/kundli_screen.dart';
 import 'package:astro_user/features/auth/controllers/auth_controller.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 class ChatScreen extends StatefulWidget {
   final String astrologerName;
@@ -118,7 +119,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_controller.status.value.name == 'ongoing' || _controller.status.value.name == 'initiated') {
+        if (_controller.status.value.name == 'ongoing' ||
+            _controller.status.value.name == 'initiated') {
           _controller.minimizeToBubble(
             context,
             widget.astrologerName,
@@ -137,7 +139,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           centerTitle: false,
           showLeading: true,
           onLeadingPressed: () {
-            if (_controller.status.value.name == 'ongoing' || _controller.status.value.name == 'initiated') {
+            if (_controller.status.value.name == 'ongoing' ||
+                _controller.status.value.name == 'initiated') {
               _controller.minimizeToBubble(
                 context,
                 widget.astrologerName,
@@ -157,22 +160,33 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     // Call switch icon ONLY for package/session chats
                     if (widget.isPackageChat)
                       IconButton(
-                        icon: const Icon(Icons.swap_calls_rounded, color: Colors.green, size: 26),
+                        icon: const Icon(
+                          Icons.swap_calls_rounded,
+                          color: Colors.green,
+                          size: 26,
+                        ),
                         tooltip: "Switch to Call",
                         onPressed: () => _showSwitchToCallConfirmation(context),
                       ),
                     const SizedBox(width: 4),
                     Padding(
-                      padding: const EdgeInsets.only(right: 16), // Adjusted right margin to 16
+                      padding: const EdgeInsets.only(
+                        right: 16,
+                      ), // Adjusted right margin to 16
                       child: InkWell(
                         onTap: () => _showEndChatConfirmation(context),
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                            border: Border.all(
+                              color: Colors.red.withOpacity(0.3),
+                            ),
                           ),
                           child: const AppText(
                             "End Chat",
@@ -200,360 +214,485 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ),
           child: Column(
             children: [
-            // Timer / Status Bar
-            Obx(() {
-              final seconds = _controller.elapsedSeconds.value;
-              final status = _controller.status.value.name.toLowerCase();
-              final isEnded = status == 'ended' || status == 'completed' || status == 'cancelled' || status == 'rejected';
-              final isInitiated = status == 'initiated';
+              // Timer / Status Bar
+              Obx(() {
+                final seconds = _controller.elapsedSeconds.value;
+                final status = _controller.status.value.name.toLowerCase();
+                final isEnded =
+                    status == 'ended' ||
+                    status == 'completed' ||
+                    status == 'cancelled' ||
+                    status == 'rejected';
+                final isInitiated = status == 'initiated';
 
-              if (isInitiated) return const SizedBox.shrink();
+                if (isInitiated) return const SizedBox.shrink();
 
-              String statusText = "Chat has ended";
-              if (status == 'ongoing') {
-                statusText = "Chat in progress • ${_formatDuration(seconds)}";
-              } else if (status == 'cancelled') {
-                statusText = "Chat Cancelled";
-              } else if (status == 'rejected') {
-                statusText = "Chat Rejected";
-              } else if (status == 'completed') {
-                statusText = "Chat Completed";
-              }
+                String statusText = "Chat has ended";
+                if (status == 'ongoing') {
+                  statusText = "Chat in progress • ${_formatDuration(seconds)}";
+                } else if (status == 'cancelled') {
+                  statusText = "Chat Cancelled";
+                } else if (status == 'rejected') {
+                  statusText = "Chat Rejected";
+                } else if (status == 'completed') {
+                  statusText = "Chat Completed";
+                }
 
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                color: isEnded ? Colors.grey.shade300 : AppColors.lightPink.withOpacity(0.3),
-                child: Center(
-                  child: AppText(
-                    statusText,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isEnded ? Colors.black54 : AppColors.deepPink,
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  color:
+                      isEnded
+                          ? Colors.grey.shade300
+                          : AppColors.lightPink.withOpacity(0.3),
+                  child: Center(
+                    child: AppText(
+                      statusText,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isEnded ? Colors.black54 : AppColors.deepPink,
+                    ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
 
-            // Messages List
-            Expanded(
-              child: Obx(() {
-                final st = _controller.status.value.name.toLowerCase();
-                final isInitiated = (st == 'initiated' || st == 'ringing') && st != 'ongoing' && st != 'accepted';
-                if (isInitiated) {
-                  return _buildRingingScreen();
-                }
+              // Messages List
+              Expanded(
+                child: Obx(() {
+                  final st = _controller.status.value.name.toLowerCase();
+                  final isInitiated =
+                      (st == 'initiated' || st == 'ringing') &&
+                      st != 'ongoing' &&
+                      st != 'accepted';
+                  if (isInitiated) {
+                    return _buildRingingScreen();
+                  }
 
-                if (_controller.isLoading.value && _controller.messages.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return ListView.builder(
-                  controller: _controller.scrollController,
-                  padding: const EdgeInsets.all(16),
-                  reverse: true, // Show latest messages at bottom
-                  itemCount: _controller.messages.length,
-                  itemBuilder: (context, index) {
-                    // Reverse index for display
-                    final message = _controller.messages[_controller.messages.length - 1 - index];
-                    final isMe = message.isMe;
-                    final status = message.status;
-                    
-                    bool isReply = false;
-                    String replyUser = '';
-                    String replyText = '';
-                    String mainText = message.text;
-                    
-                    if (message.replyTo != null) {
-                      isReply = true;
-                      replyUser = message.replyTo!.isMe ? 'You' : (widget.astrologerName);
-                      replyText = message.replyTo!.text;
-                    } else if (mainText.startsWith('>>reply>>')) {
-                      // Fallback for old cached messages
-                      isReply = true;
-                      final endQuote = mainText.indexOf('<<reply<<');
-                      if (endQuote != -1) {
-                        final quotePart = mainText.substring(9, endQuote);
-                        final colonIdx = quotePart.indexOf(': ');
-                        if (colonIdx != -1) {
-                          replyUser = quotePart.substring(0, colonIdx);
-                          replyText = quotePart.substring(colonIdx + 2);
+                  if (_controller.isLoading.value &&
+                      _controller.messages.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ListView.builder(
+                    controller: _controller.scrollController,
+                    padding: const EdgeInsets.all(16),
+                    reverse: true, // Show latest messages at bottom
+                    itemCount: _controller.messages.length,
+                    itemBuilder: (context, index) {
+                      // Reverse index for display
+                      final message =
+                          _controller.messages[_controller.messages.length -
+                              1 -
+                              index];
+                      final isMe = message.isMe;
+                      final status = message.status;
+
+                      bool isReply = false;
+                      String replyUser = '';
+                      String replyText = '';
+                      String mainText = message.text;
+
+                      if (message.replyTo != null) {
+                        isReply = true;
+                        replyUser =
+                            message.replyTo!.isMe
+                                ? 'You'
+                                : (widget.astrologerName);
+                        replyText = message.replyTo!.text;
+                      } else if (mainText.startsWith('>>reply>>')) {
+                        // Fallback for old cached messages
+                        isReply = true;
+                        final endQuote = mainText.indexOf('<<reply<<');
+                        if (endQuote != -1) {
+                          final quotePart = mainText.substring(9, endQuote);
+                          final colonIdx = quotePart.indexOf(': ');
+                          if (colonIdx != -1) {
+                            replyUser = quotePart.substring(0, colonIdx);
+                            replyText = quotePart.substring(colonIdx + 2);
+                          } else {
+                            replyText = quotePart;
+                          }
+                          mainText =
+                              mainText.substring(endQuote + 9).trimLeft();
                         } else {
-                          replyText = quotePart;
+                          final quotePart = mainText.substring(9);
+                          final colonIdx = quotePart.indexOf(': ');
+                          if (colonIdx != -1) {
+                            replyUser = quotePart.substring(0, colonIdx);
+                            replyText = quotePart.substring(colonIdx + 2);
+                          } else {
+                            replyUser = 'User';
+                            replyText = quotePart;
+                          }
+                          mainText = '';
                         }
-                        mainText = mainText.substring(endQuote + 9).trimLeft();
-                      } else {
-                        final quotePart = mainText.substring(9);
-                        final colonIdx = quotePart.indexOf(': ');
-                        if (colonIdx != -1) {
-                          replyUser = quotePart.substring(0, colonIdx);
-                          replyText = quotePart.substring(colonIdx + 2);
-                        } else {
-                          replyUser = 'User';
-                          replyText = quotePart;
-                        }
-                        mainText = '';
                       }
-                    }
 
-                    return SwipeTo(
-                      key: ObjectKey(message),
-                      onRightSwipe: (details) {
-                        _controller.setReply(message);
-                      },
-                      onLeftSwipe: (details) {
-                        _controller.setReply(message);
-                      },
-                      child: Align(
-                        alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          constraints: BoxConstraints(maxWidth: Get.width * 0.75),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: isMe ? AppColors.deepPink : Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(16),
-                              topRight: const Radius.circular(16),
-                              bottomLeft: isMe ? const Radius.circular(16) : Radius.zero,
-                              bottomRight: isMe ? Radius.zero : const Radius.circular(16),
+                      return SwipeTo(
+                        key: ObjectKey(message),
+                        onRightSwipe: (details) {
+                          _controller.setReply(message);
+                        },
+                        onLeftSwipe: (details) {
+                          _controller.setReply(message);
+                        },
+                        child: Align(
+                          alignment:
+                              isMe
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            constraints: BoxConstraints(
+                              maxWidth: Get.width * 0.75,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isMe ? AppColors.deepPink : Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(16),
+                                topRight: const Radius.circular(16),
+                                bottomLeft:
+                                    isMe
+                                        ? const Radius.circular(16)
+                                        : Radius.zero,
+                                bottomRight:
+                                    isMe
+                                        ? Radius.zero
+                                        : const Radius.circular(16),
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              if (isReply)
-                                Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: isMe ? Colors.white.withOpacity(0.2) : Colors.black.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border(left: BorderSide(color: isMe ? Colors.white : AppColors.deepPink, width: 4)),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      AppText(replyUser, color: isMe ? Colors.white : AppColors.deepPink, fontWeight: FontWeight.bold, fontSize: 12),
-                                      const SizedBox(height: 4),
-                                      AppText(replyText, color: isMe ? Colors.white70 : Colors.black87, fontSize: 12, maxLines: 2, overflow: TextOverflow.ellipsis),
-                                    ],
-                                  ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
                                 ),
-                              if (message.type == 'image')
-                                ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: message.image != null && message.image!.startsWith('http')
-                                    ? Image.network(
-                                        message.image!,
-                                        height: 150,
-                                        width: 200,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : (message.image != null && File(message.image!).existsSync()
-                                        ? Image.file(
-                                            File(message.image!),
-                                            height: 150,
-                                            width: 200,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Image.network(
-                                            message.attachmentUrl != null && message.attachmentUrl!.startsWith('http')
-                                                ? message.attachmentUrl!
-                                                : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
-                                            height: 150,
-                                            width: 200,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (c, e, s) => Container(
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (isReply)
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isMe
+                                              ? Colors.white.withOpacity(0.2)
+                                              : Colors.black.withOpacity(0.05),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border(
+                                        left: BorderSide(
+                                          color:
+                                              isMe
+                                                  ? Colors.white
+                                                  : AppColors.deepPink,
+                                          width: 4,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        AppText(
+                                          replyUser,
+                                          color:
+                                              isMe
+                                                  ? Colors.white
+                                                  : AppColors.deepPink,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        AppText(
+                                          replyText,
+                                          color:
+                                              isMe
+                                                  ? Colors.white70
+                                                  : Colors.black87,
+                                          fontSize: 12,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                if (message.type == 'image')
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child:
+                                        message.image != null &&
+                                                message.image!.startsWith(
+                                                  'http',
+                                                )
+                                            ? CustomImageWidget(
+                                              imagePath: message.image!,
                                               height: 150,
                                               width: 200,
-                                              color: Colors.grey,
-                                              child: const Icon(Icons.broken_image, color: Colors.white),
-                                            ),
-                                          )),
-                              )
-                            else if (message.type == 'document')
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.05),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
+                                              fit: BoxFit.cover,
+                                            )
+                                            : (message.image != null &&
+                                                    File(
+                                                      message.image!,
+                                                    ).existsSync()
+                                                ? Image.file(
+                                                  File(message.image!),
+                                                  height: 150,
+                                                  width: 200,
+                                                  fit: BoxFit.cover,
+                                                )
+                                                : CustomImageWidget(
+                                                  imagePath:
+                                                      message.attachmentUrl !=
+                                                                  null &&
+                                                              message
+                                                                  .attachmentUrl!
+                                                                  .startsWith(
+                                                                    'http',
+                                                                  )
+                                                          ? message
+                                                              .attachmentUrl!
+                                                          : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
+                                                  height: 150,
+                                                  width: 200,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder:
+                                                      (c, e, s) => Container(
+                                                        height: 150,
+                                                        width: 200,
+                                                        color: Colors.grey,
+                                                        child: const Icon(
+                                                          Icons.broken_image,
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                )),
+                                  )
+                                else if (message.type == 'document')
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.05),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Iconsax.document,
+                                          color: Colors.black54,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: AppText(
+                                            mainText.replaceFirst('📄 ', ''),
+                                            fontSize: 14,
+                                            color: Colors.black87,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                else if (mainText.isNotEmpty)
+                                  AppText(
+                                    mainText,
+                                    fontSize: 14,
+                                    color: isMe ? Colors.white : Colors.black87,
+                                    height: 1.4,
+                                  ),
+                                const SizedBox(height: 4),
+                                Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Iconsax.document, color: Colors.black54, size: 24),
-                                    const SizedBox(width: 8),
-                                    Flexible(
-                                      child: AppText(
-                                        mainText.replaceFirst('📄 ', ''),
-                                        fontSize: 14,
+                                    AppText(
+                                      "${message.time.hour.toString().padLeft(2, '0')}:${message.time.minute.toString().padLeft(2, '0')} ${message.time.hour >= 12 ? 'pm' : 'am'}",
+                                      fontSize: 10,
+                                      color:
+                                          isMe
+                                              ? Colors.white.withOpacity(0.7)
+                                              : Colors.grey,
+                                    ),
+                                    if (isMe) ...[
+                                      const SizedBox(width: 4),
+                                      Icon(
+                                        status == 'sending...'
+                                            ? Icons.access_time
+                                            : status == 'sent'
+                                            ? Icons.check
+                                            : Icons.done_all,
+                                        size: 16,
+                                        color:
+                                            (status == 'seen' ||
+                                                    status == 'read')
+                                                ? Colors.blueAccent
+                                                : Colors.white.withOpacity(0.7),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ),
+
+              // Input Area
+              Obx(() {
+                final status = _controller.status.value.name.toLowerCase();
+                final isEnded =
+                    status == 'ended' ||
+                    status == 'completed' ||
+                    status == 'cancelled' ||
+                    status == 'rejected';
+                final isInitiated = status == 'initiated';
+                if (isEnded || isInitiated) return const SizedBox.shrink();
+
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_controller.replyingToMessage.value != null)
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                              border: const Border(
+                                left: BorderSide(
+                                  color: AppColors.deepPink,
+                                  width: 4,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      AppText(
+                                        _controller
+                                                .replyingToMessage
+                                                .value!
+                                                .isMe
+                                            ? 'You'
+                                            : widget.astrologerName,
+                                        color: AppColors.deepPink,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      AppText(
+                                        _controller
+                                            .replyingToMessage
+                                            .value!
+                                            .text
+                                            .replaceAll('\n', ' '),
                                         color: Colors.black87,
+                                        fontSize: 12,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            else if (mainText.isNotEmpty)
-                              AppText(
-                                mainText,
-                                fontSize: 14,
-                                color: isMe ? Colors.white : Colors.black87,
-                                height: 1.4,
-                              ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                AppText(
-                                  "${message.time.hour.toString().padLeft(2, '0')}:${message.time.minute.toString().padLeft(2, '0')} ${message.time.hour >= 12 ? 'pm' : 'am'}",
-                                  fontSize: 10,
-                                  color: isMe ? Colors.white.withOpacity(0.7) : Colors.grey,
-                                ),
-                                if (isMe) ...[
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    status == 'sending...'
-                                        ? Icons.access_time
-                                        : status == 'sent'
-                                            ? Icons.check
-                                            : Icons.done_all,
-                                    size: 16,
-                                    color: (status == 'seen' || status == 'read')
-                                        ? Colors.blueAccent
-                                        : Colors.white.withOpacity(0.7),
+                                    ],
                                   ),
-                                ],
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    size: 20,
+                                    color: Colors.grey,
+                                  ),
+                                  onPressed: () => _controller.cancelReply(),
+                                ),
                               ],
+                            ),
+                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                color: Colors.grey,
+                              ),
+                              onPressed: _showAttachmentBottomSheet,
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.auto_awesome,
+                                color: AppColors.deepPink,
+                              ),
+                              onPressed: _openKundli,
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: _controller.messageController,
+                                decoration: InputDecoration(
+                                  hintText: "Type a message...",
+                                  filled: true,
+                                  fillColor: const Color(0xFFF5F5F5),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () => _controller.sendTextMessage(),
+                              child: Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: const BoxDecoration(
+                                  color: AppColors.deepPink,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Iconsax.send_1_copy,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                      )
-                    );
-                  },
+                      ],
+                    ),
+                  ),
                 );
               }),
-            ),
-
-            // Input Area
-            Obx(() {
-              final status = _controller.status.value.name.toLowerCase();
-              final isEnded = status == 'ended' || status == 'completed' || status == 'cancelled' || status == 'rejected';
-              final isInitiated = status == 'initiated';
-              if (isEnded || isInitiated) return const SizedBox.shrink();
-
-              return Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
-                ),
-                child: SafeArea(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_controller.replyingToMessage.value != null)
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                            border: const Border(left: BorderSide(color: AppColors.deepPink, width: 4)),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    AppText(
-                                      _controller.replyingToMessage.value!.isMe ? 'You' : widget.astrologerName,
-                                      color: AppColors.deepPink,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                    const SizedBox(height: 4),
-                                    AppText(
-                                      _controller.replyingToMessage.value!.text.replaceAll('\n', ' '),
-                                      color: Colors.black87,
-                                      fontSize: 12,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.close, size: 20, color: Colors.grey),
-                                onPressed: () => _controller.cancelReply(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
-                            onPressed: _showAttachmentBottomSheet,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.auto_awesome, color: AppColors.deepPink),
-                            onPressed: _openKundli,
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: _controller.messageController,
-                              decoration: InputDecoration(
-                                hintText: "Type a message...",
-                                filled: true,
-                                fillColor: const Color(0xFFF5F5F5),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _controller.sendTextMessage(),
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: const BoxDecoration(
-                                color: AppColors.deepPink,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Iconsax.send_1_copy, color: Colors.white, size: 20),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );
@@ -580,7 +719,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       height: 148 + pulse * 20,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.deepPink.withOpacity(0.07 - pulse * 0.05),
+                        color: AppColors.deepPink.withOpacity(
+                          0.07 - pulse * 0.05,
+                        ),
                       ),
                     );
                   },
@@ -610,15 +751,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ],
                   ),
                   clipBehavior: Clip.hardEdge,
-                  child: widget.astrologerImage.isNotEmpty
-                      ? Image.network(
-                          widget.astrologerImage,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Center(
+                  child:
+                      widget.astrologerImage.isNotEmpty
+                          ? CustomImageWidget(
+                            imagePath: widget.astrologerImage,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) => Center(
+                                  child: Text(
+                                    widget.astrologerName.isNotEmpty
+                                        ? widget.astrologerName
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                        : '',
+                                    style: TextStyle(
+                                      fontSize: 44,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
+                                ),
+                          )
+                          : Center(
                             child: Text(
                               widget.astrologerName.isNotEmpty
-                                  ? widget.astrologerName.substring(0, 1).toUpperCase()
-                                  : 'A',
+                                  ? widget.astrologerName
+                                      .substring(0, 1)
+                                      .toUpperCase()
+                                  : '',
                               style: TextStyle(
                                 fontSize: 44,
                                 fontWeight: FontWeight.bold,
@@ -626,19 +786,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                        )
-                      : Center(
-                          child: Text(
-                            widget.astrologerName.isNotEmpty
-                                ? widget.astrologerName.substring(0, 1).toUpperCase()
-                                : 'A',
-                            style: TextStyle(
-                              fontSize: 44,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.deepPink,
-                            ),
-                          ),
-                        ),
                 ),
                 // Chat badge at bottom-right
                 Positioned(
@@ -651,7 +798,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
-                    child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 14),
+                    child: const Icon(
+                      Icons.chat_bubble_rounded,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                   ),
                 ),
               ],
@@ -700,7 +851,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 children: [
                   // User bubble
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.deepPink,
                       borderRadius: const BorderRadius.only(
@@ -719,7 +873,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: const BorderRadius.only(
@@ -777,7 +934,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             GestureDetector(
               onTap: () => _controller.rejectChatSession(),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(30),
@@ -786,7 +946,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.close_rounded, color: Colors.red.shade400, size: 18),
+                    Icon(
+                      Icons.close_rounded,
+                      color: Colors.red.shade400,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Cancel Request',
@@ -810,9 +974,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final progress = _dotController.value;
     final delay = index * 0.25;
     final adjustedProgress = ((progress - delay) % 1.0 + 1.0) % 1.0;
-    final opacity = adjustedProgress < 0.5
-        ? adjustedProgress * 2
-        : 1.0 - ((adjustedProgress - 0.5) * 2);
+    final opacity =
+        adjustedProgress < 0.5
+            ? adjustedProgress * 2
+            : 1.0 - ((adjustedProgress - 0.5) * 2);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Opacity(
@@ -836,23 +1001,29 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     } else {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("End Chat"),
-          content: const Text("Are you sure you want to end this chat session?"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+        builder:
+            (context) => AlertDialog(
+              title: const Text("End Chat"),
+              content: const Text(
+                "Are you sure you want to end this chat session?",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _controller.terminateEntireSession();
+                  },
+                  child: const Text(
+                    "End Chat",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _controller.terminateEntireSession();
-              },
-              child: const Text("End Chat", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        ),
       );
     }
   }
@@ -865,84 +1036,102 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40, height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(10),
-              ),
+      builder:
+          (ctx) => Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            // Title
-            const Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
-                SizedBox(width: 8),
-                Text(
-                  'End Consultation Options',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                // Title
+                const Row(
+                  children: [
+                    Icon(
+                      Icons.help_outline_rounded,
+                      color: Color(0xFF6B21A8),
+                      size: 22,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'End Consultation Options',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1A1A2E),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Package time remaining: $m:$s',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.orange.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Option 1: End Chat Only
+                _buildEndOption(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  iconColor: Colors.blue.shade700,
+                  bgColor: Colors.blue.shade50,
+                  title: 'End Chat Only (Continue Calling)',
+                  subtitle: 'Closes chat window and returns you to the call.',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _controller.terminateChannelOnly();
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Option 2: End Entire Session
+                _buildEndOption(
+                  icon: Icons.cancel_rounded,
+                  iconColor: Colors.red,
+                  bgColor: Colors.red.shade50,
+                  title: 'End Entire Session',
+                  subtitle:
+                      'Completes consultation and finalises package time.',
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _controller.terminateEntireSession();
+                  },
+                ),
+                const SizedBox(height: 12),
+
+                // Option 3: Cancel
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 4),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Package time remaining: $m:$s',
-                style: TextStyle(fontSize: 13, color: Colors.orange.shade700, fontWeight: FontWeight.w500),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Option 1: End Chat Only
-            _buildEndOption(
-              icon: Icons.chat_bubble_outline_rounded,
-              iconColor: Colors.blue.shade700,
-              bgColor: Colors.blue.shade50,
-              title: 'End Chat Only (Continue Calling)',
-              subtitle: 'Closes chat window and returns you to the call.',
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _controller.terminateChannelOnly();
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Option 2: End Entire Session
-            _buildEndOption(
-              icon: Icons.cancel_rounded,
-              iconColor: Colors.red,
-              bgColor: Colors.red.shade50,
-              title: 'End Entire Session',
-              subtitle: 'Completes consultation and finalises package time.',
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _controller.terminateEntireSession();
-              },
-            ),
-            const SizedBox(height: 12),
-
-            // Option 3: Cancel
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontSize: 15)),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -979,9 +1168,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF1A1A2E))),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Color(0xFF1A1A2E),
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                  ),
                 ],
               ),
             ),
@@ -992,92 +1191,114 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-
   void _showSwitchToCallConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text("Switch to Call"),
-        content: const Text("Are you sure you want to end this chat session and switch to a call?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(dialogContext).pop();
-              
-              // Show loader
-              Get.dialog(
-                const Center(child: CircularProgressIndicator(color: AppColors.deepPink)),
-                barrierDismissible: false,
-              );
-
-              try {
-                int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
-                
-                if (subSessionId > 0) {
-                  await PackageSessionService.spawnChannel(
-                    subSessionId: subSessionId,
-                    channelType: 'call',
-                    callType: 'audio',
-                  );
-                }
-
-                int providerId = _controller.peerId ?? 0;
-
-                if (providerId <= 0) {
-                  final apiClient = Get.find<ApiClient>();
-                  final response = await apiClient.get(AppUrls.getCurrentSession);
-                  
-                  if (response.isSuccess && response.body['data'] != null) {
-                    final data = response.body['data'];
-                    final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
-                    providerId = int.tryParse(session?['provider_id']?.toString() ?? '') ?? 0;
-                  }
-                }
-                
-                if (providerId > 0) {
-                  // If not package session, end chat session cleanly
-                  if (subSessionId <= 0) {
-                    await _controller.endChatSession(skipSummary: true);
-                  }
-                  
-                  // Close loader dialog
-                  if (Get.isDialogOpen ?? false) Get.back();
-
-                  // Initiate call
-                  final callController = Get.isRegistered<CallController>()
-                      ? Get.find<CallController>()
-                      : Get.put(CallController());
-                  
-                  await callController.initiateCall(
-                    providerId: providerId,
-                    providerName: widget.astrologerName,
-                    providerImage: widget.astrologerImage,
-                    isPackageSession: widget.isPackageChat,
-                  );
-
-                  // Navigate to CallScreen so user sees ringing UI
-                  Get.to(() => const CallScreen());
-                  return;
-                }
-                
-                Get.back(); // close loader
-                CustomSnackbar.showError("Failed to switch: active session details not found.");
-              } catch (e) {
-                Get.back(); // close loader
-                CustomSnackbar.showError("Failed to switch: $e");
-              }
-            },
-            child: const Text(
-              "Switch",
-              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+      builder:
+          (dialogContext) => AlertDialog(
+            title: const Text("Switch to Call"),
+            content: const Text(
+              "Are you sure you want to end this chat session and switch to a call?",
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(dialogContext).pop();
+
+                  // Show loader
+                  Get.dialog(
+                    const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                    barrierDismissible: false,
+                  );
+
+                  try {
+                    int subSessionId =
+                        PackageSessionService.activeSubSessionId ?? 0;
+
+                    if (subSessionId > 0) {
+                      await PackageSessionService.spawnChannel(
+                        subSessionId: subSessionId,
+                        channelType: 'call',
+                        callType: 'audio',
+                      );
+                    }
+
+                    int providerId = _controller.peerId ?? 0;
+
+                    if (providerId <= 0) {
+                      final apiClient = Get.find<ApiClient>();
+                      final response = await apiClient.get(
+                        AppUrls.getCurrentSession,
+                      );
+
+                      if (response.isSuccess && response.body['data'] != null) {
+                        final data = response.body['data'];
+                        final session =
+                            (data is Map && data.containsKey('session'))
+                                ? data['session']
+                                : data;
+                        providerId =
+                            int.tryParse(
+                              session?['provider_id']?.toString() ?? '',
+                            ) ??
+                            0;
+                      }
+                    }
+
+                    if (providerId > 0) {
+                      // If not package session, end chat session cleanly
+                      if (subSessionId <= 0) {
+                        await _controller.endChatSession(skipSummary: true);
+                      }
+
+                      // Close loader dialog
+                      if (Get.isDialogOpen ?? false) Get.back();
+
+                      // Initiate call
+                      final callController =
+                          Get.isRegistered<CallController>()
+                              ? Get.find<CallController>()
+                              : Get.put(CallController());
+
+                      await callController.initiateCall(
+                        providerId: providerId,
+                        providerName: widget.astrologerName,
+                        providerImage: widget.astrologerImage,
+                        isPackageSession: widget.isPackageChat,
+                      );
+
+                      // Navigate to CallScreen so user sees ringing UI
+                      Get.to(() => const CallScreen());
+                      return;
+                    }
+
+                    Get.back(); // close loader
+                    CustomSnackbar.showError(
+                      "Failed to switch: active session details not found.",
+                    );
+                  } catch (e) {
+                    Get.back(); // close loader
+                    CustomSnackbar.showError("Failed to switch: $e");
+                  }
+                },
+                child: const Text(
+                  "Switch",
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -1108,7 +1329,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     // 1. Check messages loaded in ChatController for system message with birth details
     for (final msg in _controller.messages) {
       final content = msg.text;
-      if (content.contains('Birth Details:') || content.contains('Date of Birth:')) {
+      if (content.contains('Birth Details:') ||
+          content.contains('Date of Birth:')) {
         final lines = content.split('\n');
         for (final line in lines) {
           final trimmed = line.trim().replaceAll(RegExp(r'^-\s*'), '');
@@ -1149,17 +1371,21 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
     if (dob.isNotEmpty) {
       if (tob.length == 5) tob += ":00";
-      Get.to(() => KundliScreen(
-        fullName: name,
-        gender: gender.isEmpty ? 'Male' : gender,
-        dob: dob,
-        tob: tob.isNotEmpty ? tob : '00:00:00',
-        place: place.isEmpty ? 'India' : place,
-        latitude: lat,
-        longitude: lng,
-      ));
+      Get.to(
+        () => KundliScreen(
+          fullName: name,
+          gender: gender.isEmpty ? 'Male' : gender,
+          dob: dob,
+          tob: tob.isNotEmpty ? tob : '00:00:00',
+          place: place.isEmpty ? 'India' : place,
+          latitude: lat,
+          longitude: lng,
+        ),
+      );
     } else {
-      CustomSnackbar.showError("Birth details not found. Please complete profile.");
+      CustomSnackbar.showError(
+        "Birth details not found. Please complete profile.",
+      );
     }
   }
 
@@ -1167,60 +1393,61 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildAttachmentOption(
-                  icon: Iconsax.camera,
-                  color: Colors.blue,
-                  label: "Camera",
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _pickImage(ImageSource.camera);
-                  },
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                _buildAttachmentOption(
-                  icon: Iconsax.gallery,
-                  color: Colors.purple,
-                  label: "Gallery",
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _pickImage(ImageSource.gallery);
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildAttachmentOption(
+                      icon: Iconsax.camera,
+                      color: Colors.blue,
+                      label: "Camera",
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _pickImage(ImageSource.camera);
+                      },
+                    ),
+                    _buildAttachmentOption(
+                      icon: Iconsax.gallery,
+                      color: Colors.purple,
+                      label: "Gallery",
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _pickImage(ImageSource.gallery);
+                      },
+                    ),
+                    _buildAttachmentOption(
+                      icon: Iconsax.document,
+                      color: Colors.orange,
+                      label: "Document",
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _pickDocument();
+                      },
+                    ),
+                  ],
                 ),
-                _buildAttachmentOption(
-                  icon: Iconsax.document,
-                  color: Colors.orange,
-                  label: "Document",
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _pickDocument();
-                  },
-                ),
+                const SizedBox(height: 20),
               ],
             ),
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+          ),
     );
   }
 

@@ -243,7 +243,8 @@ class AstrologersPreviewSection extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (astro.isOnline && (astro.isChatEnabled || astro.isCallEnabled)) ...[
+                        if (astro.isOnline &&
+                            (astro.isChatEnabled || astro.isCallEnabled)) ...[
                           CustomButton(
                             text: astro.packageSessionText,
                             icon: Icons.timer,

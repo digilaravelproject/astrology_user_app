@@ -25,7 +25,7 @@ class SubscriptionSuccessScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              
+
               // Success Icon/Animation Placeholder
               Container(
                 width: 120,
@@ -49,9 +49,9 @@ class SubscriptionSuccessScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               const AppText(
                 'Subscription Successful',
                 fontSize: 28,
@@ -59,18 +59,18 @@ class SubscriptionSuccessScreen extends StatelessWidget {
                 color: Color(0xFF2D3142),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               AppText(
                 'Congratulations! Your plan has been upgraded to $planName successfully. You can now access all premium features.',
                 fontSize: 16,
                 color: Colors.grey.shade600,
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 50),
-              
+
               // Transaction Details Card
               Container(
                 padding: const EdgeInsets.all(24),
@@ -95,9 +95,9 @@ class SubscriptionSuccessScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               CustomButton(
                 text: 'OK',
                 fontSize: 17,
@@ -108,7 +108,7 @@ class SubscriptionSuccessScreen extends StatelessWidget {
                   Get.offAllNamed(AppRoutes.dashboard, arguments: {'index': 1});
                 },
               ),
-              
+
               const SizedBox(height: 20),
             ],
           ),

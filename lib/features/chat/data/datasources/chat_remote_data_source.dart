@@ -6,9 +6,17 @@ import 'package:astro_user/core/services/network/response_model.dart';
 
 abstract class IChatRemoteDataSource {
   Future<ResponseModel> getChatHistory(int sessionId);
-  Future<ResponseModel> sendTextMessage(int sessionId, String text, {int? replyToId});
+  Future<ResponseModel> sendTextMessage(
+    int sessionId,
+    String text, {
+    int? replyToId,
+  });
   Future<ResponseModel> uploadImageAttachment(int sessionId, dynamic xFile);
-  Future<ResponseModel> uploadDocumentAttachment(int sessionId, String fileName, dynamic pickerResult);
+  Future<ResponseModel> uploadDocumentAttachment(
+    int sessionId,
+    String fileName,
+    dynamic pickerResult,
+  );
   Future<ResponseModel> sendAttachmentMessage({
     required int sessionId,
     required String message,
@@ -16,7 +24,11 @@ abstract class IChatRemoteDataSource {
     required String attachmentUrl,
   });
   Future<ResponseModel> markMessagesRead(int sessionId);
-  Future<ResponseModel> syncMessageStatus(int sessionId, List<int> messageIds, String status);
+  Future<ResponseModel> syncMessageStatus(
+    int sessionId,
+    List<int> messageIds,
+    String status,
+  );
   Future<ResponseModel> endChatSession(int sessionId);
   Future<ResponseModel> rejectChatSession(int sessionId);
 }
@@ -24,7 +36,8 @@ abstract class IChatRemoteDataSource {
 class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   final ApiClient _apiClient;
 
-  ChatRemoteDataSourceImpl({required ApiClient apiClient}) : _apiClient = apiClient;
+  ChatRemoteDataSourceImpl({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   @override
   Future<ResponseModel> getChatHistory(int sessionId) async {
@@ -36,7 +49,11 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   }
 
   @override
-  Future<ResponseModel> sendTextMessage(int sessionId, String text, {int? replyToId}) async {
+  Future<ResponseModel> sendTextMessage(
+    int sessionId,
+    String text, {
+    int? replyToId,
+  }) async {
     final Map<String, dynamic> data = {'message': text, 'type': 'text'};
     if (replyToId != null) {
       data['reply_to_id'] = replyToId;
@@ -58,18 +75,17 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   }) async {
     return await _apiClient.post(
       AppUrls.sendChatMessage(sessionId),
-      data: {
-        'message': message,
-        'type': type,
-        'attachment_url': attachmentUrl,
-      },
+      data: {'message': message, 'type': type, 'attachment_url': attachmentUrl},
       handleError: false,
       showToaster: false,
     );
   }
 
   @override
-  Future<ResponseModel> uploadImageAttachment(int sessionId, dynamic xFile) async {
+  Future<ResponseModel> uploadImageAttachment(
+    int sessionId,
+    dynamic xFile,
+  ) async {
     return await _apiClient.postMultipartData(
       AppUrls.uploadAttachment,
       {'chat_session_id': sessionId.toString(), 'type': 'image'},
@@ -81,7 +97,11 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   }
 
   @override
-  Future<ResponseModel> uploadDocumentAttachment(int sessionId, String fileName, dynamic pickerResult) async {
+  Future<ResponseModel> uploadDocumentAttachment(
+    int sessionId,
+    String fileName,
+    dynamic pickerResult,
+  ) async {
     return await _apiClient.postMultipartData(
       AppUrls.uploadAttachment,
       {'chat_session_id': sessionId.toString(), 'type': 'document'},
@@ -104,13 +124,14 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   }
 
   @override
-  Future<ResponseModel> syncMessageStatus(int sessionId, List<int> messageIds, String status) async {
+  Future<ResponseModel> syncMessageStatus(
+    int sessionId,
+    List<int> messageIds,
+    String status,
+  ) async {
     return await _apiClient.post(
       AppUrls.syncChatStatus(sessionId),
-      data: {
-        'status': status,
-        'message_ids': messageIds,
-      },
+      data: {'status': status, 'message_ids': messageIds},
       handleError: false,
       showToaster: false,
     );

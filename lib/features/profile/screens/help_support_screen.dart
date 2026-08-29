@@ -39,12 +39,14 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
   void _parseContent(String content) {
     // Basic regex to find emails and phone numbers
-    final emailRegExp = RegExp(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}');
+    final emailRegExp = RegExp(
+      r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
+    );
     final phoneRegExp = RegExp(r'\+?[0-9][0-9\s-]{8,15}');
 
     _emails = emailRegExp.allMatches(content).map((m) => m.group(0)!).toList();
     _phones = phoneRegExp.allMatches(content).map((m) => m.group(0)!).toList();
-    
+
     // De-duplicate
     _emails = _emails.toSet().toList();
     _phones = _phones.toSet().toList();
@@ -68,11 +70,16 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const AppText("Failed to load contact info", color: Colors.grey),
+                const AppText(
+                  "Failed to load contact info",
+                  color: Colors.grey,
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadData,
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.deepPink),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.deepPink,
+                  ),
                   child: const AppText("Retry", color: Colors.white),
                 ),
               ],
@@ -92,36 +99,50 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   const SizedBox(height: 25),
                   const Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: AppText("Email Support", fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
-                  ),
-                  ..._emails.map((email) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildSupportOption(
-                      icon: Iconsax.sms_copy,
-                      title: "Email",
-                      subtitle: email,
-                      onTap: () => _launchEmail(email),
+                    child: AppText(
+                      "Email Support",
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
                     ),
-                  )),
+                  ),
+                  ..._emails.map(
+                    (email) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildSupportOption(
+                        icon: Iconsax.sms_copy,
+                        title: "Email",
+                        subtitle: email,
+                        onTap: () => _launchEmail(email),
+                      ),
+                    ),
+                  ),
                 ],
 
                 if (_phones.isNotEmpty) ...[
                   const SizedBox(height: 25),
                   const Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: AppText("Call Support", fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
-                  ),
-                  ..._phones.map((phone) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildSupportOption(
-                      icon: Iconsax.call_copy,
-                      title: "Call",
-                      subtitle: phone,
-                      onTap: () => _launchPhone(phone),
+                    child: AppText(
+                      "Call Support",
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
                     ),
-                  )),
+                  ),
+                  ..._phones.map(
+                    (phone) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildSupportOption(
+                        icon: Iconsax.call_copy,
+                        title: "Call",
+                        subtitle: phone,
+                        onTap: () => _launchPhone(phone),
+                      ),
+                    ),
+                  ),
                 ],
-                
+
                 const SizedBox(height: 40),
                 Center(
                   child: AppText(
@@ -206,7 +227,11 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey[400]),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: Colors.grey[400],
+            ),
           ],
         ),
       ),

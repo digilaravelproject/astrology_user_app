@@ -8,6 +8,7 @@ import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({super.key});
@@ -16,18 +17,21 @@ class ReferralScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.referAndEarn,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.referAndEarn, centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            Image.network(
-              "https://img.freepik.com/free-vector/refer-friend-concept-illustration_114360-7039.jpg?t=st=1716960000~exp=1716963600~hmac=6069e80...",
+            CustomImageWidget(
+              imagePath:
+                  "https://img.freepik.com/free-vector/refer-friend-concept-illustration_114360-7039.jpg?t=st=1716960000~exp=1716963600~hmac=6069e80...",
               height: 200,
-              errorBuilder: (context, error, stackTrace) => Icon(Iconsax.gift_copy, size: 100, color: AppColors.lightPink),
+              errorBuilder:
+                  (context, error, stackTrace) => Icon(
+                    Iconsax.gift_copy,
+                    size: 100,
+                    color: AppColors.lightPink,
+                  ),
             ),
             const SizedBox(height: 30),
             AppText(
@@ -51,7 +55,10 @@ class ReferralScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                border: Border.all(
+                  color: Colors.grey.shade300,
+                  style: BorderStyle.solid,
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,7 +85,9 @@ class ReferralScreen extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Clipboard.setData(const ClipboardData(text: "ASTRO2024"));
-                      CustomSnackbar.showInfo("Referral code copied to clipboard");
+                      CustomSnackbar.showInfo(
+                        "Referral code copied to clipboard",
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -86,10 +95,17 @@ class ReferralScreen extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
-                          BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 4),
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 4,
+                          ),
                         ],
                       ),
-                      child: const Icon(Icons.copy_rounded, color: AppColors.deepPink, size: 20),
+                      child: const Icon(
+                        Icons.copy_rounded,
+                        color: AppColors.deepPink,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],

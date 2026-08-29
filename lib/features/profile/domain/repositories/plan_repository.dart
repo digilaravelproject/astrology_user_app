@@ -24,10 +24,13 @@ class PlanRepository {
     required String providerPaymentId,
     required String signature,
   }) async {
-    return await apiClient.post(AppUrls.upgradePlansVerify, data: {
-      'razorpay_order_id': providerOrderId,
-      'razorpay_payment_id': providerPaymentId,
-      'razorpay_signature': signature,
-    });
+    return await apiClient.post(
+      AppUrls.upgradePlansVerify,
+      data: {
+        'razorpay_order_id': providerOrderId,
+        'razorpay_payment_id': providerPaymentId,
+        'razorpay_signature': signature,
+      },
+    );
   }
 }

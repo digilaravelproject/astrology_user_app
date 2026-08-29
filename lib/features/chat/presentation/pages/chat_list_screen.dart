@@ -35,13 +35,16 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final astrologerController = Get.find<AstrologerController>();
-    
+
     // Fetch top astrologers for stories and all astrologers for the filtered list
     WidgetsBinding.instance.addPostFrameCallback((_) {
       astrologerController.fetchTopAstrologers(serviceType: 'chat');
-      astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
+      astrologerController.fetchFilteredAstrologers(
+        type: 'all',
+        serviceType: 'chat',
+      );
     });
-    
+
     final TextEditingController searchController = TextEditingController();
 
     return Stack(
@@ -65,154 +68,217 @@ class ChatListScreen extends StatelessWidget {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {
-                      await astrologerController.fetchTopAstrologers(serviceType: 'chat');
-                      await astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat');
+                      await astrologerController.fetchTopAstrologers(
+                        serviceType: 'chat',
+                      );
+                      await astrologerController.fetchFilteredAstrologers(
+                        type: 'all',
+                        serviceType: 'chat',
+                      );
                     },
                     child: CustomScrollView(
                       slivers: [
-
-              // White Container with Content
-              SliverToBoxAdapter(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Top Astrologers Heading
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: AppColors.primaryColor,
-                              size: 22,
+                        // White Container with Content
+                        SliverToBoxAdapter(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(30),
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            const AppText(
-                              'Top Astrologers',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryColor,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Container(
-                        height: 120,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        child: Obx(() {
-                          if (astrologerController.isTopLoading.value) {
-                            return _buildTopShimmerList();
-                          }
-                          return ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: astrologerController.topAstrologers.length,
-                            itemBuilder: (context, index) {
-                              return _buildStoryItem(astrologerController.topAstrologers[index]);
-                            },
-                          );
-                        }),
-                      ),
-
-                      // Filter Section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0),
-                        child: Obx(() {
-                          // Access reactive properties directly to ensure GetX registers the dependency
-                          final _ = astrologerController.selectedSkills.length;
-                          final isOnlineOnly = astrologerController.isOnlineOnly.value;
-                          
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(width: 18),
-                                // All Chip
-                                _buildInteractiveChip(
-                                  label: 'All', 
-                                  isSelected: astrologerController.selectedSkills.isEmpty && !isOnlineOnly,
-                                  onTap: () => astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat'),
-                                ),
-                                const SizedBox(width: 8),
-
-                                // Dynamic Skill Chips
-                                ...AppConstants.skillList.map((skill) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: _buildInteractiveChip(
-                                    label: skill, 
-                                    isSelected: astrologerController.selectedSkills.contains(skill),
-                                    onTap: () => astrologerController.toggleSkill(skill, serviceType: 'chat'),
+                                // Top Astrologers Heading
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    20,
+                                    16,
+                                    20,
+                                    8,
                                   ),
-                                )),
-
-                                // Online Chip
-                                _buildInteractiveChip(
-                                  label: 'Online', 
-                                  isSelected: isOnlineOnly,
-                                  onTap: () => astrologerController.fetchFilteredAstrologers(serviceType: 'chat', online: !isOnlineOnly),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        color: AppColors.primaryColor,
+                                        size: 22,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const AppText(
+                                        'Top Astrologers',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(width: 18),
+
+                                Container(
+                                  height: 120,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                  ),
+                                  child: Obx(() {
+                                    if (astrologerController
+                                        .isTopLoading
+                                        .value) {
+                                      return _buildTopShimmerList();
+                                    }
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                      ),
+                                      itemCount:
+                                          astrologerController
+                                              .topAstrologers
+                                              .length,
+                                      itemBuilder: (context, index) {
+                                        return _buildStoryItem(
+                                          astrologerController
+                                              .topAstrologers[index],
+                                        );
+                                      },
+                                    );
+                                  }),
+                                ),
+
+                                // Filter Section
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                  ),
+                                  child: Obx(() {
+                                    // Access reactive properties directly to ensure GetX registers the dependency
+                                    final _ =
+                                        astrologerController
+                                            .selectedSkills
+                                            .length;
+                                    final isOnlineOnly =
+                                        astrologerController.isOnlineOnly.value;
+
+                                    return SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(width: 18),
+                                          // All Chip
+                                          _buildInteractiveChip(
+                                            label: 'All',
+                                            isSelected:
+                                                astrologerController
+                                                    .selectedSkills
+                                                    .isEmpty &&
+                                                !isOnlineOnly,
+                                            onTap:
+                                                () => astrologerController
+                                                    .fetchFilteredAstrologers(
+                                                      type: 'all',
+                                                      serviceType: 'chat',
+                                                    ),
+                                          ),
+                                          const SizedBox(width: 8),
+
+                                          // Dynamic Skill Chips
+                                          ...AppConstants.skillList.map(
+                                            (skill) => Padding(
+                                              padding: const EdgeInsets.only(
+                                                right: 8,
+                                              ),
+                                              child: _buildInteractiveChip(
+                                                label: skill,
+                                                isSelected: astrologerController
+                                                    .selectedSkills
+                                                    .contains(skill),
+                                                onTap:
+                                                    () => astrologerController
+                                                        .toggleSkill(
+                                                          skill,
+                                                          serviceType: 'chat',
+                                                        ),
+                                              ),
+                                            ),
+                                          ),
+
+                                          // Online Chip
+                                          _buildInteractiveChip(
+                                            label: 'Online',
+                                            isSelected: isOnlineOnly,
+                                            onTap:
+                                                () => astrologerController
+                                                    .fetchFilteredAstrologers(
+                                                      serviceType: 'chat',
+                                                      online: !isOnlineOnly,
+                                                    ),
+                                          ),
+                                          const SizedBox(width: 18),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 12),
                               ],
                             ),
+                          ),
+                        ),
+
+                        // Astrologer Cards List (REACTIVE SECTION)
+                        Obx(() {
+                          if (astrologerController.isFilteredLoading.value) {
+                            return SliverPadding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              sliver: _buildShimmerList(),
+                            );
+                          }
+
+                          final astrologers =
+                              astrologerController.filteredAstrologers;
+                          if (astrologers.isEmpty) {
+                            return const SliverToBoxAdapter(
+                              child: Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 50),
+                                  child: AppText(
+                                    'No astrologers available',
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
+                          return SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                return _buildAstrologerCard(
+                                  context,
+                                  astrologers[index],
+                                );
+                              }, childCount: astrologers.length),
+                            ),
                           );
                         }),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+
+                        const SliverToBoxAdapter(child: SizedBox(height: 150)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-
-              // Astrologer Cards List (REACTIVE SECTION)
-              Obx(() {
-                if (astrologerController.isFilteredLoading.value) {
-                  return SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    sliver: _buildShimmerList(),
-                  );
-                }
-
-                final astrologers = astrologerController.filteredAstrologers;
-                if (astrologers.isEmpty) {
-                  return const SliverToBoxAdapter(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 50),
-                        child: AppText('No astrologers available', color: Colors.grey),
-                      ),
-                    ),
-                  );
-                }
-
-                return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _buildAstrologerCard(context, astrologers[index]);
-                      },
-                      childCount: astrologers.length,
-                    ),
-                  ),
-                );
-              }),
-
-              const SliverToBoxAdapter(child: SizedBox(height: 150)),
-            ],
+              ],
+            ),
           ),
         ),
-        )
       ],
-    )
-    )
-        )
-    ]
     );
   }
 
@@ -238,10 +304,7 @@ class ChatListScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.goldAccent,
-                      width: 1.5,
-                    ),
+                    border: Border.all(color: AppColors.goldAccent, width: 1.5),
                   ),
                   child: Container(
                     decoration: const BoxDecoration(
@@ -249,12 +312,14 @@ class ChatListScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
-                        ? CustomImageWidget(
-                            imagePath: astro.fullProfilePhoto,
-                            fit: BoxFit.cover,
-                          )
-                        : _buildPlaceholder(),
+                    child:
+                        astro.profilePhoto != null &&
+                                astro.profilePhoto!.isNotEmpty
+                            ? CustomImageWidget(
+                              imagePath: astro.fullProfilePhoto,
+                              fit: BoxFit.cover,
+                            )
+                            : _buildPlaceholder(),
                   ),
                 ),
                 Positioned(
@@ -264,12 +329,10 @@ class ChatListScreen extends StatelessWidget {
                     width: 16,
                     height: 16,
                     decoration: BoxDecoration(
-                      color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                      color:
+                          astro.isAvailableOnline ? Colors.green : Colors.grey,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 2,
-                      ),
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
                   ),
                 ),
@@ -297,29 +360,21 @@ class ChatListScreen extends StatelessWidget {
   Widget _buildPlaceholder() {
     return Container(
       color: AppColors.lightPink,
-      child: const Icon(
-        Icons.person,
-        color: AppColors.primaryColor,
-        size: 36,
-      ),
+      child: const Icon(Icons.person, color: AppColors.primaryColor, size: 36),
     );
   }
 
   Widget _buildPlaceholderLarge() {
     return Container(
       color: AppColors.lightPink,
-      child: const Icon(
-        Icons.person,
-        color: AppColors.primaryColor,
-        size: 50,
-      ),
+      child: const Icon(Icons.person, color: AppColors.primaryColor, size: 50),
     );
   }
 
   Widget _buildActionItem(IconData icon, VoidCallback onTap) {
     final notificationController = Get.find<NotificationController>();
     bool isNotification = icon == Icons.notifications_outlined;
-    
+
     Widget iconWidget = Container(
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.all(8),
@@ -350,10 +405,7 @@ class ChatListScreen extends StatelessWidget {
         ),
       );
     }
-    return GestureDetector(
-      onTap: onTap,
-      child: iconWidget,
-    );
+    return GestureDetector(onTap: onTap, child: iconWidget);
   }
 
   Widget _buildBadgeWidget(int count) {
@@ -363,10 +415,7 @@ class ChatListScreen extends StatelessWidget {
         color: AppColors.deepPink,
         shape: BoxShape.circle,
       ),
-      constraints: const BoxConstraints(
-        minWidth: 16,
-        minHeight: 16,
-      ),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
       child: Center(
         child: Text(
           count > 99 ? '99+' : count.toString(),
@@ -380,7 +429,11 @@ class ChatListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInteractiveChip({required String label, required bool isSelected, required VoidCallback onTap}) {
+  Widget _buildInteractiveChip({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -405,13 +458,16 @@ class ChatListScreen extends StatelessWidget {
                 color: isSelected ? Colors.transparent : Colors.grey.shade300,
                 width: 1,
               ),
-              boxShadow: isSelected ? [
-                BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                )
-              ] : null,
+              boxShadow:
+                  isSelected
+                      ? [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                      : null,
             ),
             child: AppText(
               label,
@@ -440,10 +496,7 @@ class ChatListScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
+          border: Border.all(color: Colors.grey.shade200, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -469,17 +522,22 @@ class ChatListScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: astro.isAvailableOnline ? Colors.green : Colors.grey.shade300,
+                              color:
+                                  astro.isAvailableOnline
+                                      ? Colors.green
+                                      : Colors.grey.shade300,
                               width: 2,
                             ),
                           ),
                           child: ClipOval(
-                            child: astro.profilePhoto != null && astro.profilePhoto!.isNotEmpty
-                                ? CustomImageWidget(
-                                    imagePath: astro.fullProfilePhoto,
-                                    fit: BoxFit.cover,
-                                  )
-                                : _buildPlaceholderLarge(),
+                            child:
+                                astro.profilePhoto != null &&
+                                        astro.profilePhoto!.isNotEmpty
+                                    ? CustomImageWidget(
+                                      imagePath: astro.fullProfilePhoto,
+                                      fit: BoxFit.cover,
+                                    )
+                                    : _buildPlaceholderLarge(),
                           ),
                         ),
                         Positioned(
@@ -489,7 +547,10 @@ class ChatListScreen extends StatelessWidget {
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
-                              color: astro.isAvailableOnline ? Colors.green : Colors.grey,
+                              color:
+                                  astro.isAvailableOnline
+                                      ? Colors.green
+                                      : Colors.grey,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
@@ -499,15 +560,24 @@ class ChatListScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFF7E6),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFFFB74D).withOpacity(0.5)),
+                        border: Border.all(
+                          color: const Color(0xFFFFB74D).withOpacity(0.5),
+                        ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.star, color: Color(0xFFFFB74D), size: 12),
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xFFFFB74D),
+                            size: 12,
+                          ),
                           const SizedBox(width: 2),
                           AppText(
                             astro.rating.toStringAsFixed(1),
@@ -535,12 +605,18 @@ class ChatListScreen extends StatelessWidget {
                             color: const Color(0xFF2E1A47),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.verified, color: Colors.blue, size: 14),
+                          const Icon(
+                            Icons.verified,
+                            color: Colors.blue,
+                            size: 14,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       AppText(
-                        astro.areasOfExpertise.map((e) => e.trim().tr).join(', '),
+                        astro.areasOfExpertise
+                            .map((e) => e.trim().tr)
+                            .join(', '),
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: Colors.grey.shade600,
@@ -550,7 +626,11 @@ class ChatListScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(Icons.schedule, color: Colors.grey, size: 12),
+                          const Icon(
+                            Icons.schedule,
+                            color: Colors.grey,
+                            size: 12,
+                          ),
                           const SizedBox(width: 2),
                           AppText(
                             '${astro.yearsOfExperience} ${"Years".tr}',
@@ -559,11 +639,17 @@ class ChatListScreen extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.language, color: Colors.grey, size: 12),
+                          const Icon(
+                            Icons.language,
+                            color: Colors.grey,
+                            size: 12,
+                          ),
                           const SizedBox(width: 2),
                           Expanded(
                             child: AppText(
-                              astro.languages.map((l) => l.trim().tr).join(', '),
+                              astro.languages
+                                  .map((l) => l.trim().tr)
+                                  .join(', '),
                               fontSize: 10,
                               fontWeight: FontWeight.w500,
                               color: Colors.grey.shade600,
@@ -593,7 +679,10 @@ class ChatListScreen extends StatelessWidget {
                           if (astro.packageSessionPriceOnly != null) ...[
                             const SizedBox(width: 12),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.orange.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
@@ -626,12 +715,24 @@ class ChatListScreen extends StatelessWidget {
                         fontSize: 11,
                         height: 32,
                         borderRadius: 8,
-                        backgroundColor: astro.isBusy ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        backgroundColor:
+                            astro.isBusy
+                                ? Colors.grey.withOpacity(0.2)
+                                : (astro.isPurchase == true
+                                    ? Colors.green
+                                    : Colors.orange),
                         textColor: astro.isBusy ? Colors.grey : Colors.white,
-                        borderColor: astro.isBusy ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        borderColor:
+                            astro.isBusy
+                                ? Colors.grey
+                                : (astro.isPurchase == true
+                                    ? Colors.green
+                                    : Colors.orange),
                         onTap: () {
                           if (astro.isBusy) {
-                            CustomSnackbar.showInfo('Astrologer is currently engaged.');
+                            CustomSnackbar.showInfo(
+                              'Astrologer is currently engaged.',
+                            );
                             return;
                           }
                           SessionBottomSheetHelper.show(context, astro);
@@ -701,23 +802,20 @@ class ChatListScreen extends StatelessWidget {
 
   Widget _buildShimmerList() {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 16),
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
             ),
-          );
-        },
-        childCount: 5,
-      ),
+          ),
+        );
+      }, childCount: 5),
     );
   }
 
@@ -752,7 +850,6 @@ class ChatListScreen extends StatelessWidget {
               _buildHeaderIcon(Icons.search, () {
                 Get.to(() => AstrologerSearchScreen(serviceType: serviceType));
               }),
-
             ],
           ),
         ],

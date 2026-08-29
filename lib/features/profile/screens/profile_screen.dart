@@ -61,10 +61,7 @@ class ProfileScreen extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Color(0xFFFFD1D1),
-            Color(0xFFFFF8F9),
-          ],
+          colors: [Color(0xFFFFD1D1), Color(0xFFFFF8F9)],
         ),
         borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(30),
@@ -107,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          
+
           // Profile Image
           Stack(
             alignment: Alignment.bottomRight,
@@ -121,13 +118,17 @@ class ProfileScreen extends StatelessWidget {
                 child: Obx(() {
                   final user = authController.currentUser.value;
                   return CustomImageWidget(
-                    imagePath: (() {
-                      final photo = user?.profilePhoto;
-                      if (photo == null || photo.isEmpty) return null;
-                      if (photo.startsWith('http')) return photo;
-                      final cleanPhoto = photo.startsWith('/') ? photo.substring(1) : photo;
-                      return '${AppUrls.baseImageUrl}$cleanPhoto';
-                    })(),
+                    imagePath:
+                        (() {
+                          final photo = user?.profilePhoto;
+                          if (photo == null || photo.isEmpty) return null;
+                          if (photo.startsWith('http')) return photo;
+                          final cleanPhoto =
+                              photo.startsWith('/')
+                                  ? photo.substring(1)
+                                  : photo;
+                          return '${AppUrls.baseImageUrl}$cleanPhoto';
+                        })(),
                     height: 100,
                     width: 100,
                     radius: BorderRadius.circular(50),
@@ -141,7 +142,9 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        user?.name.isNotEmpty == true ? user!.name[0].toUpperCase() : '?',
+                        user?.name.isNotEmpty == true
+                            ? user!.name[0].toUpperCase()
+                            : '?',
                         style: GoogleFonts.poppins(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
@@ -167,21 +170,25 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Name and Phone
-          Obx(() => AppText(
-            authController.currentUser.value?.name ?? AppStrings.guest,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF2E1A47),
-          )),
+          Obx(
+            () => AppText(
+              authController.currentUser.value?.name ?? AppStrings.guest,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF2E1A47),
+            ),
+          ),
           const SizedBox(height: 4),
-          Obx(() => AppText(
-            authController.currentUser.value?.mobile ?? "+91 9876543210",
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.black54,
-          )),
+          Obx(
+            () => AppText(
+              authController.currentUser.value?.mobile ?? "+91 9876543210",
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black54,
+            ),
+          ),
         ],
       ),
     );
@@ -226,15 +233,20 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.amber.withOpacity(0.2),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: AppText(AppStrings.proBadge, fontSize: 10, fontWeight: FontWeight.bold, color: Colors.amber[800]),
+            child: AppText(
+              AppStrings.proBadge,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: Colors.amber[800],
+            ),
           ),
         ),
+
         // _buildMenuItem(
         //   icon: Iconsax.arrow_circle_up_copy,
         //   title: AppStrings.upgradePlan,
         //   onTap: () => Get.toNamed(AppRoutes.subscriptionScreen),
         // ),
-        
         const SizedBox(height: 10),
         _buildSectionHeader(AppStrings.referralsCommunity),
         // _buildMenuItem(
@@ -250,7 +262,11 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.user_remove_copy,
           title: 'Blocked Astrologers'.tr,
-          onTap: () => Get.to(() => const BlockedAstrologersScreen(), binding: ProfileBinding()),
+          onTap:
+              () => Get.to(
+                () => const BlockedAstrologersScreen(),
+                binding: ProfileBinding(),
+              ),
         ),
 
         const SizedBox(height: 10),
@@ -258,7 +274,11 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.headphone_copy,
           title: AppStrings.customerSupport,
-          onTap: () => Get.to(() => const HelpSupportScreen(), binding: ProfileBinding()),
+          onTap:
+              () => Get.to(
+                () => const HelpSupportScreen(),
+                binding: ProfileBinding(),
+              ),
         ),
         _buildMenuItem(
           icon: Iconsax.message_question_copy,
@@ -275,11 +295,11 @@ class ProfileScreen extends StatelessWidget {
           title: AppStrings.termsAndConditions,
           onTap: () => Get.toNamed(AppRoutes.termsAndConditions),
         ),
-         _buildMenuItem(
+        _buildMenuItem(
           icon: Iconsax.money_change_copy,
           title: AppStrings.paymentPolicy,
-         onTap: () => Get.toNamed(AppRoutes.paymentPolicy)
-         // onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.paymentPolicy, content: "Refund Policy Content Placeholder...")),
+          onTap: () => Get.toNamed(AppRoutes.paymentPolicy),
+          // onTap: () => Get.to(() => SimpleContentScreen(title: AppStrings.paymentPolicy, content: "Refund Policy Content Placeholder...")),
         ),
 
         const SizedBox(height: 10),
@@ -287,14 +307,18 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.like_1_copy,
           title: AppStrings.feedback,
-          onTap: () => Get.to(() => const FeedbackScreen(), binding: ProfileBinding()),
+          onTap:
+              () => Get.to(
+                () => const FeedbackScreen(),
+                binding: ProfileBinding(),
+              ),
         ),
         _buildMenuItem(
           icon: Iconsax.star_1_copy,
           title: AppStrings.rateUs,
           onTap: () => _rateUs(),
         ),
-         _buildMenuItem(
+        _buildMenuItem(
           icon: Iconsax.share_copy,
           title: AppStrings.share,
           onTap: () => _shareApp(),
@@ -302,7 +326,11 @@ class ProfileScreen extends StatelessWidget {
         _buildMenuItem(
           icon: Iconsax.info_circle_copy,
           title: AppStrings.aboutUs,
-          onTap: () => Get.to(() => const AboutUsScreen(), binding: ProfileBinding()),
+          onTap:
+              () => Get.to(
+                () => const AboutUsScreen(),
+                binding: ProfileBinding(),
+              ),
         ),
       ],
     );
@@ -346,7 +374,13 @@ class ProfileScreen extends StatelessWidget {
         fontWeight: FontWeight.w500,
         color: const Color(0xFF2E1A47),
       ),
-      trailing: trailing ?? const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.black26),
+      trailing:
+          trailing ??
+          const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 14,
+            color: Colors.black26,
+          ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
       minVerticalPadding: 15,
     );
@@ -362,7 +396,9 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () {
               Get.dialog(
                 Dialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -378,7 +414,11 @@ class ProfileScreen extends StatelessWidget {
                             color: Colors.red.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
+                          child: const Icon(
+                            Icons.logout_rounded,
+                            color: Colors.red,
+                            size: 32,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         const AppText(
@@ -402,11 +442,20 @@ class ProfileScreen extends StatelessWidget {
                               child: OutlinedButton(
                                 onPressed: () => Get.back(),
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   side: BorderSide(color: Colors.grey[300]!),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                child: AppText('Cancel', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                child: AppText(
+                                  'Cancel',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[600],
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -417,12 +466,21 @@ class ProfileScreen extends StatelessWidget {
                                   authController.logout();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
                                   backgroundColor: Colors.red,
                                   elevation: 0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                 ),
-                                child: const AppText('Logout', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                child: const AppText(
+                                  'Logout',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -455,7 +513,7 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 15),
 
           TextButton(
@@ -467,14 +525,15 @@ class ProfileScreen extends StatelessWidget {
               color: Colors.red,
             ),
           ),
-
         ],
       ),
     );
   }
 
   void _rateUs() async {
-    final Uri url = Uri.parse('https://play.google.com/store/apps/details?id=com.suryapath.user');
+    final Uri url = Uri.parse(
+      'https://play.google.com/store/apps/details?id=com.suryapath.user',
+    );
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       debugPrint('Could not launch Play Store');
     }

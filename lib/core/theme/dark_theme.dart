@@ -58,9 +58,7 @@ ThemeData darkTheme = ThemeData(
       side: const BorderSide(color: AppColors.darkPrimaryColor, width: 2.0),
       elevation: 2,
       shadowColor: Colors.black.withOpacity(0.3),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       padding: const EdgeInsets.symmetric(vertical: 14),
       textStyle: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
     ),
@@ -75,9 +73,7 @@ ThemeData darkTheme = ThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: AppColors.darkPrimaryColor,
       side: const BorderSide(color: AppColors.darkPrimaryColor, width: 2.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   ),
 );

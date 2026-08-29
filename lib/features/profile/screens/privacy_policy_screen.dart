@@ -12,7 +12,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SupportController>();
-    
+
     // Fetch privacy policy when screen is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchPrivacyPolicy();
@@ -26,7 +26,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isPrivacyLoading.value) {
-          return const Center(child: CircularProgressIndicator(color: Colors.pink));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.pink),
+          );
         }
 
         final policyData = controller.privacyPolicyData.value;

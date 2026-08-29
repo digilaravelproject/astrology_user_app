@@ -7,11 +7,8 @@ class HoroscopePill extends StatelessWidget {
   final VoidCallback onTap;
   final String? text;
 
-  const HoroscopePill({
-    Key? key,
-    required this.onTap,
-    this.text,
-  }) : super(key: key);
+  const HoroscopePill({Key? key, required this.onTap, this.text})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {

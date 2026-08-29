@@ -14,12 +14,15 @@ abstract class HistoryRepository {
 class HistoryRepositoryImpl implements HistoryRepository {
   final ApiClient _apiClient;
 
-  HistoryRepositoryImpl({required ApiClient apiClient}) : _apiClient = apiClient;
+  HistoryRepositoryImpl({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   @override
   Future<ChatSessionListResponse> getChatSessions({int page = 1}) async {
     try {
-      final response = await _apiClient.get('${AppUrls.userChatSessions}?page=$page');
+      final response = await _apiClient.get(
+        '${AppUrls.userChatSessions}?page=$page',
+      );
       if (response.isSuccess && response.body != null) {
         return ChatSessionListResponse.fromJson(response.body);
       } else {
@@ -34,7 +37,9 @@ class HistoryRepositoryImpl implements HistoryRepository {
   @override
   Future<CallSessionListResponse> getCallSessions({int page = 1}) async {
     try {
-      final response = await _apiClient.get('${AppUrls.userCallSessions}?page=$page');
+      final response = await _apiClient.get(
+        '${AppUrls.userCallSessions}?page=$page',
+      );
       if (response.isSuccess && response.body != null) {
         return CallSessionListResponse.fromJson(response.body);
       } else {
@@ -46,4 +51,3 @@ class HistoryRepositoryImpl implements HistoryRepository {
     }
   }
 }
-

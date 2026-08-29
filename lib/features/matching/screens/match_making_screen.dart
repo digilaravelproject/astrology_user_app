@@ -31,7 +31,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              
+
               // Profile Circles with Connection
               Stack(
                 alignment: Alignment.center,
@@ -43,7 +43,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
                       painter: ConnectionLinePainter(),
                     ),
                   ),
-                  
+
                   // Decorative Stars
                   Positioned(
                     top: 20,
@@ -81,33 +81,37 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
                       size: 35,
                     ),
                   ),
-                  
+
                   // Profile Circles
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       profile1Name != null
                           ? _buildProfileCircle(
-                              profile1Name!.substring(0, 1).toUpperCase(),
-                              profile1Name,
-                              () => _showAddProfileDialog(true),
-                            )
-                          : _buildAddProfileCircle(() => _showAddProfileDialog(true)),
+                            profile1Name!.substring(0, 1).toUpperCase(),
+                            profile1Name,
+                            () => _showAddProfileDialog(true),
+                          )
+                          : _buildAddProfileCircle(
+                            () => _showAddProfileDialog(true),
+                          ),
                       const SizedBox(width: 80),
                       profile2Name != null
                           ? _buildProfileCircle(
-                              profile2Name!.substring(0, 1).toUpperCase(),
-                              profile2Name,
-                              () => _showAddProfileDialog(false),
-                            )
-                          : _buildAddProfileCircle(() => _showAddProfileDialog(false)),
+                            profile2Name!.substring(0, 1).toUpperCase(),
+                            profile2Name,
+                            () => _showAddProfileDialog(false),
+                          )
+                          : _buildAddProfileCircle(
+                            () => _showAddProfileDialog(false),
+                          ),
                     ],
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 60),
-              
+
               // Description
               const AppText(
                 'The stars reveal compatibility',
@@ -126,7 +130,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
                 height: 1.5,
               ),
               const SizedBox(height: 40),
-              
+
               // Check Compatibility Button
               SizedBox(
                 width: double.infinity,
@@ -179,10 +183,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color(0xFFE8DEFF),
-              border: Border.all(
-                color: const Color(0xFFFFB74D),
-                width: 4,
-              ),
+              border: Border.all(color: const Color(0xFFFFB74D), width: 4),
             ),
             child: Center(
               child: AppText(
@@ -271,10 +272,11 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
 class ConnectionLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFFFB74D).withOpacity(0.3)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = const Color(0xFFFFB74D).withOpacity(0.3)
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke;
 
     final path = Path();
     path.moveTo(60, size.height / 2);
@@ -287,11 +289,12 @@ class ConnectionLinePainter extends CustomPainter {
 
     // Heart in the middle
     canvas.drawPath(path, paint);
-    
-    final heartPaint = Paint()
-      ..color = Colors.pink.shade300
-      ..style = PaintingStyle.fill;
-    
+
+    final heartPaint =
+        Paint()
+          ..color = Colors.pink.shade300
+          ..style = PaintingStyle.fill;
+
     canvas.drawCircle(
       Offset(size.width / 2 - 5, size.height / 2 - 45),
       8,
@@ -344,7 +347,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               color: Color(0xFF2D3142),
             ),
             const SizedBox(height: 24),
-            
+
             // Name
             TextField(
               controller: _nameController,
@@ -358,11 +361,14 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Gender
             const AppText(
               'Gender',
@@ -379,10 +385,16 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: selectedGender == 'Male' ? const Color(0xFF4C63B6) : Colors.white,
+                        color:
+                            selectedGender == 'Male'
+                                ? const Color(0xFF4C63B6)
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: selectedGender == 'Male' ? const Color(0xFF4C63B6) : Colors.grey.shade300,
+                          color:
+                              selectedGender == 'Male'
+                                  ? const Color(0xFF4C63B6)
+                                  : Colors.grey.shade300,
                         ),
                       ),
                       child: Center(
@@ -390,7 +402,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           'Male',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: selectedGender == 'Male' ? Colors.white : const Color(0xFF6B7280),
+                          color:
+                              selectedGender == 'Male'
+                                  ? Colors.white
+                                  : const Color(0xFF6B7280),
                         ),
                       ),
                     ),
@@ -403,10 +418,16 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: selectedGender == 'Female' ? const Color(0xFF4C63B6) : Colors.white,
+                        color:
+                            selectedGender == 'Female'
+                                ? const Color(0xFF4C63B6)
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: selectedGender == 'Female' ? const Color(0xFF4C63B6) : Colors.grey.shade300,
+                          color:
+                              selectedGender == 'Female'
+                                  ? const Color(0xFF4C63B6)
+                                  : Colors.grey.shade300,
                         ),
                       ),
                       child: Center(
@@ -414,7 +435,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           'Female',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: selectedGender == 'Female' ? Colors.white : const Color(0xFF6B7280),
+                          color:
+                              selectedGender == 'Female'
+                                  ? Colors.white
+                                  : const Color(0xFF6B7280),
                         ),
                       ),
                     ),
@@ -423,7 +447,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Date of Birth
             TextField(
               controller: _dobController,
@@ -440,7 +464,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           height: 320,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -457,14 +483,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text(
                                   'Select Birth Date',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.deepPink,
+                                  ),
                                 ),
                               ),
                               Expanded(
                                 child: CupertinoTheme(
                                   data: const CupertinoThemeData(
                                     textTheme: CupertinoTextThemeData(
-                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                      dateTimePickerTextStyle: TextStyle(
+                                        color: AppColors.deepPink,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   child: CupertinoDatePicker(
@@ -480,12 +514,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Divider(height: 1, color: Colors.black12),
                               InkWell(
-                                onTap: () => Navigator.of(context).pop(tempDate),
+                                onTap:
+                                    () => Navigator.of(context).pop(tempDate),
                                 child: Container(
                                   width: double.infinity,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  child: Text(
+                                    'Done'.tr,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -496,7 +540,8 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   },
                 );
                 if (result != null) {
-                  _dobController.text = "${result.day}-${result.month}-${result.year}";
+                  _dobController.text =
+                      "${result.day}-${result.month}-${result.year}";
                 }
               },
               decoration: InputDecoration(
@@ -510,11 +555,14 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Time of Birth
             TextField(
               controller: _tobController,
@@ -531,7 +579,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           height: 320,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -548,14 +598,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text(
                                   'Select Birth Time',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.deepPink,
+                                  ),
                                 ),
                               ),
                               Expanded(
                                 child: CupertinoTheme(
                                   data: const CupertinoThemeData(
                                     textTheme: CupertinoTextThemeData(
-                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                      dateTimePickerTextStyle: TextStyle(
+                                        color: AppColors.deepPink,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   child: CupertinoDatePicker(
@@ -569,12 +627,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Divider(height: 1, color: Colors.black12),
                               InkWell(
-                                onTap: () => Navigator.of(context).pop(tempTime),
+                                onTap:
+                                    () => Navigator.of(context).pop(tempTime),
                                 child: Container(
                                   width: double.infinity,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  child: Text(
+                                    'Done'.tr,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -588,7 +656,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   final hour = result.hour;
                   final minute = result.minute.toString().padLeft(2, '0');
                   final period = hour >= 12 ? 'PM' : 'AM';
-                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12)
+                      .toString()
+                      .padLeft(2, '0');
                   _tobController.text = "$formattedHour:$minute $period";
                 }
               },
@@ -603,11 +673,14 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Place of Birth
             TextField(
               controller: _pobController,
@@ -622,11 +695,14 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Buttons
             Row(
               children: [

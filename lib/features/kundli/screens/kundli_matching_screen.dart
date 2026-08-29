@@ -11,21 +11,22 @@ class KundliMatchingScreen extends StatefulWidget {
   State<KundliMatchingScreen> createState() => _KundliMatchingScreenState();
 }
 
-class _KundliMatchingScreenState extends State<KundliMatchingScreen> with SingleTickerProviderStateMixin {
+class _KundliMatchingScreenState extends State<KundliMatchingScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   // Boy's Details
   final TextEditingController _boyNameController = TextEditingController();
   final TextEditingController _boyDateController = TextEditingController();
   final TextEditingController _boyTimeController = TextEditingController();
   final TextEditingController _boyPlaceController = TextEditingController();
-  
+
   // Girl's Details
   final TextEditingController _girlNameController = TextEditingController();
   final TextEditingController _girlDateController = TextEditingController();
   final TextEditingController _girlTimeController = TextEditingController();
   final TextEditingController _girlPlaceController = TextEditingController();
-  
+
   bool _saveDetails = false;
 
   @override
@@ -74,20 +75,14 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
               ),
-              tabs: [
-                Tab(text: 'OPEN KUNDLI'.tr),
-                Tab(text: 'NEW MATCHING'.tr),
-              ],
+              tabs: [Tab(text: 'OPEN KUNDLI'.tr), Tab(text: 'NEW MATCHING'.tr)],
             ),
           ),
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildOpenKundliTab(),
-          _buildNewMatchingTab(),
-        ],
+        children: [_buildOpenKundliTab(), _buildNewMatchingTab()],
       ),
     );
   }
@@ -140,7 +135,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             maxLines: 2,
           ),
           const SizedBox(height: 30),
-          
+
           AppText(
             "GIRL'S DETAILS".tr,
             fontSize: 16,
@@ -183,7 +178,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             maxLines: 2,
           ),
           const SizedBox(height: 20),
-          
+
           // Save Checkbox
           Row(
             children: [
@@ -205,7 +200,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             ],
           ),
           const SizedBox(height: 10),
-          
+
           // Type or Paste Button
           Container(
             width: double.infinity,
@@ -213,7 +208,9 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: const Color(0xFFD81B60).withOpacity(0.3)),
+              border: Border.all(
+                color: const Color(0xFFD81B60).withOpacity(0.3),
+              ),
             ),
             child: const Center(
               child: Row(
@@ -232,7 +229,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Show Match Button
           SizedBox(
             width: double.infinity,
@@ -310,7 +307,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             maxLines: 2,
           ),
           const SizedBox(height: 30),
-          
+
           const AppText(
             "GIRL'S DETAILS",
             fontSize: 16,
@@ -353,7 +350,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             maxLines: 2,
           ),
           const SizedBox(height: 20),
-          
+
           // Save Checkbox
           Row(
             children: [
@@ -375,7 +372,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             ],
           ),
           const SizedBox(height: 10),
-          
+
           // Type or Paste Button
           Container(
             width: double.infinity,
@@ -383,7 +380,9 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(30),
-              border: Border.all(color: const Color(0xFFD81B60).withOpacity(0.3)),
+              border: Border.all(
+                color: const Color(0xFFD81B60).withOpacity(0.3),
+              ),
             ),
             child: const Center(
               child: Row(
@@ -402,7 +401,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
             ),
           ),
           const SizedBox(height: 20),
-          
+
           // Show Match Button
           SizedBox(
             width: double.infinity,
@@ -479,7 +478,10 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
     );
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     DateTime tempDate = DateTime.now();
     final result = await showModalBottomSheet<DateTime>(
       context: context,
@@ -548,7 +550,11 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: const Text(
                         'Done',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF8B0D31),
+                        ),
                       ),
                     ),
                   ),
@@ -560,11 +566,15 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
       },
     );
     if (result != null) {
-      controller.text = "${result.day}-${_getMonthName(result.month)}-${result.year}";
+      controller.text =
+          "${result.day}-${_getMonthName(result.month)}-${result.year}";
     }
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     DateTime tempTime = DateTime.now();
     final result = await showModalBottomSheet<DateTime>(
       context: context,
@@ -631,7 +641,11 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: const Text(
                         'Done',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF8B0D31),
+                        ),
                       ),
                     ),
                   ),
@@ -646,13 +660,28 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
       final hour = result.hour;
       final minute = result.minute.toString().padLeft(2, '0');
       final period = hour >= 12 ? 'PM' : 'AM';
-      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12)
+          .toString()
+          .padLeft(2, '0');
       controller.text = "$formattedHour:$minute $period";
     }
   }
 
   String _getMonthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[month - 1];
   }
 }

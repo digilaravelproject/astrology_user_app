@@ -15,7 +15,8 @@ class PermissionScreen extends StatefulWidget {
   State<PermissionScreen> createState() => _PermissionScreenState();
 }
 
-class _PermissionScreenState extends State<PermissionScreen> with WidgetsBindingObserver {
+class _PermissionScreenState extends State<PermissionScreen>
+    with WidgetsBindingObserver {
   bool isCameraGranted = false;
   bool isMicrophoneGranted = false;
   bool isNotificationGranted = false;
@@ -32,7 +33,7 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-  
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
@@ -69,21 +70,28 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
       Permission.microphone,
       Permission.notification,
     ];
-    
+
     await permissions.request();
     await _checkPermissions();
-    
+
     // Check if any permanently denied
     if (!_allPermissionsGranted) {
-      bool cameraPermanentlyDenied = await Permission.camera.isPermanentlyDenied;
-      bool micPermanentlyDenied = await Permission.microphone.isPermanentlyDenied;
-      bool notifPermanentlyDenied = await Permission.notification.isPermanentlyDenied;
-      
-      if (cameraPermanentlyDenied || micPermanentlyDenied || notifPermanentlyDenied) {
+      bool cameraPermanentlyDenied =
+          await Permission.camera.isPermanentlyDenied;
+      bool micPermanentlyDenied =
+          await Permission.microphone.isPermanentlyDenied;
+      bool notifPermanentlyDenied =
+          await Permission.notification.isPermanentlyDenied;
+
+      if (cameraPermanentlyDenied ||
+          micPermanentlyDenied ||
+          notifPermanentlyDenied) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Some permissions are permanently denied. Please enable them in settings.'),
+              content: const Text(
+                'Some permissions are permanently denied. Please enable them in settings.',
+              ),
               action: SnackBarAction(
                 label: 'Settings',
                 onPressed: () {
@@ -145,7 +153,8 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
               _buildPermissionItem(
                 icon: Icons.notifications_none_outlined,
                 title: 'Notifications',
-                description: 'To notify you about upcoming sessions and messages.',
+                description:
+                    'To notify you about upcoming sessions and messages.',
                 isGranted: isNotificationGranted,
               ),
               const Spacer(),
@@ -209,7 +218,10 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isGranted ? Colors.green.withOpacity(0.1) : AppColors.primaryColor.withOpacity(0.1),
+            color:
+                isGranted
+                    ? Colors.green.withOpacity(0.1)
+                    : AppColors.primaryColor.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -223,31 +235,17 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppText(
-                title,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              AppText(title, fontWeight: FontWeight.bold, fontSize: 16),
               const SizedBox(height: 4),
-              AppText(
-                description,
-                color: Colors.grey.shade600,
-                fontSize: 13,
-              ),
+              AppText(description, color: Colors.grey.shade600, fontSize: 13),
             ],
           ),
         ),
         const SizedBox(width: 8),
         if (isGranted)
-          const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-          )
+          const Icon(Icons.check_circle, color: Colors.green)
         else
-          Icon(
-            Icons.cancel,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.cancel, color: Colors.grey.shade400),
       ],
     );
   }

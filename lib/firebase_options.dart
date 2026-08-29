@@ -67,7 +67,8 @@ class DefaultFirebaseOptions {
     projectId: 'suryapath-kundli',
     databaseURL: 'https://suryapath-kundli-default-rtdb.firebaseio.com',
     storageBucket: 'suryapath-kundli.firebasestorage.app',
-    iosClientId: '397276146259-5j9m3i38i2vh2scq4g16nmde1mjq64g4.apps.googleusercontent.com',
+    iosClientId:
+        '397276146259-5j9m3i38i2vh2scq4g16nmde1mjq64g4.apps.googleusercontent.com',
     iosBundleId: 'com.suryapath.user',
   );
 
@@ -78,7 +79,8 @@ class DefaultFirebaseOptions {
     projectId: 'suryapath-kundli',
     databaseURL: 'https://suryapath-kundli-default-rtdb.firebaseio.com',
     storageBucket: 'suryapath-kundli.firebasestorage.app',
-    iosClientId: '397276146259-14pivjf70p3gmgh3h71t00grrdqrpk7e.apps.googleusercontent.com',
+    iosClientId:
+        '397276146259-14pivjf70p3gmgh3h71t00grrdqrpk7e.apps.googleusercontent.com',
     iosBundleId: 'hash.code.file.fileStracture',
   );
 

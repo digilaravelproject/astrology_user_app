@@ -11,6 +11,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 import '../../auth/controllers/auth_controller.dart';
 import '../../../core/constants/app_urls.dart';
 import 'package:image_picker/image_picker.dart';
@@ -25,11 +26,11 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final AuthController _authController = Get.find<AuthController>();
-  
+
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _placeController;
-  
+
   String? _selectedGender;
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
@@ -43,13 +44,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _initData() {
     final user = _authController.currentUser.value;
-    
-    _nameController = TextEditingController(text: user?.name ?? AppStrings.guest);
-    _phoneController = TextEditingController(text: user?.mobile ?? "+91 9876543210");
-    _placeController = TextEditingController(text: user?.placeOfBirth ?? "New Delhi, India"); 
-    
+
+    _nameController = TextEditingController(
+      text: user?.name ?? AppStrings.guest,
+    );
+    _phoneController = TextEditingController(
+      text: user?.mobile ?? "+91 9876543210",
+    );
+    _placeController = TextEditingController(
+      text: user?.placeOfBirth ?? "New Delhi, India",
+    );
+
     _selectedGender = _parseGender(user?.gender);
-    
+
     if (user?.dateOfBirth != null && user!.dateOfBirth!.isNotEmpty) {
       try {
         _selectedDate = DateTime.parse(user.dateOfBirth!).toLocal();
@@ -59,11 +66,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       _selectedDate = DateTime(1995, 8, 15);
     }
-    
+
     if (user?.timeOfBirth != null && user!.timeOfBirth!.isNotEmpty) {
       final parts = user.timeOfBirth!.split(':');
       if (parts.length >= 2) {
-        _selectedTime = TimeOfDay(hour: int.tryParse(parts[0]) ?? 10, minute: int.tryParse(parts[1]) ?? 30);
+        _selectedTime = TimeOfDay(
+          hour: int.tryParse(parts[0]) ?? 10,
+          minute: int.tryParse(parts[1]) ?? 30,
+        );
       } else {
         _selectedTime = const TimeOfDay(hour: 10, minute: 30);
       }
@@ -83,20 +93,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _authController.currentUser.value = freshUser;
         if (mounted) {
           setState(() {
-            _nameController.text = freshUser.name.isNotEmpty ? freshUser.name : _nameController.text;
-            _phoneController.text = freshUser.mobile.isNotEmpty ? freshUser.mobile : _phoneController.text;
-            _placeController.text = (freshUser.placeOfBirth != null && freshUser.placeOfBirth!.isNotEmpty) ? freshUser.placeOfBirth! : _placeController.text;
+            _nameController.text =
+                freshUser.name.isNotEmpty
+                    ? freshUser.name
+                    : _nameController.text;
+            _phoneController.text =
+                freshUser.mobile.isNotEmpty
+                    ? freshUser.mobile
+                    : _phoneController.text;
+            _placeController.text =
+                (freshUser.placeOfBirth != null &&
+                        freshUser.placeOfBirth!.isNotEmpty)
+                    ? freshUser.placeOfBirth!
+                    : _placeController.text;
             _selectedGender = _parseGender(freshUser.gender);
-            
-            if (freshUser.dateOfBirth != null && freshUser.dateOfBirth!.isNotEmpty) {
+
+            if (freshUser.dateOfBirth != null &&
+                freshUser.dateOfBirth!.isNotEmpty) {
               try {
-                _selectedDate = DateTime.parse(freshUser.dateOfBirth!).toLocal();
+                _selectedDate =
+                    DateTime.parse(freshUser.dateOfBirth!).toLocal();
               } catch (_) {}
             }
-            if (freshUser.timeOfBirth != null && freshUser.timeOfBirth!.isNotEmpty) {
+            if (freshUser.timeOfBirth != null &&
+                freshUser.timeOfBirth!.isNotEmpty) {
               final parts = freshUser.timeOfBirth!.split(':');
               if (parts.length >= 2) {
-                _selectedTime = TimeOfDay(hour: int.tryParse(parts[0]) ?? 10, minute: int.tryParse(parts[1]) ?? 30);
+                _selectedTime = TimeOfDay(
+                  hour: int.tryParse(parts[0]) ?? 10,
+                  minute: int.tryParse(parts[1]) ?? 30,
+                );
               }
             }
           });
@@ -124,7 +150,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime now = DateTime.now();
-    DateTime tempDate = _selectedDate ?? now.subtract(const Duration(days: 365 * 20));
+    DateTime tempDate =
+        _selectedDate ?? now.subtract(const Duration(days: 365 * 20));
     if (tempDate.isAfter(now)) {
       tempDate = now;
     }
@@ -133,9 +160,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final formattedHeader = "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
+            final formattedHeader =
+                "${_getDayName(tempDate.weekday)}, ${_getMonthShort(tempDate.month)} ${tempDate.day}, ${tempDate.year}";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -148,10 +178,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -162,7 +197,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -229,7 +268,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _selectTime(BuildContext context) async {
     final now = DateTime.now();
-    final bool isSelectedDateToday = _selectedDate != null &&
+    final bool isSelectedDateToday =
+        _selectedDate != null &&
         _selectedDate!.year == now.year &&
         _selectedDate!.month == now.month &&
         _selectedDate!.day == now.day;
@@ -251,12 +291,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            final hour = tempTime.hour == 0 ? 12 : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
+            final hour =
+                tempTime.hour == 0
+                    ? 12
+                    : (tempTime.hour > 12 ? tempTime.hour - 12 : tempTime.hour);
             final minute = tempTime.minute.toString().padLeft(2, '0');
             final period = tempTime.hour >= 12 ? 'PM' : 'AM';
             final formattedHeader = "$hour:$minute $period";
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Container(
                 width: 320,
                 padding: const EdgeInsets.all(16),
@@ -269,10 +314,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: const BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(12),
+                        ),
                       ),
                       child: Text(
                         formattedHeader,
@@ -283,7 +333,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.deepPink, thickness: 1.5),
+                    const Divider(
+                      height: 1,
+                      color: AppColors.deepPink,
+                      thickness: 1.5,
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 180,
@@ -302,10 +356,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.time,
                           initialDateTime: tempTime,
-                          maximumDate: isSelectedDateToday ? DateTime.now() : null,
+                          maximumDate:
+                              isSelectedDateToday ? DateTime.now() : null,
                           onDateTimeChanged: (DateTime newTime) {
                             setModalState(() {
-                              if (isSelectedDateToday && newTime.isAfter(DateTime.now())) {
+                              if (isSelectedDateToday &&
+                                  newTime.isAfter(DateTime.now())) {
                                 tempTime = DateTime.now();
                               } else {
                                 tempTime = newTime;
@@ -320,7 +376,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     InkWell(
                       onTap: () {
                         final currentNow = DateTime.now();
-                        if (isSelectedDateToday && tempTime.isAfter(currentNow)) {
+                        if (isSelectedDateToday &&
+                            tempTime.isAfter(currentNow)) {
                           tempTime = currentNow;
                         }
                         Navigator.of(context).pop(tempTime);
@@ -348,7 +405,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
     );
     if (result != null) {
-      setState(() => _selectedTime = TimeOfDay(hour: result.hour, minute: result.minute));
+      setState(
+        () =>
+            _selectedTime = TimeOfDay(hour: result.hour, minute: result.minute),
+      );
     }
   }
 
@@ -358,7 +418,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   String _getMonthShort(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[(month - 1) % 12];
   }
 
@@ -366,43 +439,60 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        title: AppStrings.editProfile,
-        centerTitle: true,
-      ),
+      appBar: CustomAppBar(title: AppStrings.editProfile, centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildProfileImage(),
             const SizedBox(height: 30),
-            _buildTextField(AppStrings.nameLabel, _nameController, Iconsax.user_copy),
+            _buildTextField(
+              AppStrings.nameLabel,
+              _nameController,
+              Iconsax.user_copy,
+            ),
             const SizedBox(height: 20),
-            _buildTextField(AppStrings.mobileNumber, _phoneController, Iconsax.call_copy, readOnly: true),
+            _buildTextField(
+              AppStrings.mobileNumber,
+              _phoneController,
+              Iconsax.call_copy,
+              readOnly: true,
+            ),
             const SizedBox(height: 20),
-            _buildDropdown(AppStrings.gender, [AppStrings.male, AppStrings.female, AppStrings.other], _selectedGender, (val) {
-              setState(() => _selectedGender = val);
-            }),
+            _buildDropdown(
+              AppStrings.gender,
+              [AppStrings.male, AppStrings.female, AppStrings.other],
+              _selectedGender,
+              (val) {
+                setState(() => _selectedGender = val);
+              },
+            ),
             const SizedBox(height: 20),
-             _buildReadOnlyField(
+            _buildReadOnlyField(
               label: AppStrings.dobLabel,
-              value: _selectedDate != null
-                  ? DateFormat('dd MMM yyyy').format(_selectedDate!)
-                  : AppStrings.selectDate,
+              value:
+                  _selectedDate != null
+                      ? DateFormat('dd MMM yyyy').format(_selectedDate!)
+                      : AppStrings.selectDate,
               icon: Iconsax.calendar_1_copy,
               onTap: () => _selectDate(context),
             ),
             const SizedBox(height: 20),
             _buildReadOnlyField(
               label: AppStrings.tobLabel,
-              value: _selectedTime != null
-                  ? _selectedTime!.format(context)
-                  : AppStrings.selectTime,
+              value:
+                  _selectedTime != null
+                      ? _selectedTime!.format(context)
+                      : AppStrings.selectTime,
               icon: Iconsax.clock_copy,
               onTap: () => _selectTime(context),
             ),
-             const SizedBox(height: 20),
-            _buildTextField(AppStrings.pobLabel, _placeController, Iconsax.location_copy),
+            const SizedBox(height: 20),
+            _buildTextField(
+              AppStrings.pobLabel,
+              _placeController,
+              Iconsax.location_copy,
+            ),
 
             const SizedBox(height: 40),
             Obx(() {
@@ -412,12 +502,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 isLoading: profileController.isLoading.value,
                 onTap: () async {
                   final genderLower = _selectedGender?.toLowerCase() ?? 'male';
-                  final dobString = _selectedDate != null
-                      ? "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}"
-                      : '';
-                  final tobString = _selectedTime != null
-                      ? "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}"
-                      : '';
+                  final dobString =
+                      _selectedDate != null
+                          ? "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}"
+                          : '';
+                  final tobString =
+                      _selectedTime != null
+                          ? "${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}"
+                          : '';
 
                   final data = {
                     "name": _nameController.text.trim(),
@@ -429,7 +521,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     "languages": ["English"],
                   };
 
-                  final success = await profileController.updateProfileInApp(data);
+                  final success = await profileController.updateProfileInApp(
+                    data,
+                  );
                   if (success) Get.back();
                 },
               );
@@ -454,33 +548,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             child: Obx(() {
               final user = _authController.currentUser.value;
-              return Container(
+              final String profilePhotoUrl = (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
+                  ? "${AppUrls.baseImageUrl}${user.profilePhoto!}"
+                  : 'https://i.pravatar.cc/300?u=a042581f4e29026704d';
+
+              return CustomImageWidget(
+                imagePath: _imageFile != null ? 'file://${_imageFile!.path}' : profilePhotoUrl,
                 height: 100,
                 width: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: _imageFile != null
-                      ? DecorationImage(
-                          image: FileImage(_imageFile!),
-                          fit: BoxFit.cover,
-                        )
-                      : (user?.profilePhoto != null && user!.profilePhoto!.isNotEmpty)
-                          ? DecorationImage(
-                              image: NetworkImage("${AppUrls.baseImageUrl}${user.profilePhoto!}"),
-                              fit: BoxFit.cover,
-                            )
-                          : const DecorationImage(
-                              image: NetworkImage('https://i.pravatar.cc/300?u=a042581f4e29026704d'),
-                              fit: BoxFit.cover,
-                            ),
-                  border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 1),
+                radius: BorderRadius.circular(50),
+                border: Border.all(
+                  color: AppColors.deepPink.withOpacity(0.2),
+                  width: 1,
                 ),
+                fit: BoxFit.cover,
               );
             }),
           ),
           GestureDetector(
             onTap: () async {
-              final file = await ImagePickerHelper.showImagePickerSheet(context);
+              final file = await ImagePickerHelper.showImagePickerSheet(
+                context,
+              );
               if (file != null) {
                 setState(() => _imageFile = file);
                 final profileController = Get.find<ProfileController>();
@@ -506,7 +595,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   );
                 }
-                return const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16);
+                return const Icon(
+                  Icons.camera_alt_rounded,
+                  color: Colors.white,
+                  size: 16,
+                );
               }),
             ),
           ),
@@ -515,26 +608,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, IconData icon, {bool readOnly = false}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    bool readOnly = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(label, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]!),
+        AppText(
+          label,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[700]!,
+        ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-             color: readOnly ? Colors.grey[100] : Colors.white,
-             borderRadius: BorderRadius.circular(12),
-             border: Border.all(color: Colors.grey[300]!),
+            color: readOnly ? Colors.grey[100] : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[300]!),
           ),
           child: TextField(
             controller: controller,
             readOnly: readOnly,
-            style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
+            style: GoogleFonts.manrope(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
             decoration: InputDecoration(
               prefixIcon: Icon(icon, color: Colors.grey[500], size: 20),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
             ),
           ),
         ),
@@ -542,19 +652,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildReadOnlyField({required String label, required String value, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildReadOnlyField({
+    required String label,
+    required String value,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(label, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]!),
+        AppText(
+          label,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[700]!,
+        ),
         const SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
-               color: Colors.white,
-               borderRadius: BorderRadius.circular(12),
-               border: Border.all(color: Colors.grey[300]!),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[300]!),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
@@ -569,7 +689,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     color: Colors.black87,
                   ),
                 ),
-                const Icon(Icons.arrow_drop_down_rounded, color: Colors.black54),
+                const Icon(
+                  Icons.arrow_drop_down_rounded,
+                  color: Colors.black54,
+                ),
               ],
             ),
           ),
@@ -578,36 +701,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildDropdown(String label, List<String> items, String? selectedValue, Function(String?) onChanged) {
+  Widget _buildDropdown(
+    String label,
+    List<String> items,
+    String? selectedValue,
+    Function(String?) onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText(label, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[700]!),
-         const SizedBox(height: 8),
+        AppText(
+          label,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey[700]!,
+        ),
+        const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-             color: Colors.white,
-             borderRadius: BorderRadius.circular(12),
-             border: Border.all(color: Colors.grey[300]!),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[300]!),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: selectedValue,
               isExpanded: true,
-              icon: const Icon(Icons.arrow_drop_down_rounded, color: Colors.black54),
-              items: items.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Row(
-                    children: [
-                      Icon(Iconsax.user_copy, color: Colors.grey[500], size: 20),
-                      const SizedBox(width: 12),
-                      AppText(value, fontSize: 15, fontWeight: FontWeight.w600, color: Colors.black87),
-                    ],
-                  ),
-                );
-              }).toList(),
+              icon: const Icon(
+                Icons.arrow_drop_down_rounded,
+                color: Colors.black54,
+              ),
+              items:
+                  items.map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Iconsax.user_copy,
+                            color: Colors.grey[500],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          AppText(
+                            value,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
               onChanged: onChanged,
             ),
           ),

@@ -10,9 +10,6 @@ class PlanModel {
   final String? updatedAt;
   final bool? purchased;
 
-
-
-
   PlanModel({
     required this.id,
     required this.name,

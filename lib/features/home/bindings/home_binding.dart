@@ -22,26 +22,32 @@ class HomeBinding extends Bindings {
     Get.lazyPut(() => RemedyService(Get.find<RemedyRepository>()));
     Get.lazyPut(() => GetRemediesUseCase(Get.find<RemedyService>()));
     Get.lazyPut(() => GetRemedyByIdUseCase(Get.find<RemedyService>()));
-    Get.lazyPut(() => RemedyController(
-      getRemediesUseCase: Get.find<GetRemediesUseCase>(),
-      getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
-    ));
+    Get.lazyPut(
+      () => RemedyController(
+        getRemediesUseCase: Get.find<GetRemediesUseCase>(),
+        getRemedyByIdUseCase: Get.find<GetRemedyByIdUseCase>(),
+      ),
+    );
 
     Get.lazyPut(() => BlogRepository(Get.find<ApiClient>()));
     Get.lazyPut(() => BlogService(Get.find<BlogRepository>()));
     Get.lazyPut(() => GetBlogsUseCase(Get.find<BlogService>()));
     Get.lazyPut(() => GetBlogByIdUseCase(Get.find<BlogService>()));
-    Get.lazyPut(() => BlogController(
-      getBlogsUseCase: Get.find<GetBlogsUseCase>(),
-      getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
-    ));
+    Get.lazyPut(
+      () => BlogController(
+        getBlogsUseCase: Get.find<GetBlogsUseCase>(),
+        getBlogByIdUseCase: Get.find<GetBlogByIdUseCase>(),
+      ),
+    );
 
     // Founder words
     Get.lazyPut(() => FounderRepository(Get.find<ApiClient>()));
     Get.lazyPut(() => FounderService(Get.find<FounderRepository>()));
     Get.lazyPut(() => GetFounderWordsUseCase(Get.find<FounderService>()));
-    Get.lazyPut(() => FounderController(
-      getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
-    ));
+    Get.lazyPut(
+      () => FounderController(
+        getFounderWordsUseCase: Get.find<GetFounderWordsUseCase>(),
+      ),
+    );
   }
 }

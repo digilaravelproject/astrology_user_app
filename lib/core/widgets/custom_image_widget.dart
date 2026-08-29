@@ -5,6 +5,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../constants/image_constants.dart';
 import 'shimmer_widget.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 /// Enum to represent different image types
 enum ImageType { svg, svgString, png, network, file, gif, unknown }
@@ -38,6 +39,23 @@ extension ImageTypeExtension on String {
 
 /// A reusable custom image widget
 class CustomImageWidget extends StatelessWidget {
+  final String? imagePath;
+  final double? height;
+  final double? width;
+  final Color? color;
+  final BoxFit? fit;
+  final String placeHolder;
+  final Alignment? alignment;
+  final VoidCallback? onTap;
+  final EdgeInsetsGeometry? margin;
+  final BorderRadius? radius;
+  final BoxBorder? border;
+  final Widget? fallbackWidget;
+  final int? memCacheHeight;
+  final int? memCacheWidth;
+  final Widget Function(BuildContext, Object, StackTrace?)? errorBuilder;
+  final Widget Function(BuildContext, Widget, ImageChunkEvent?)? loadingBuilder;
+
   const CustomImageWidget({
     super.key,
     this.imagePath,
@@ -51,53 +69,36 @@ class CustomImageWidget extends StatelessWidget {
     this.margin,
     this.border,
     this.fallbackWidget,
+    this.memCacheHeight,
+    this.memCacheWidth,
+    this.errorBuilder,
+    this.loadingBuilder,
     this.placeHolder = ImageConstants.imageNotFound,
   });
-
-  final String? imagePath;
-  final double? height;
-  final double? width;
-  final Color? color;
-  final BoxFit? fit;
-  final String placeHolder;
-  final Alignment? alignment;
-  final VoidCallback? onTap;
-  final EdgeInsetsGeometry? margin;
-  final BorderRadius? radius;
-  final BoxBorder? border;
-  final Widget? fallbackWidget;
 
   @override
   Widget build(BuildContext context) {
     return alignment != null
-        ? Align(
-      alignment: alignment!,
-      child: _buildWidget(),
-    )
+        ? Align(alignment: alignment!, child: _buildWidget())
         : _buildWidget();
   }
 
   Widget _buildWidget() {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: onTap != null
-          ? Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: onTap,
-                child: _buildCircleImage(),
-              ),
-            )
-          : _buildCircleImage(),
+      child:
+          onTap != null
+              ? Material(
+                color: Colors.transparent,
+                child: InkWell(onTap: onTap, child: _buildCircleImage()),
+              )
+              : _buildCircleImage(),
     );
   }
 
   Widget _buildCircleImage() {
     if (radius != null) {
-      return ClipRRect(
-        borderRadius: radius!,
-        child: _buildImageWithBorder(),
-      );
+      return ClipRRect(borderRadius: radius!, child: _buildImageWithBorder());
     }
     return _buildImageWithBorder();
   }
@@ -105,10 +106,7 @@ class CustomImageWidget extends StatelessWidget {
   Widget _buildImageWithBorder() {
     if (border != null) {
       return Container(
-        decoration: BoxDecoration(
-          border: border,
-          borderRadius: radius,
-        ),
+        decoration: BoxDecoration(border: border, borderRadius: radius),
         child: _buildImageView(),
       );
     }
@@ -124,9 +122,10 @@ class CustomImageWidget extends StatelessWidget {
             height: height,
             width: width,
             fit: fit ?? BoxFit.contain,
-            colorFilter: color != null
-                ? ColorFilter.mode(color!, BlendMode.srcIn)
-                : null,
+            colorFilter:
+                color != null
+                    ? ColorFilter.mode(color!, BlendMode.srcIn)
+                    : null,
           );
         case ImageType.svgString:
           return SvgPicture.string(
@@ -134,9 +133,10 @@ class CustomImageWidget extends StatelessWidget {
             height: height,
             width: width,
             fit: fit ?? BoxFit.contain,
-            colorFilter: color != null
-                ? ColorFilter.mode(color!, BlendMode.srcIn)
-                : null,
+            colorFilter:
+                color != null
+                    ? ColorFilter.mode(color!, BlendMode.srcIn)
+                    : null,
           );
         case ImageType.file:
           return Image.file(
@@ -153,11 +153,19 @@ class CustomImageWidget extends StatelessWidget {
             fit: fit,
             imageUrl: imagePath!,
             color: color,
-            placeholder: (context, url) => ShimmerWidget.rectangular(
-              height: height ?? double.infinity,
-              width: width ?? double.infinity,
-            ),
-            errorWidget: (context, url, error) => fallbackWidget ?? _buildDefaultFallback(),
+            memCacheHeight:
+                memCacheHeight ??
+                (height != null && height != double.infinity ? (height! * 2).toInt() : null),
+            memCacheWidth:
+                memCacheWidth ?? (width != null && width != double.infinity ? (width! * 2).toInt() : null),
+            placeholder:
+                (context, url) => ShimmerWidget.rectangular(
+                  height: height ?? double.infinity,
+                  width: width ?? double.infinity,
+                ),
+            errorWidget:
+                (context, url, error) =>
+                    fallbackWidget ?? _buildDefaultFallback(),
           );
         case ImageType.png:
           return Image.asset(
@@ -178,13 +186,15 @@ class CustomImageWidget extends StatelessWidget {
                     width: width ?? 30,
                   );
                 } else if (snapshot.hasError || !snapshot.hasData) {
-                  return Image.network(
-                    imagePath!,
+                  return CustomImageWidget(
+                    imagePath: imagePath!,
                     height: height,
                     width: width,
                     fit: fit ?? BoxFit.cover,
                     color: color,
-                    errorBuilder: (context, error, stackTrace) => fallbackWidget ?? _buildDefaultFallback(),
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            fallbackWidget ?? _buildDefaultFallback(),
                   );
                 } else {
                   return Image.file(
@@ -230,7 +240,11 @@ class CustomImageWidget extends StatelessWidget {
         borderRadius: radius,
       ),
       child: Center(
-        child: Icon(Icons.person, color: Colors.grey.shade400, size: (height != null ? height! * 0.5 : 24)),
+        child: Icon(
+          Icons.person,
+          color: Colors.grey.shade400,
+          size: (height != null ? height! * 0.5 : 24),
+        ),
       ),
     );
   }

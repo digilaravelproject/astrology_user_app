@@ -11,7 +11,6 @@ import '../../../core/services/network/websocket_service.dart';
 import '../../../core/services/fcm_notification_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 
-
 class AuthController extends GetxController {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
@@ -24,7 +23,6 @@ class AuthController extends GetxController {
   final UpdateProfileUseCase _updateProfileUseCase;
   final DeleteAccountUseCase _deleteAccountUseCase;
 
-
   AuthController({
     required LoginUseCase loginUseCase,
     required RegisterUseCase registerUseCase,
@@ -36,17 +34,16 @@ class AuthController extends GetxController {
     required ResendOtpUseCase resendOtpUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
     required DeleteAccountUseCase deleteAccountUseCase,
-  })  : _loginUseCase = loginUseCase,
-        _registerUseCase = registerUseCase,
-        _verifyOtpUseCase = verifyOtpUseCase,
-        _logoutUseCase = logoutUseCase,
-        _checkLoginStatusUseCase = checkLoginStatusUseCase,
-        _getUserInfoUseCase = getUserInfoUseCase,
-        _sendOtpUseCase = sendOtpUseCase,
-        _resendOtpUseCase = resendOtpUseCase,
-        _updateProfileUseCase = updateProfileUseCase,
-        _deleteAccountUseCase = deleteAccountUseCase;
-
+  }) : _loginUseCase = loginUseCase,
+       _registerUseCase = registerUseCase,
+       _verifyOtpUseCase = verifyOtpUseCase,
+       _logoutUseCase = logoutUseCase,
+       _checkLoginStatusUseCase = checkLoginStatusUseCase,
+       _getUserInfoUseCase = getUserInfoUseCase,
+       _sendOtpUseCase = sendOtpUseCase,
+       _resendOtpUseCase = resendOtpUseCase,
+       _updateProfileUseCase = updateProfileUseCase,
+       _deleteAccountUseCase = deleteAccountUseCase;
 
   final isLoading = false.obs;
   final currentMobile = ''.obs;
@@ -102,7 +99,9 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Signup failed. Please try again.');
+      CustomSnackbar.showError(
+        errorMsg.isNotEmpty ? errorMsg : 'Signup failed. Please try again.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -110,10 +109,10 @@ class AuthController extends GetxController {
 
   Future<void> login() async {
     print('Login called for Send OTP');
-    
+
     try {
       isLoading.value = true;
-      
+
       final mobile = mobileController.text.trim();
       final responseModel = await _sendOtpUseCase.execute(mobile);
 
@@ -127,11 +126,12 @@ class AuthController extends GetxController {
       } else {
         CustomSnackbar.showError('Failed to send OTP. Please try again.');
       }
-      
     } catch (e) {
       print('Login error: $e');
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
+      CustomSnackbar.showError(
+        errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -139,22 +139,25 @@ class AuthController extends GetxController {
 
   Future<void> resendOtp() async {
     print('Resend OTP called');
-    
+
     try {
       isLoading.value = true;
-      
-      final responseModel = await _resendOtpUseCase.execute(currentMobile.value);
+
+      final responseModel = await _resendOtpUseCase.execute(
+        currentMobile.value,
+      );
 
       if (responseModel != null) {
         CustomSnackbar.showSuccess('OTP resent successfully');
       } else {
         CustomSnackbar.showError('Failed to resend OTP. Please try again.');
       }
-      
     } catch (e) {
       print('Resend OTP error: $e');
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.');
+      CustomSnackbar.showError(
+        errorMsg.isNotEmpty ? errorMsg : 'An error occurred. Please try again.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -168,7 +171,7 @@ class AuthController extends GetxController {
 
     try {
       isLoading.value = true;
-      
+
       final user = await _verifyOtpUseCase.execute(
         currentMobile.value, // populated from login() or signup()
         otpController.text.trim(),
@@ -180,7 +183,7 @@ class AuthController extends GetxController {
 
         CustomSnackbar.showSuccess('OTP Verified!');
         //Get.offAllNamed(RouteHelper.getRegistrationSuccessRoute());
-        
+
         if (user.profileCompleted == true) {
           Get.find<WebSocketService>().connect();
           FCMNotificationService.registerDeviceToken(null);
@@ -197,7 +200,11 @@ class AuthController extends GetxController {
     } catch (e) {
       print('OTP Verification error: $e');
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'An error occurred during verification.');
+      CustomSnackbar.showError(
+        errorMsg.isNotEmpty
+            ? errorMsg
+            : 'An error occurred during verification.',
+      );
     } finally {
       isLoading.value = false;
     }
@@ -218,11 +225,16 @@ class AuthController extends GetxController {
         return;
       }
 
-      final dobString = "${dob.year}-${dob.month.toString().padLeft(2, '0')}-${dob.day.toString().padLeft(2, '0')}";
-      final tobString = "${tob.hour.toString().padLeft(2, '0')}:${tob.minute.toString().padLeft(2, '0')}";
-      
+      final dobString =
+          "${dob.year}-${dob.month.toString().padLeft(2, '0')}-${dob.day.toString().padLeft(2, '0')}";
+      final tobString =
+          "${tob.hour.toString().padLeft(2, '0')}:${tob.minute.toString().padLeft(2, '0')}";
+
       final localizationController = Get.find<LocalizationController>();
-      final String selectedLang = localizationController.languages[localizationController.selectedIndex].languageName;
+      final String selectedLang =
+          localizationController
+              .languages[localizationController.selectedIndex]
+              .languageName;
 
       final Map<String, dynamic> data = {
         "name": nameController.text.trim(),
@@ -236,7 +248,7 @@ class AuthController extends GetxController {
       };
 
       final updatedUser = await _updateProfileUseCase.execute(userId, data);
-      
+
       if (updatedUser != null) {
         currentUser.value = updatedUser;
         await Get.find<AuthService>().saveUserInfo(updatedUser);
@@ -247,9 +259,11 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       final errorMsg = e.toString().replaceAll('Exception: ', '');
-      CustomSnackbar.showError(errorMsg.isNotEmpty ? errorMsg : 'Failed to update profile');
+      CustomSnackbar.showError(
+        errorMsg.isNotEmpty ? errorMsg : 'Failed to update profile',
+      );
     } finally {
-       isLoading.value = false;
+      isLoading.value = false;
     }
   }
 
@@ -259,7 +273,7 @@ class AuthController extends GetxController {
       print('AuthController.logout() called');
       await FCMNotificationService.removeDeviceToken();
       final response = await _logoutUseCase.execute();
-      
+
       if (response.isSuccess) {
         print('AuthController.logout() completed successfully');
         currentUser.value = null;
@@ -267,12 +281,12 @@ class AuthController extends GetxController {
         mobileController.clear();
         otpController.clear();
         nameController.clear();
-        
+
         Get.find<WebSocketService>().disconnect();
         FlutterBackgroundService().invoke('stopService');
-        
+
         Get.offAllNamed(RouteHelper.getLoginRoute());
-        
+
         Future.delayed(const Duration(milliseconds: 300), () {
           CustomSnackbar.showSuccess('Logged out successfully');
         });
@@ -286,7 +300,6 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   Future<void> deleteAccount() async {
     Get.dialog(
@@ -307,7 +320,11 @@ class AuthController extends GetxController {
                   color: Colors.red.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.delete_forever_rounded, color: Colors.red, size: 32),
+                child: const Icon(
+                  Icons.delete_forever_rounded,
+                  color: Colors.red,
+                  size: 32,
+                ),
               ),
               const SizedBox(height: 20),
               const AppText(
@@ -333,9 +350,16 @@ class AuthController extends GetxController {
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         side: BorderSide(color: Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: AppText('Cancel', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                      child: AppText(
+                        'Cancel',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -345,29 +369,40 @@ class AuthController extends GetxController {
                         Get.back(); // Close dialog
                         try {
                           isLoading.value = true;
-                          final response = await _deleteAccountUseCase.execute();
-                          
+                          final response =
+                              await _deleteAccountUseCase.execute();
+
                           if (response.isSuccess) {
                             currentUser.value = null;
                             currentMobile.value = '';
                             mobileController.clear();
                             otpController.clear();
                             nameController.clear();
-                            
+
                             Get.find<WebSocketService>().disconnect();
                             FlutterBackgroundService().invoke('stopService');
-                            
+
                             Get.offAllNamed(RouteHelper.getLoginRoute());
-                            
-                            Future.delayed(const Duration(milliseconds: 300), () {
-                              CustomSnackbar.showSuccess(response.message ?? 'Account deleted successfully');
-                            });
+
+                            Future.delayed(
+                              const Duration(milliseconds: 300),
+                              () {
+                                CustomSnackbar.showSuccess(
+                                  response.message ??
+                                      'Account deleted successfully',
+                                );
+                              },
+                            );
                           } else {
-                            CustomSnackbar.showError(response.message ?? 'Failed to delete account');
+                            CustomSnackbar.showError(
+                              response.message ?? 'Failed to delete account',
+                            );
                           }
                         } catch (e) {
                           print('Delete account error: $e');
-                          CustomSnackbar.showError('An error occurred during account deletion');
+                          CustomSnackbar.showError(
+                            'An error occurred during account deletion',
+                          );
                         } finally {
                           isLoading.value = false;
                         }
@@ -376,9 +411,16 @@ class AuthController extends GetxController {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         backgroundColor: Colors.red,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const AppText('Delete', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                      child: const AppText(
+                        'Delete',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -391,7 +433,6 @@ class AuthController extends GetxController {
   }
 
   String? validateName(String? value) {
-
     if (value == null || value.isEmpty) {
       return 'Please enter your name';
     }
@@ -409,7 +450,6 @@ class AuthController extends GetxController {
   }
 }
 
-
 class LoginUseCase {
   final AuthService _authService;
 
@@ -425,7 +465,6 @@ class LoginUseCase {
   }
 }
 
-
 class VerifyOtpUseCase {
   final AuthService _authService;
 
@@ -435,20 +474,21 @@ class VerifyOtpUseCase {
     final response = await _authService.verifyOtp(mobile, otp);
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
         final Map<String, dynamic> userJson = bodyMap['user'] ?? bodyMap;
         final token = response.token ?? '';
-        
+
         final userModel = UserModel.fromJson(userJson);
-        
+
         if (token.isNotEmpty) {
           await _authService.saveUserToken(token);
         }
-        
+
         if (userModel.profileCompleted == true) {
           await _authService.saveUserInfo(userModel);
         }
-        
+
         return userModel;
       } catch (e) {
         print('Error parsing VerifyOtpResponse: $e');
@@ -460,8 +500,6 @@ class VerifyOtpUseCase {
   }
 }
 
-
-
 class LogoutUseCase {
   final AuthService _authService;
 
@@ -472,8 +510,6 @@ class LogoutUseCase {
   }
 }
 
-
-
 class CheckLoginStatusUseCase {
   final AuthService _authService;
 
@@ -483,8 +519,6 @@ class CheckLoginStatusUseCase {
     return await _authService.isLoggedIn();
   }
 }
-
-
 
 class GetUserInfoUseCase {
   final AuthService _authService;
@@ -573,7 +607,8 @@ class UpdateProfileUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
         final Map<String, dynamic> userJson = bodyMap['user'] ?? bodyMap;
         return UserModel.fromJson(userJson);
       } catch (e) {
@@ -595,7 +630,3 @@ class DeleteAccountUseCase {
     return await _authService.deleteAccount();
   }
 }
-
-
-
-

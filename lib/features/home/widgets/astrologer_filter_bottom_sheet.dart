@@ -9,10 +9,12 @@ class AstrologerFilterBottomSheet extends StatefulWidget {
   const AstrologerFilterBottomSheet({Key? key}) : super(key: key);
 
   @override
-  State<AstrologerFilterBottomSheet> createState() => _AstrologerFilterBottomSheetState();
+  State<AstrologerFilterBottomSheet> createState() =>
+      _AstrologerFilterBottomSheetState();
 }
 
-class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomSheet> {
+class _AstrologerFilterBottomSheetState
+    extends State<AstrologerFilterBottomSheet> {
   final controller = Get.find<AstrologerController>();
   int selectedCategoryIndex = 0;
 
@@ -33,36 +35,50 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
         'rating_high_to_low',
         'price_low_to_high',
         'price_high_to_low',
-        'experience_high_to_low'
+        'experience_high_to_low',
       ],
       'display_options': [
         'Rating: High to Low',
         'Price: Low to High',
         'Price: High to Low',
-        'Experience: High to Low'
-      ]
+        'Experience: High to Low',
+      ],
     },
     {
       'title': AppStrings.skills,
       'type': 'checkbox',
-      'options': ['Vedic', 'Tarot', 'Numerology', 'Palmistry', 'Vastu', 'Life Coach']
+      'options': [
+        'Vedic',
+        'Tarot',
+        'Numerology',
+        'Palmistry',
+        'Vastu',
+        'Life Coach',
+      ],
     },
     {
       'title': AppStrings.languages,
       'type': 'checkbox',
-      'options': ['Hindi', 'English', 'Marathi', 'Bengali', 'Gujarati', 'Punjabi']
+      'options': [
+        'Hindi',
+        'English',
+        'Marathi',
+        'Bengali',
+        'Gujarati',
+        'Punjabi',
+      ],
     },
-    {
-      'title': AppStrings.priceRange,
-      'type': 'slider',
-      'min': 0,
-      'max': 1000,
-    },
+    {'title': AppStrings.priceRange, 'type': 'slider', 'min': 0, 'max': 1000},
     {
       'title': AppStrings.rating,
       'type': 'radio',
       'options': [4.5, 4.0, 3.0, 0.0],
-      'display_options': ['4.5 & above', '4.0 & above', '3.0 & above', 'All Ratings']
+      'display_options': [
+        '4.5 & above',
+        '4.0 & above',
+        '3.0 & above',
+        'All Ratings',
+      ],
     },
   ];
 
@@ -129,20 +145,35 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
                     itemBuilder: (context, index) {
                       bool isSelected = selectedCategoryIndex == index;
                       return GestureDetector(
-                        onTap: () => setState(() => selectedCategoryIndex = index),
+                        onTap:
+                            () => setState(() => selectedCategoryIndex = index),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 18),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 18,
+                          ),
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.white : Colors.transparent,
-                            border: isSelected
-                                ? const Border(left: BorderSide(color: AppColors.deepPink, width: 4))
-                                : null,
+                            color:
+                                isSelected ? Colors.white : Colors.transparent,
+                            border:
+                                isSelected
+                                    ? const Border(
+                                      left: BorderSide(
+                                        color: AppColors.deepPink,
+                                        width: 4,
+                                      ),
+                                    )
+                                    : null,
                           ),
                           child: AppText(
                             filterCategories[index]['title'],
                             fontSize: 14,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? AppColors.deepPink : Colors.black87,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color:
+                                isSelected
+                                    ? AppColors.deepPink
+                                    : Colors.black87,
                           ),
                         ),
                       );
@@ -191,9 +222,15 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       side: const BorderSide(color: AppColors.deepPink),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                    child: AppText(AppStrings.clearAll, color: AppColors.deepPink, fontWeight: FontWeight.w600),
+                    child: AppText(
+                      AppStrings.clearAll,
+                      color: AppColors.deepPink,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 15),
@@ -214,10 +251,16 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.deepPink,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       elevation: 0,
                     ),
-                    child: AppText(AppStrings.applyFilters, color: Colors.white, fontWeight: FontWeight.w600),
+                    child: AppText(
+                      AppStrings.applyFilters,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -276,12 +319,16 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
       itemCount: options.length,
       itemBuilder: (context, index) {
         final option = options[index];
-        final String displayText = displayOptions != null ? displayOptions[index].toString() : option.toString();
+        final String displayText =
+            displayOptions != null
+                ? displayOptions[index].toString()
+                : option.toString();
 
         if (type == 'checkbox') {
-          final isChecked = cat['title'] == AppStrings.skills
-              ? tempSkills.contains(option)
-              : tempLanguages.contains(option);
+          final isChecked =
+              cat['title'] == AppStrings.skills
+                  ? tempSkills.contains(option)
+                  : tempLanguages.contains(option);
 
           return CheckboxListTile(
             value: isChecked,
@@ -294,7 +341,9 @@ class _AstrologerFilterBottomSheetState extends State<AstrologerFilterBottomShee
                 if (cat['title'] == AppStrings.skills) {
                   val! ? tempSkills.add(option) : tempSkills.remove(option);
                 } else {
-                  val! ? tempLanguages.add(option) : tempLanguages.remove(option);
+                  val!
+                      ? tempLanguages.add(option)
+                      : tempLanguages.remove(option);
                 }
               });
             },

@@ -51,7 +51,9 @@ class LanguageBottomSheet extends StatelessWidget {
               children: [
                 Text(
                   'select_language'.tr,
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 IconButton(
                   onPressed: () => Get.back(),
@@ -66,52 +68,61 @@ class LanguageBottomSheet extends StatelessWidget {
           const SizedBox(height: 5),
 
           // Language list
-          Obx(() => ListView.separated(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
-            itemCount: controller.languages.length,
-            itemBuilder: (context, index) {
-              final language = controller.languages[index];
-              final isSelected = controller.selectedIndex == index;
+          Obx(
+            () => ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              itemCount: controller.languages.length,
+              itemBuilder: (context, index) {
+                final language = controller.languages[index];
+                final isSelected = controller.selectedIndex == index;
 
-              return Material(
-                color: isSelected
-                    ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-                child: InkWell(
+                return Material(
+                  color:
+                      isSelected
+                          ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                          : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
-                  onTap: () {
-                    controller.setLanguage(language);
-                    Get.back();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-                    child: Row(
-                      children: [
-                        CustomImageWidget(
-                          imagePath: language.imageUrl,
-                          width: 32,
-                          height: 20,
-                          fit: BoxFit.cover,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Text(
-                            language.languageName,
-                            style: theme.textTheme.bodyLarge,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {
+                      controller.setLanguage(language);
+                      Get.back();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          CustomImageWidget(
+                            imagePath: language.imageUrl,
+                            width: 32,
+                            height: 20,
+                            fit: BoxFit.cover,
                           ),
-                        ),
-                        if (isSelected)
-                          Icon(Icons.check_circle, color: theme.colorScheme.primary),
-                      ],
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              language.languageName,
+                              style: theme.textTheme.bodyLarge,
+                            ),
+                          ),
+                          if (isSelected)
+                            Icon(
+                              Icons.check_circle,
+                              color: theme.colorScheme.primary,
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
-          )),
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 20),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 class ServiceSectionRow extends StatelessWidget {
   const ServiceSectionRow({Key? key}) : super(key: key);
@@ -32,11 +33,27 @@ class ServiceSectionRow extends StatelessWidget {
       child: Stack(
         children: [
           // Decorative stars
-          Positioned(top: 15, left: 20, child: _buildStar(9, const Color(0xFFFFE082))),
-          Positioned(top: 30, right: 22, child: _buildStar(7, const Color(0xFFF48FB1))),
-          Positioned(bottom: 160, left: 18, child: _buildStar(6, const Color(0xFFFFD54F))),
-          Positioned(bottom: 170, right: 20, child: _buildStar(8, const Color(0xFFFFAB40))),
-          
+          Positioned(
+            top: 15,
+            left: 20,
+            child: _buildStar(9, const Color(0xFFFFE082)),
+          ),
+          Positioned(
+            top: 30,
+            right: 22,
+            child: _buildStar(7, const Color(0xFFF48FB1)),
+          ),
+          Positioned(
+            bottom: 160,
+            left: 18,
+            child: _buildStar(6, const Color(0xFFFFD54F)),
+          ),
+          Positioned(
+            bottom: 170,
+            right: 20,
+            child: _buildStar(8, const Color(0xFFFFAB40)),
+          ),
+
           // Main content
           Padding(
             padding: const EdgeInsets.all(20),
@@ -69,7 +86,11 @@ class ServiceSectionRow extends StatelessWidget {
             color: const Color(0xFFFFE082).withOpacity(0.25),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Icon(Icons.calendar_today_outlined, size: 18, color: Color(0xFFFFB74D)),
+          child: const Icon(
+            Icons.calendar_today_outlined,
+            size: 18,
+            color: Color(0xFFFFB74D),
+          ),
         ),
         const SizedBox(width: 12),
         Flexible(
@@ -106,11 +127,27 @@ class ServiceSectionRow extends StatelessWidget {
       child: Stack(
         children: [
           // Sparkle effects
-          Positioned(top: 15, left: 25, child: _buildStar(7, Colors.white.withOpacity(0.8))),
-          Positioned(top: 40, right: 35, child: _buildStar(5, Colors.white.withOpacity(0.7))),
-          Positioned(bottom: 25, left: 45, child: _buildStar(6, Colors.white.withOpacity(0.9))),
-          Positioned(bottom: 50, right: 55, child: _buildStar(4, Colors.white.withOpacity(0.6))),
-          
+          Positioned(
+            top: 15,
+            left: 25,
+            child: _buildStar(7, Colors.white.withOpacity(0.8)),
+          ),
+          Positioned(
+            top: 40,
+            right: 35,
+            child: _buildStar(5, Colors.white.withOpacity(0.7)),
+          ),
+          Positioned(
+            bottom: 25,
+            left: 45,
+            child: _buildStar(6, Colors.white.withOpacity(0.9)),
+          ),
+          Positioned(
+            bottom: 50,
+            right: 55,
+            child: _buildStar(4, Colors.white.withOpacity(0.6)),
+          ),
+
           // Images - side by side
           Padding(
             padding: const EdgeInsets.all(16),
@@ -135,8 +172,9 @@ class ServiceSectionRow extends StatelessWidget {
                         'assets/images/kundali_birth_chart.png',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            "https://www.prokerala.com/astrology/images/kundli-chart-north.png",
+                          return CustomImageWidget(
+                            imagePath:
+                                "https://www.prokerala.com/astrology/images/kundli-chart-north.png",
                             fit: BoxFit.cover,
                           );
                         },
@@ -164,8 +202,9 @@ class ServiceSectionRow extends StatelessWidget {
                         'assets/images/zodiac_tarot_cards.png',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
+                          return CustomImageWidget(
+                            imagePath:
+                                "https://cdn-icons-png.flaticon.com/512/2917/2917995.png",
                             fit: BoxFit.cover,
                           );
                         },
@@ -214,7 +253,12 @@ class ServiceSectionRow extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceButton(String title, IconData icon, Color bgColor, Color iconColor) {
+  Widget _buildServiceButton(
+    String title,
+    IconData icon,
+    Color bgColor,
+    Color iconColor,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(

@@ -57,7 +57,9 @@ class ComingSoonScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primaryColor.withValues(alpha: 0.1),
+                              color: AppColors.primaryColor.withValues(
+                                alpha: 0.1,
+                              ),
                               blurRadius: 30,
                               spreadRadius: 10,
                             ),
@@ -94,12 +96,17 @@ class ComingSoonScreen extends StatelessWidget {
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
-                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 40,
+                            vertical: 15,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
                           elevation: 8,
-                          shadowColor: AppColors.primaryColor.withValues(alpha: 0.3),
+                          shadowColor: AppColors.primaryColor.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                         child: Text(
                           AppStrings.goBack,

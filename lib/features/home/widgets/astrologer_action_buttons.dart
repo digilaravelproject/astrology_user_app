@@ -45,11 +45,18 @@ class AstrologerActionButtons extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
-                    child: Text('Offline'.tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                    child: Text(
+                      'Offline'.tr,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         );
       } else {
@@ -81,20 +88,29 @@ class AstrologerActionButtons extends StatelessWidget {
           if (hasChat)
             Expanded(
               child: GestureDetector(
-                onTap: astro.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : (astro.isBusy == true)
-                      ? () => CustomSnackbar.showInfo('Astrologer is currently engaged.')
-                      : () {
+                onTap:
+                    astro.isBlocked == true
+                        ? () => CustomSnackbar.showError(
+                          "This astrologer is blocked",
+                        )
+                        : (astro.isBusy == true)
+                        ? () => CustomSnackbar.showInfo(
+                          'Astrologer is currently engaged.',
+                        )
+                        : () {
                           final walletController = Get.find<WalletController>();
-                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                          final double balance =
+                              double.tryParse(walletController.balance) ?? 0.0;
                           WalletHelper.checkBalanceAndProceed(
                             context: context,
                             type: 'chat',
                             name: astro.name,
                             imageUrl: astro.fullProfilePhoto,
                             price: astro.chatRate ?? '0',
-                            providerId: astro.userId > 0 ? astro.userId : (providerIdFallback ?? 0),
+                            providerId:
+                                astro.userId > 0
+                                    ? astro.userId
+                                    : (providerIdFallback ?? 0),
                             simulatedBalance: balance,
                           );
                         },
@@ -103,13 +119,25 @@ class AstrologerActionButtons extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: (astro.isBlocked == true || astro.isBusy == true)
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFF4CAF50), Color(0xFF388E3C)]),
+                      gradient:
+                          (astro.isBlocked == true || astro.isBusy == true)
+                              ? LinearGradient(
+                                colors: [
+                                  Colors.grey.shade400,
+                                  Colors.grey.shade600,
+                                ],
+                              )
+                              : const LinearGradient(
+                                colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
+                              ),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: ((astro.isBlocked == true || astro.isBusy == true) ? Colors.grey : const Color(0xFF4CAF50)).withOpacity(0.3),
+                          color: ((astro.isBlocked == true ||
+                                      astro.isBusy == true)
+                                  ? Colors.grey
+                                  : const Color(0xFF4CAF50))
+                              .withOpacity(0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -118,7 +146,11 @@ class AstrologerActionButtons extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.message_rounded, color: Colors.white, size: 18),
+                        const Icon(
+                          Icons.message_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Column(
                           mainAxisSize: MainAxisSize.min,
@@ -126,18 +158,37 @@ class AstrologerActionButtons extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text((astro.isBlocked == true ? 'Blocked' : (astro.isBusy == true ? 'Busy' : 'Chat')).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text(
+                                  (astro.isBlocked == true
+                                          ? 'Blocked'
+                                          : (astro.isBusy == true
+                                              ? 'Busy'
+                                              : 'Chat'))
+                                      .tr,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
                                 if (astro.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                      vertical: 1,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
                                       '${astro.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 7,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.yellow,
+                                      ),
                                     ),
                                   ),
                               ],
@@ -145,15 +196,29 @@ class AstrologerActionButtons extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (astro.hasOffer == true && astro.originalChatRatePerMinute != null)
+                                if (astro.hasOffer == true &&
+                                    astro.originalChatRatePerMinute != null)
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4),
                                     child: Text(
                                       '₹ ${double.tryParse(astro.originalChatRatePerMinute!)?.toStringAsFixed(2) ?? astro.originalChatRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9), decoration: TextDecoration.lineThrough,decorationColor: Colors.white,),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.9),
+                                        decoration: TextDecoration.lineThrough,
+                                        decorationColor: Colors.white,
+                                      ),
                                     ),
                                   ),
-                                Text('₹ ${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}${"/min".tr}', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                                Text(
+                                  '₹ ${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}${"/min".tr}',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -168,20 +233,29 @@ class AstrologerActionButtons extends StatelessWidget {
           if (hasCall)
             Expanded(
               child: GestureDetector(
-                onTap: astro.isBlocked == true 
-                  ? () => CustomSnackbar.showError("This astrologer is blocked") 
-                  : (astro.isBusy == true)
-                      ? () => CustomSnackbar.showInfo('Astrologer is currently engaged.')
-                      : () {
+                onTap:
+                    astro.isBlocked == true
+                        ? () => CustomSnackbar.showError(
+                          "This astrologer is blocked",
+                        )
+                        : (astro.isBusy == true)
+                        ? () => CustomSnackbar.showInfo(
+                          'Astrologer is currently engaged.',
+                        )
+                        : () {
                           final walletController = Get.find<WalletController>();
-                          final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                          final double balance =
+                              double.tryParse(walletController.balance) ?? 0.0;
                           WalletHelper.checkBalanceAndProceed(
                             context: context,
                             type: 'call',
                             name: astro.name,
                             imageUrl: astro.fullProfilePhoto,
                             price: astro.callRate ?? '0',
-                            providerId: astro.userId > 0 ? astro.userId : (providerIdFallback ?? 0),
+                            providerId:
+                                astro.userId > 0
+                                    ? astro.userId
+                                    : (providerIdFallback ?? 0),
                             simulatedBalance: balance,
                           );
                         },
@@ -190,13 +264,25 @@ class AstrologerActionButtons extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
-                      gradient: (astro.isBlocked == true || astro.isBusy == true)
-                          ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade600])
-                          : const LinearGradient(colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)]),
+                      gradient:
+                          (astro.isBlocked == true || astro.isBusy == true)
+                              ? LinearGradient(
+                                colors: [
+                                  Colors.grey.shade400,
+                                  Colors.grey.shade600,
+                                ],
+                              )
+                              : const LinearGradient(
+                                colors: [Color(0xFFD32F2F), Color(0xFFB71C1C)],
+                              ),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: ((astro.isBlocked == true || astro.isBusy == true) ? Colors.grey : const Color(0xFFD32F2F)).withOpacity(0.3),
+                          color: ((astro.isBlocked == true ||
+                                      astro.isBusy == true)
+                                  ? Colors.grey
+                                  : const Color(0xFFD32F2F))
+                              .withOpacity(0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -213,18 +299,37 @@ class AstrologerActionButtons extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text((astro.isBlocked == true ? 'Blocked' : (astro.isBusy == true ? 'Busy' : 'Call')).tr, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
+                                Text(
+                                  (astro.isBlocked == true
+                                          ? 'Blocked'
+                                          : (astro.isBusy == true
+                                              ? 'Busy'
+                                              : 'Call'))
+                                      .tr,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
                                 if (astro.hasOffer == true)
                                   Container(
                                     margin: const EdgeInsets.only(left: 4),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                      vertical: 1,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: Colors.yellow.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
                                       '${astro.discountPercentage ?? ''}% OFF',
-                                      style: GoogleFonts.inter(fontSize: 7, fontWeight: FontWeight.w800, color: Colors.yellow),
+                                      style: GoogleFonts.inter(
+                                        fontSize: 7,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.yellow,
+                                      ),
                                     ),
                                   ),
                               ],
@@ -232,18 +337,29 @@ class AstrologerActionButtons extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (astro.hasOffer == true && astro.originalCallRatePerMinute != null)
+                                if (astro.hasOffer == true &&
+                                    astro.originalCallRatePerMinute != null)
                                   Padding(
                                     padding: const EdgeInsets.only(right: 4),
                                     child: Text(
                                       '₹ ${double.tryParse(astro.originalCallRatePerMinute!)?.toStringAsFixed(2) ?? astro.originalCallRatePerMinute!}',
-                                      style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9),
-                                          decoration: TextDecoration.lineThrough,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white.withOpacity(0.9),
+                                        decoration: TextDecoration.lineThrough,
                                         decorationColor: Colors.white,
-                                        ),
+                                      ),
                                     ),
                                   ),
-                                Text('₹ ${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.9))),
+                                Text(
+                                  '₹ ${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white.withOpacity(0.9),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -262,9 +378,10 @@ class AstrologerActionButtons extends StatelessWidget {
           if (hasChat)
             Expanded(
               child: CustomButton(
-                text: astro.isBusy
-                    ? 'Busy'
-                    : '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min',
+                text:
+                    astro.isBusy
+                        ? 'Busy'
+                        : '${AppStrings.chat.tr} - ₹${double.tryParse(astro.chatRate ?? '0')?.toStringAsFixed(2) ?? astro.chatRate ?? '0'}/min',
                 icon: Icons.chat_bubble_outline_rounded,
                 fontSize: 10,
                 height: 32,
@@ -274,13 +391,9 @@ class AstrologerActionButtons extends StatelessWidget {
                         ? Colors.grey.withOpacity(0.2)
                         : Colors.transparent,
                 textColor:
-                    (astro.isBusy)
-                        ? Colors.grey
-                        : const Color(0xFF4CAF50),
+                    (astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                 borderColor:
-                    (astro.isBusy)
-                        ? Colors.grey
-                        : const Color(0xFF4CAF50),
+                    (astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 onTap: () {
                   if (astro.isBusy) {
@@ -288,14 +401,18 @@ class AstrologerActionButtons extends StatelessWidget {
                     return;
                   }
                   final walletController = Get.find<WalletController>();
-                  final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                  final double balance =
+                      double.tryParse(walletController.balance) ?? 0.0;
                   WalletHelper.checkBalanceAndProceed(
                     context: context,
                     type: 'chat',
                     name: astro.name,
                     imageUrl: astro.fullProfilePhoto,
                     price: astro.chatRate ?? '0',
-                    providerId: astro.userId > 0 ? astro.userId : (providerIdFallback ?? 0),
+                    providerId:
+                        astro.userId > 0
+                            ? astro.userId
+                            : (providerIdFallback ?? 0),
                     simulatedBalance: balance,
                   );
                 },
@@ -305,9 +422,10 @@ class AstrologerActionButtons extends StatelessWidget {
           if (hasCall)
             Expanded(
               child: CustomButton(
-                text: astro.isBusy
-                    ? 'Busy'
-                    : '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
+                text:
+                    astro.isBusy
+                        ? 'Busy'
+                        : '${AppStrings.call.tr} - ₹${double.tryParse(astro.callRate ?? '0')?.toStringAsFixed(2) ?? astro.callRate ?? '0'}/min',
                 icon: Icons.call_outlined,
                 fontSize: 10,
                 height: 32,
@@ -317,13 +435,9 @@ class AstrologerActionButtons extends StatelessWidget {
                         ? Colors.grey.withOpacity(0.2)
                         : Colors.transparent,
                 textColor:
-                    (astro.isBusy)
-                        ? Colors.grey
-                        : const Color(0xFF4CAF50),
+                    (astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                 borderColor:
-                    (astro.isBusy)
-                        ? Colors.grey
-                        : const Color(0xFF4CAF50),
+                    (astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 onTap: () {
                   if (astro.isBusy) {
@@ -331,14 +445,18 @@ class AstrologerActionButtons extends StatelessWidget {
                     return;
                   }
                   final walletController = Get.find<WalletController>();
-                  final double balance = double.tryParse(walletController.balance) ?? 0.0;
+                  final double balance =
+                      double.tryParse(walletController.balance) ?? 0.0;
                   WalletHelper.checkBalanceAndProceed(
                     context: context,
                     type: 'call',
                     name: astro.name,
                     imageUrl: astro.fullProfilePhoto,
                     price: astro.callRate ?? '0',
-                    providerId: astro.userId > 0 ? astro.userId : (providerIdFallback ?? 0),
+                    providerId:
+                        astro.userId > 0
+                            ? astro.userId
+                            : (providerIdFallback ?? 0),
                     simulatedBalance: balance,
                   );
                 },

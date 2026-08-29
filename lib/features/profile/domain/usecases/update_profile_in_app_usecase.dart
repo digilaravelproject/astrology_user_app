@@ -11,8 +11,10 @@ class UpdateProfileInAppUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
-        final Map<String, dynamic> userJson = bodyMap.containsKey('user') ? bodyMap['user'] : bodyMap;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
+        final Map<String, dynamic> userJson =
+            bodyMap.containsKey('user') ? bodyMap['user'] : bodyMap;
         return UserModel.fromJson(userJson);
       } catch (e) {
         print('Error parsing UpdateProfileInApp data: $e');

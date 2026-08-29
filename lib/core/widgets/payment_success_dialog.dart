@@ -24,9 +24,7 @@ class PaymentSuccessDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       backgroundColor: Colors.white,
       child: Container(
         padding: const EdgeInsets.all(24),
@@ -99,11 +97,7 @@ class PaymentSuccessDialog extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        AppText(
-          label,
-          fontSize: 13,
-          color: Colors.grey.shade500,
-        ),
+        AppText(label, fontSize: 13, color: Colors.grey.shade500),
         AppText(
           value,
           fontSize: 14,

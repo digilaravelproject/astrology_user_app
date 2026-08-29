@@ -6,7 +6,11 @@ class PostReviewUseCase {
 
   PostReviewUseCase({required this.service});
 
-  Future<ResponseModel> execute(int astrologerId, int rating, String review) async {
+  Future<ResponseModel> execute(
+    int astrologerId,
+    int rating,
+    String review,
+  ) async {
     return await service.postReview(astrologerId, rating, review);
   }
 }

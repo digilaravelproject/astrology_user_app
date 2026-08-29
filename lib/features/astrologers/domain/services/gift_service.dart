@@ -10,7 +10,11 @@ class GiftService {
     return await repository.getGifts();
   }
 
-  Future<ResponseModel> sendGift(int giftId, int astrologerId, String paymentMethod) async {
+  Future<ResponseModel> sendGift(
+    int giftId,
+    int astrologerId,
+    String paymentMethod,
+  ) async {
     return await repository.sendGift(giftId, astrologerId, paymentMethod);
   }
 

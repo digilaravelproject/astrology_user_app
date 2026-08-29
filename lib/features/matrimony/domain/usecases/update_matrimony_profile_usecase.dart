@@ -6,9 +6,13 @@ import '../models/matrimony_profile_model.dart';
 class UpdateMatrimonyProfileUseCase {
   final MatrimonyServiceInterface _service;
 
-  UpdateMatrimonyProfileUseCase({required MatrimonyServiceInterface service}) : _service = service;
+  UpdateMatrimonyProfileUseCase({required MatrimonyServiceInterface service})
+    : _service = service;
 
-  Future<ResponseModel> execute(MatrimonyProfileModel profile, XFile? photo) async {
+  Future<ResponseModel> execute(
+    MatrimonyProfileModel profile,
+    XFile? photo,
+  ) async {
     return await _service.updateProfile(profile, photo);
   }
 }

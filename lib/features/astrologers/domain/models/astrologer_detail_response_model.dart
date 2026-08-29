@@ -4,10 +4,7 @@ class AstrologerDetailResponseModel {
   final String status;
   final AstrologerDetailData data;
 
-  AstrologerDetailResponseModel({
-    required this.status,
-    required this.data,
-  });
+  AstrologerDetailResponseModel({required this.status, required this.data});
 
   factory AstrologerDetailResponseModel.fromJson(Map<String, dynamic> json) {
     return AstrologerDetailResponseModel(

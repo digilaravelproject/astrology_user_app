@@ -9,7 +9,8 @@ class AnimatedZodiacWheel extends StatefulWidget {
   State<AnimatedZodiacWheel> createState() => _AnimatedZodiacWheelState();
 }
 
-class _AnimatedZodiacWheelState extends State<AnimatedZodiacWheel> with SingleTickerProviderStateMixin {
+class _AnimatedZodiacWheelState extends State<AnimatedZodiacWheel>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

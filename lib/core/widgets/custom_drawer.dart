@@ -31,13 +31,16 @@ class CustomDrawer extends StatelessWidget {
         children: [
           // Drawer Header
           _buildDrawerHeader(authController),
-          
+
           // Drawer Menu Items
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 20),
               children: [
-                _buildDrawerItem(Icons.shopping_bag_outlined, AppStrings.myOrders),
+                _buildDrawerItem(
+                  Icons.shopping_bag_outlined,
+                  AppStrings.myOrders,
+                ),
                 _buildDrawerItem(
                   Icons.account_balance_wallet_outlined,
                   AppStrings.walletTransactions,
@@ -51,7 +54,10 @@ class CustomDrawer extends StatelessWidget {
                   AppStrings.myProfileNav,
                   onTap: () {
                     Get.back();
-                    Get.to(() => const ProfileScreen(), binding: ProfileBinding());
+                    Get.to(
+                      () => const ProfileScreen(),
+                      binding: ProfileBinding(),
+                    );
                   },
                 ),
                 _buildDrawerItem(
@@ -62,9 +68,12 @@ class CustomDrawer extends StatelessWidget {
                     Get.to(() => const HistoryScreen());
                   },
                 ),
-                
+
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
                   child: Divider(color: Colors.grey.shade200, thickness: 1),
                 ),
 
@@ -75,7 +84,7 @@ class CustomDrawer extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // Logout Section
           Padding(
             padding: const EdgeInsets.all(24),
@@ -84,7 +93,9 @@ class CustomDrawer extends StatelessWidget {
                 Get.back(); // Close drawer
                 Get.dialog(
                   Dialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -100,7 +111,11 @@ class CustomDrawer extends StatelessWidget {
                               color: Colors.red.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
+                            child: const Icon(
+                              Icons.logout_rounded,
+                              color: Colors.red,
+                              size: 32,
+                            ),
                           ),
                           const SizedBox(height: 20),
                           const AppText(
@@ -111,7 +126,8 @@ class CustomDrawer extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           AppText(
-                            'Are you sure you want to logout from your account?'.tr,
+                            'Are you sure you want to logout from your account?'
+                                .tr,
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: Colors.grey[600],
@@ -124,11 +140,20 @@ class CustomDrawer extends StatelessWidget {
                                 child: OutlinedButton(
                                   onPressed: () => Get.back(),
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     side: BorderSide(color: Colors.grey[300]!),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
-                                  child: AppText('Cancel'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                  child: AppText(
+                                    'Cancel'.tr,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -139,12 +164,21 @@ class CustomDrawer extends StatelessWidget {
                                     authController.logout();
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
                                     backgroundColor: Colors.red,
                                     elevation: 0,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
-                                  child: AppText('Logout'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                  child: AppText(
+                                    'Logout'.tr,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],
@@ -157,7 +191,10 @@ class CustomDrawer extends StatelessWidget {
               },
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFF0F0),
                   borderRadius: BorderRadius.circular(16),
@@ -171,7 +208,11 @@ class CustomDrawer extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.logout, color: Color(0xFFD32F2F), size: 18),
+                      child: const Icon(
+                        Icons.logout,
+                        color: Color(0xFFD32F2F),
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     AppText(
@@ -204,9 +245,7 @@ class CustomDrawer extends StatelessWidget {
             AppColors.deepPink, // Pink
           ],
         ),
-        borderRadius: BorderRadius.only(
-          bottomRight: Radius.circular(40),
-        ),
+        borderRadius: BorderRadius.only(bottomRight: Radius.circular(40)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +255,10 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.5),
+                width: 1,
+              ),
             ),
             child: Container(
               decoration: const BoxDecoration(
@@ -225,7 +267,8 @@ class CustomDrawer extends StatelessWidget {
               ),
               padding: const EdgeInsets.all(2),
               child: CustomImageWidget(
-                imagePath: 'https://i.pravatar.cc/150?u=a042581f4e29026704d', // Placeholder or user image
+                imagePath:
+                    'https://i.pravatar.cc/150?u=a042581f4e29026704d', // Placeholder or user image
                 height: 70,
                 width: 70,
                 radius: BorderRadius.circular(35),
@@ -233,20 +276,24 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          Obx(() => AppText(
-            authController.currentUser.value?.name ?? AppStrings.guest,
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            height: 1.2,
-          )),
+          Obx(
+            () => AppText(
+              authController.currentUser.value?.name ?? AppStrings.guest,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.2,
+            ),
+          ),
           const SizedBox(height: 4),
-          Obx(() => AppText(
-            authController.currentUser.value?.mobile ?? "+91 XXXXX XXXXX",
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.white.withOpacity(0.8),
-          )),
+          Obx(
+            () => AppText(
+              authController.currentUser.value?.mobile ?? "+91 XXXXX XXXXX",
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.8),
+            ),
+          ),
         ],
       ),
     );
@@ -275,12 +322,14 @@ class CustomDrawer extends StatelessWidget {
           color: Colors.grey.shade50,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Colors.grey),
+        child: const Icon(
+          Icons.arrow_forward_ios_rounded,
+          size: 12,
+          color: Colors.grey,
+        ),
       ),
       onTap: onTap,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
 }

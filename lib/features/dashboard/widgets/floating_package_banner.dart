@@ -6,15 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/custom_image_widget.dart';
 
 class FloatingPackageBannerWidget extends StatefulWidget {
   const FloatingPackageBannerWidget({Key? key}) : super(key: key);
 
   @override
-  State<FloatingPackageBannerWidget> createState() => _FloatingPackageBannerWidgetState();
+  State<FloatingPackageBannerWidget> createState() =>
+      _FloatingPackageBannerWidgetState();
 }
 
-class _FloatingPackageBannerWidgetState extends State<FloatingPackageBannerWidget> {
+class _FloatingPackageBannerWidgetState
+    extends State<FloatingPackageBannerWidget> {
   Timer? _timer;
 
   @override
@@ -48,12 +51,15 @@ class _FloatingPackageBannerWidgetState extends State<FloatingPackageBannerWidge
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        final channel = WebSocketService.packageActiveChannel.value.toLowerCase();
+        final channel =
+            WebSocketService.packageActiveChannel.value.toLowerCase();
         if (channel == 'chat' || channel == 'text') {
           if (FloatingChatBubble.onTapCallback != null) {
             FloatingChatBubble.onTapCallback?.call();
           }
-        } else if (channel == 'call' || channel == 'audio' || channel == 'video') {
+        } else if (channel == 'call' ||
+            channel == 'audio' ||
+            channel == 'video') {
           if (FloatingCallBubble.onTapCallback != null) {
             FloatingCallBubble.onTapCallback?.call();
           }
@@ -78,10 +84,11 @@ class _FloatingPackageBannerWidgetState extends State<FloatingPackageBannerWidge
             Obx(() {
               final avatar = WebSocketService.packageAstrologerAvatar.value;
               if (avatar.isNotEmpty) {
-                return CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(avatar),
-                  backgroundColor: Colors.white24,
+                return CustomImageWidget(
+                  imagePath: avatar,
+                  height: 40,
+                  width: 40,
+                  radius: BorderRadius.circular(20),
                 );
               }
               return const CircleAvatar(
@@ -95,33 +102,36 @@ class _FloatingPackageBannerWidgetState extends State<FloatingPackageBannerWidge
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() => Text(
-                    WebSocketService.packageAstrologerName.value,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  Obx(
+                    () => Text(
+                      WebSocketService.packageAstrologerName.value,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  )),
+                  ),
                   Obx(() {
-                    final channel = WebSocketService.packageActiveChannel.value.toLowerCase();
+                    final channel =
+                        WebSocketService.packageActiveChannel.value
+                            .toLowerCase();
                     final isChat = channel == 'chat' || channel == 'text';
                     return Row(
                       children: [
                         Icon(
-                          isChat ? Icons.chat_bubble_outline : Icons.call_outlined,
+                          isChat
+                              ? Icons.chat_bubble_outline
+                              : Icons.call_outlined,
                           color: Colors.white70,
                           size: 14,
                         ),
                         const SizedBox(width: 4),
                         const Text(
                           'Active Package',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
                         ),
                       ],
                     );
@@ -137,16 +147,24 @@ class _FloatingPackageBannerWidgetState extends State<FloatingPackageBannerWidge
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.timer_outlined, color: AppColors.deepPink, size: 16),
+                  const Icon(
+                    Icons.timer_outlined,
+                    color: AppColors.deepPink,
+                    size: 16,
+                  ),
                   const SizedBox(width: 4),
-                  Obx(() => Text(
-                    _formatDuration(WebSocketService.packageRemainingSeconds.value),
-                    style: const TextStyle(
-                      color: AppColors.deepPink,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                  Obx(
+                    () => Text(
+                      _formatDuration(
+                        WebSocketService.packageRemainingSeconds.value,
+                      ),
+                      style: const TextStyle(
+                        color: AppColors.deepPink,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),

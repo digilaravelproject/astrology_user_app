@@ -12,14 +12,24 @@ class SupportBinding extends Bindings {
   void dependencies() {
     Get.lazyPut(() => SupportRepository(apiClient: Get.find<ApiClient>()));
     Get.lazyPut(() => GetFAQUseCase(repository: Get.find<SupportRepository>()));
-    Get.lazyPut(() => GetPrivacyPolicyUseCase(repository: Get.find<SupportRepository>()));
-    Get.lazyPut(() => GetPaymentPolicyUseCase(repository: Get.find<SupportRepository>()));
-    Get.lazyPut(() => GetTermsAndConditionsUseCase(repository: Get.find<SupportRepository>()));
-    Get.lazyPut(() => SupportController(
-          getFAQUseCase: Get.find<GetFAQUseCase>(),
-          getPrivacyPolicyUseCase: Get.find<GetPrivacyPolicyUseCase>(),
-          getPaymentPolicyUseCase: Get.find<GetPaymentPolicyUseCase>(),
-          getTermsAndConditionsUseCase: Get.find<GetTermsAndConditionsUseCase>(),
-        ));
+    Get.lazyPut(
+      () => GetPrivacyPolicyUseCase(repository: Get.find<SupportRepository>()),
+    );
+    Get.lazyPut(
+      () => GetPaymentPolicyUseCase(repository: Get.find<SupportRepository>()),
+    );
+    Get.lazyPut(
+      () => GetTermsAndConditionsUseCase(
+        repository: Get.find<SupportRepository>(),
+      ),
+    );
+    Get.lazyPut(
+      () => SupportController(
+        getFAQUseCase: Get.find<GetFAQUseCase>(),
+        getPrivacyPolicyUseCase: Get.find<GetPrivacyPolicyUseCase>(),
+        getPaymentPolicyUseCase: Get.find<GetPaymentPolicyUseCase>(),
+        getTermsAndConditionsUseCase: Get.find<GetTermsAndConditionsUseCase>(),
+      ),
+    );
   }
 }

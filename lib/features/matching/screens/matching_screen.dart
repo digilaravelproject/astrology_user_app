@@ -24,7 +24,8 @@ class MatchingScreen extends StatefulWidget {
   State<MatchingScreen> createState() => _MatchingScreenState();
 }
 
-class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProviderStateMixin {
+class _MatchingScreenState extends State<MatchingScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String? profile1Name;
   String? profile2Name;
@@ -37,14 +38,18 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   // Matching Boy Controllers
   final TextEditingController _boysNameController = TextEditingController();
-  final TextEditingController _boysGenderController = TextEditingController(text: 'Male');
+  final TextEditingController _boysGenderController = TextEditingController(
+    text: 'Male',
+  );
   final TextEditingController _boysDobController = TextEditingController();
   final TextEditingController _boysTobController = TextEditingController();
   final TextEditingController _boysPobController = TextEditingController();
 
   // Matching Girl Controllers
   final TextEditingController _girlsNameController = TextEditingController();
-  final TextEditingController _girlsGenderController = TextEditingController(text: 'Female');
+  final TextEditingController _girlsGenderController = TextEditingController(
+    text: 'Female',
+  );
   final TextEditingController _girlsDobController = TextEditingController();
   final TextEditingController _girlsTobController = TextEditingController();
   final TextEditingController _girlsPobController = TextEditingController();
@@ -144,144 +149,160 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
           ),
           body: Column(
             children: [
-          // Custom Circular Tab Bar
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _tabController.animateTo(0);
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: _tabController.index == 0
-                            ? AppColors.primaryColor
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Center(
-                        child: AppText(
-                          'OPEN KUNDLI',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: _tabController.index == 0
-                              ? Colors.white
-                              : Colors.grey.shade600,
+              // Custom Circular Tab Bar
+              Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _tabController.animateTo(0);
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color:
+                                _tabController.index == 0
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: AppText(
+                              'OPEN KUNDLI',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color:
+                                  _tabController.index == 0
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _tabController.animateTo(1);
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: _tabController.index == 1
-                            ? AppColors.primaryColor
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Center(
-                        child: AppText(
-                          'NEW MATCHING',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: _tabController.index == 1
-                              ? Colors.white
-                              : Colors.grey.shade600,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _tabController.animateTo(1);
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color:
+                                _tabController.index == 1
+                                    ? AppColors.primaryColor
+                                    : Colors.transparent,
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Center(
+                            child: AppText(
+                              'NEW MATCHING',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color:
+                                  _tabController.index == 1
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // Tab Content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildOpenKundliTab(),
-               // _buildNewMatchingTab(),
-                Padding(
-                  padding: EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 0),
-                  child:  _buildMatchingForm(),
-                )
-              ],
-            ),
+              // Tab Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildOpenKundliTab(),
+                    // _buildNewMatchingTab(),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                        top: 0,
+                      ),
+                      child: _buildMatchingForm(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-  ],
-);
-}
-
+        ),
+      ],
+    );
+  }
 
   Widget _buildOpenKundliTab() {
     final kundliController = Get.find<KundliController>();
     print('[KUNDLI_APP] [DEBUG] UI: Building Open Kundli Tab');
-    print('[KUNDLI_APP] [DEBUG] UI: Controller found, list length: ${kundliController.kundliList.length}');
-    print('[KUNDLI_APP] [DEBUG] UI: isLoadingList: ${kundliController.isLoadingList.value}');
-    
+    print(
+      '[KUNDLI_APP] [DEBUG] UI: Controller found, list length: ${kundliController.kundliList.length}',
+    );
+    print(
+      '[KUNDLI_APP] [DEBUG] UI: isLoadingList: ${kundliController.isLoadingList.value}',
+    );
+
     return Stack(
       children: [
         Column(
           children: [
             // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withOpacity(0.1),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: TextField(
-                    textAlignVertical: TextAlignVertical.center,
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search Kundli...'.tr,
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 14,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: AppColors.primaryColor,
-                        size: 22,
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  textAlignVertical: TextAlignVertical.center,
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search Kundli...'.tr,
+                    hintStyle: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 14,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: AppColors.primaryColor,
+                      size: 22,
+                    ),
+                    suffixIcon:
+                        _searchController.text.isNotEmpty
+                            ? IconButton(
                               icon: Icon(
                                 Icons.clear,
                                 color: Colors.grey.shade500,
@@ -292,49 +313,53 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                 setState(() {});
                               },
                             )
-                          : null,
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                            : null,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 0,
+                      horizontal: 16,
                     ),
                   ),
                 ),
               ),
+            ),
 
             // Saved Kundlis List
             Expanded(
               child: Obx(() {
                 if (kundliController.isLoadingList.value) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
-                
+
                 // Filter list based on search query
                 final searchQuery = _searchController.text.toLowerCase();
-                final filteredList = searchQuery.isEmpty
-                    ? kundliController.kundliList
-                    : kundliController.kundliList.where((kundli) {
-                        return kundli.name.toLowerCase().contains(searchQuery);
-                      }).toList();
-                
+                final filteredList =
+                    searchQuery.isEmpty
+                        ? kundliController.kundliList
+                        : kundliController.kundliList.where((kundli) {
+                          return kundli.name.toLowerCase().contains(
+                            searchQuery,
+                          );
+                        }).toList();
+
                 if (filteredList.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          searchQuery.isEmpty 
-                              ? Icons.folder_open_outlined 
+                          searchQuery.isEmpty
+                              ? Icons.folder_open_outlined
                               : Icons.search_off_outlined,
                           size: 80,
                           color: Colors.grey.shade300,
                         ),
                         const SizedBox(height: 16),
                         AppText(
-                          searchQuery.isEmpty 
-                              ? 'No Saved Kundlis' 
+                          searchQuery.isEmpty
+                              ? 'No Saved Kundlis'
                               : 'No Results Found',
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -342,7 +367,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         ),
                         const SizedBox(height: 8),
                         AppText(
-                          searchQuery.isEmpty 
+                          searchQuery.isEmpty
                               ? 'Save kundlis to access them quickly'
                               : 'Try searching with a different name',
                           fontSize: 14,
@@ -352,7 +377,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   padding: const EdgeInsets.only(
                     left: 20,
@@ -415,9 +440,10 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                     width: 16,
                                     height: 16,
                                     decoration: BoxDecoration(
-                                      color: kundli.gender.toLowerCase() == 'male' 
-                                          ? Colors.blue 
-                                          : Colors.pink,
+                                      color:
+                                          kundli.gender.toLowerCase() == 'male'
+                                              ? Colors.blue
+                                              : Colors.pink,
                                       shape: BoxShape.circle,
                                       border: Border.all(
                                         color: Colors.white,
@@ -425,8 +451,8 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                       ),
                                     ),
                                     child: Icon(
-                                      kundli.gender.toLowerCase() == 'male' 
-                                          ? Icons.male 
+                                      kundli.gender.toLowerCase() == 'male'
+                                          ? Icons.male
                                           : Icons.female,
                                       size: 10,
                                       color: Colors.white,
@@ -454,20 +480,31 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                       ),
                                       const SizedBox(width: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
                                         decoration: BoxDecoration(
-                                          color: kundli.gender.toLowerCase() == 'male' 
-                                              ? Colors.blue.withOpacity(0.1) 
-                                              : Colors.pink.withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(4),
+                                          color:
+                                              kundli.gender.toLowerCase() ==
+                                                      'male'
+                                                  ? Colors.blue.withOpacity(0.1)
+                                                  : Colors.pink.withOpacity(
+                                                    0.1,
+                                                  ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
                                         ),
                                         child: AppText(
                                           kundli.gender.toUpperCase(),
                                           fontSize: 8,
                                           fontWeight: FontWeight.w600,
-                                          color: kundli.gender.toLowerCase() == 'male' 
-                                              ? Colors.blue 
-                                              : Colors.pink,
+                                          color:
+                                              kundli.gender.toLowerCase() ==
+                                                      'male'
+                                                  ? Colors.blue
+                                                  : Colors.pink,
                                         ),
                                       ),
                                     ],
@@ -545,72 +582,78 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                                     time: kundli.formattedTime,
                                     place: kundli.place,
                                     latitude: double.tryParse(kundli.latitude),
-                                    longitude: double.tryParse(kundli.longitude),
+                                    longitude: double.tryParse(
+                                      kundli.longitude,
+                                    ),
                                   );
                                 } else if (value == 'edit') {
                                   // Edit kundli - fetch data and show bottom sheet
                                   await _showEditKundliBottomSheet(kundli.id);
                                 } else if (value == 'delete') {
                                   // Delete kundli - show confirmation dialog
-                                  _showDeleteConfirmationDialog(kundli.id, kundli.name);
+                                  _showDeleteConfirmationDialog(
+                                    kundli.id,
+                                    kundli.name,
+                                  );
                                 }
                               },
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  value: 'view',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.visibility_outlined,
-                                        size: 18,
-                                        color: AppColors.textColorPrimary,
+                              itemBuilder:
+                                  (context) => [
+                                    PopupMenuItem(
+                                      value: 'view',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.visibility_outlined,
+                                            size: 18,
+                                            color: AppColors.textColorPrimary,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          AppText(
+                                            'View'.tr,
+                                            fontSize: 14,
+                                            color: AppColors.textColorPrimary,
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 12),
-                                      AppText(
-                                        'View'.tr,
-                                        fontSize: 14,
-                                        color: AppColors.textColorPrimary,
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.edit_outlined,
+                                            size: 18,
+                                            color: AppColors.primaryColor,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          AppText(
+                                            'Edit'.tr,
+                                            fontSize: 14,
+                                            color: AppColors.textColorPrimary,
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit_outlined,
-                                        size: 18,
-                                        color: AppColors.primaryColor,
+                                    ),
+                                    PopupMenuItem(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.delete_outline,
+                                            size: 18,
+                                            color: Colors.red.shade400,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          AppText(
+                                            'Delete'.tr,
+                                            fontSize: 14,
+                                            color: Colors.red.shade400,
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 12),
-                                      AppText(
-                                        'Edit'.tr,
-                                        fontSize: 14,
-                                        color: AppColors.textColorPrimary,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.delete_outline,
-                                        size: 18,
-                                        color: Colors.red.shade400,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      AppText(
-                                        'Delete'.tr,
-                                        fontSize: 14,
-                                        color: Colors.red.shade400,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                    ),
+                                  ],
                             ),
                           ],
                         ),
@@ -620,7 +663,6 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 );
               }),
             ),
-
           ],
         ),
         // FAB Button (Right Bottom)
@@ -632,11 +674,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               onPressed: _showAddKundliBottomSheet,
               backgroundColor: AppColors.primaryColor,
               elevation: 8,
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 28,
-              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 28),
             ),
           ),
         ),
@@ -664,58 +702,100 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildField("Name", "Enter boy's name", sax.Iconsax.user_copy, controller: _boysNameController),
-                  _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _boysDobController, isPicker: true, onTap: () {
-                    boyDobError.value = '';
-                    _selectDate(context, _boysDobController);
-                  }),
-                  Obx(() => boyDobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            boyDobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
-                  _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _boysTobController, isPicker: true, onTap: () {
-                    boyTobError.value = '';
-                    _selectTime(context, _boysTobController);
-                  }),
-                  Obx(() => boyTobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            boyTobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
-                  _buildField("Birth Place", "Select birth place", sax.Iconsax.location_copy, controller: _boysPobController, isPicker: true, onTap: () async {
-                    boyPobError.value = '';
-                    final result = await Navigator.of(context, rootNavigator: true)
-                        .push<LocationResult>(MaterialPageRoute(
-                      builder: (_) => const LocationSearchScreen(title: "Select Boy's Birth Place"),
-                      fullscreenDialog: true,
-                    ));
-                    if (result != null) {
-                      _boysPobController.text = result.displayName;
-                      _boyLat = result.latitude;
-                      _boyLng = result.longitude;
-                    }
-                  }),
-                  Obx(() => boyPobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            boyPobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
+                  _buildField(
+                    "Name",
+                    "Enter boy's name",
+                    sax.Iconsax.user_copy,
+                    controller: _boysNameController,
+                  ),
+                  _buildField(
+                    "Birth Date",
+                    "Select date",
+                    sax.Iconsax.calendar_copy,
+                    controller: _boysDobController,
+                    isPicker: true,
+                    onTap: () {
+                      boyDobError.value = '';
+                      _selectDate(context, _boysDobController);
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        boyDobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                boyDobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                  _buildField(
+                    "Birth Time",
+                    "Select time",
+                    sax.Iconsax.clock_copy,
+                    controller: _boysTobController,
+                    isPicker: true,
+                    onTap: () {
+                      boyTobError.value = '';
+                      _selectTime(context, _boysTobController);
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        boyTobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                boyTobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                  _buildField(
+                    "Birth Place",
+                    "Select birth place",
+                    sax.Iconsax.location_copy,
+                    controller: _boysPobController,
+                    isPicker: true,
+                    onTap: () async {
+                      boyPobError.value = '';
+                      final result = await Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).push<LocationResult>(
+                        MaterialPageRoute(
+                          builder:
+                              (_) => const LocationSearchScreen(
+                                title: "Select Boy's Birth Place",
+                              ),
+                          fullscreenDialog: true,
+                        ),
+                      );
+                      if (result != null) {
+                        _boysPobController.text = result.displayName;
+                        _boyLat = result.latitude;
+                        _boyLng = result.longitude;
+                      }
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        boyPobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                boyPobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),
@@ -726,58 +806,100 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildField("Name", "Enter girl's name", sax.Iconsax.user_copy, controller: _girlsNameController),
-                  _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: _girlsDobController, isPicker: true, onTap: () {
-                    girlDobError.value = '';
-                    _selectDate(context, _girlsDobController);
-                  }),
-                  Obx(() => girlDobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            girlDobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
-                  _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: _girlsTobController, isPicker: true, onTap: () {
-                    girlTobError.value = '';
-                    _selectTime(context, _girlsTobController);
-                  }),
-                  Obx(() => girlTobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            girlTobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
-                  _buildField("Birth Place", "Select birth place", sax.Iconsax.location_copy, controller: _girlsPobController, isPicker: true, onTap: () async {
-                    girlPobError.value = '';
-                    final result = await Navigator.of(context, rootNavigator: true)
-                        .push<LocationResult>(MaterialPageRoute(
-                      builder: (_) => const LocationSearchScreen(title: "Select Girl's Birth Place"),
-                      fullscreenDialog: true,
-                    ));
-                    if (result != null) {
-                      _girlsPobController.text = result.displayName;
-                      _girlLat = result.latitude;
-                      _girlLng = result.longitude;
-                    }
-                  }),
-                  Obx(() => girlPobError.value.isNotEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.only(left: 14, top: 4),
-                          child: AppText(
-                            girlPobError.value,
-                            fontSize: 11,
-                            color: Colors.red,
-                          ),
-                        )
-                      : const SizedBox.shrink()),
+                  _buildField(
+                    "Name",
+                    "Enter girl's name",
+                    sax.Iconsax.user_copy,
+                    controller: _girlsNameController,
+                  ),
+                  _buildField(
+                    "Birth Date",
+                    "Select date",
+                    sax.Iconsax.calendar_copy,
+                    controller: _girlsDobController,
+                    isPicker: true,
+                    onTap: () {
+                      girlDobError.value = '';
+                      _selectDate(context, _girlsDobController);
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        girlDobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                girlDobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                  _buildField(
+                    "Birth Time",
+                    "Select time",
+                    sax.Iconsax.clock_copy,
+                    controller: _girlsTobController,
+                    isPicker: true,
+                    onTap: () {
+                      girlTobError.value = '';
+                      _selectTime(context, _girlsTobController);
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        girlTobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                girlTobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                  _buildField(
+                    "Birth Place",
+                    "Select birth place",
+                    sax.Iconsax.location_copy,
+                    controller: _girlsPobController,
+                    isPicker: true,
+                    onTap: () async {
+                      girlPobError.value = '';
+                      final result = await Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).push<LocationResult>(
+                        MaterialPageRoute(
+                          builder:
+                              (_) => const LocationSearchScreen(
+                                title: "Select Girl's Birth Place",
+                              ),
+                          fullscreenDialog: true,
+                        ),
+                      );
+                      if (result != null) {
+                        _girlsPobController.text = result.displayName;
+                        _girlLat = result.latitude;
+                        _girlLng = result.longitude;
+                      }
+                    },
+                  ),
+                  Obx(
+                    () =>
+                        girlPobError.value.isNotEmpty
+                            ? Padding(
+                              padding: const EdgeInsets.only(left: 14, top: 4),
+                              child: AppText(
+                                girlPobError.value,
+                                fontSize: 11,
+                                color: Colors.red,
+                              ),
+                            )
+                            : const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),
@@ -785,159 +907,195 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 30),
               child: GestureDetector(
-                onTap: matchingController.isLoading.value ? null : () async {
-                  // Clear previous errors
-                  boyDobError.value = '';
-                  boyTobError.value = '';
-                  boyPobError.value = '';
-                  girlDobError.value = '';
-                  girlTobError.value = '';
-                  girlPobError.value = '';
+                onTap:
+                    matchingController.isLoading.value
+                        ? null
+                        : () async {
+                          // Clear previous errors
+                          boyDobError.value = '';
+                          boyTobError.value = '';
+                          boyPobError.value = '';
+                          girlDobError.value = '';
+                          girlTobError.value = '';
+                          girlPobError.value = '';
 
-                  // Validate all fields
-                  bool hasError = false;
-                  
-                  if (_boysDobController.text.trim().isEmpty) {
-                    boyDobError.value = 'Please select boy\'s date of birth';
-                    hasError = true;
-                  }
-                  if (_boysTobController.text.trim().isEmpty) {
-                    boyTobError.value = 'Please select boy\'s time of birth';
-                    hasError = true;
-                  }
-                  if (_boysPobController.text.trim().isEmpty) {
-                    boyPobError.value = 'Please enter boy\'s place of birth';
-                    hasError = true;
-                  }
-                  if (_girlsDobController.text.trim().isEmpty) {
-                    girlDobError.value = 'Please select girl\'s date of birth';
-                    hasError = true;
-                  }
-                  if (_girlsTobController.text.trim().isEmpty) {
-                    girlTobError.value = 'Please select girl\'s time of birth';
-                    hasError = true;
-                  }
-                  if (_girlsPobController.text.trim().isEmpty) {
-                    girlPobError.value = 'Please enter girl\'s place of birth';
-                    hasError = true;
-                  }
+                          // Validate all fields
+                          bool hasError = false;
 
-                  if (hasError) return;
+                          if (_boysDobController.text.trim().isEmpty) {
+                            boyDobError.value =
+                                'Please select boy\'s date of birth';
+                            hasError = true;
+                          }
+                          if (_boysTobController.text.trim().isEmpty) {
+                            boyTobError.value =
+                                'Please select boy\'s time of birth';
+                            hasError = true;
+                          }
+                          if (_boysPobController.text.trim().isEmpty) {
+                            boyPobError.value =
+                                'Please enter boy\'s place of birth';
+                            hasError = true;
+                          }
+                          if (_girlsDobController.text.trim().isEmpty) {
+                            girlDobError.value =
+                                'Please select girl\'s date of birth';
+                            hasError = true;
+                          }
+                          if (_girlsTobController.text.trim().isEmpty) {
+                            girlTobError.value =
+                                'Please select girl\'s time of birth';
+                            hasError = true;
+                          }
+                          if (_girlsPobController.text.trim().isEmpty) {
+                            girlPobError.value =
+                                'Please enter girl\'s place of birth';
+                            hasError = true;
+                          }
 
-              // Convert date format from "15-Jan-1995" to "1995-01-15"
-              String convertDate(String dateStr) {
-                try {
-                  final parts = dateStr.split('-');
-                  if (parts.length == 3) {
-                    final day = parts[0].padLeft(2, '0');
-                    final monthMap = {
-                      'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-                      'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-                      'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-                    };
-                    final month = monthMap[parts[1]] ?? '01';
-                    final year = parts[2];
-                    return '$year-$month-$day';
-                  }
-                } catch (e) {
-                  print('Date conversion error: $e');
-                }
-                return dateStr;
-              }
+                          if (hasError) return;
 
-              // Convert time format from "7:47 PM" to "19:47:00"
-              String convertTime(String timeStr) {
-                try {
-                  String clean = timeStr.trim();
-                  bool isPm = clean.toUpperCase().contains('PM');
-                  bool isAm = clean.toUpperCase().contains('AM');
-                  clean = clean.replaceAll(' AM', '').replaceAll(' PM', '').replaceAll('am', '').replaceAll('pm', '').trim();
-                  List<String> parts = clean.split(':');
-                  if (parts.length >= 2) {
-                    int hour = int.parse(parts[0]);
-                    int min = int.parse(parts[1]);
-                    if (isPm && hour < 12) hour += 12;
-                    if (isAm && hour == 12) hour = 0;
-                    return "${hour.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}:00";
-                  }
-                } catch (e) {
-                  print('Time conversion error: $e');
-                }
-                return timeStr;
-              }
+                          // Convert date format from "15-Jan-1995" to "1995-01-15"
+                          String convertDate(String dateStr) {
+                            try {
+                              final parts = dateStr.split('-');
+                              if (parts.length == 3) {
+                                final day = parts[0].padLeft(2, '0');
+                                final monthMap = {
+                                  'Jan': '01',
+                                  'Feb': '02',
+                                  'Mar': '03',
+                                  'Apr': '04',
+                                  'May': '05',
+                                  'Jun': '06',
+                                  'Jul': '07',
+                                  'Aug': '08',
+                                  'Sep': '09',
+                                  'Oct': '10',
+                                  'Nov': '11',
+                                  'Dec': '12',
+                                };
+                                final month = monthMap[parts[1]] ?? '01';
+                                final year = parts[2];
+                                return '$year-$month-$day';
+                              }
+                            } catch (e) {
+                              print('Date conversion error: $e');
+                            }
+                            return dateStr;
+                          }
 
-              final boyDob = convertDate(_boysDobController.text);
-              final boyTob = convertTime(_boysTobController.text);
-              final girlDob = convertDate(_girlsDobController.text);
-              final girlTob = convertTime(_girlsTobController.text);
+                          // Convert time format from "7:47 PM" to "19:47:00"
+                          String convertTime(String timeStr) {
+                            try {
+                              String clean = timeStr.trim();
+                              bool isPm = clean.toUpperCase().contains('PM');
+                              bool isAm = clean.toUpperCase().contains('AM');
+                              clean =
+                                  clean
+                                      .replaceAll(' AM', '')
+                                      .replaceAll(' PM', '')
+                                      .replaceAll('am', '')
+                                      .replaceAll('pm', '')
+                                      .trim();
+                              List<String> parts = clean.split(':');
+                              if (parts.length >= 2) {
+                                int hour = int.parse(parts[0]);
+                                int min = int.parse(parts[1]);
+                                if (isPm && hour < 12) hour += 12;
+                                if (isAm && hour == 12) hour = 0;
+                                return "${hour.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}:00";
+                              }
+                            } catch (e) {
+                              print('Time conversion error: $e');
+                            }
+                            return timeStr;
+                          }
 
-              // Fetch matching data dynamically
-              await matchingController.fetchMatchingData(
-                boyName: _boysNameController.text.trim().isEmpty ? 'Boy' : _boysNameController.text.trim(),
-                boyGender: 'Male',
-                boyDob: boyDob,
-                boyTob: boyTob,
-                boyPlace: _boysPobController.text.trim(),
-                boyLat: _boyLat,
-                boyLng: _boyLng,
-                boyTz: '+05:30',
-                girlName: _girlsNameController.text.trim().isEmpty ? 'Girl' : _girlsNameController.text.trim(),
-                girlGender: 'Female',
-                girlDob: girlDob,
-                girlTob: girlTob,
-                girlPlace: _girlsPobController.text.trim(),
-                girlLat: _girlLat,
-                girlLng: _girlLng,
-                girlTz: '+05:30',
-              );
+                          final boyDob = convertDate(_boysDobController.text);
+                          final boyTob = convertTime(_boysTobController.text);
+                          final girlDob = convertDate(_girlsDobController.text);
+                          final girlTob = convertTime(_girlsTobController.text);
 
-              // Navigate only if data is successfully loaded
-              if (matchingController.matchingData.value != null) {
-                Get.toNamed(RouteHelper.getKundaliMatchingRoute());
-              }
-            },
-            child: Container(
-              height: 56,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: matchingController.isLoading.value
-                    ? LinearGradient(colors: [Colors.grey.shade400, Colors.grey.shade400])
-                    : AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryColor.withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: matchingController.isLoading.value
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2.5,
-                        ),
-                      )
-                    : const AppText(
-                        "Generate Horoscope",
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                          // Fetch matching data dynamically
+                          await matchingController.fetchMatchingData(
+                            boyName:
+                                _boysNameController.text.trim().isEmpty
+                                    ? 'Boy'
+                                    : _boysNameController.text.trim(),
+                            boyGender: 'Male',
+                            boyDob: boyDob,
+                            boyTob: boyTob,
+                            boyPlace: _boysPobController.text.trim(),
+                            boyLat: _boyLat,
+                            boyLng: _boyLng,
+                            boyTz: '+05:30',
+                            girlName:
+                                _girlsNameController.text.trim().isEmpty
+                                    ? 'Girl'
+                                    : _girlsNameController.text.trim(),
+                            girlGender: 'Female',
+                            girlDob: girlDob,
+                            girlTob: girlTob,
+                            girlPlace: _girlsPobController.text.trim(),
+                            girlLat: _girlLat,
+                            girlLng: _girlLng,
+                            girlTz: '+05:30',
+                          );
+
+                          // Navigate only if data is successfully loaded
+                          if (matchingController.matchingData.value != null) {
+                            Get.toNamed(RouteHelper.getKundaliMatchingRoute());
+                          }
+                        },
+                child: Container(
+                  height: 56,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient:
+                        matchingController.isLoading.value
+                            ? LinearGradient(
+                              colors: [
+                                Colors.grey.shade400,
+                                Colors.grey.shade400,
+                              ],
+                            )
+                            : AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
                       ),
+                    ],
+                  ),
+                  child: Center(
+                    child:
+                        matchingController.isLoading.value
+                            ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2.5,
+                              ),
+                            )
+                            : const AppText(
+                              "Generate Horoscope",
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    );
+          ],
+        );
       },
     );
   }
-
 
   void _showAddKundliBottomSheet() {
     _showKundliBottomSheet(isEdit: false);
@@ -945,23 +1103,23 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   Future<void> _showEditKundliBottomSheet(int kundliId) async {
     final kundliController = Get.find<KundliController>();
-    
+
     // Show loading
     Get.dialog(
       const Center(child: CircularProgressIndicator()),
       barrierDismissible: false,
     );
-    
+
     try {
       // Fetch kundli data
       await kundliController.fetchKundliById(kundliId);
-      
+
       // Close loading - use a small delay to ensure dialog is properly mounted
       await Future.delayed(const Duration(milliseconds: 100));
       if (Get.isDialogOpen ?? false) {
         Get.back();
       }
-      
+
       // Show bottom sheet with data after loading is complete
       _showKundliBottomSheet(isEdit: true);
     } catch (e) {
@@ -977,9 +1135,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
   void _showDeleteConfirmationDialog(int kundliId, String kundliName) {
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -1004,7 +1160,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 ),
               ),
               const SizedBox(height: 20),
-              
+
               // Title
               const AppText(
                 'Delete Kundli?',
@@ -1013,7 +1169,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 color: AppColors.textColorPrimary,
               ),
               const SizedBox(height: 12),
-              
+
               // Message
               AppText(
                 'Are you sure you want to delete "$kundliName"? This action cannot be undone.',
@@ -1023,7 +1179,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                 height: 1.5,
               ),
               const SizedBox(height: 24),
-              
+
               // Buttons
               Row(
                 children: [
@@ -1035,7 +1191,9 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         onPressed: () => Get.back(),
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: AppColors.textColorSecondary.withOpacity(0.3),
+                            color: AppColors.textColorSecondary.withOpacity(
+                              0.3,
+                            ),
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -1052,7 +1210,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     ),
                   ),
                   const SizedBox(width: 12),
-                  
+
                   // Delete Button
                   Expanded(
                     child: SizedBox(
@@ -1060,29 +1218,31 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       child: ElevatedButton(
                         onPressed: () async {
                           final kundliController = Get.find<KundliController>();
-                          
+
                           // Close dialog
                           Get.back();
-                          
+
                           // Show loading
                           Get.dialog(
                             const Center(child: CircularProgressIndicator()),
                             barrierDismissible: false,
                           );
-                          
+
                           try {
                             // Call delete API
                             await kundliController.deleteKundli(kundliId);
-                            
+
                             // Close loading
                             Get.back();
-                            
+
                             // Show success message
-                            CustomSnackbar.showSuccess('Kundli deleted successfully');
+                            CustomSnackbar.showSuccess(
+                              'Kundli deleted successfully',
+                            );
                           } catch (e) {
                             // Close loading
                             Get.back();
-                            
+
                             // Show error message
                             CustomSnackbar.showError('Failed to delete kundli');
                           }
@@ -1115,12 +1275,12 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   void _showKundliBottomSheet({required bool isEdit}) {
     final kundliController = Get.find<KundliController>();
-    
+
     // Clear controllers only if creating new
     if (!isEdit) {
       kundliController.clearControllers();
     }
-    
+
     // Validation error states
     final nameError = ''.obs;
     final dobError = ''.obs;
@@ -1139,277 +1299,339 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Obx(() => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppText(
-                    isEdit ? 'Edit Kundli'.tr : 'Add New Kundli'.tr,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textColorPrimary,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 22),
-                    onPressed: () => Get.back(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              _buildSectionCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          child: Obx(
+            () => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildField("Name", "Enter name", sax.Iconsax.user_copy, controller: kundliController.nameController),
-                    if (nameError.value.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 14, top: 4),
-                        child: AppText(
-                          nameError.value,
-                          fontSize: 11,
-                          color: Colors.red,
-                        ),
-                      ),
-                    _buildField("Gender", "Select gender", sax.Iconsax.user_tag_copy, controller: kundliController.genderController, isPicker: true, onTap: () => _showGenderSelection(kundliController.genderController)),
-                    if (genderError.value.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 14, top: 4),
-                        child: AppText(
-                          genderError.value,
-                          fontSize: 11,
-                          color: Colors.red,
-                        ),
-                      ),
-                    _buildField("Birth Date", "Select date", sax.Iconsax.calendar_copy, controller: kundliController.dobController, isPicker: true, onTap: () {
-                      dobError.value = '';
-                      _selectDate(context, kundliController.dobController);
-                    }),
-                    if (dobError.value.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 14, top: 4),
-                        child: AppText(
-                          dobError.value,
-                          fontSize: 11,
-                          color: Colors.red,
-                        ),
-                      ),
-                    _buildField("Birth Time", "Select time", sax.Iconsax.clock_copy, controller: kundliController.tobController, isPicker: true, onTap: () {
-                      tobError.value = '';
-                      _selectTime(context, kundliController.tobController);
-                    }),
-                    if (tobError.value.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 14, top: 4),
-                        child: AppText(
-                          tobError.value,
-                          fontSize: 11,
-                          color: Colors.red,
-                        ),
-                      ),
-                    _buildField(
-                      "Birth Place",
-                      "Enter birth place",
-                      sax.Iconsax.location_copy,
-                      controller: kundliController.pobController,
-                      isPicker: true,
-                      onTap: () async {
-                        pobError.value = '';
-                        final LocationResult? result = await Navigator.of(
-                          Get.context!,
-                          rootNavigator: true,
-                        ).push<LocationResult>(
-                          MaterialPageRoute(
-                            builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
-                            fullscreenDialog: true,
-                          ),
-                        );
-                        if (result != null) {
-                          kundliController.pobController.text = result.displayName;
-                          selectedLat.value = result.latitude.toString();
-                          selectedLng.value = result.longitude.toString();
-                          kundliController.selectedLatitude.value = result.latitude.toString();
-                          kundliController.selectedLongitude.value = result.longitude.toString();
-                        }
-                      },
+                    AppText(
+                      isEdit ? 'Edit Kundli'.tr : 'Add New Kundli'.tr,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textColorPrimary,
                     ),
-                    if (pobError.value.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 14, top: 4),
-                        child: AppText(
-                          pobError.value,
-                          fontSize: 11,
-                          color: Colors.red,
-                        ),
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 22),
+                      onPressed: () => Get.back(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 24),
-              // Save/Update Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    // Clear previous errors
-                    nameError.value = '';
-                    dobError.value = '';
-                    tobError.value = '';
-                    pobError.value = '';
-                    genderError.value = '';
+                const SizedBox(height: 20),
 
-                    // Validate fields
-                    bool hasError = false;
-                    
-                    if (kundliController.nameController.text.trim().isEmpty) {
-                      nameError.value = 'Please enter name';
-                      hasError = true;
-                    }
-                    if (kundliController.dobController.text.trim().isEmpty) {
-                      dobError.value = 'Please select date of birth';
-                      hasError = true;
-                    }
-                    if (kundliController.tobController.text.trim().isEmpty) {
-                      tobError.value = 'Please select time of birth';
-                      hasError = true;
-                    }
-                    if (kundliController.pobController.text.trim().isEmpty) {
-                      pobError.value = 'Please enter place of birth';
-                      hasError = true;
-                    }
-                    if (kundliController.genderController.text.trim().isEmpty) {
-                      genderError.value = 'Please enter Gender';
-                      hasError = true;
-                    }
-                    
-                    if (hasError) return;
-                    
-                    final latitude = selectedLat.value;
-                    final longitude = selectedLng.value;
-
-                    if (isEdit) {
-                      // Update existing kundli
-                      try {
-                        // Convert formats
-                        final birthDate = _convertDateToApiFormat(kundliController.dobController.text);
-                        final birthTime = _convertTimeToApiFormat(kundliController.tobController.text);
-                        final datetime = _createDatetime(birthDate, birthTime);
-                        
-                        // Close bottom sheet
-                        Get.back();
-                        
-                        // Show loading
-                        Get.dialog(
-                          const Center(child: CircularProgressIndicator()),
-                          barrierDismissible: false,
-                        );
-                        
-                        // Call update API
-                        await kundliController.updateKundli(
-                          id: kundliController.editingKundliId.value,
-                          name: kundliController.nameController.text,
-                          gender: kundliController.genderController.text.toLowerCase(),
-                          birthDate: birthDate,
-                          birthTime: birthTime,
-                          latitude: latitude,
-                          longitude: longitude,
-                          datetime: datetime,
-                          place: kundliController.pobController.text,
-                        );
-                        
-                        // Close loading
-                        Get.back();
-                        
-                        CustomSnackbar.showSuccess('Kundli updated successfully');
-                      } catch (e) {
-                        Get.back(); // Close loading if open
-                        CustomSnackbar.showError('Failed to update kundli');
-                      }
-                    } else {
-                      // Create new kundli
-                      try {
-                        
-                        // Convert formats
-                        final birthDate = _convertDateToApiFormat(kundliController.dobController.text);
-                        final birthTime = _convertTimeToApiFormat(kundliController.tobController.text); // Already includes :00
-                        final datetime = _createDatetime(birthDate, birthTime);
-                        
-                        // Close bottom sheet
-                        Get.back();
-                      
-                      // Show loading
-                      Get.dialog(
-                        const Center(child: CircularProgressIndicator()),
-                        barrierDismissible: false,
-                      );
-                      
-                      // Call create API
-                      await kundliController.createKundli(
-                        name: kundliController.nameController.text,
-                        gender: kundliController.genderController.text.toLowerCase(),
-                        birthDate: birthDate,
-                        birthTime: birthTime,
-                        latitude: latitude,
-                        longitude: longitude,
-                        datetime: datetime,
-                        place: kundliController.pobController.text,
-                      );
-                      
-                      // Close loading
-                      Get.back();
-                      
-                      CustomSnackbar.showSuccess('Kundli created successfully');
-                      
-                      // Navigate to Kundli screen
-                      _navigateToKundliScreen(
-                        name: kundliController.nameController.text,
-                        gender: kundliController.genderController.text,
-                        dob: kundliController.dobController.text,
-                        time: kundliController.tobController.text,
-                        place: kundliController.pobController.text,
-                        latitude: double.tryParse(latitude),
-                        longitude: double.tryParse(longitude),
-                      );
-                      } catch (e) {
-                        Get.back(); // Close loading if open
-                        CustomSnackbar.showError('Failed to create kundli');
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
-                  ),
-                  child: AppText(
-                    isEdit ? 'Update Kundli'.tr : 'Save & View Kundli'.tr,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                _buildSectionCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildField(
+                        "Name",
+                        "Enter name",
+                        sax.Iconsax.user_copy,
+                        controller: kundliController.nameController,
+                      ),
+                      if (nameError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            nameError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        ),
+                      _buildField(
+                        "Gender",
+                        "Select gender",
+                        sax.Iconsax.user_tag_copy,
+                        controller: kundliController.genderController,
+                        isPicker: true,
+                        onTap:
+                            () => _showGenderSelection(
+                              kundliController.genderController,
+                            ),
+                      ),
+                      if (genderError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            genderError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        ),
+                      _buildField(
+                        "Birth Date",
+                        "Select date",
+                        sax.Iconsax.calendar_copy,
+                        controller: kundliController.dobController,
+                        isPicker: true,
+                        onTap: () {
+                          dobError.value = '';
+                          _selectDate(context, kundliController.dobController);
+                        },
+                      ),
+                      if (dobError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            dobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        ),
+                      _buildField(
+                        "Birth Time",
+                        "Select time",
+                        sax.Iconsax.clock_copy,
+                        controller: kundliController.tobController,
+                        isPicker: true,
+                        onTap: () {
+                          tobError.value = '';
+                          _selectTime(context, kundliController.tobController);
+                        },
+                      ),
+                      if (tobError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            tobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        ),
+                      _buildField(
+                        "Birth Place",
+                        "Enter birth place",
+                        sax.Iconsax.location_copy,
+                        controller: kundliController.pobController,
+                        isPicker: true,
+                        onTap: () async {
+                          pobError.value = '';
+                          final LocationResult? result = await Navigator.of(
+                            Get.context!,
+                            rootNavigator: true,
+                          ).push<LocationResult>(
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => const LocationSearchScreen(
+                                    title: 'Select Birth Place',
+                                  ),
+                              fullscreenDialog: true,
+                            ),
+                          );
+                          if (result != null) {
+                            kundliController.pobController.text =
+                                result.displayName;
+                            selectedLat.value = result.latitude.toString();
+                            selectedLng.value = result.longitude.toString();
+                            kundliController.selectedLatitude.value =
+                                result.latitude.toString();
+                            kundliController.selectedLongitude.value =
+                                result.longitude.toString();
+                          }
+                        },
+                      ),
+                      if (pobError.value.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 14, top: 4),
+                          child: AppText(
+                            pobError.value,
+                            fontSize: 11,
+                            color: Colors.red,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                // Save/Update Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // Clear previous errors
+                      nameError.value = '';
+                      dobError.value = '';
+                      tobError.value = '';
+                      pobError.value = '';
+                      genderError.value = '';
+
+                      // Validate fields
+                      bool hasError = false;
+
+                      if (kundliController.nameController.text.trim().isEmpty) {
+                        nameError.value = 'Please enter name';
+                        hasError = true;
+                      }
+                      if (kundliController.dobController.text.trim().isEmpty) {
+                        dobError.value = 'Please select date of birth';
+                        hasError = true;
+                      }
+                      if (kundliController.tobController.text.trim().isEmpty) {
+                        tobError.value = 'Please select time of birth';
+                        hasError = true;
+                      }
+                      if (kundliController.pobController.text.trim().isEmpty) {
+                        pobError.value = 'Please enter place of birth';
+                        hasError = true;
+                      }
+                      if (kundliController.genderController.text
+                          .trim()
+                          .isEmpty) {
+                        genderError.value = 'Please enter Gender';
+                        hasError = true;
+                      }
+
+                      if (hasError) return;
+
+                      final latitude = selectedLat.value;
+                      final longitude = selectedLng.value;
+
+                      if (isEdit) {
+                        // Update existing kundli
+                        try {
+                          // Convert formats
+                          final birthDate = _convertDateToApiFormat(
+                            kundliController.dobController.text,
+                          );
+                          final birthTime = _convertTimeToApiFormat(
+                            kundliController.tobController.text,
+                          );
+                          final datetime = _createDatetime(
+                            birthDate,
+                            birthTime,
+                          );
+
+                          // Close bottom sheet
+                          Get.back();
+
+                          // Show loading
+                          Get.dialog(
+                            const Center(child: CircularProgressIndicator()),
+                            barrierDismissible: false,
+                          );
+
+                          // Call update API
+                          await kundliController.updateKundli(
+                            id: kundliController.editingKundliId.value,
+                            name: kundliController.nameController.text,
+                            gender:
+                                kundliController.genderController.text
+                                    .toLowerCase(),
+                            birthDate: birthDate,
+                            birthTime: birthTime,
+                            latitude: latitude,
+                            longitude: longitude,
+                            datetime: datetime,
+                            place: kundliController.pobController.text,
+                          );
+
+                          // Close loading
+                          Get.back();
+
+                          CustomSnackbar.showSuccess(
+                            'Kundli updated successfully',
+                          );
+                        } catch (e) {
+                          Get.back(); // Close loading if open
+                          CustomSnackbar.showError('Failed to update kundli');
+                        }
+                      } else {
+                        // Create new kundli
+                        try {
+                          // Convert formats
+                          final birthDate = _convertDateToApiFormat(
+                            kundliController.dobController.text,
+                          );
+                          final birthTime = _convertTimeToApiFormat(
+                            kundliController.tobController.text,
+                          ); // Already includes :00
+                          final datetime = _createDatetime(
+                            birthDate,
+                            birthTime,
+                          );
+
+                          // Close bottom sheet
+                          Get.back();
+
+                          // Show loading
+                          Get.dialog(
+                            const Center(child: CircularProgressIndicator()),
+                            barrierDismissible: false,
+                          );
+
+                          // Call create API
+                          await kundliController.createKundli(
+                            name: kundliController.nameController.text,
+                            gender:
+                                kundliController.genderController.text
+                                    .toLowerCase(),
+                            birthDate: birthDate,
+                            birthTime: birthTime,
+                            latitude: latitude,
+                            longitude: longitude,
+                            datetime: datetime,
+                            place: kundliController.pobController.text,
+                          );
+
+                          // Close loading
+                          Get.back();
+
+                          CustomSnackbar.showSuccess(
+                            'Kundli created successfully',
+                          );
+
+                          // Navigate to Kundli screen
+                          _navigateToKundliScreen(
+                            name: kundliController.nameController.text,
+                            gender: kundliController.genderController.text,
+                            dob: kundliController.dobController.text,
+                            time: kundliController.tobController.text,
+                            place: kundliController.pobController.text,
+                            latitude: double.tryParse(latitude),
+                            longitude: double.tryParse(longitude),
+                          );
+                        } catch (e) {
+                          Get.back(); // Close loading if open
+                          CustomSnackbar.showError('Failed to create kundli');
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    child: AppText(
+                      isEdit ? 'Update Kundli'.tr : 'Save & View Kundli'.tr,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
+
+          // ),
         ),
-     // ),
-
-    ),
-
       ),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
     );
   }
 
-  Widget _buildSectionCard({String? title, IconData? titleIcon, required Widget child}) {
+  Widget _buildSectionCard({
+    String? title,
+    IconData? titleIcon,
+    required Widget child,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -1436,11 +1658,18 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   Icon(titleIcon, size: 20, color: AppColors.primaryColor),
                   const SizedBox(width: 8),
                 ],
-                AppText(title.tr, fontSize: 16, color: AppColors.textColorPrimary.withOpacity(0.8)),
+                AppText(
+                  title.tr,
+                  fontSize: 16,
+                  color: AppColors.textColorPrimary.withOpacity(0.8),
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            Container(height: 1, color: AppColors.primaryColor.withOpacity(0.05)),
+            Container(
+              height: 1,
+              color: AppColors.primaryColor.withOpacity(0.05),
+            ),
             const SizedBox(height: 12),
           ],
           child,
@@ -1449,13 +1678,25 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     );
   }
 
-  Widget _buildField(String label, String hint, IconData icon, {required TextEditingController controller, bool isPicker = false, VoidCallback? onTap}) {
+  Widget _buildField(
+    String label,
+    String hint,
+    IconData icon, {
+    required TextEditingController controller,
+    bool isPicker = false,
+    VoidCallback? onTap,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 4, top: 8),
-          child: AppText(label.tr, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary.withOpacity(0.6)),
+          child: AppText(
+            label.tr,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textColorPrimary.withOpacity(0.6),
+          ),
         ),
         GestureDetector(
           onTap: isPicker ? (onTap ?? () {}) : null,
@@ -1476,44 +1717,61 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
             ),
             child: Row(
               children: [
-                Icon(icon, size: 16, color: AppColors.primaryColor.withOpacity(0.6)),
+                Icon(
+                  icon,
+                  size: 16,
+                  color: AppColors.primaryColor.withOpacity(0.6),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: isPicker
-                      ? ValueListenableBuilder<TextEditingValue>(
-                          valueListenable: controller,
-                          builder: (context, value, _) {
-                            final textVal = value.text;
-                            return AppText(
-                              textVal.isEmpty ? hint.tr : textVal.tr,
+                  child:
+                      isPicker
+                          ? ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: controller,
+                            builder: (context, value, _) {
+                              final textVal = value.text;
+                              return AppText(
+                                textVal.isEmpty ? hint.tr : textVal.tr,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    textVal.isEmpty
+                                        ? AppColors.textColorHint.withOpacity(
+                                          0.6,
+                                        )
+                                        : AppColors.textColorPrimary,
+                              );
+                            },
+                          )
+                          : TextField(
+                            controller: controller,
+                            cursorColor: AppColors.primaryColor,
+                            readOnly: isPicker,
+                            enabled: !isPicker,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: textVal.isEmpty ? AppColors.textColorHint.withOpacity(0.6) : AppColors.textColorPrimary,
-                            );
-                          },
-                        )
-                      : TextField(
-                          controller: controller,
-                          cursorColor: AppColors.primaryColor,
-                          readOnly: isPicker,
-                          enabled: !isPicker,
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textColorPrimary),
-                          onTap: isPicker ? (onTap ?? () {}) : null,
-                          decoration: InputDecoration(
-                            hintText: hint.tr,
-                            hintStyle: TextStyle(color: AppColors.textColorHint.withOpacity(0.6), fontSize: 12),
-                            filled: false,
-                            fillColor: Colors.transparent,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                            errorBorder: InputBorder.none,
-                            focusedErrorBorder: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                              color: AppColors.textColorPrimary,
+                            ),
+                            onTap: isPicker ? (onTap ?? () {}) : null,
+                            decoration: InputDecoration(
+                              hintText: hint.tr,
+                              hintStyle: TextStyle(
+                                color: AppColors.textColorHint.withOpacity(0.6),
+                                fontSize: 12,
+                              ),
+                              filled: false,
+                              fillColor: Colors.transparent,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              focusedErrorBorder: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
                           ),
-                        ),
                 ),
               ],
             ),
@@ -1523,14 +1781,18 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     );
   }
 
-
   DateTime? _parseDateString(String str) {
     if (str.isEmpty) return null;
     try {
       final parsed = DateTime.tryParse(str);
       if (parsed != null) return parsed;
 
-      final cleaned = str.replaceAll('-', ' ').replaceAll('/', ' ').replaceAll(',', ' ').trim();
+      final cleaned =
+          str
+              .replaceAll('-', ' ')
+              .replaceAll('/', ' ')
+              .replaceAll(',', ' ')
+              .trim();
       final parts = cleaned.split(RegExp(r'\s+'));
       if (parts.length >= 3) {
         int? day = int.tryParse(parts[0]);
@@ -1538,7 +1800,20 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
         int? month;
 
         final monthStr = parts[1].toLowerCase();
-        final monthNames = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+        final monthNames = [
+          "jan",
+          "feb",
+          "mar",
+          "apr",
+          "may",
+          "jun",
+          "jul",
+          "aug",
+          "sep",
+          "oct",
+          "nov",
+          "dec",
+        ];
         for (int i = 0; i < monthNames.length; i++) {
           if (monthStr.startsWith(monthNames[i])) {
             month = i + 1;
@@ -1573,7 +1848,10 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     return null;
   }
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     DateTime tempDate = _parseDateString(controller.text) ?? DateTime.now();
     final result = await showModalBottomSheet<DateTime>(
       context: context,
@@ -1642,7 +1920,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Text(
                         'Done'.tr,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.deepPink,
+                        ),
                       ),
                     ),
                   ),
@@ -1654,11 +1936,15 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       },
     );
     if (result != null) {
-      controller.text = "${result.day}-${_getMonthName(result.month)}-${result.year}";
+      controller.text =
+          "${result.day}-${_getMonthName(result.month)}-${result.year}";
     }
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(
+    BuildContext context,
+    TextEditingController controller,
+  ) async {
     DateTime tempTime = DateTime.now();
     final result = await showModalBottomSheet<DateTime>(
       context: context,
@@ -1725,7 +2011,11 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Text(
                         'Done'.tr,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.deepPink,
+                        ),
                       ),
                     ),
                   ),
@@ -1740,100 +2030,149 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       final hour = result.hour;
       final minute = result.minute.toString().padLeft(2, '0');
       final period = hour >= 12 ? 'PM' : 'AM';
-      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+      final formattedHour = (hour % 12 == 0 ? 12 : hour % 12)
+          .toString()
+          .padLeft(2, '0');
       controller.text = "$formattedHour:$minute $period";
     }
   }
 
   void _showGenderSelection(TextEditingController controller) {
     _showSelectionSheet("Select Gender", ["Male", "Female", "Other"], (val) {
-        setState(() => controller.text = val);
+      setState(() => controller.text = val);
     });
   }
 
-  void _showSelectionSheet(String title, List<String> items, Function(String) onSelect) {
+  void _showSelectionSheet(
+    String title,
+    List<String> items,
+    Function(String) onSelect,
+  ) {
     String searchQuery = '';
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          final List<String> filteredItems = searchQuery.isEmpty
-              ? items
-              : items.where((item) => item.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      builder:
+          (context) => StatefulBuilder(
+            builder: (context, setSheetState) {
+              final List<String> filteredItems =
+                  searchQuery.isEmpty
+                      ? items
+                      : items
+                          .where(
+                            (item) => item.toLowerCase().contains(
+                              searchQuery.toLowerCase(),
+                            ),
+                          )
+                          .toList();
 
-          return Container(
-            height: MediaQuery.of(context).size.height * 0.7,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-            ),
-            child: Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(width: 45, height: 5, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
-
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Row(
-                    children: [
-                      AppText(title, fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textColorPrimary),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
                 ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.softPink.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: AppColors.primaryColor.withOpacity(0.1)),
-                    ),
-                    child: TextField(
-                      onChanged: (val) => setSheetState(() => searchQuery = val),
-                      decoration: const InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryColor),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 45,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                  ),
-                ),
 
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: filteredItems.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: const Icon(Icons.location_on_outlined, color: AppColors.primaryColor, size: 20),
-                        title: AppText(filteredItems[index], fontSize: 16),
-                        onTap: () {
-                          onSelect(filteredItems[index]);
-                          Navigator.pop(context);
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Row(
+                        children: [
+                          AppText(
+                            title,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textColorPrimary,
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.softPink.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(
+                            color: AppColors.primaryColor.withOpacity(0.1),
+                          ),
+                        ),
+                        child: TextField(
+                          onChanged:
+                              (val) => setSheetState(() => searchQuery = val),
+                          decoration: const InputDecoration(
+                            hintText: 'Search...',
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              color: AppColors.primaryColor,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredItems.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            leading: const Icon(
+                              Icons.location_on_outlined,
+                              color: AppColors.primaryColor,
+                              size: 20,
+                            ),
+                            title: AppText(filteredItems[index], fontSize: 16),
+                            onTap: () {
+                              onSelect(filteredItems[index]);
+                              Navigator.pop(context);
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
     );
   }
 
   String _getMonthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[month - 1];
   }
 
@@ -1854,9 +2193,18 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
       }
 
       final monthMap = {
-        'jan': '01', 'feb': '02', 'mar': '03', 'apr': '04',
-        'may': '05', 'jun': '06', 'jul': '07', 'aug': '08',
-        'sep': '09', 'oct': '10', 'nov': '11', 'dec': '12'
+        'jan': '01',
+        'feb': '02',
+        'mar': '03',
+        'apr': '04',
+        'may': '05',
+        'jun': '06',
+        'jul': '07',
+        'aug': '08',
+        'sep': '09',
+        'oct': '10',
+        'nov': '11',
+        'dec': '12',
       };
 
       final parts = text.split(RegExp(r'[-/\s]'));
@@ -1934,32 +2282,28 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
     final lat = latitude ?? 0.0;
     final lng = longitude ?? 0.0;
 
-    Get.to(() => KundliScreen(
-      fullName: name,
-      gender: gender.isEmpty ? 'Male' : gender,
-      dob: birthDate,
-      tob: birthTime,
-      place: place.isEmpty ? 'India' : place,
-      latitude: lat,
-      longitude: lng,
-    ));
+    Get.to(
+      () => KundliScreen(
+        fullName: name,
+        gender: gender.isEmpty ? 'Male' : gender,
+        dob: birthDate,
+        tob: birthTime,
+        place: place.isEmpty ? 'India' : place,
+        latitude: lat,
+        longitude: lng,
+      ),
+    );
   }
-
-
-
-
 }
-
-
-
 
 class ConnectionLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primaryColor.withOpacity(0.3)
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = AppColors.primaryColor.withOpacity(0.3)
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke;
 
     final path = Path();
     path.moveTo(60, size.height / 2);
@@ -1973,9 +2317,10 @@ class ConnectionLinePainter extends CustomPainter {
     // Heart in the middle
     canvas.drawPath(path, paint);
 
-    final heartPaint = Paint()
-      ..color = AppColors.secondaryColor
-      ..style = PaintingStyle.fill;
+    final heartPaint =
+        Paint()
+          ..color = AppColors.secondaryColor
+          ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
       Offset(size.width / 2 - 5, size.height / 2 - 45),
@@ -2043,7 +2388,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -2064,10 +2412,16 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: selectedGender == 'Male' ? AppColors.primaryColor : Colors.white,
+                        color:
+                            selectedGender == 'Male'
+                                ? AppColors.primaryColor
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: selectedGender == 'Male' ? AppColors.primaryColor : Colors.grey.shade300,
+                          color:
+                              selectedGender == 'Male'
+                                  ? AppColors.primaryColor
+                                  : Colors.grey.shade300,
                         ),
                       ),
                       child: Center(
@@ -2075,7 +2429,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           'Male',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: selectedGender == 'Male' ? Colors.white : AppColors.textColorSecondary,
+                          color:
+                              selectedGender == 'Male'
+                                  ? Colors.white
+                                  : AppColors.textColorSecondary,
                         ),
                       ),
                     ),
@@ -2088,10 +2445,16 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: selectedGender == 'Female' ? AppColors.primaryColor : Colors.white,
+                        color:
+                            selectedGender == 'Female'
+                                ? AppColors.primaryColor
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: selectedGender == 'Female' ? AppColors.primaryColor : Colors.grey.shade300,
+                          color:
+                              selectedGender == 'Female'
+                                  ? AppColors.primaryColor
+                                  : Colors.grey.shade300,
                         ),
                       ),
                       child: Center(
@@ -2099,7 +2462,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           'Female',
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: selectedGender == 'Female' ? Colors.white : AppColors.textColorSecondary,
+                          color:
+                              selectedGender == 'Female'
+                                  ? Colors.white
+                                  : AppColors.textColorSecondary,
                         ),
                       ),
                     ),
@@ -2125,7 +2491,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           height: 320,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -2142,14 +2510,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text(
                                   'Select Birth Date',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.deepPink,
+                                  ),
                                 ),
                               ),
                               Expanded(
                                 child: CupertinoTheme(
                                   data: const CupertinoThemeData(
                                     textTheme: CupertinoTextThemeData(
-                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                      dateTimePickerTextStyle: TextStyle(
+                                        color: AppColors.deepPink,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   child: CupertinoDatePicker(
@@ -2165,12 +2541,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Divider(height: 1, color: Colors.black12),
                               InkWell(
-                                onTap: () => Navigator.of(context).pop(tempDate),
+                                onTap:
+                                    () => Navigator.of(context).pop(tempDate),
                                 child: Container(
                                   width: double.infinity,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  child: Text(
+                                    'Done'.tr,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -2181,7 +2567,8 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   },
                 );
                 if (result != null) {
-                  _dobController.text = "${result.day}-${result.month}-${result.year}";
+                  _dobController.text =
+                      "${result.day}-${result.month}-${result.year}";
                 }
               },
               decoration: InputDecoration(
@@ -2195,7 +2582,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -2216,7 +2606,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                           height: 320,
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(24),
+                            ),
                           ),
                           child: Column(
                             children: [
@@ -2233,14 +2625,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text(
                                   'Select Birth Time',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.deepPink,
+                                  ),
                                 ),
                               ),
                               Expanded(
                                 child: CupertinoTheme(
                                   data: const CupertinoThemeData(
                                     textTheme: CupertinoTextThemeData(
-                                      dateTimePickerTextStyle: TextStyle(color: AppColors.deepPink, fontSize: 18, fontWeight: FontWeight.w600),
+                                      dateTimePickerTextStyle: TextStyle(
+                                        color: AppColors.deepPink,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   child: CupertinoDatePicker(
@@ -2254,12 +2654,22 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Divider(height: 1, color: Colors.black12),
                               InkWell(
-                                onTap: () => Navigator.of(context).pop(tempTime),
+                                onTap:
+                                    () => Navigator.of(context).pop(tempTime),
                                 child: Container(
                                   width: double.infinity,
                                   alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  child: Text('Done'.tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink)),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  child: Text(
+                                    'Done'.tr,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -2273,7 +2683,9 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   final hour = result.hour;
                   final minute = result.minute.toString().padLeft(2, '0');
                   final period = hour >= 12 ? 'PM' : 'AM';
-                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12).toString().padLeft(2, '0');
+                  final formattedHour = (hour % 12 == 0 ? 12 : hour % 12)
+                      .toString()
+                      .padLeft(2, '0');
                   _tobController.text = "$formattedHour:$minute $period";
                 }
               },
@@ -2288,7 +2700,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -2298,11 +2713,18 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               controller: _pobController,
               readOnly: true,
               onTap: () async {
-                final result = await Navigator.of(context, rootNavigator: true)
-                    .push<LocationResult>(MaterialPageRoute(
-                  builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
-                  fullscreenDialog: true,
-                ));
+                final result = await Navigator.of(
+                  context,
+                  rootNavigator: true,
+                ).push<LocationResult>(
+                  MaterialPageRoute(
+                    builder:
+                        (_) => const LocationSearchScreen(
+                          title: 'Select Birth Place',
+                        ),
+                    fullscreenDialog: true,
+                  ),
+                );
                 if (result != null) {
                   _pobController.text = result.displayName;
                 }
@@ -2318,7 +2740,10 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -2375,14 +2800,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
       ),
     );
   }
-
-
-
-
-
-
 }
-
 
 Widget _buildInputField({
   required IconData icon,
@@ -2431,7 +2849,6 @@ Widget _buildInputField({
   );
 }
 
-
 Widget _buildProfileCircle(String initial, String? name, VoidCallback onTap) {
   return GestureDetector(
     onTap: onTap,
@@ -2443,10 +2860,7 @@ Widget _buildProfileCircle(String initial, String? name, VoidCallback onTap) {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.softPink,
-            border: Border.all(
-              color: AppColors.primaryColor,
-              width: 3,
-            ),
+            border: Border.all(color: AppColors.primaryColor, width: 3),
           ),
           child: Center(
             child: AppText(
@@ -2533,12 +2947,15 @@ void _showAddProfileDialog(bool isFirstProfile) {
 
 void _showGenderSelection(TextEditingController controller) {
   _showSelectionSheet("Select Gender", ["Male", "Female", "Other"], (val) {
-  //  setState(() => controller.text = val);
+    //  setState(() => controller.text = val);
   });
 }
 
-
-void _showSelectionSheet(String title, List<String> items, Function(String) onSelect) {
+void _showSelectionSheet(
+  String title,
+  List<String> items,
+  Function(String) onSelect,
+) {
   String searchQuery = '';
   // showModalBottomSheet(
   //  // context: context,
@@ -2618,7 +3035,6 @@ void _showSelectionSheet(String title, List<String> items, Function(String) onSe
   //   ),
   // );
 }
-
 
 /*Widget _buildNewMatchingTab() {
     return Container(

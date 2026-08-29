@@ -8,7 +8,7 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
-
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 class FloatingChatBubble {
   static final RxInt unreadCount = 0.obs;
@@ -21,7 +21,9 @@ class FloatingChatBubble {
   static bool get isActive => _isActive.value;
 
   static StreamSubscription? _overlaySub;
-  static const MethodChannel _appRetainChannel = MethodChannel('com.suryapath.user/app_retain');
+  static const MethodChannel _appRetainChannel = MethodChannel(
+    'com.suryapath.user/app_retain',
+  );
 
   static ReceivePort? _receivePort;
 
@@ -29,7 +31,10 @@ class FloatingChatBubble {
     if (_receivePort != null) return;
     _receivePort = ReceivePort();
     IsolateNameServer.removePortNameMapping('overlay_chat_port');
-    IsolateNameServer.registerPortWithName(_receivePort!.sendPort, 'overlay_chat_port');
+    IsolateNameServer.registerPortWithName(
+      _receivePort!.sendPort,
+      'overlay_chat_port',
+    );
     _receivePort!.listen((message) async {
       if (message == 'tap') {
         debugPrint("==== OVERLAY TAPPED VIA ISOLATE PORT ====");
@@ -57,11 +62,22 @@ class FloatingChatBubble {
     required String status,
     required VoidCallback onTap,
   }) async {
-    debugPrint("==== [DEBUG LOG] FloatingChatBubble.show called for sessionId=$sessionId, status=$status ====");
+    debugPrint(
+      "==== [DEBUG LOG] FloatingChatBubble.show called for sessionId=$sessionId, status=$status ====",
+    );
     _setupIsolatePort();
 
+    // Listen for foreground task tap events
+    ForegroundTaskService.listenTaskData((data) {
+      if (data is Map && data['action'] == 'tap') {
+        onTapCallback?.call();
+      }
+    });
+
     if (_isActive.value && FloatingChatBubble.sessionId == sessionId) {
-      debugPrint("==== [DEBUG LOG] FloatingChatBubble already active for sessionId=$sessionId. Updating status to $status ====");
+      debugPrint(
+        "==== [DEBUG LOG] FloatingChatBubble already active for sessionId=$sessionId. Updating status to $status ====",
+      );
       chatStatus.value = status;
       return;
     }
@@ -71,23 +87,36 @@ class FloatingChatBubble {
     onTapCallback = onTap;
     chatStatus.value = status;
     _isActive.value = true;
-    debugPrint("==== [DEBUG LOG] FloatingChatBubble set _isActive = true for sessionId=$sessionId ====");
+    debugPrint(
+      "==== [DEBUG LOG] FloatingChatBubble set _isActive = true for sessionId=$sessionId ====",
+    );
 
     try {
-      try {
-        await ForegroundTaskService.stopService();
-      } catch (_) {}
-
       int? startedAtMillis;
+      DateTime? startedAtDate;
       if (startedAt != null && startedAt.isNotEmpty) {
         String isoUtc = startedAt.trim().replaceAll(' ', 'T');
-        if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+        if (!isoUtc.endsWith('Z') &&
+            !isoUtc.contains('+') &&
+            !isoUtc.contains('-')) {
           isoUtc += 'Z';
         }
-        startedAtMillis = DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
+        startedAtDate = DateTime.tryParse(isoUtc)?.toLocal();
       }
 
-      
+      final normalizedStatus = status.toLowerCase();
+      if (normalizedStatus == 'ongoing' || normalizedStatus == 'accepted') {
+        // Start persistent silent notification with timer
+        await ForegroundTaskService.startActiveSessionNotification(
+          title: 'Active Chat with $name',
+          type: 'Chat',
+          startedAt: startedAtDate,
+        );
+      } else {
+        // For ringing/initiated, if we want to show a waiting state notification, we could.
+        // For now, we only show persistent notification for ongoing session.
+        await ForegroundTaskService.stopService();
+      }
     } catch (e) {
       debugPrint("FloatingChatBubble show notification error: $e");
     }
@@ -103,7 +132,6 @@ class FloatingChatBubble {
     _overlaySub = null;
 
     if (stopForegroundService) {
-      
       try {
         await ForegroundTaskService.stopService();
       } catch (_) {}
@@ -134,7 +162,8 @@ class FloatingChatBubbleWidget extends StatefulWidget {
   });
 
   @override
-  State<FloatingChatBubbleWidget> createState() => _FloatingChatBubbleWidgetState();
+  State<FloatingChatBubbleWidget> createState() =>
+      _FloatingChatBubbleWidgetState();
 }
 
 class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
@@ -160,7 +189,9 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
     if (dateStr.isEmpty) return null;
 
     String isoUtc = dateStr.replaceAll(' ', 'T');
-    if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+    if (!isoUtc.endsWith('Z') &&
+        !isoUtc.contains('+') &&
+        !isoUtc.contains('-')) {
       isoUtc += 'Z';
     }
 
@@ -184,7 +215,9 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
 
   void _startTimer() {
     void updateDuration() {
-      final actualStr = widget.startedAt ?? WebSocketService.sessionStartTimes[widget.sessionId];
+      final actualStr =
+          widget.startedAt ??
+          WebSocketService.sessionStartTimes[widget.sessionId];
       final startedAt = _parseSmartDate(actualStr);
       if (startedAt != null) {
         final diff = DateTime.now().difference(startedAt).inSeconds;
@@ -214,7 +247,8 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
   }
 
   Widget _buildInitialAvatar(String name) {
-    final String initial = name.trim().isNotEmpty ? name.trim()[0].toUpperCase() : 'A';
+    final String initial =
+        name.trim().isNotEmpty ? name.trim()[0].toUpperCase() : 'A';
     return Container(
       width: 36,
       height: 36,
@@ -267,15 +301,18 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                       color: Colors.white24,
                       shape: BoxShape.circle,
                     ),
-                    child: widget.imageUrl.trim().isNotEmpty
-                        ? Image.network(
-                            widget.imageUrl,
-                            width: 36,
-                            height: 36,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => _buildInitialAvatar(widget.name),
-                          )
-                        : _buildInitialAvatar(widget.name),
+                    child:
+                        widget.imageUrl.trim().isNotEmpty
+                            ? CustomImageWidget(
+                              imagePath: widget.imageUrl,
+                              width: 36,
+                              height: 36,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) =>
+                                      _buildInitialAvatar(widget.name),
+                            )
+                            : _buildInitialAvatar(widget.name),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -300,11 +337,17 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFD700).withOpacity(0.2),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.5), width: 0.8),
+                              border: Border.all(
+                                color: const Color(0xFFFFD700).withOpacity(0.5),
+                                width: 0.8,
+                              ),
                             ),
                             child: const Text(
                               'CHAT',
@@ -320,8 +363,11 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                       ),
                       const SizedBox(height: 2),
                       Obx(() {
-                        final currentStatus = FloatingChatBubble.chatStatus.value;
-                        if (currentStatus == 'initiated' || currentStatus == 'ringing' || currentStatus == 'waiting') {
+                        final currentStatus =
+                            FloatingChatBubble.chatStatus.value;
+                        if (currentStatus == 'initiated' ||
+                            currentStatus == 'ringing' ||
+                            currentStatus == 'waiting') {
                           return const Text(
                             'Waiting for acceptance...',
                             style: TextStyle(
@@ -344,7 +390,10 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),

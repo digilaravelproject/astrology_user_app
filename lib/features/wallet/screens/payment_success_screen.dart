@@ -24,7 +24,7 @@ class PaymentSuccessScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              
+
               // Success Icon/Animation Placeholder
               Container(
                 width: 120,
@@ -41,9 +41,9 @@ class PaymentSuccessScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               const AppText(
                 'Payment Successful',
                 fontSize: 28,
@@ -51,9 +51,9 @@ class PaymentSuccessScreen extends StatelessWidget {
                 color: Color(0xFF2E1A47),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
@@ -74,9 +74,9 @@ class PaymentSuccessScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 50),
-              
+
               // Transaction Details Card
               Container(
                 padding: const EdgeInsets.all(24),
@@ -96,9 +96,9 @@ class PaymentSuccessScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               CustomButton(
                 text: 'Back to Dashboard',
                 fontSize: 16,
@@ -106,7 +106,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                 borderRadius: 16,
                 onTap: () => Get.offAllNamed(RouteHelper.getDashboardRoute()),
               ),
-              
+
               const SizedBox(height: 20),
             ],
           ),

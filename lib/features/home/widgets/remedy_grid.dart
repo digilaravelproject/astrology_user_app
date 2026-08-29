@@ -67,7 +67,11 @@ class RemedyGrid extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.spa, color: Color(0xFFB57E2F), size: 20), // Golden lotus-like icon
+                      const Icon(
+                        Icons.spa,
+                        color: Color(0xFFB57E2F),
+                        size: 20,
+                      ), // Golden lotus-like icon
                       const SizedBox(width: 8),
                       AppText(
                         'Remedies',
@@ -90,14 +94,18 @@ class RemedyGrid extends StatelessWidget {
                           color: const Color(0xFF5D1E2D),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.arrow_forward_ios, size: 10, color: Color(0xFF5D1E2D)),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 10,
+                          color: Color(0xFF5D1E2D),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Grid
             SizedBox(
               height: 155,
@@ -107,15 +115,18 @@ class RemedyGrid extends StatelessWidget {
                 itemCount: remedyController.remedies.length,
                 itemBuilder: (context, index) {
                   final remedy = remedyController.remedies[index];
-                  final imageUrl = remedy.image ?? remedyController.getRemedyImage(index);
-                  
+                  final imageUrl =
+                      remedy.image ?? remedyController.getRemedyImage(index);
+
                   return GestureDetector(
                     onTap: () {
-                      Get.to(() => RemedyDetailScreen(
-                        remedyId: remedy.id,
-                        accentColor: AppColors.primaryColor,
-                        imageUrl: imageUrl,
-                      ));
+                      Get.to(
+                        () => RemedyDetailScreen(
+                          remedyId: remedy.id,
+                          accentColor: AppColors.primaryColor,
+                          imageUrl: imageUrl,
+                        ),
+                      );
                     },
                     child: Container(
                       width: 115,

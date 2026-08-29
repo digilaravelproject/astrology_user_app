@@ -20,34 +20,39 @@ class FollowingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profileController = Get.find<ProfileController>();
-    final astrologerController = Get.put(AstrologerController(
-      getAstrologersUseCase: Get.find(),
-      getAstrologerByIdUseCase: Get.find(),
-      blockAstrologerUseCase: Get.find(),
-      reportAstrologerUseCase: Get.find(),
-      postReviewUseCase: Get.find(),
-      getReviewsUseCase: Get.find(),
-      followAstrologerUseCase: Get.find(),
-      getGiftsUseCase: Get.find(),
-      sendGiftUseCase: Get.find(),
-      getGiftHistoryUseCase: Get.find(),
-      getAstrologerGalleryUseCase: Get.find(),
-    ));
-    
+    final astrologerController = Get.put(
+      AstrologerController(
+        getAstrologersUseCase: Get.find(),
+        getAstrologerByIdUseCase: Get.find(),
+        blockAstrologerUseCase: Get.find(),
+        reportAstrologerUseCase: Get.find(),
+        postReviewUseCase: Get.find(),
+        getReviewsUseCase: Get.find(),
+        followAstrologerUseCase: Get.find(),
+        getGiftsUseCase: Get.find(),
+        sendGiftUseCase: Get.find(),
+        getGiftHistoryUseCase: Get.find(),
+        getAstrologerGalleryUseCase: Get.find(),
+      ),
+    );
+
     // Fetch following list when screen is accessed
     WidgetsBinding.instance.addPostFrameCallback((_) {
       profileController.fetchFollowing();
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA), // Light grey background for better card contrast
+      backgroundColor: const Color(
+        0xFFF8F9FA,
+      ), // Light grey background for better card contrast
       appBar: CustomAppBar(
         title: AppStrings.following,
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
       body: Obx(() {
-        if (profileController.isLoading.value && profileController.followingList.isEmpty) {
+        if (profileController.isLoading.value &&
+            profileController.followingList.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
@@ -95,23 +100,34 @@ class FollowingScreen extends StatelessWidget {
           itemCount: followingList.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
-            return _buildAstrologerCard(followingList[index], profileController, astrologerController);
+            return _buildAstrologerCard(
+              followingList[index],
+              profileController,
+              astrologerController,
+            );
           },
         );
       }),
     );
   }
 
-  Widget _buildAstrologerCard(dynamic astro, ProfileController profileController, AstrologerController astrologerController) {
-    final imageUrl = astro['profile_photo'] != null 
-        ? AppUrls.baseImageUrl+astro['profile_photo']
-        : null;
-    
+  Widget _buildAstrologerCard(
+    dynamic astro,
+    ProfileController profileController,
+    AstrologerController astrologerController,
+  ) {
+    final imageUrl =
+        astro['profile_photo'] != null
+            ? AppUrls.baseImageUrl + astro['profile_photo']
+            : null;
+
     return GestureDetector(
       onTap: () {
         // Navigate to astrologer detail screen
         Get.to(
-          () => AstrologerDetailScreen(astrologerId: astro['astrologer_id'] ?? astro['user_id'] ?? 0),
+          () => AstrologerDetailScreen(
+            astrologerId: astro['astrologer_id'] ?? astro['user_id'] ?? 0,
+          ),
           binding: AstrologersBinding(),
           transition: Transition.rightToLeft,
         );
@@ -140,18 +156,26 @@ class FollowingScreen extends StatelessWidget {
                   width: 65,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.deepPink.withOpacity(0.2), width: 2),
+                    border: Border.all(
+                      color: AppColors.deepPink.withOpacity(0.2),
+                      width: 2,
+                    ),
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: imageUrl != null 
-                      ? CustomImageWidget(
-                          imagePath: imageUrl,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          color: AppColors.lightPink,
-                          child: const Icon(Icons.person, color: AppColors.primaryColor, size: 36),
-                        ),
+                  child:
+                      imageUrl != null
+                          ? CustomImageWidget(
+                            imagePath: imageUrl,
+                            fit: BoxFit.cover,
+                          )
+                          : Container(
+                            color: AppColors.lightPink,
+                            child: const Icon(
+                              Icons.person,
+                              color: AppColors.primaryColor,
+                              size: 36,
+                            ),
+                          ),
                 ),
                 Positioned(
                   right: 2,
@@ -160,7 +184,11 @@ class FollowingScreen extends StatelessWidget {
                     height: 14,
                     width: 14,
                     decoration: BoxDecoration(
-                      color: (astro['is_online'] == true || astro['is_online'] == 1) ? Colors.green : Colors.grey,
+                      color:
+                          (astro['is_online'] == true ||
+                                  astro['is_online'] == 1)
+                              ? Colors.green
+                              : Colors.grey,
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
@@ -169,7 +197,7 @@ class FollowingScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(width: 16),
-            
+
             // Details
             Expanded(
               child: Column(
@@ -179,7 +207,15 @@ class FollowingScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: AppText(
-                          (astro['name']?.toString() ?? '').split(' ').map((str) => str.isNotEmpty ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}' : '').join(' '),
+                          (astro['name']?.toString() ?? '')
+                              .split(' ')
+                              .map(
+                                (str) =>
+                                    str.isNotEmpty
+                                        ? '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}'
+                                        : '',
+                              )
+                              .join(' '),
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2E1A47),
@@ -210,7 +246,11 @@ class FollowingScreen extends StatelessWidget {
                         color: Colors.black87,
                       ),
                       const SizedBox(width: 12),
-                      Icon(Iconsax.global, size: 14, color: Colors.grey.shade400),
+                      Icon(
+                        Iconsax.global,
+                        size: 14,
+                        color: Colors.grey.shade400,
+                      ),
                       const SizedBox(width: 4),
                       Flexible(
                         child: AppText(
@@ -226,14 +266,16 @@ class FollowingScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Action Button
             const SizedBox(width: 8),
             GestureDetector(
               onTap: () async {
                 final id = astro['astrologer_id'] ?? astro['user_id'] ?? 0;
                 if (id != 0) {
-                  final response = await astrologerController.followAstrologer(id);
+                  final response = await astrologerController.followAstrologer(
+                    id,
+                  );
                   if (response.isSuccess) {
                     CustomSnackbar.showSuccess(response.message);
                     profileController.fetchFollowing();
@@ -243,11 +285,16 @@ class FollowingScreen extends StatelessWidget {
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.lightPink.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
+                  border: Border.all(
+                    color: AppColors.deepPink.withOpacity(0.3),
+                  ),
                 ),
                 child: AppText(
                   "Following",

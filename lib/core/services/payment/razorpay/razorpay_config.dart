@@ -5,7 +5,7 @@ import '../../../constants/app_constants.dart';
 class RazorpayConfig {
   static const String currency = 'INR';
   static const int timeout = 300; // in seconds
-  
+
   static Map<String, dynamic> getDefaultOptions({
     required String key,
     required double amount,
@@ -24,12 +24,10 @@ class RazorpayConfig {
       'timeout': timeout,
       'currency': currency,
       'theme': {
-        'color': '#${AppColors.primaryColor.value.toRadixString(16).substring(2).toUpperCase()}' // Dynamically using AppColors.primaryColor hex
+        'color':
+            '#${AppColors.primaryColor.value.toRadixString(16).substring(2).toUpperCase()}', // Dynamically using AppColors.primaryColor hex
       },
-      'prefill': {
-        'contact': contact,
-        'email': email,
-      }
+      'prefill': {'contact': contact, 'email': email},
     };
   }
 }

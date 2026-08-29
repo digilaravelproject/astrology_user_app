@@ -11,9 +11,12 @@ class GetRemediesUseCase {
 
     if (response.isSuccess && response.body != null) {
       try {
-        final Map<String, dynamic> bodyMap = response.body as Map<String, dynamic>;
+        final Map<String, dynamic> bodyMap =
+            response.body as Map<String, dynamic>;
         final List<dynamic> list = bodyMap['remedies'] ?? [];
-        return list.map((e) => RemedyModel.fromJson(e as Map<String, dynamic>)).toList();
+        return list
+            .map((e) => RemedyModel.fromJson(e as Map<String, dynamic>))
+            .toList();
       } catch (e) {
         print('Error parsing remedies: $e');
       }

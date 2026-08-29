@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_text.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
 
 class ShopServicesSection extends StatelessWidget {
   const ShopServicesSection({Key? key}) : super(key: key);
@@ -32,13 +33,37 @@ class ShopServicesSection extends StatelessWidget {
       child: Stack(
         children: [
           // Decorative stars positioned absolutely
-          Positioned(top: 18, left: 22, child: _buildStar(10, const Color(0xFFFFB74D))),
-          Positioned(top: 35, right: 24, child: _buildStar(8, const Color(0xFFF48FB1))),
-          Positioned(bottom: 95, left: 16, child: _buildStar(7, const Color(0xFFFFD54F))),
-          Positioned(bottom: 115, right: 20, child: _buildStar(11, const Color(0xFFFFAB40))),
-          Positioned(top: 75, left: 28, child: _buildStar(5, const Color(0xFFFCE4EC))),
-          Positioned(top: 185, right: 28, child: _buildStar(7, const Color(0xFFFFE082))),
-          
+          Positioned(
+            top: 18,
+            left: 22,
+            child: _buildStar(10, const Color(0xFFFFB74D)),
+          ),
+          Positioned(
+            top: 35,
+            right: 24,
+            child: _buildStar(8, const Color(0xFFF48FB1)),
+          ),
+          Positioned(
+            bottom: 95,
+            left: 16,
+            child: _buildStar(7, const Color(0xFFFFD54F)),
+          ),
+          Positioned(
+            bottom: 115,
+            right: 20,
+            child: _buildStar(11, const Color(0xFFFFAB40)),
+          ),
+          Positioned(
+            top: 75,
+            left: 28,
+            child: _buildStar(5, const Color(0xFFFCE4EC)),
+          ),
+          Positioned(
+            top: 185,
+            right: 28,
+            child: _buildStar(7, const Color(0xFFFFE082)),
+          ),
+
           // Main content
           Padding(
             padding: const EdgeInsets.all(20),
@@ -93,11 +118,7 @@ class ShopServicesSection extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFFE5CC),
-                Color(0xFFFFD9B3),
-                Color(0xFFFFCFA0),
-              ],
+              colors: [Color(0xFFFFE5CC), Color(0xFFFFD9B3), Color(0xFFFFCFA0)],
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
@@ -131,7 +152,10 @@ class ShopServicesSection extends StatelessWidget {
                     _buildCheckItem("✓ ${AppStrings.bookLiveRemedySession}"),
                     const SizedBox(height: 18),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFFFFB74D), Color(0xFFFF8F00)],
@@ -166,8 +190,9 @@ class ShopServicesSection extends StatelessWidget {
                     height: 145,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      return Image.network(
-                        "https://placehold.co/300x300/png?text=Remedy+Chest", // Pooja Thali
+                      return CustomImageWidget(
+                        imagePath:
+                            "https://placehold.co/300x300/png?text=Remedy+Chest", // Pooja Thali
                         height: 145,
                         fit: BoxFit.cover,
                       );
@@ -182,17 +207,29 @@ class ShopServicesSection extends StatelessWidget {
         Positioned(
           top: 12,
           left: 16,
-          child: AppText("✨", fontSize: 13, color: Colors.white.withOpacity(0.75)),
+          child: AppText(
+            "✨",
+            fontSize: 13,
+            color: Colors.white.withOpacity(0.75),
+          ),
         ),
         Positioned(
           top: 24,
           right: 22,
-          child: AppText("✨", fontSize: 11, color: Colors.white.withOpacity(0.65)),
+          child: AppText(
+            "✨",
+            fontSize: 11,
+            color: Colors.white.withOpacity(0.65),
+          ),
         ),
         Positioned(
           bottom: 16,
           left: 24,
-          child: AppText("✨", fontSize: 9, color: Colors.white.withOpacity(0.55)),
+          child: AppText(
+            "✨",
+            fontSize: 9,
+            color: Colors.white.withOpacity(0.55),
+          ),
         ),
       ],
     );
@@ -239,13 +276,13 @@ class ShopServicesSection extends StatelessWidget {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFDE7EF),
-                Color(0xFFFCE4EC),
-              ],
+              colors: [Color(0xFFFDE7EF), Color(0xFFFCE4EC)],
             ),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.9), width: 2.5),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.9),
+              width: 2.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.pink.withOpacity(0.18),
@@ -266,42 +303,47 @@ class ShopServicesSection extends StatelessWidget {
               const SizedBox(height: 12),
               Container(
                 height: 80,
-                child: imageUrl.startsWith('assets/')
-                    ? Image.asset(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            fallbackUrl,
-                            height: 80,
-                            fit: BoxFit.contain,
-                          );
-                        },
-                      )
-                    : Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            fallbackUrl,
-                            height: 80,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error2, stackTrace2) {
-                              return Image.network(
-                                title == "Gemstones"
-                                    ? "https://cdn-icons-png.flaticon.com/512/616/616554.png"
-                                    : "https://cdn-icons-png.flaticon.com/512/865/865860.png",
-                                height: 80,
-                                fit: BoxFit.contain,
-                              );
-                            },
-                          );
-                        },
-                      ),
+                child:
+                    imageUrl.startsWith('assets/')
+                        ? Image.asset(
+                          imageUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return CustomImageWidget(
+                              imagePath: fallbackUrl,
+                              height: 80,
+                              fit: BoxFit.contain,
+                            );
+                          },
+                        )
+                        : CustomImageWidget(
+                          imagePath: imageUrl,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return CustomImageWidget(
+                              imagePath: fallbackUrl,
+                              height: 80,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error2, stackTrace2) {
+                                return CustomImageWidget(
+                                  imagePath:
+                                      title == "Gemstones"
+                                          ? "https://cdn-icons-png.flaticon.com/512/616/616554.png"
+                                          : "https://cdn-icons-png.flaticon.com/512/865/865860.png",
+                                  height: 80,
+                                  fit: BoxFit.contain,
+                                );
+                              },
+                            );
+                          },
+                        ),
               ),
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFFFFCA28), Color(0xFFFF8F00)],

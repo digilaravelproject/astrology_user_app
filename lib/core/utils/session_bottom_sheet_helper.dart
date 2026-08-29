@@ -27,9 +27,10 @@ class SessionBottomSheetHelper {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: AppColors.deepPink),
-      ),
+      builder:
+          (context) => const Center(
+            child: CircularProgressIndicator(color: AppColors.deepPink),
+          ),
     );
 
     bool hasActivePackage = false;
@@ -40,20 +41,25 @@ class SessionBottomSheetHelper {
       final response = await apiClient.get(
         '${AppUrls.packageActiveStatus}?astrologer_id=${astro.userId}',
       );
-      
+
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.isSuccess && response.body != null) {
         final body = response.body;
-        final data = (body is Map && body.containsKey('has_active_package'))
-            ? body
-            : (body is Map ? body['data'] : null);
+        final data =
+            (body is Map && body.containsKey('has_active_package'))
+                ? body
+                : (body is Map ? body['data'] : null);
         if (data != null && data is Map) {
           hasActivePackage = data['has_active_package'] == true;
           if (hasActivePackage) {
             final purchase = data['package_purchase'];
             if (purchase != null && purchase is Map) {
-              remainingSeconds = int.tryParse(purchase['remaining_duration']?.toString() ?? '') ?? 0;
+              remainingSeconds =
+                  int.tryParse(
+                    purchase['remaining_duration']?.toString() ?? '',
+                  ) ??
+                  0;
             }
           }
         }
@@ -65,7 +71,8 @@ class SessionBottomSheetHelper {
     }
 
     final walletController = Get.find<WalletController>();
-    final double walletBalance = double.tryParse(walletController.balance) ?? 0.0;
+    final double walletBalance =
+        double.tryParse(walletController.balance) ?? 0.0;
 
     // If package is not purchased, verify wallet balance and show confirmation.
     if (!hasActivePackage) {
@@ -75,13 +82,19 @@ class SessionBottomSheetHelper {
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (context) => RechargeBottomSheet(
-            neededAmount: requiredAmount,
-            serviceType: 'package',
-          ),
+          builder:
+              (context) => RechargeBottomSheet(
+                neededAmount: requiredAmount,
+                serviceType: 'package',
+              ),
         );
       } else {
-        _showPurchaseConfirmationSheet(context, astro, walletBalance, requiredAmount);
+        _showPurchaseConfirmationSheet(
+          context,
+          astro,
+          walletBalance,
+          requiredAmount,
+        );
       }
       return;
     }
@@ -133,7 +146,7 @@ class SessionBottomSheetHelper {
                 ),
               ),
               const SizedBox(height: 8),
-              
+
               // Header
               AppText(
                 "Connect with".tr + " ${astro.name}",
@@ -165,7 +178,11 @@ class SessionBottomSheetHelper {
                         color: Colors.orange.shade100,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.timer_outlined, color: Colors.orange.shade800, size: 20),
+                      child: Icon(
+                        Icons.timer_outlined,
+                        color: Colors.orange.shade800,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -200,43 +217,71 @@ class SessionBottomSheetHelper {
                     if (astro.isChatEnabled)
                       Expanded(
                         child: CustomButton(
-                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.chat),
+                          text:
+                              astro.isBusy
+                                  ? 'Busy'
+                                  : (!astro.isOnline
+                                      ? 'Offline'
+                                      : AppStrings.chat),
                           icon: Icons.chat_bubble_outline_rounded,
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
+                          backgroundColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey.withOpacity(0.2)
+                                  : null,
+                          textColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : Colors.white,
+                          borderColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : Colors.transparent,
                           onTap: () async {
                             if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              CustomSnackbar.showInfo(
+                                astro.isBusy
+                                    ? 'Astrologer is currently engaged.'
+                                    : 'Astrologer is offline.',
+                              );
                               return;
                             }
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(color: AppColors.deepPink),
-                              ),
+                              builder:
+                                  (context) => const Center(
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.deepPink,
+                                    ),
+                                  ),
                             );
                             try {
-                              final result = await PackageSessionService.startSubSession(
-                                astrologerId: astro.userId,
-                                mode: 'chat',
-                              );
+                              final result =
+                                  await PackageSessionService.startSubSession(
+                                    astrologerId: astro.userId,
+                                    mode: 'chat',
+                                  );
                               Navigator.pop(context); // Dismiss loading dialog
                               Navigator.pop(context); // Dismiss bottom sheet
-                              
+
                               activeSubSessionId = result.subSession.id;
-                              
-                              Get.to(() => ChatScreen(
-                                astrologerName: astro.name,
-                                astrologerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
-                                sessionId: result.linkedChatSession!.id,
-                                initialStatus: 'initiated',
-                                isPackageChat: true,
-                              ), binding: ChatBinding());
+
+                              Get.to(
+                                () => ChatScreen(
+                                  astrologerName: astro.name,
+                                  astrologerImage:
+                                      astro.profilePhoto != null
+                                          ? '${AppUrls.baseImageUrl}${astro.profilePhoto}'
+                                          : '',
+                                  sessionId: result.linkedChatSession!.id,
+                                  initialStatus: 'initiated',
+                                  isPackageChat: true,
+                                ),
+                                binding: ChatBinding(),
+                              );
                             } catch (e) {
                               Navigator.pop(context); // Dismiss loading dialog
                               CustomSnackbar.showError(e.toString());
@@ -249,53 +294,83 @@ class SessionBottomSheetHelper {
                     if (astro.isCallEnabled)
                       Expanded(
                         child: CustomButton(
-                          text: astro.isBusy ? 'Busy' : (!astro.isOnline ? 'Offline' : AppStrings.call),
+                          text:
+                              astro.isBusy
+                                  ? 'Busy'
+                                  : (!astro.isOnline
+                                      ? 'Offline'
+                                      : AppStrings.call),
                           icon: Icons.call_outlined,
                           fontSize: 13,
                           height: 48,
                           borderRadius: 12,
-                          backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : null,
-                          textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                          borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.transparent,
-                          gradient: (!astro.isOnline || astro.isBusy) ? null : const LinearGradient(
-                            colors: [
-                              Color(0xFF4CAF50),
-                              Color(0xFF388E3C),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          backgroundColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey.withOpacity(0.2)
+                                  : null,
+                          textColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : Colors.white,
+                          borderColor:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? Colors.grey
+                                  : Colors.transparent,
+                          gradient:
+                              (!astro.isOnline || astro.isBusy)
+                                  ? null
+                                  : const LinearGradient(
+                                    colors: [
+                                      Color(0xFF4CAF50),
+                                      Color(0xFF388E3C),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                           onTap: () async {
                             if (!astro.isOnline || astro.isBusy) {
-                              CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                              CustomSnackbar.showInfo(
+                                astro.isBusy
+                                    ? 'Astrologer is currently engaged.'
+                                    : 'Astrologer is offline.',
+                              );
                               return;
                             }
-                            var permissionStatus = await Permission.microphone.status;
+                            var permissionStatus =
+                                await Permission.microphone.status;
                             if (!permissionStatus.isGranted) {
-                              permissionStatus = await Permission.microphone.request();
+                              permissionStatus =
+                                  await Permission.microphone.request();
                             }
-                            if (permissionStatus.isDenied || permissionStatus.isPermanentlyDenied) {
+                            if (permissionStatus.isDenied ||
+                                permissionStatus.isPermanentlyDenied) {
                               await openAppSettings();
                               return;
                             }
 
                             if (permissionStatus.isGranted) {
                               Navigator.pop(context); // Dismiss bottom sheet
-                              
-                              final callController = Get.isRegistered<CallController>()
-                                  ? Get.find<CallController>()
-                                  : Get.put(CallController());
-                                  
+
+                              final callController =
+                                  Get.isRegistered<CallController>()
+                                      ? Get.find<CallController>()
+                                      : Get.put(CallController());
+
                               Get.to(() => const CallScreen());
-                              
+
                               callController.initiateCall(
                                 providerId: astro.userId,
                                 providerName: astro.name,
-                                providerImage: astro.profilePhoto != null ? '${AppUrls.baseImageUrl}${astro.profilePhoto}' : '',
+                                providerImage:
+                                    astro.profilePhoto != null
+                                        ? '${AppUrls.baseImageUrl}${astro.profilePhoto}'
+                                        : '',
                                 isPackageSession: true,
                               );
                             } else {
-                              CustomSnackbar.showError('Microphone permission is required for calling.');
+                              CustomSnackbar.showError(
+                                'Microphone permission is required for calling.',
+                              );
                             }
                           },
                         ),
@@ -334,7 +409,9 @@ class SessionBottomSheetHelper {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircularProgressIndicator(color: AppColors.deepPink),
+                      const CircularProgressIndicator(
+                        color: AppColors.deepPink,
+                      ),
                       const SizedBox(height: 16),
                       Text("Purchasing package, please wait...".tr),
                     ],
@@ -362,7 +439,8 @@ class SessionBottomSheetHelper {
                 ),
                 const SizedBox(height: 6),
                 AppText(
-                  "Would you like to purchase this session package for".tr + " ₹${astro.packagePrice ?? 500}?",
+                  "Would you like to purchase this session package for".tr +
+                      " ₹${astro.packagePrice ?? 500}?",
                   fontSize: 13,
                   color: Colors.grey.shade500,
                   textAlign: TextAlign.center,
@@ -395,23 +473,30 @@ class SessionBottomSheetHelper {
                               data: {'astrologer_id': astro.userId},
                             );
                             if (response.isSuccess) {
-                              CustomSnackbar.showSuccess("Package purchased successfully.".tr);
+                              CustomSnackbar.showSuccess(
+                                "Package purchased successfully.".tr,
+                              );
                               Navigator.pop(context);
                               // Refresh wallet balance
                               await Get.find<WalletController>().fetchWallet();
-                              final astrologerController = Get.find<AstrologerController>();
+                              final astrologerController =
+                                  Get.find<AstrologerController>();
                               await astrologerController.fetchAstrologers();
-                              final updatedAstro = astrologerController.astrologers.firstWhere(
-                                (a) => a.id == astro.id,
-                                orElse: () => astro,
-                              );
+                              final updatedAstro = astrologerController
+                                  .astrologers
+                                  .firstWhere(
+                                    (a) => a.id == astro.id,
+                                    orElse: () => astro,
+                                  );
                               show(context, updatedAstro);
                             } else {
                               CustomSnackbar.showError(response.message);
                               isPurchasing.value = false;
                             }
                           } catch (e) {
-                            CustomSnackbar.showError("Something went wrong during purchase.".tr);
+                            CustomSnackbar.showError(
+                              "Something went wrong during purchase.".tr,
+                            );
                             isPurchasing.value = false;
                           }
                         },
@@ -440,21 +525,27 @@ class PackageSessionService {
     );
     if (response.isSuccess) {
       final body = response.body;
-      final Map<String, dynamic> data = (body is Map && body.containsKey('has_active_package'))
-          ? Map<String, dynamic>.from(body)
-          : (body is Map && body['data'] is Map ? Map<String, dynamic>.from(body['data']) : {});
-      final purchase = data['package_purchase'] != null 
-          ? PackagePurchase.fromJson(data['package_purchase']) 
-          : null;
+      final Map<String, dynamic> data =
+          (body is Map && body.containsKey('has_active_package'))
+              ? Map<String, dynamic>.from(body)
+              : (body is Map && body['data'] is Map
+                  ? Map<String, dynamic>.from(body['data'])
+                  : {});
+      final purchase =
+          data['package_purchase'] != null
+              ? PackagePurchase.fromJson(data['package_purchase'])
+              : null;
       if (purchase != null) {
-        WebSocketService.packageRemainingSeconds.value = purchase.remainingDuration;
+        WebSocketService.packageRemainingSeconds.value =
+            purchase.remainingDuration;
       }
       return ActiveStatusResponse(
         hasActivePackage: data['has_active_package'] ?? false,
         purchase: purchase,
-        activeSubSession: data['active_sub_session'] != null 
-            ? PackageSubSession.fromJson(data['active_sub_session']) 
-            : null,
+        activeSubSession:
+            data['active_sub_session'] != null
+                ? PackageSubSession.fromJson(data['active_sub_session'])
+                : null,
       );
     } else {
       throw Exception(response.message);
@@ -476,20 +567,22 @@ class PackageSessionService {
       },
     );
     if (response.isSuccess) {
-      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
-          ? response.body 
-          : {};
-      final remainingDuration = int.tryParse(data['remaining_duration']?.toString() ?? '') ?? 0;
+      final Map<String, dynamic> data =
+          response.body is Map<String, dynamic> ? response.body : {};
+      final remainingDuration =
+          int.tryParse(data['remaining_duration']?.toString() ?? '') ?? 0;
       WebSocketService.packageRemainingSeconds.value = remainingDuration;
       return StartSubSessionResult(
         subSession: PackageSubSession.fromJson(data['sub_session']),
         remainingDuration: remainingDuration,
-        linkedChatSession: data['chat_session'] != null
-            ? PackageChatSession.fromJson(data['chat_session'])
-            : null,
-        linkedCallSession: data['call_session'] != null
-            ? PackageCallSession.fromJson(data['call_session'])
-            : null,
+        linkedChatSession:
+            data['chat_session'] != null
+                ? PackageChatSession.fromJson(data['chat_session'])
+                : null,
+        linkedCallSession:
+            data['call_session'] != null
+                ? PackageCallSession.fromJson(data['call_session'])
+                : null,
       );
     } else {
       throw Exception(response.message);
@@ -515,7 +608,9 @@ class PackageSessionService {
       },
     );
     if (response.isSuccess) {
-      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+      return response.body is Map<String, dynamic>
+          ? response.body['data'] ?? {}
+          : {};
     } else {
       throw Exception(response.message);
     }
@@ -536,7 +631,9 @@ class PackageSessionService {
       },
     );
     if (response.isSuccess) {
-      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+      return response.body is Map<String, dynamic>
+          ? response.body['data'] ?? {}
+          : {};
     } else {
       throw Exception(response.message);
     }
@@ -549,9 +646,8 @@ class PackageSessionService {
       data: {'sub_session_id': subSessionId},
     );
     if (response.isSuccess) {
-      final Map<String, dynamic> data = response.body is Map<String, dynamic> 
-          ? response.body 
-          : {};
+      final Map<String, dynamic> data =
+          response.body is Map<String, dynamic> ? response.body : {};
       return EndSubSessionResult(
         subSession: PackageSubSession.fromJson(data['sub_session']),
         remainingDuration: data['remaining_duration'] ?? 0,
@@ -561,4 +657,3 @@ class PackageSessionService {
     }
   }
 }
-

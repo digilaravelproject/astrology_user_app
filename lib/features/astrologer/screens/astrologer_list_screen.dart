@@ -20,7 +20,7 @@ class AstrologerListScreen extends StatelessWidget {
         "rating": "4.8",
         "status": "Online",
         "languages": "Hindi, English",
-        "waitTime": "2 min"
+        "waitTime": "2 min",
       },
       {
         "name": "Astro Anjali",
@@ -30,7 +30,7 @@ class AstrologerListScreen extends StatelessWidget {
         "rating": "4.9",
         "status": "Busy",
         "languages": "Hindi, Punjabi",
-        "waitTime": "10 min"
+        "waitTime": "10 min",
       },
       {
         "name": "Astro Kavi",
@@ -40,7 +40,7 @@ class AstrologerListScreen extends StatelessWidget {
         "rating": "4.7",
         "status": "Online",
         "languages": "English, Sanskrit",
-        "waitTime": "5 min"
+        "waitTime": "5 min",
       },
       {
         "name": "Astro Meera",
@@ -50,7 +50,7 @@ class AstrologerListScreen extends StatelessWidget {
         "rating": "4.5",
         "status": "Online",
         "languages": "Hindi, Gujarati",
-        "waitTime": "Available"
+        "waitTime": "Available",
       },
       {
         "name": "Astro Rahul",
@@ -60,7 +60,7 @@ class AstrologerListScreen extends StatelessWidget {
         "rating": "4.6",
         "status": "Busy",
         "languages": "Hindi, Marathi",
-        "waitTime": "15 min"
+        "waitTime": "15 min",
       },
     ];
 
@@ -85,9 +85,15 @@ class AstrologerListScreen extends StatelessWidget {
               _buildHeader(context),
               _buildFilterChips(),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
                 child: Column(
-                  children: astrologers.map((astro) => _buildAstrologerCard(context, astro)).toList(),
+                  children:
+                      astrologers
+                          .map((astro) => _buildAstrologerCard(context, astro))
+                          .toList(),
                 ),
               ),
               const SizedBox(height: 280),
@@ -125,12 +131,25 @@ class AstrologerListScreen extends StatelessWidget {
           Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Search"))),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ComingSoonScreen(title: "Search"),
+                      ),
+                    ),
                 child: _buildIconButton(Icons.search_rounded),
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Filters"))),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => const ComingSoonScreen(title: "Filters"),
+                      ),
+                    ),
                 child: _buildIconButton(Icons.tune_rounded),
               ),
             ],
@@ -159,7 +178,14 @@ class AstrologerListScreen extends StatelessWidget {
   }
 
   Widget _buildFilterChips() {
-    final filters = ["All", "Vedic", "Tarot", "Palmistry", "Numerology", "Vastu"];
+    final filters = [
+      "All",
+      "Vedic",
+      "Tarot",
+      "Palmistry",
+      "Numerology",
+      "Vastu",
+    ];
     return SizedBox(
       height: 60,
       child: ListView.builder(
@@ -172,36 +198,47 @@ class AstrologerListScreen extends StatelessWidget {
             margin: const EdgeInsets.only(right: 12, top: 12, bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
-              gradient: isSelected
-                  ? LinearGradient(
-                      colors: [AppColors.primaryColor, AppColors.secondaryColor],
-                    )
-                  : null,
+              gradient:
+                  isSelected
+                      ? LinearGradient(
+                        colors: [
+                          AppColors.primaryColor,
+                          AppColors.secondaryColor,
+                        ],
+                      )
+                      : null,
               color: isSelected ? null : Colors.white,
               borderRadius: BorderRadius.circular(25),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: AppColors.primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 5,
-                        offset: const Offset(0, 2),
-                      )
-                    ],
-              border: isSelected ? null : Border.all(color: const Color(0xFFEEEEEE)),
+              boxShadow:
+                  isSelected
+                      ? [
+                        BoxShadow(
+                          color: AppColors.primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                      : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 5,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+              border:
+                  isSelected
+                      ? null
+                      : Border.all(color: const Color(0xFFEEEEEE)),
             ),
             alignment: Alignment.center,
             child: AppText(
               filters[index] == "All" ? AppStrings.all : filters[index],
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : const Color(0xFF2E1A47).withValues(alpha: 0.7),
+              color:
+                  isSelected
+                      ? Colors.white
+                      : const Color(0xFF2E1A47).withValues(alpha: 0.7),
             ),
           );
         },
@@ -209,7 +246,10 @@ class AstrologerListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAstrologerCard(BuildContext context, Map<String, dynamic> astro) {
+  Widget _buildAstrologerCard(
+    BuildContext context,
+    Map<String, dynamic> astro,
+  ) {
     final bool isOnline = astro["status"] == "Online";
 
     return Container(
@@ -240,7 +280,10 @@ class AstrologerListScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: isOnline ? const Color(0xFF4CAF50).withValues(alpha: 0.5) : Colors.orange.withValues(alpha: 0.5), 
+                        color:
+                            isOnline
+                                ? const Color(0xFF4CAF50).withValues(alpha: 0.5)
+                                : Colors.orange.withValues(alpha: 0.5),
                         width: 2.5,
                       ),
                     ),
@@ -263,12 +306,16 @@ class AstrologerListScreen extends StatelessWidget {
                       width: 14,
                       height: 14,
                       decoration: BoxDecoration(
-                        color: isOnline ? const Color(0xFF4CAF50) : Colors.orange,
+                        color:
+                            isOnline ? const Color(0xFF4CAF50) : Colors.orange,
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: (isOnline ? const Color(0xFF4CAF50) : Colors.orange).withValues(alpha: 0.4),
+                            color: (isOnline
+                                    ? const Color(0xFF4CAF50)
+                                    : Colors.orange)
+                                .withValues(alpha: 0.4),
                             blurRadius: 6,
                             spreadRadius: 2,
                           ),
@@ -288,7 +335,11 @@ class AstrologerListScreen extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star_rounded, color: Color(0xFFFFB300), size: 14),
+                    const Icon(
+                      Icons.star_rounded,
+                      color: Color(0xFFFFB300),
+                      size: 14,
+                    ),
                     const SizedBox(width: 3),
                     AppText(
                       astro["rating"]!,
@@ -321,7 +372,11 @@ class AstrologerListScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.verified_rounded, color: Color(0xFF2196F3), size: 16),
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: Color(0xFF2196F3),
+                      size: 16,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 3),
@@ -335,8 +390,16 @@ class AstrologerListScreen extends StatelessWidget {
                 Wrap(
                   spacing: 6,
                   children: [
-                    _buildTinyTag(Icons.history_rounded, astro["exp"]!, Colors.blueGrey.shade400),
-                    _buildTinyTag(Icons.translate_rounded, "Hin, Eng", Colors.blueGrey.shade400),
+                    _buildTinyTag(
+                      Icons.history_rounded,
+                      astro["exp"]!,
+                      Colors.blueGrey.shade400,
+                    ),
+                    _buildTinyTag(
+                      Icons.translate_rounded,
+                      "Hin, Eng",
+                      Colors.blueGrey.shade400,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -364,13 +427,39 @@ class AstrologerListScreen extends StatelessWidget {
           Column(
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Chat Coming Soon"))),
-                child: _buildActionButton(Icons.chat_bubble_rounded, AppStrings.chat, AppColors.primaryColor),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => const ComingSoonScreen(
+                              title: "Chat Coming Soon",
+                            ),
+                      ),
+                    ),
+                child: _buildActionButton(
+                  Icons.chat_bubble_rounded,
+                  AppStrings.chat,
+                  AppColors.primaryColor,
+                ),
               ),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Call Coming Soon"))),
-                child: _buildActionButton(Icons.call_rounded, AppStrings.call, const Color(0xFF4CAF50)),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => const ComingSoonScreen(
+                              title: "Call Coming Soon",
+                            ),
+                      ),
+                    ),
+                child: _buildActionButton(
+                  Icons.call_rounded,
+                  AppStrings.call,
+                  const Color(0xFF4CAF50),
+                ),
               ),
             ],
           ),
@@ -385,12 +474,7 @@ class AstrologerListScreen extends StatelessWidget {
       children: [
         Icon(icon, size: 12, color: color),
         const SizedBox(width: 3),
-        AppText(
-          label,
-          fontSize: 10,
-          fontWeight: FontWeight.w500,
-          color: color,
-        ),
+        AppText(label, fontSize: 10, fontWeight: FontWeight.w500, color: color),
       ],
     );
   }

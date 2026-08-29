@@ -33,40 +33,136 @@ class ServicesScreen extends StatelessWidget {
               _buildHeader(),
               _buildSection(AppStrings.latestOfferings, isNew: true),
               _buildHorizontalMasonry([
-                _ServiceData(AppStrings.bhriguMargdarshan, "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg", Colors.orange.shade50),
-                _ServiceData(AppStrings.palmScanAI, "https://img.freepik.com/free-vector/hand-palm-lines-astrology-concept_23-2148630043.jpg", Colors.blue.shade50),
-                _ServiceData(AppStrings.chineseHoroscope, "https://img.freepik.com/free-vector/chinese-zodiac-concept-illustration_114360-18456.jpg", Colors.red.shade50),
-                _ServiceData(AppStrings.yearlyMap2024, "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg", Colors.purple.shade50),
+                _ServiceData(
+                  AppStrings.bhriguMargdarshan,
+                  "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg",
+                  Colors.orange.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.palmScanAI,
+                  "https://img.freepik.com/free-vector/hand-palm-lines-astrology-concept_23-2148630043.jpg",
+                  Colors.blue.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.chineseHoroscope,
+                  "https://img.freepik.com/free-vector/chinese-zodiac-concept-illustration_114360-18456.jpg",
+                  Colors.red.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.yearlyMap2024,
+                  "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg",
+                  Colors.purple.shade50,
+                ),
               ]),
-              
+
               _buildSection("Vedic Astrology"),
               _buildModernGrid([
-                _ServiceData(AppStrings.kundali, "https://img.freepik.com/free-vector/zodiac-wheel-with-astrology-icons_23-2148425232.jpg", Colors.purple.shade50),
-                _ServiceData(AppStrings.matchMakingService, "https://img.freepik.com/free-vector/love-story-concept-illustration_114360-1558.jpg", Colors.pink.shade50),
-                _ServiceData(AppStrings.dailyPanchangService, "https://img.freepik.com/free-vector/calendar-concept-illustration_114360-1234.jpg", Colors.orange.shade50),
-                _ServiceData(AppStrings.varshphal, "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg", Colors.blue.shade50),
-                _ServiceData(AppStrings.transitChart, "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg", Colors.indigo.shade50),
-                _ServiceData(AppStrings.rajyoga, "https://img.freepik.com/free-vector/royal-crown-concept-illustration_114360-1234.jpg", Colors.amber.shade50),
-                _ServiceData(AppStrings.dasha, "https://img.freepik.com/free-vector/constellation-concept-illustration_114360-1555.jpg", Colors.teal.shade50),
-                _ServiceData(AppStrings.hora, "https://img.freepik.com/free-vector/clock-concept-illustration_114360-1234.jpg", Colors.cyan.shade50),
-                _ServiceData(AppStrings.sadeSati, "https://img.freepik.com/free-vector/planet-concept-illustration_114360-1555.jpg", Colors.deepPurple.shade50),
-                _ServiceData(AppStrings.mangalDosh, "https://img.freepik.com/free-vector/mars-planet-concept-illustration_114360-1555.jpg", Colors.red.shade50),
+                _ServiceData(
+                  AppStrings.kundali,
+                  "https://img.freepik.com/free-vector/zodiac-wheel-with-astrology-icons_23-2148425232.jpg",
+                  Colors.purple.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.matchMakingService,
+                  "https://img.freepik.com/free-vector/love-story-concept-illustration_114360-1558.jpg",
+                  Colors.pink.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.dailyPanchangService,
+                  "https://img.freepik.com/free-vector/calendar-concept-illustration_114360-1234.jpg",
+                  Colors.orange.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.varshphal,
+                  "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg",
+                  Colors.blue.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.transitChart,
+                  "https://img.freepik.com/free-vector/astrology-concept-illustration_114360-1014.jpg",
+                  Colors.indigo.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.rajyoga,
+                  "https://img.freepik.com/free-vector/royal-crown-concept-illustration_114360-1234.jpg",
+                  Colors.amber.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.dasha,
+                  "https://img.freepik.com/free-vector/constellation-concept-illustration_114360-1555.jpg",
+                  Colors.teal.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.hora,
+                  "https://img.freepik.com/free-vector/clock-concept-illustration_114360-1234.jpg",
+                  Colors.cyan.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.sadeSati,
+                  "https://img.freepik.com/free-vector/planet-concept-illustration_114360-1555.jpg",
+                  Colors.deepPurple.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.mangalDosh,
+                  "https://img.freepik.com/free-vector/mars-planet-concept-illustration_114360-1555.jpg",
+                  Colors.red.shade50,
+                ),
               ]),
 
               _buildSection("Cosmic & Spiritual"),
               _buildModernGrid([
-                _ServiceData(AppStrings.numerology, "https://img.freepik.com/free-vector/numbers-concept-illustration_114360-1234.jpg", Colors.green.shade50),
-                _ServiceData(AppStrings.tarotReading, "https://img.freepik.com/free-vector/tarot-cards-concept-illustration_114360-1555.jpg", Colors.purple.shade50),
-                _ServiceData(AppStrings.palmistry, "https://img.freepik.com/free-vector/hand-palm-lines-astrology-concept_23-2148630043.jpg", Colors.orange.shade50),
-                _ServiceData(AppStrings.lalKitab, "https://img.freepik.com/free-vector/book-concept-illustration_114360-1234.jpg", Colors.red.shade50),
-                _ServiceData(AppStrings.vastu, "https://img.freepik.com/free-vector/house-concept-illustration_114360-1234.jpg", Colors.brown.shade50),
-                _ServiceData(AppStrings.kpChart, "https://img.freepik.com/free-vector/constellation-concept-illustration_114360-1555.jpg", Colors.blueGrey.shade50),
-                _ServiceData(AppStrings.gemstonesService, "https://img.freepik.com/free-vector/diamond-concept-illustration_114360-1234.jpg", Colors.blue.shade50),
-                _ServiceData(AppStrings.rudraksha, "https://img.freepik.com/free-vector/mandalas-concept-illustration_114360-1555.jpg", Colors.brown.shade50),
-                _ServiceData(AppStrings.babyNames, "https://img.freepik.com/free-vector/baby-concept-illustration_114360-1234.jpg", Colors.pink.shade50),
-                _ServiceData(AppStrings.shubhMuhurat, "https://img.freepik.com/free-vector/clock-concept-illustration_114360-1234.jpg", Colors.amber.shade50),
+                _ServiceData(
+                  AppStrings.numerology,
+                  "https://img.freepik.com/free-vector/numbers-concept-illustration_114360-1234.jpg",
+                  Colors.green.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.tarotReading,
+                  "https://img.freepik.com/free-vector/tarot-cards-concept-illustration_114360-1555.jpg",
+                  Colors.purple.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.palmistry,
+                  "https://img.freepik.com/free-vector/hand-palm-lines-astrology-concept_23-2148630043.jpg",
+                  Colors.orange.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.lalKitab,
+                  "https://img.freepik.com/free-vector/book-concept-illustration_114360-1234.jpg",
+                  Colors.red.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.vastu,
+                  "https://img.freepik.com/free-vector/house-concept-illustration_114360-1234.jpg",
+                  Colors.brown.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.kpChart,
+                  "https://img.freepik.com/free-vector/constellation-concept-illustration_114360-1555.jpg",
+                  Colors.blueGrey.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.gemstonesService,
+                  "https://img.freepik.com/free-vector/diamond-concept-illustration_114360-1234.jpg",
+                  Colors.blue.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.rudraksha,
+                  "https://img.freepik.com/free-vector/mandalas-concept-illustration_114360-1555.jpg",
+                  Colors.brown.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.babyNames,
+                  "https://img.freepik.com/free-vector/baby-concept-illustration_114360-1234.jpg",
+                  Colors.pink.shade50,
+                ),
+                _ServiceData(
+                  AppStrings.shubhMuhurat,
+                  "https://img.freepik.com/free-vector/clock-concept-illustration_114360-1234.jpg",
+                  Colors.amber.shade50,
+                ),
               ]),
-              
+
               const SizedBox(height: 280),
             ],
           ),
@@ -112,7 +208,11 @@ class ServicesScreen extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(Icons.apps_rounded, color: AppColors.primaryColor, size: 24),
+            child: const Icon(
+              Icons.apps_rounded,
+              color: AppColors.primaryColor,
+              size: 24,
+            ),
           ),
         ],
       ),
@@ -125,7 +225,13 @@ class ServicesScreen extends StatelessWidget {
       child: Row(
         children: [
           AppText(
-            title == AppStrings.latestOfferings ? AppStrings.latestOfferings : (title == "Vedic Astrology" ? AppStrings.vedicAstrology : (title == "Cosmic & Spiritual" ? AppStrings.cosmicSpiritual : title)),
+            title == AppStrings.latestOfferings
+                ? AppStrings.latestOfferings
+                : (title == "Vedic Astrology"
+                    ? AppStrings.vedicAstrology
+                    : (title == "Cosmic & Spiritual"
+                        ? AppStrings.cosmicSpiritual
+                        : title)),
             fontSize: 18,
             fontWeight: FontWeight.w800,
             color: const Color(0xFF2E1A47),
@@ -163,7 +269,13 @@ class ServicesScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = items[index];
           return GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ComingSoonScreen(title: item.title))),
+            onTap:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ComingSoonScreen(title: item.title),
+                  ),
+                ),
             child: Container(
               width: 260,
               margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -212,7 +324,10 @@ class ServicesScreen extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.arrow_right_alt_rounded, color: Color(0xFF2E1A47)),
+                          child: const Icon(
+                            Icons.arrow_right_alt_rounded,
+                            color: Color(0xFF2E1A47),
+                          ),
                         ),
                       ],
                     ),
@@ -242,7 +357,13 @@ class ServicesScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = items[index];
           return GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ComingSoonScreen(title: item.title))),
+            onTap:
+                () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ComingSoonScreen(title: item.title),
+                  ),
+                ),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
