@@ -72,20 +72,27 @@ class FCMNotificationService {
           }
         }
 
+        final String rawSessionId = message.data['session_id']?.toString() ??
+            message.data['chat_session_id']?.toString() ??
+            message.data['chat_assistance_session_id']?.toString() ??
+            message.data['live_session_id']?.toString() ??
+            message.data['id']?.toString() ?? '';
+        final int parsedSessionId = int.tryParse(rawSessionId) ?? 0;
+
         // If chat/call ended message arrives, immediately cancel ongoing timer notification & floating bubble
         if (title.contains('Chat Ended') ||
             type == 'chat_ended' ||
             type == 'CHAT_ENDED' ||
             type == 'session_ended' ||
             type == 'chat_summary') {
-          LocalNotificationService.cancelOngoingChatNotification(null);
+          LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         } else if (title.contains('Call Ended') ||
             type == 'call_ended' ||
             type == 'CALL_ENDED' ||
             type == 'session_completed') {
-          LocalNotificationService.cancelOngoingCallNotification(null);
+          LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
           return;
         }
 
@@ -100,12 +107,6 @@ class FCMNotificationService {
         // live_ prefix  → LiveRoomScreen
         // call_ prefix  → CallScreen
         // bare int      → ChatScreen
-        final String rawSessionId = message.data['session_id']?.toString() ??
-            message.data['chat_session_id']?.toString() ??
-            message.data['chat_assistance_session_id']?.toString() ??
-            message.data['live_session_id']?.toString() ??
-            message.data['id']?.toString() ?? '';
-
         String structuredPayload;
         if (type == 'live_stream' || type == 'live' || type == 'live_session') {
           structuredPayload = 'live_$rawSessionId';
