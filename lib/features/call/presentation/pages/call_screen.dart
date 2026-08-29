@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:astro_user/core/enums/session_status_enums.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
@@ -136,7 +137,7 @@ class _CallScreenState extends State<CallScreen> {
                                   border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
                                 ),
                                 child: Text(
-                                  status == 'ongoing' ? 'Ongoing Call' : status.toUpperCase(),
+                                  status == CallStatus.ongoing ? 'Ongoing Call' : status.toUpperCase(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -146,7 +147,7 @@ class _CallScreenState extends State<CallScreen> {
                                 ),
                               ),
                               const SizedBox(height: 12),
-                              if (status == 'ongoing') ...[
+                              if (status == CallStatus.ongoing) ...[
                                 Text(
                                   '$minutes:$seconds',
                                   style: const TextStyle(
@@ -214,7 +215,7 @@ class _CallScreenState extends State<CallScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        status == 'ringing' ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
+                        status == CallStatus.ringing ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 15,
@@ -252,7 +253,7 @@ class _CallScreenState extends State<CallScreen> {
                         ),
 
                         // Switch to Chat (visible during ongoing call)
-                        if (controller.isPackageCall && status == 'ongoing')
+                        if (controller.isPackageCall && status == CallStatus.ongoing)
                           _buildControlButton(
                             icon: Icons.swap_calls_rounded,
                             label: 'Chat',

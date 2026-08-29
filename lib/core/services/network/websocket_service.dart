@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:astro_user/core/enums/session_status_enums.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
