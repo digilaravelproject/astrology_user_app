@@ -87,12 +87,7 @@ class FloatingChatBubble {
         startedAtMillis = DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
       }
 
-      LocalNotificationService.showOngoingChatNotification(
-        sessionId: sessionId,
-        title: status == 'ongoing' ? '$name • Chat' : 'Waiting for acceptance with $name...',
-        body: 'Tap to return to chat session',
-        startedAtMillis: status == 'ongoing' ? startedAtMillis : null,
-      );
+      
     } catch (e) {
       debugPrint("FloatingChatBubble show notification error: $e");
     }
@@ -108,9 +103,7 @@ class FloatingChatBubble {
     _overlaySub = null;
 
     if (stopForegroundService) {
-      try {
-        await LocalNotificationService.cancelOngoingChatNotification(idToCancel);
-      } catch (_) {}
+      
       try {
         await ForegroundTaskService.stopService();
       } catch (_) {}

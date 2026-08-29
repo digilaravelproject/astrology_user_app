@@ -125,7 +125,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       _timer?.cancel();
       FlutterBackgroundService().invoke('stopService');
       if (_sessionId != null) {
-        LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+        
       }
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
@@ -154,7 +154,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
     if (_sessionId != null) {
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      
     }
     FloatingChatBubble.dismiss();
     WebSocketService.activeSessionId = null;
@@ -266,12 +266,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       if (status.value == ChatStatus.initiated || status.value == ChatStatus.initiated) {
         _startRingtone();
       }
-      LocalNotificationService.showOngoingChatNotification(
-        sessionId: sessionId,
-        title: status.value == ChatStatus.ongoing ? 'Chat in progress' : 'Waiting for acceptance...',
-        body: 'Active chat with $astrologerName',
-        startedAtMillis: status.value == ChatStatus.ongoing ? startedAtMillis : null,
-      );
+      
     }
 
     ever(status, (val) {
@@ -448,12 +443,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             // FlutterBackgroundService().startService(); // Disabled to prevent OOM crash on low-resource devices
             
             final startedAtMillis = effectiveStart.millisecondsSinceEpoch;
-            LocalNotificationService.showOngoingChatNotification(
-              sessionId: _sessionId!,
-              title: 'Chat in progress',
-              body: 'Active chat with ${_astrologerName ?? 'Astrologer'}',
-              startedAtMillis: startedAtMillis,
-            );
+            
           }
         }
       }
@@ -465,7 +455,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
     if (_sessionId != null) {
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      
     }
     FloatingChatBubble.dismiss();
     if (Get.isRegistered<AuthController>()) {
@@ -484,7 +474,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
     if (_sessionId != null) {
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      
     }
     FloatingChatBubble.dismiss();
     Get.back();
@@ -782,7 +772,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     status.value = ChatStatus.completed;
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
-    LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    
     FloatingChatBubble.dismiss();
     if (Get.isRegistered<ChatController>()) {
       Get.back();
@@ -831,7 +821,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     status.value = ChatStatus.completed;
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
-    LocalNotificationService.cancelOngoingChatNotification(targetId);
+    
     FloatingChatBubble.dismiss();
     
     // Immediately close screen for smooth UX
@@ -844,7 +834,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       debugPrint("Error rejecting/cancelling chat session: $e");
     } finally {
-      LocalNotificationService.cancelOngoingChatNotification(targetId);
+      
       FloatingChatBubble.dismiss();
     }
   }
@@ -908,7 +898,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _timer?.cancel();
     FlutterBackgroundService().invoke('stopService');
     if (_sessionId != null) {
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+      
     }
     FloatingChatBubble.dismiss();
     WebSocketService.activeSessionId = null;
@@ -942,9 +932,9 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Only dismiss notification & bubble if session is actually ended/completed
     if (status.value == ChatStatus.completed || status.value == ChatStatus.completed || status.value == ChatStatus.cancelled || status.value == ChatStatus.rejected) {
       if (_sessionId != null) {
-        LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+        
       } else {
-        LocalNotificationService.cancelOngoingChatNotification(null);
+        
       }
       FloatingChatBubble.dismiss(stopForegroundService: true);
       if (WebSocketService.activeSessionId == _sessionId) {

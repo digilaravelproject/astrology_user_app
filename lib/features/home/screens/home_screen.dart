@@ -293,12 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
           if (sessionId != null) {
-            LocalNotificationService.showOngoingChatNotification(
-              sessionId: sessionId,
-              title: '$name • Chat',
-              body: 'Ongoing chat session',
-              startedAtMillis: startedAtMillis,
-            );
+            
           }
           FloatingChatBubble.show(
             context: Get.context!,

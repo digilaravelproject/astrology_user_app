@@ -406,7 +406,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
     durationSeconds.value = 0;
 
     final acceptedMillis = DateTime.now().millisecondsSinceEpoch;
-    LocalNotificationService.cancelIncomingCallNotification(sessionId!);
+    
     _startCallTimer();
     _showOngoingNotification(startedAtMillis: acceptedMillis);
 
@@ -483,12 +483,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   void _showOngoingNotification({int? startedAtMillis}) {
     if (sessionId != null) {
-      LocalNotificationService.showOngoingCallNotification(
-        sessionId: sessionId!,
-        title: 'Active Call in Progress',
-        body: 'Talking with $providerName',
-        startedAtMillis: startedAtMillis,
-      );
+      
     }
   }
 
@@ -513,7 +508,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
     _ringingTimer?.cancel();
     _ringingTimer = null;
     if (sessionId != null) {
-      LocalNotificationService.cancelOngoingCallNotification(sessionId!);
+      
     }
     try {
       ForegroundTaskService.stopService();
@@ -643,24 +638,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
             }
 
             // Show Notification
-            final minutes = (durationSeconds.value ~/ 60).toString().padLeft(2, '0');
-            final seconds = (durationSeconds.value % 60).toString().padLeft(2, '0');
-            LocalNotificationService.showOngoingCallNotification(
-              sessionId: sessionId!,
-              title: '$providerName • Call',
-              body: 'Tap to return to call session',
-              startedAtMillis: () {
-                if (sessionStatus == 'ongoing' && session['started_at'] != null) {
-                  String isoUtc = session['started_at'].toString().trim().replaceAll(' ', 'T');
-                  if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
-                    isoUtc += 'Z';
-                  }
-                  return DateTime.tryParse(isoUtc)?.toLocal().millisecondsSinceEpoch;
-                }
-                return null;
-              }(),
-            );
-
+            // Removed Notification call
             // Show Floating Bubble
             if (!isCallScreenVisible) {
               FloatingCallBubble.show(

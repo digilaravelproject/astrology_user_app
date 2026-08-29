@@ -87,7 +87,7 @@ class FCMNotificationService {
             type == 'chat_summary' ||
             type == 'CHAT_MISSED' ||
             type == 'CHAT_DISMISSED') {
-          LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
+          
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         } else if (title.contains('Call Ended') ||
@@ -96,11 +96,11 @@ class FCMNotificationService {
             type == 'session_completed' ||
             type == 'CALL_FAILED' ||
             type == 'CALL_DISMISSED') {
-          LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
+          
           return;
         } else if (type == 'PACKAGE_EXHAUSTED') {
-          LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
-          LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
+          
+          
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         }
@@ -159,14 +159,7 @@ class FCMNotificationService {
         }
         // ──────────────────────────────────────────────────────────────────────────
 
-        LocalNotificationService.showNotification(
-          id: message.hashCode,
-          title: message.notification?.title ?? 'Notification',
-          body: message.notification?.body ?? '',
-          payload: structuredPayload,
-          notificationType: type,
-          playSound: playSound,
-        );
+        
       }
     });
 
