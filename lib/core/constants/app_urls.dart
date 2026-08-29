@@ -181,4 +181,5 @@ class AppUrls {
   static const String eventPackageSubSessionStarted = 'PackageSubSessionStarted';
   static const String eventPackageSubSessionEnded = 'PackageSubSessionEnded';
   static const String eventPackageSessionTerminated = 'PackageSessionTerminated';
+  static const String eventPackageSessionStateUpdated = 'PackageSessionStateUpdated';
 }

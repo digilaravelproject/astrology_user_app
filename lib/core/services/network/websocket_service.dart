@@ -349,6 +349,23 @@ class WebSocketService extends GetxService {
           } catch (e) {
             Logger.e('Error handling PackageSubSessionEnded -> $e');
           }
+        } else if (event == AppUrls.eventPackageSessionStateUpdated || event == 'App\\Events\\${AppUrls.eventPackageSessionStateUpdated}') {
+          Logger.d('Prepaid Package state updated: ${data['data']}');
+          try {
+            Map<String, dynamic> eventData = {};
+            if (data['data'] is String) {
+              eventData = jsonDecode(data['data'] as String);
+            } else if (data['data'] is Map) {
+              eventData = Map<String, dynamic>.from(data['data'] as Map);
+            }
+            final secs = eventData['remaining_seconds'];
+            if (secs != null) {
+              packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
+            }
+            // other UI syncs like call_status, chat_status can be added here if needed by the dashboard
+          } catch (e) {
+            Logger.e('Error handling PackageSessionStateUpdated -> $e');
+          }
         } else if (event == AppUrls.eventPackageSessionTerminated || event == 'App\\Events\\${AppUrls.eventPackageSessionTerminated}') {
           Logger.d('Prepaid Package session terminated!');
           packageRemainingSeconds.value = 0;
