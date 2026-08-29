@@ -318,6 +318,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   /// End Call Only — keeps chat alive, navigates back to chat screen
   Future<void> terminateChannelOnly() async {
+    if (!isPackageCall) return;
+    
     final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
       Logger.e('CallController: terminateChannelOnly — no activeSubSessionId found');
@@ -364,6 +366,12 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
   /// End Entire Session — terminates both call and chat, closes consultation
   Future<void> terminateEntireSession() async {
+    if (!isPackageCall) {
+      // Fallback to normal call end
+      await endCall();
+      return;
+    }
+    
     final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
       // Fallback to regular endCall

@@ -108,6 +108,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   /// End Chat Only — terminates chat channel but keeps call active
   Future<void> terminateChannelOnly() async {
+    if (!isPackageChat) return;
+    
     final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
       Logger.e('ChatController: terminateChannelOnly — no activeSubSessionId found');
@@ -144,6 +146,12 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   /// End Entire Session — terminates both chat and call channels
   Future<void> terminateEntireSession() async {
+    if (!isPackageChat) {
+      // Fallback to normal chat end
+      await endChatSession();
+      return;
+    }
+    
     final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
     if (subId == null) {
       // Fallback
