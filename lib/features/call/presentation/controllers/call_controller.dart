@@ -253,8 +253,11 @@ class CallController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  bool _isEndingCall = false;
+
   Future<void> endCall() async {
     if (sessionId == null) return;
+    _isEndingCall = true;
     try {
       final response = isPackageCall && SessionBottomSheetHelper.activeSubSessionId != null
           ? await _apiClient.post(
@@ -302,6 +305,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
       if (isCallScreenVisible) {
         Get.back();
       }
+    } finally {
+      _isEndingCall = false;
     }
   }
 
@@ -536,6 +541,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void minimizeToBubble(BuildContext context, String name, String image, {bool shouldPop = true}) {
+    if (_isEndingCall) return;
     debugPrint("==== [CALL_DEBUG] CallController.minimizeToBubble called! sessionId=$sessionId, status=${status.value}, shouldPop=$shouldPop ====");
     if (sessionId == null || (status.value != 'ongoing' && status.value != 'ringing' && status.value != 'dialing' && status.value != 'waiting')) {
       debugPrint("==== [CALL_DEBUG] minimizeToBubble SKIPPED because sessionId is null or status invalid ====");
