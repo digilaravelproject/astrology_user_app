@@ -771,6 +771,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Immediately close UI for smooth UX
     status.value = ChatStatus.completed;
     _timer?.cancel();
+    LocalNotificationService.cancelChatNotification();
     FlutterBackgroundService().invoke('stopService');
     
     FloatingChatBubble.dismiss();
@@ -820,6 +821,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _stopRingtone();
     status.value = ChatStatus.completed;
     _timer?.cancel();
+    LocalNotificationService.cancelChatNotification();
     FlutterBackgroundService().invoke('stopService');
     
     FloatingChatBubble.dismiss();

@@ -617,7 +617,7 @@ class CallListScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                if (astro.isCallEnabled == true) ...[
+                if (astro.isOnline && astro.isCallEnabled) ...[
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
@@ -627,12 +627,12 @@ class CallListScreen extends StatelessWidget {
                         fontSize: 11,
                         height: 32,
                         borderRadius: 8,
-                        backgroundColor: (!astro.isOnline || astro.isBusy) ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
-                        textColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : Colors.white,
-                        borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        backgroundColor: astro.isBusy ? Colors.grey.withOpacity(0.2) : (astro.isPurchase == true ? Colors.green : Colors.orange),
+                        textColor: astro.isBusy ? Colors.grey : Colors.white,
+                        borderColor: astro.isBusy ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
                         onTap: () {
-                          if (!astro.isOnline || astro.isBusy) {
-                            CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                          if (astro.isBusy) {
+                            CustomSnackbar.showInfo('Astrologer is currently engaged.');
                             return;
                           }
                           SessionBottomSheetHelper.show(context, astro);

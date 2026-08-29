@@ -39,12 +39,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         type == 'chat_summary' ||
         type == 'CHAT_MISSED' ||
         type == 'CHAT_DISMISSED') {
+        LocalNotificationService.cancelChatNotification();
+        LocalNotificationService.cancelAll();
       } else if (title.contains('Call Ended') ||
         type == 'call_ended' ||
         type == 'CALL_ENDED' ||
         type == 'session_completed' ||
         type == 'CALL_FAILED' ||
         type == 'CALL_DISMISSED') {
+        LocalNotificationService.cancelCallNotification();
+        LocalNotificationService.cancelAll();
       }
     if (data.containsKey('session')) {
       final sessionData = data['session'] is String 

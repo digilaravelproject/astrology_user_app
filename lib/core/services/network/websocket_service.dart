@@ -26,8 +26,9 @@ import 'package:astro_user/features/live/presentation/controllers/live_controlle
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'package:astro_user/features/astrologers/controllers/astrologer_controller.dart';
+import 'package:astro_user/core/services/network/presence_controller.dart';
 
-class WebSocketService extends GetxService {
+class WebSocketService extends GetxService with WidgetsBindingObserver {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   bool _isConnecting = false;
@@ -64,6 +65,32 @@ class WebSocketService extends GetxService {
   final String _wsUrl = AppUrls.webSocketUrl;
   
   bool get isConnected => _isConnected;
+
+  @override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    disconnect();
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached) {
+      Logger.d('[WebSocketService] App detached, disconnecting socket.');
+      disconnect();
+    } else if (state == AppLifecycleState.resumed) {
+      if (!_isConnected && !_isConnecting) {
+        Logger.d('[WebSocketService] App resumed and socket disconnected, reconnecting.');
+        connect();
+      }
+    }
+  }
 
   Future<WebSocketService> init() async {
     // We will wait until we actually have user data to connect
@@ -107,10 +134,14 @@ class WebSocketService extends GetxService {
       
       _channel?.stream.listen(
         (message) {
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          Logger.d('|📥 WEBSOCKET RECEIVED');
-          Logger.d('|📨 Data: $message');
-          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          final msgStr = message.toString();
+          if (!msgStr.contains('pusher_internal:member_added') && 
+              !msgStr.contains('pusher_internal:member_removed')) {
+            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            Logger.d('|📥 WEBSOCKET RECEIVED');
+            Logger.d('|📨 Data: $message');
+            Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          }
           _handleMessage(message);
         },
         onDone: () {
@@ -165,6 +196,39 @@ class WebSocketService extends GetxService {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|✅ WEBSOCKET SUBSCRIPTION SUCCESS');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          if (data['channel'] == AppUrls.presenceRoomChannel) {
+            final payloadStr = data['data'];
+            if (payloadStr != null && payloadStr is String) {
+              final payload = jsonDecode(payloadStr);
+              if (Get.isRegistered<PresenceController>()) {
+                Get.find<PresenceController>().handleSubscriptionSucceeded(payload);
+              }
+            }
+          }
+        } else if (event == 'pusher_internal:member_added') {
+          if (data['channel'] == AppUrls.presenceRoomChannel) {
+            final payloadStr = data['data'];
+            if (payloadStr != null && payloadStr is String) {
+              final payload = jsonDecode(payloadStr);
+              final userIdStr = payload['user_id'];
+              final userId = int.tryParse(userIdStr?.toString() ?? '') ?? 0;
+              if (Get.isRegistered<PresenceController>()) {
+                Get.find<PresenceController>().handleMemberAdded(userId);
+              }
+            }
+          }
+        } else if (event == 'pusher_internal:member_removed') {
+          if (data['channel'] == AppUrls.presenceRoomChannel) {
+            final payloadStr = data['data'];
+            if (payloadStr != null && payloadStr is String) {
+              final payload = jsonDecode(payloadStr);
+              final userIdStr = payload['user_id'];
+              final userId = int.tryParse(userIdStr?.toString() ?? '') ?? 0;
+              if (Get.isRegistered<PresenceController>()) {
+                Get.find<PresenceController>().handleMemberRemoved(userId);
+              }
+            }
+          }
         } else if (event == AppUrls.eventChatAccepted || event == 'App\\Events\\ChatAccepted') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
@@ -183,17 +247,24 @@ class WebSocketService extends GetxService {
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleChatDismissed(data['data']);
-        } else if (event == AppUrls.eventMessageSent || event == 'App\\Events\\MessageSent') {
+        } else if (event == AppUrls.eventMessageSent || event == 'App\\Events\\MessageSent' || event == '.MessageSent') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           _handleMessageSent(data['data']);
-        } else if (event == AppUrls.eventChatInitiated || event == 'App\\Events\\ChatInitiated') {
+        } else if (event == AppUrls.eventChatInitiated || event == 'App\\Events\\ChatInitiated' || event == '.ChatInitiated') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
           Logger.d('|📦 Data: ${data['data']}');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleChatInitiated(data['data']);
+        } else if (event == AppUrls.eventCallInitiated || event == 'App\\Events\\CallInitiated' || event == '.CallInitiated') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|🔔 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleCallInitiated(data['data']);
         } else if (event == 'ChatQueueUpdated' || event == 'App\\Events\\ChatQueueUpdated') {
           // Server sends ChatQueueUpdated instead of ChatAccepted/ChatDismissed
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -471,6 +542,18 @@ class WebSocketService extends GetxService {
       final bool isBusy = eventData['is_busy'] == true || eventData['is_busy'] == 1;
       final bool isOnline = eventData['is_online'] == true || eventData['is_online'] == 1;
       final String availabilityStatus = eventData['availability_status'] ?? 'Offline';
+      
+      final bool? isChatEnabled = eventData['is_chat_enabled'] != null 
+          ? (eventData['is_chat_enabled'] == true || eventData['is_chat_enabled'] == 1 || eventData['is_chat_enabled'].toString() == 'true' || eventData['is_chat_enabled'].toString() == '1')
+          : (eventData['chat_enabled'] != null ? (eventData['chat_enabled'] == true || eventData['chat_enabled'] == 1 || eventData['chat_enabled'].toString() == 'true' || eventData['chat_enabled'].toString() == '1') : null);
+          
+      final bool? isCallEnabled = eventData['is_call_enabled'] != null 
+          ? (eventData['is_call_enabled'] == true || eventData['is_call_enabled'] == 1 || eventData['is_call_enabled'].toString() == 'true' || eventData['is_call_enabled'].toString() == '1')
+          : (eventData['call_enabled'] != null ? (eventData['call_enabled'] == true || eventData['call_enabled'] == 1 || eventData['call_enabled'].toString() == 'true' || eventData['call_enabled'].toString() == '1') : null);
+          
+      final bool? isVideoCallEnabled = eventData['is_video_call_enabled'] != null 
+          ? (eventData['is_video_call_enabled'] == true || eventData['is_video_call_enabled'] == 1 || eventData['is_video_call_enabled'].toString() == 'true' || eventData['is_video_call_enabled'].toString() == '1')
+          : (eventData['video_call_enabled'] != null ? (eventData['video_call_enabled'] == true || eventData['video_call_enabled'] == 1 || eventData['video_call_enabled'].toString() == 'true' || eventData['video_call_enabled'].toString() == '1') : null);
 
       if (Get.isRegistered<AstrologerController>() && astroId > 0) {
         Get.find<AstrologerController>().updateAstrologerAvailability(
@@ -478,6 +561,8 @@ class WebSocketService extends GetxService {
           isOnline: isOnline,
           isBusy: isBusy,
           availabilityStatus: availabilityStatus,
+          isChatEnabled: isChatEnabled,
+          isCallEnabled: isCallEnabled,
         );
       }
     } catch (e) {
@@ -774,17 +859,23 @@ class WebSocketService extends GetxService {
     }
   }
 
+
+
   Future<void> _authenticateAndSubscribe() async {
     if (_socketId == null || _userId == null) return;
 
     final Set<String> channelsToSubscribe = {
       AppUrls.privateUserChannel(_userId!),
-      AppUrls.presenceRoomChannel,
       'astrologers',
       ..._subscribedChannels,
     };
 
     for (String channelName in channelsToSubscribe) {
+      _authenticateAndSubscribeToChannel(channelName);
+    }
+  }
+
+  Future<void> _authenticateAndSubscribeToChannel(String channelName) async {
       if (!channelName.startsWith('private-') && !channelName.startsWith('presence-')) {
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         Logger.d('|✅ WEBSOCKET PUBLIC CHANNEL SUBSCRIPTION');
@@ -794,7 +885,7 @@ class WebSocketService extends GetxService {
           "event": AppUrls.pusherSubscribe,
           "data": { "channel": channelName }
         }));
-        continue;
+        return;
       }
 
       Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -851,7 +942,6 @@ class WebSocketService extends GetxService {
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
       }
     }
-  }
 
   void _send(String data) {
     if (_channel != null && _isConnected) {
@@ -871,6 +961,14 @@ class WebSocketService extends GetxService {
     Future.delayed(const Duration(seconds: 5), () {
       connect();
     });
+  }
+
+  void _handleCallInitiated(dynamic rawData) {
+    // Consumer app typically initiates calls and waits for ChatQueueUpdated or CallAccepted.
+  }
+
+  void _handleChatInitiated(dynamic rawData) {
+    // Consumer app typically initiates chats and waits for ChatQueueUpdated or ChatAccepted.
   }
 
   void disconnect() {

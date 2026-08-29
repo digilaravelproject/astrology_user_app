@@ -70,7 +70,12 @@ class LocalNotificationService {
             debugPrint('[LocalNotificationService] Stale call notification tapped, cancelling...');
             final sessionIdStr = payload.replaceFirst('call_', '');
             final int? sessionId = int.tryParse(sessionIdStr);
-            
+            _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
+            if (sessionId != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Get.toNamed('/session-summary', arguments: {'sessionId': sessionId});
+              });
+            }
           }
         } else if (FloatingChatBubble.onTapCallback != null) {
           // ── Active Chat bubble tap ──
@@ -108,146 +113,133 @@ class LocalNotificationService {
     );
 
     // Pre-create notification channels explicitly
+
+
     final androidPlugin = _notificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
     if (androidPlugin != null) {
-      // --- FCM Spec Channels ---
-      // call_channel: Incoming Calls (max importance, sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'call_channel_v2',
-          'Incoming Calls',
-          description: 'Incoming Audio/Video Call wake-up alert',
+          'call',
+          'Incoming Call',
+          description: 'Incoming audio/video call alerts',
           importance: Importance.max,
-          playSound: false,
+          sound: RawResourceAndroidNotificationSound('call_ringtone'),
+          playSound: true,
         ),
       );
-      // chat_channel: Chat messages (sound controlled per message via play_sound)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'chat_channel_v2',
-          'Chat Messages & Requests',
-          description: 'Regular chat messages (silent) and new chat session requests (audible)',
+          'chat',
+          'Chat Message',
+          description: 'New chat message alerts',
           importance: Importance.high,
-          playSound: false, // Channel allows sound; silenced per-message when play_sound==0
+          playSound: true,
         ),
       );
-      // live_session_channel: Live stream broadcasts (sound OFF)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'live_session_channel_v2',
-          'Live Session Alerts',
+          'chat_request',
+          'Chat Requests',
+          description: 'New chat consultation requests',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'call_request',
+          'Call Requests',
+          description: 'New call consultation requests',
+          importance: Importance.high,
+          playSound: true,
+        ),
+      );
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'live_stream',
+          'Live Stream Alerts',
           description: 'Astrologer live stream broadcast notifications',
           importance: Importance.high,
-          playSound: false,
+          playSound: true,
         ),
       );
-      // astology_notifications: General / promo / system (default importance)
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          'astology_notifications_v2',
-          'General Announcements',
-          description: 'Promotional messages, wallet updates and system alerts',
+          'wallet',
+          'Wallet & Orders',
+          description: 'Payment, wallet, order updates',
           importance: Importance.defaultImportance,
-          playSound: false,
+          playSound: true,
+        ),
+      );
+      await androidPlugin.createNotificationChannel(
+        const AndroidNotificationChannel(
+          'general',
+          'General Announcements',
+          description: 'General/promotional alerts',
+          importance: Importance.defaultImportance,
+          playSound: true,
         ),
       );
 
-      // --- Legacy / Ongoing Service Channels (kept for backward compat) ---
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'calls_channel',
-          'Incoming Calls (Legacy)',
-          description: 'Incoming Call Ringing (User & Astrologer)',
-          importance: Importance.max,
-          playSound: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'chats_channel',
-          'Chat Messages & Requests (Legacy)',
-          description: 'New Chat Requests and Chat Room messages',
-          importance: Importance.high,
-          playSound: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'session_channel',
-          'Consultations & Billing',
-          description: 'Session Lifecycle, Acceptance, Ending & Billing Notifications',
-          importance: Importance.high,
-          playSound: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'wallet_channel',
-          'Wallet & Gifts',
-          description: 'Wallet Top-Up, Gifts & Transactions',
-          importance: Importance.defaultImportance,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'system_channel',
-          'Account & System Alerts',
-          description: 'Account status and system notifications',
-          importance: Importance.defaultImportance,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'active_chat_channel_v1',
-          'Active Chats',
-          description: 'Ongoing notification for active chat sessions',
-          importance: Importance.max,
-          playSound: false,
-          enableVibration: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'active_call_channel_v1',
-          'Active Calls',
-          description: 'Ongoing notification for active call sessions',
-          importance: Importance.max,
-          playSound: false,
-          enableVibration: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'incoming_call_channel_v1',
-          'Incoming Calls Alert',
-          description: 'Alert for incoming call notifications',
-          importance: Importance.max,
-          playSound: false,
-        ),
-      );
-      await androidPlugin.createNotificationChannel(
-        const AndroidNotificationChannel(
-          'active_consultation_foreground_channel_v4',
-          'Active Consultation Service',
-          description: 'Ongoing active call and chat consultation status',
-          importance: Importance.max,
-          playSound: false,
-          enableVibration: false,
-        ),
-      );
       androidPlugin.requestNotificationsPermission();
     }
+  }
+
+  // ---------------------------------------------------------------------
+  // Helper: Show a local notification (used for foreground FCM messages)
+  // ---------------------------------------------------------------------
+  static Future<void> showNotification({
+    required String title,
+    required String body,
+    required String payload,
+    required String channelId,
+    int? notificationId,
+    bool playSound = false,
+    Importance importance = Importance.high,
+    Priority priority = Priority.high,
+  }) async {
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelId,
+      channelDescription: 'Foreground push notification',
+      importance: importance,
+      priority: priority,
+      playSound: playSound,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    final notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: playSound,
+      ),
+    );
+
+    await _notificationsPlugin.show(
+      notificationId ?? DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      notificationDetails,
+      payload: payload,
+    );
   }
 
   static const int ACTIVE_CHAT_NOTIFICATION_ID = 777777;
   static const int ACTIVE_CALL_NOTIFICATION_ID = 888888;
 
-  
-  
-  
-  
-  
-  
+  static Future<void> cancelCallNotification() async {
+    await _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
   }
+
+  static Future<void> cancelChatNotification() async {
+    await _notificationsPlugin.cancel(ACTIVE_CHAT_NOTIFICATION_ID);
+  }
+
+  static Future<void> cancelAll() async {
+    await _notificationsPlugin.cancelAll();
+  }
+}

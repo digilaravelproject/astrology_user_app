@@ -14,6 +14,7 @@ import '../../features/splash/domain/repositories/splash_repository.dart';
 import '../../features/splash/domain/services/splash_service.dart';
 import '../services/payment/razorpay/razorpay_service.dart';
 import '../services/network/websocket_service.dart';
+import '../services/network/presence_controller.dart';
 import '../../features/chat/data/datasources/chat_remote_data_source.dart';
 import '../../features/chat/data/datasources/chat_local_data_source.dart';
 import '../../features/chat/data/repositories/chat_repository_impl.dart';
@@ -30,7 +31,8 @@ class InitialBindings extends Bindings {
     Get.put(NetworkInfo(Get.find<Connectivity>()), permanent: true);
     Get.put(RazorpayService(), permanent: true);
     
-    // WebSockets
+    // Presence & WebSockets
+    Get.put(PresenceController(), permanent: true);
     final wsService = Get.put(WebSocketService(), permanent: true);
     wsService.init().then((_) {
       // Connect will automatically attempt connecting if token exists

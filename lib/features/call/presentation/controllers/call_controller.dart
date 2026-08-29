@@ -511,6 +511,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
       
     }
     try {
+      LocalNotificationService.cancelCallNotification();
       ForegroundTaskService.stopService();
     } catch (_) {}
     FloatingCallBubble.dismiss();

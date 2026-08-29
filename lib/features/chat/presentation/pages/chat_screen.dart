@@ -296,6 +296,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     }
 
                     return SwipeTo(
+                      key: ObjectKey(message),
                       onRightSwipe: (details) {
                         _controller.setReply(message);
                       },

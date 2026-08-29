@@ -187,6 +187,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
     }
 
     return SwipeTo(
+          key: ObjectKey(message),
           onRightSwipe: (details) {
             controller.setReply(message);
           },

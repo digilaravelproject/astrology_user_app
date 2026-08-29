@@ -11,6 +11,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'local_notification_service.dart';
 
 class FCMNotificationService {
@@ -59,9 +60,10 @@ class FCMNotificationService {
     // 4. Foreground Message Handler
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground Message Received: ${message.notification?.title}');
-      if (message.notification != null) {
+      if (message.notification != null || message.data.isNotEmpty) {
         final type = message.data['type']?.toString();
-        final title = message.notification?.title ?? '';
+        final title = message.notification?.title ?? message.data['title']?.toString() ?? '';
+        final body = message.notification?.body ?? message.data['body']?.toString() ?? '';
 
         // If chat accepted notification arrives while user is on waiting screen, update status to ongoing
         if (title.contains('Accepted') || type == 'chat_accepted' || type == 'CHAT_ACCEPTED' || type == 'chat') {
@@ -88,6 +90,8 @@ class FCMNotificationService {
             type == 'CHAT_MISSED' ||
             type == 'CHAT_DISMISSED') {
           
+          LocalNotificationService.cancelChatNotification();
+          LocalNotificationService.cancelAll();
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         } else if (title.contains('Call Ended') ||
@@ -97,6 +101,8 @@ class FCMNotificationService {
             type == 'CALL_FAILED' ||
             type == 'CALL_DISMISSED') {
           
+          LocalNotificationService.cancelCallNotification();
+          LocalNotificationService.cancelAll();
           return;
         } else if (type == 'PACKAGE_EXHAUSTED') {
           
@@ -105,12 +111,26 @@ class FCMNotificationService {
           return;
         }
 
-        // Read play_sound from FCM data map (Force disabled per user request)
-        // final String playSoundRaw = message.data['play_sound']?.toString() ?? '0';
-        // final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true';
-        const bool playSound = false; // Audio disabled globally
+        // Read sound, priority, importance dynamically from backend data map
+        final String playSoundRaw = message.data['play_sound']?.toString() ?? message.data['playSound']?.toString() ?? '0';
+        final bool playSound = playSoundRaw == '1' || playSoundRaw == 'true' || playSoundRaw == 'yes' || playSoundRaw == 'true';
 
-        debugPrint('[FCMNotificationService] type=$type playSound=$playSound');
+        final String priorityRaw = message.data['priority']?.toString().toLowerCase() ?? 'high';
+        Priority priority = Priority.high;
+        if (priorityRaw == 'max') priority = Priority.max;
+        else if (priorityRaw == 'low') priority = Priority.low;
+        else if (priorityRaw == 'min') priority = Priority.min;
+        else if (priorityRaw == 'default' || priorityRaw == 'normal') priority = Priority.defaultPriority;
+
+        final String importanceRaw = message.data['importance']?.toString().toLowerCase() ?? 'high';
+        Importance importance = Importance.high;
+        if (importanceRaw == 'max') importance = Importance.max;
+        else if (importanceRaw == 'low') importance = Importance.low;
+        else if (importanceRaw == 'min') importance = Importance.min;
+        else if (importanceRaw == 'default' || importanceRaw == 'normal') importance = Importance.defaultImportance;
+        else if (importanceRaw == 'none') importance = Importance.none;
+
+        debugPrint('[FCMNotificationService] type=$type playSound=$playSound priority=$priorityRaw importance=$importanceRaw');
 
         // Build a structured payload so onDidReceiveNotificationResponse can route correctly.
         // live_ prefix  → LiveRoomScreen
@@ -124,6 +144,45 @@ class FCMNotificationService {
         } else {
           structuredPayload = rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
         }
+
+        // ---- Show foreground notification ----
+        String channelId;
+        final upperType = type?.toUpperCase() ?? '';
+        
+        if (upperType == 'CALL') {
+          channelId = 'call';
+        } else if (upperType == 'CHAT') {
+          channelId = 'chat';
+        } else if (upperType == 'CHAT_REQUEST') {
+          channelId = 'chat_request';
+        } else if (upperType == 'CALL_REQUEST') {
+          channelId = 'call_request';
+        } else if (upperType == 'LIVE_STREAM' || upperType == 'LIVE' || upperType == 'LIVE_SESSION') {
+          channelId = 'live_stream';
+        } else if (upperType == 'WALLET' || upperType == 'ORDER') {
+          channelId = 'wallet';
+        } else if (upperType == 'CHAT_ACCEPTED') {
+          channelId = 'chat_request';
+        } else if (upperType == 'CALL_ACCEPTED') {
+          channelId = 'call_request';
+        } else if (upperType.contains('CHAT')) {
+          channelId = 'chat';
+        } else if (upperType.contains('CALL')) {
+          channelId = 'call';
+        } else {
+          channelId = 'general';
+        }
+
+        // Show the notification (with dynamic params)
+        LocalNotificationService.showNotification(
+          title: title,
+          body: body,
+          payload: structuredPayload,
+          channelId: channelId,
+          playSound: playSound,
+          priority: priority,
+          importance: importance,
+        );
 
         // ── Suppress notification if user is already viewing that chat session ──
         // Chat/message notifications are noisy when the user is actively in the
