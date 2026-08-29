@@ -118,35 +118,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
 
         if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
-          if (sessionId != null) {
-            LocalNotificationService.showOngoingChatNotification(
-              sessionId: sessionId,
-              title: '$name • Chat',
-              body: 'Ongoing chat session',
-              startedAtMillis: startedAtMillis,
+          final sessionType = session?['session_type']?.toString().toLowerCase() ?? 
+                              session?['type']?.toString().toLowerCase() ?? '';
+          final isCall = sessionType == 'call' || sessionType == 'audio_call' || sessionType == 'video_call';
+          
+          if (!isCall) {
+            if (sessionId != null) {
+              LocalNotificationService.showOngoingChatNotification(
+                sessionId: sessionId,
+                title: '$name • Chat',
+                body: 'Ongoing chat session',
+                startedAtMillis: startedAtMillis,
+              );
+            }
+            FloatingChatBubble.show(
+                context: Get.context!,
+                sessionId: sessionId,
+                name: name,
+                imageUrl: '', // We don't have the image in this payload
+                status: status,
+                startedAt: startedAt,
+                onTap: () {
+                  final currentStatus = FloatingChatBubble.chatStatus.value;
+                  Get.to(
+                        () => ChatScreen(
+                      astrologerName: name,
+                      astrologerImage: '',
+                      sessionId: sessionId,
+                      initialStatus: currentStatus,
+                      startedAtString: startedAt,
+                    ),
+                    binding: ChatBinding(),
+                  );
+                }
             );
           }
-          FloatingChatBubble.show(
-              context: Get.context!,
-              sessionId: sessionId,
-              name: name,
-              imageUrl: '', // We don't have the image in this payload
-              status: status,
-              startedAt: startedAt,
-              onTap: () {
-                final currentStatus = FloatingChatBubble.chatStatus.value;
-                Get.to(
-                      () => ChatScreen(
-                    astrologerName: name,
-                    astrologerImage: '',
-                    sessionId: sessionId,
-                    initialStatus: currentStatus,
-                    startedAtString: startedAt,
-                  ),
-                  binding: ChatBinding(),
-                );
-              }
-          );
         }
       }
     } catch (e) {
