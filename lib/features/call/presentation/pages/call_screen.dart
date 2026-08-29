@@ -39,10 +39,10 @@ class _CallScreenState extends State<CallScreen> {
   void dispose() {
     controller.isCallScreenVisible = false;
     // Minimize to bubble if the call is still active
-    if (controller.status.value == 'ongoing' || 
-        controller.status.value == 'ringing' || 
-        controller.status.value == 'dialing' || 
-        controller.status.value == 'waiting') {
+    if (controller.status.value.name == 'ongoing' || 
+        controller.status.value.name == 'ringing' || 
+        controller.status.value.name == 'dialing' || 
+        controller.status.value.name == 'waiting') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (controller.sessionId != null && controller.providerName != null) {
           controller.minimizeToBubble(Get.context!, controller.providerName!, controller.providerImage ?? "", shouldPop: false);
@@ -292,9 +292,9 @@ class _CallScreenState extends State<CallScreen> {
       }
     } else {
       // Normal (non-package) call
-      if (controller.status.value == 'ringing' || 
-          controller.status.value == 'dialing' || 
-          controller.status.value == 'waiting') {
+      if (controller.status.value.name == 'ringing' || 
+          controller.status.value.name == 'dialing' || 
+          controller.status.value.name == 'waiting') {
         controller.cancelCall();
       } else {
         controller.endCall();
@@ -530,7 +530,7 @@ class _CallScreenState extends State<CallScreen> {
         debugPrint("Error spawning chat channel: $e");
       }
     } else {
-      if (controller.status.value == 'ongoing') {
+      if (controller.status.value.name == 'ongoing') {
         await controller.endCall();
       } else {
         await controller.cancelCall();

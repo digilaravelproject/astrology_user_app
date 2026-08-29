@@ -118,7 +118,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (_controller.status.value == 'ongoing' || _controller.status.value == 'initiated') {
+        if (_controller.status.value.name == 'ongoing' || _controller.status.value.name == 'initiated') {
           _controller.minimizeToBubble(
             context,
             widget.astrologerName,
@@ -137,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           centerTitle: false,
           showLeading: true,
           onLeadingPressed: () {
-            if (_controller.status.value == 'ongoing' || _controller.status.value == 'initiated') {
+            if (_controller.status.value.name == 'ongoing' || _controller.status.value.name == 'initiated') {
               _controller.minimizeToBubble(
                 context,
                 widget.astrologerName,
@@ -150,7 +150,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           },
           actions: [
             Obx(() {
-              if (_controller.status.value == 'ongoing') {
+              if (_controller.status.value.name == 'ongoing') {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
