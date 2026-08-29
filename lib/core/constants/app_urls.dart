@@ -1,9 +1,11 @@
+import 'package:astro_user/core/services/config/env_config.dart';
+
 class AppUrls {
-  static String baseUrl = "https://suryapathkundli.com";
+  static String get baseUrl => EnvConfig.baseUrl;
   //static String baseUrl = "https://darkgoldenrod-peafowl-305286.hostingersite.com";
-  static const String baseImageUrl = "https://suryapathkundli.com/storage/";
-  static const String webSocketUrl =
-      "wss://suryapathkundli.com/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
+  static String get baseImageUrl => "${EnvConfig.baseUrl}/storage/";
+  static String get webSocketUrl =>
+      "${EnvConfig.baseUrl.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://')}/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
   static const String broadcastingAuth = "/api/v1/broadcasting/auth";
   static String sendOtp = "/api/v1/user/send-otp";
   static String verifyOtp = "/api/v1/user/verify-otp";

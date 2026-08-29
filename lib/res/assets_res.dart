@@ -7,7 +7,7 @@ class AssetsRes {
   AssetsRes._();
 
   static const String PROJECT_NAME = 'astro_user';
-  static const String PROJECT_VERSION = '1.0.1+2';
+  static const String PROJECT_VERSION = '1.0.3+4';
   static const String GENRAL_SOUND_BOTH = 'assets/audio/genral_sound_both.mp3';
   static const String USER_APP_SOUND = 'assets/audio/user_app_sound.mp3';
   static const String BUBBLE_IMG = 'assets/icons/bubble_img.png';
