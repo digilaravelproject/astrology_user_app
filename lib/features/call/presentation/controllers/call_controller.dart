@@ -289,10 +289,19 @@ class CallController extends GetxController with WidgetsBindingObserver {
         if (isCallScreenVisible) {
           Get.back();
         }
+      } else {
+        CustomSnackbar.showError(response.message ?? 'Failed to end call properly, but cleaning up locally.');
+        cleanUp();
+        if (isCallScreenVisible) {
+          Get.back();
+        }
       }
     } catch (e) {
       Logger.e('CallController: Error ending call -> $e');
       cleanUp();
+      if (isCallScreenVisible) {
+        Get.back();
+      }
     }
   }
 
