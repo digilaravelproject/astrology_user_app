@@ -8,8 +8,12 @@ class AstrologerService {
 
   Future<ResponseModel> getAstrologers({
     Map<String, dynamic>? queryParameters,
+    Function(ResponseModel)? onCacheData,
   }) async {
-    return await repository.getAstrologers(queryParameters: queryParameters);
+    return await repository.getAstrologers(
+      queryParameters: queryParameters,
+      onCacheData: onCacheData,
+    );
   }
 
   Future<ResponseModel> getAstrologerById(int id) async {

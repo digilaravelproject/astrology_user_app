@@ -9,10 +9,12 @@ class AstrologerRepository {
 
   Future<ResponseModel> getAstrologers({
     Map<String, dynamic>? queryParameters,
+    Function(ResponseModel)? onCacheData,
   }) async {
     return await apiClient.get(
       AppUrls.astrologers,
       queryParameters: queryParameters,
+      onCacheData: onCacheData,
     );
   }
 

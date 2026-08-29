@@ -32,7 +32,7 @@ class FCMNotificationService {
         .requestPermission(
           alert: true,
           badge: true,
-          sound: false,
+          sound: true,
           provisional: false,
         )
         .then((settings) {

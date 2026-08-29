@@ -250,7 +250,15 @@ class AstrologerController extends GetxController {
         params['language'] = selectedLanguages.join(',');
       }
 
-      final result = await _getAstrologersUseCase.execute(params: params);
+      final result = await _getAstrologersUseCase.execute(
+        params: params,
+        onCacheData: (cachedList) {
+          if (cachedList.isNotEmpty) {
+            astrologers.assignAll(cachedList);
+            isLoading.value = false;
+          }
+        },
+      );
       astrologers.assignAll(result);
     } catch (e) {
       print('Error fetching astrologers: $e');
