@@ -930,7 +930,7 @@ class WebSocketService extends GetxService {
       if (Get.isRegistered<ChatController>()) {
         final controller = Get.find<ChatController>();
         if (controller.sessionId == sessionId) {
-          controller.status.value = 'ongoing';
+          controller.status.value = ChatStatus.ongoing;
         }
       }
     } catch (e) {
