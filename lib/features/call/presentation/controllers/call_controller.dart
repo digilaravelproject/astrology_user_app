@@ -51,6 +51,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _iceSubscription;
   StreamSubscription? _endedSubscription;
   StreamSubscription? _packageTerminatedSub;
+  StreamSubscription? _callStatusSub;
+
+  bool isManualEnd = false;
 
   @override
   void onInit() {
@@ -367,6 +370,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       await endCall();
       return;
     }
+    
+    isManualEnd = true;
+    
     try {
       await PackageSessionService.terminateChannel(
         subSessionId: subId,
@@ -671,6 +677,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
   }
 
   void _handlePackageTerminated() {
+    if (isManualEnd) return;
+    
+    _stopRingtone();
     status.value = CallStatus.completed;
     cleanUp();
     if (isCallScreenVisible) {

@@ -104,7 +104,7 @@ class FCMNotificationService {
           LocalNotificationService.cancelCallNotification();
           LocalNotificationService.cancelAll();
           return;
-        } else if (type == 'PACKAGE_EXHAUSTED') {
+        } else if (type == 'PACKAGE_EXHAUSTED' || type == 'package') {
           
           
           FloatingChatBubble.dismiss(stopForegroundService: true);

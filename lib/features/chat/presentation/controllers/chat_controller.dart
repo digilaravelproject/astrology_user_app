@@ -95,6 +95,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _dismissSub;
   StreamSubscription? _statusUpdateSub;
   StreamSubscription? _packageTerminatedSub;
+  
+  bool isManualEnd = false;
 
   int? get sessionId => _sessionId;
   int? get peerId => _peerId;
@@ -162,6 +164,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     if (Get.isRegistered<ChatController>()) {
       Get.back();
     }
+    
+    isManualEnd = true;
     
     try {
       isLoading.value = true;
