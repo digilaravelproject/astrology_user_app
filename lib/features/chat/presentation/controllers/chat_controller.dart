@@ -147,6 +147,21 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       await endChatSession();
       return;
     }
+    
+    // Immediately close UI for smooth UX
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    if (_sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    }
+    FloatingChatBubble.dismiss();
+    WebSocketService.activeSessionId = null;
+    
+    if (Get.isRegistered<ChatController>()) {
+      Get.back();
+    }
+    
     try {
       isLoading.value = true;
       await PackageSessionService.terminateChannel(
@@ -155,20 +170,8 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         action: 'complete_session',
       );
       Logger.d('ChatController: terminateEntireSession success.');
-      
-      status.value = 'ended';
-      _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
-      if (_sessionId != null) {
-        LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
-      }
-      FloatingChatBubble.dismiss();
-      WebSocketService.activeSessionId = null;
-      
-      Get.back();
     } catch (e) {
       Logger.e('ChatController: Error in terminateEntireSession -> $e');
-      await endChatSession();
     } finally {
       isLoading.value = false;
     }
@@ -770,6 +773,17 @@ class ChatController extends GetxController with WidgetsBindingObserver {
 
   Future<void> endChatSession({bool skipSummary = false}) async {
     if (_sessionId == null) return;
+    
+    // Immediately close UI for smooth UX
+    status.value = 'ended';
+    _timer?.cancel();
+    FlutterBackgroundService().invoke('stopService');
+    LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
+    FloatingChatBubble.dismiss();
+    if (Get.isRegistered<ChatController>()) {
+      Get.back();
+    }
+    
     isLoading.value = true;
     try {
       final ChatSession? session;
@@ -800,11 +814,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       CustomSnackbar.showError(e.toString());
     } finally {
       isLoading.value = false;
-      status.value = 'ended';
-      _timer?.cancel();
-      FlutterBackgroundService().invoke('stopService');
-      LocalNotificationService.cancelOngoingChatNotification(_sessionId!);
-      FloatingChatBubble.dismiss();
     }
   }
 
