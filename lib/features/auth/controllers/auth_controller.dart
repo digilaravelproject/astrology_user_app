@@ -73,7 +73,10 @@ class AuthController extends GetxController {
     final isLoggedIn = await _checkLoginStatusUseCase.execute();
     if (isLoggedIn) {
       final user = await _getUserInfoUseCase.execute();
-      if (user != null) currentUser.value = user;
+      if (user != null) {
+        currentUser.value = user;
+        Get.find<WebSocketService>().connect();
+      }
     }
   }
 

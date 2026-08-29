@@ -90,6 +90,7 @@ class WebSocketService extends GetxService {
         Logger.e('|🔌 WEBSOCKET ERROR');
         Logger.e('|⚠️ Cannot connect, token or userId is missing.');
         Logger.e('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        _isConnecting = false;
         return;
       }
 
