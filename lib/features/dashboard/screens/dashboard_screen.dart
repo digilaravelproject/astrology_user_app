@@ -23,6 +23,8 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/features/dashboard/widgets/floating_package_banner.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import '../../live/presentation/controllers/live_controller.dart';
@@ -391,6 +393,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     name: FloatingChatBubble.name!,
                     imageUrl: '',
                   );
+                } else if (WebSocketService.isPackageBannerActive.value && !FloatingChatBubble.isActive && !FloatingCallBubble.isActive) {
+                  return const FloatingPackageBannerWidget();
                 }
                 return const SizedBox.shrink();
               }),

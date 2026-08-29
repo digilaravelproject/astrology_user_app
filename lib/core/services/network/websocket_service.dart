@@ -61,6 +61,12 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   // Prepaid Package Session State
   static final RxInt packageRemainingSeconds = 0.obs;
   static final RxBool isPackageSessionTerminated = false.obs;
+  static final RxString packageActiveChannel = ''.obs;
+  static final RxString packageAstrologerName = ''.obs;
+  static final RxString packageAstrologerAvatar = ''.obs;
+  static final RxInt packageSubSessionId = (-1).obs;
+  static final RxInt packageAstrologerId = (-1).obs;
+  static final RxBool isPackageBannerActive = false.obs;
 
   final String _wsUrl = AppUrls.webSocketUrl;
   
@@ -431,11 +437,29 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
             } else if (data['data'] is Map) {
               eventData = Map<String, dynamic>.from(data['data'] as Map);
             }
-            final secs = eventData['remaining_seconds'];
+            final secs = eventData['remaining_duration_seconds'] ?? eventData['remaining_seconds'];
             if (secs != null) {
               packageRemainingSeconds.value = int.tryParse(secs?.toString() ?? '') ?? 0;
             }
-            // other UI syncs like call_status, chat_status can be added here if needed by the dashboard
+            
+            packageSubSessionId.value = int.tryParse(eventData['sub_session_id']?.toString() ?? '') ?? -1;
+            packageActiveChannel.value = eventData['active_channel']?.toString() ?? '';
+            
+            final astrologerMap = eventData['astrologer'] as Map?;
+            if (astrologerMap != null) {
+              packageAstrologerId.value = int.tryParse(astrologerMap['id']?.toString() ?? '') ?? -1;
+              packageAstrologerName.value = astrologerMap['name']?.toString() ?? '';
+              packageAstrologerAvatar.value = astrologerMap['avatar']?.toString() ?? astrologerMap['profile_photo_url']?.toString() ?? '';
+            }
+            
+            final sessionState = eventData['session_state']?.toString() ?? '';
+            final isExhausted = eventData['is_exhausted'] == true || eventData['is_exhausted'] == 'true';
+            
+            if (sessionState == 'in_progress' && !isExhausted) {
+              isPackageBannerActive.value = true;
+            } else {
+              isPackageBannerActive.value = false;
+            }
           } catch (e) {
             Logger.e('Error handling PackageSessionStateUpdated -> $e');
           }
@@ -443,6 +467,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           Logger.d('Prepaid Package session terminated!');
           packageRemainingSeconds.value = 0;
           isPackageSessionTerminated.value = true;
+          isPackageBannerActive.value = false;
         } else if (event == AppUrls.eventChatAssistanceMessageSent || event == 'App\\Events\\ChatAssistanceMessageSent') {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT: $event');
