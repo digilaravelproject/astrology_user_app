@@ -327,9 +327,10 @@ class CallController extends GetxController with WidgetsBindingObserver {
       final pImage = providerImage ?? '';
 
       // Reset call without ending the package sub-session
+      final wasVisible = isCallScreenVisible;
       cleanUp();
 
-      if (isCallScreenVisible) {
+      if (wasVisible) {
         Get.back();
       }
 
@@ -368,8 +369,9 @@ class CallController extends GetxController with WidgetsBindingObserver {
       );
       Logger.d('CallController: terminateEntireSession success.');
       status.value = 'completed';
+      final wasVisible = isCallScreenVisible;
       cleanUp();
-      if (isCallScreenVisible) {
+      if (wasVisible) {
         Get.back();
       }
     } catch (e) {
