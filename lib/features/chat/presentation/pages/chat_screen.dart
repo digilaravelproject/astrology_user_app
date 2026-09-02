@@ -135,7 +135,46 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: CustomAppBar(
-          title: widget.astrologerName,
+          title: '',
+          titleWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.deepPink.withOpacity(0.15),
+                  border: Border.all(
+                    color: AppColors.deepPink.withOpacity(0.4),
+                    width: 1.5,
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Center(
+                  child: AppText(
+                    widget.astrologerName.isNotEmpty
+                        ? widget.astrologerName.substring(0, 1).toUpperCase()
+                        : 'A',
+                    color: AppColors.deepPink,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: AppText(
+                  widget.astrologerName,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF2E1A47),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
           centerTitle: false,
           showLeading: true,
           onLeadingPressed: () {
