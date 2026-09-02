@@ -277,24 +277,26 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Setup timer if started at is known
     _setupTimer(startedAtString);
 
-    final startedAtStr =
-        startedAtString ?? WebSocketService.sessionStartTimes[_sessionId];
-    int? startedAtMillis;
-    if (startedAtStr != null) {
-      final startedAt = DateTime.tryParse(startedAtStr);
-      if (startedAt != null) {
-        startedAtMillis = startedAt.millisecondsSinceEpoch;
-      }
-    }
+    // If already ongoing, start foreground notification now so notification
+    // timer matches elapsedSeconds from the same startedAt reference.
+    if (status.value == ChatStatus.ongoing) {
+      final effectiveStart =
+          startedAtString != null ? _parseSmartDate(startedAtString) : null;
+      final startTime = effectiveStart ?? DateTime.now();
 
-    // Show ongoing local notification
-    if (status.value == ChatStatus.ongoing ||
-        status.value == ChatStatus.initiated ||
-        status.value == ChatStatus.initiated) {
-      if (status.value == ChatStatus.initiated ||
-          status.value == ChatStatus.initiated) {
-        _startRingtone();
+      // Cache in session start times so floating bubble picks it up too
+      if (_sessionId != null) {
+        WebSocketService.sessionStartTimes[_sessionId!] =
+            startTime.toIso8601String();
       }
+
+      ForegroundTaskService.startActiveSessionNotification(
+        title: 'Active Chat',
+        type: 'Chat',
+        startedAt: startTime,
+      );
+    } else if (status.value == ChatStatus.initiated) {
+      _startRingtone();
     }
 
     ever(status, (val) {
@@ -529,7 +531,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
             }
 
             final effectiveStart = serverStartTime ?? DateTime.now();
-            _startedAt = effectiveStart.toIso8601String();
+            _startedAt = effectiveStart.toUtc().toIso8601String();
             if (_sessionId != null) {
               WebSocketService.sessionStartTimes[_sessionId!] = _startedAt!;
             }
@@ -669,7 +671,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
           elapsedSeconds.value++;
           if (_sessionId != null) {
             final genStart =
-                DateTime.now()
+                DateTime.now().toUtc()
                     .subtract(Duration(seconds: elapsedSeconds.value))
                     .toIso8601String();
             _startedAt = genStart;
