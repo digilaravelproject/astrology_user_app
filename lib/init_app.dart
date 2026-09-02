@@ -17,6 +17,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'firebase_options.dart';
 
 import 'core/services/fcm_notification_service.dart';
+import 'core/services/callkit_service.dart';
 
 Future<void> initApp() async {
   // Set environment configuration
@@ -78,4 +79,7 @@ Future<void> initApp() async {
 
   // Initialize FCM Notification service (Foreground + Background + Terminated)
   await FCMNotificationService.initialize();
+
+  // Initialize Callkit listeners
+  CallkitService.init();
 }
