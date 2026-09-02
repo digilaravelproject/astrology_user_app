@@ -276,6 +276,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
           _startRingingTimeout();
         }
+      } else {
+        status.value = CallStatus.idle;
         final msg = response.body?['message']?.toString() ?? 'Failed to initiate call.';
         if (msg.toLowerCase().contains('insufficient balance')) {
           // Extract the minimum amount required if possible, otherwise fallback to 0
