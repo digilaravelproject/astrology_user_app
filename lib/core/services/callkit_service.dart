@@ -1,64 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
-import 'package:astro_user/core/services/local_notification_service.dart';
-
-import '../../features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:get/get.dart';
+import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 
 class CallkitService {
   static void init() {
     FlutterCallkitIncoming.onEvent.listen((CallEvent? event) async {
       switch (event) {
         case CallEventActionCallAccept():
-          debugPrint('CallKit: Call Accepted');
+          debugPrint('CallKit: Accepted');
           final payload = event.callKitParams.extra?['payload'] as String?;
           final callerName = event.callKitParams.nameCaller;
           final sessionId = event.callKitParams.id;
-          
+
+          // Clean name for display
           if (callerName != null) {
-            FloatingChatBubble.name = callerName.replaceAll('Chat Req: ', '').replaceAll('Call Req: ', '').trim();
+            FloatingChatBubble.name = callerName
+                .replaceAll('Chat Req: ', '')
+                .replaceAll('Call Req: ', '')
+                .trim();
           }
 
-          if (payload != null) {
-            LocalNotificationService.handleNotificationRouting(
-              payload, 
-              true, 
-              false, 
-              callerName: callerName?.replaceAll('Chat Req: ', '').replaceAll('Call Req: ', '').trim(),
-            );
+          if (payload != null && payload.startsWith('chat_')) {
+            final sId = int.tryParse(payload.replaceFirst('chat_', ''));
+            if (sId != null) {
+              // End the CallKit session so it doesn't linger as an ongoing telecom call
+              if (sessionId != null) {
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  FlutterCallkitIncoming.endCall(sessionId);
+                });
+              }
 
-            // Since it's a chat, end the CallKit session so it doesn't linger as an 'ongoing telecom call'
-            if (payload.startsWith('chat_') && sessionId != null) {
-              Future.delayed(const Duration(milliseconds: 500), () {
-                FlutterCallkitIncoming.endCall(sessionId);
+              final astroName = FloatingChatBubble.name ?? 'Astrologer';
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!Get.isRegistered<ChatController>()) {
+                  ChatBinding().dependencies();
+                }
+                Get.to(
+                  () => ChatScreen(
+                    astrologerName: astroName,
+                    astrologerImage: '',
+                    sessionId: sId,
+                    initialStatus: 'ongoing',
+                  ),
+                  binding: ChatBinding(),
+                );
               });
             }
           }
           break;
+
         case CallEventActionCallDecline():
-          debugPrint('CallKit: Call Declined');
+          debugPrint('CallKit: Declined');
           final payload = event.callKitParams.extra?['payload'] as String?;
-          final sessionId = event.callKitParams.id;
-          
-          if (sessionId != null && LocalNotificationService.isSessionCancelled(sessionId)) {
-             debugPrint('CallKit: Ignoring decline because session $sessionId was already cancelled by user');
-             break;
-          }
-          
-          if (payload != null) {
-            LocalNotificationService.handleNotificationRouting(
-              payload, 
-              false, 
-              true,
-            );
+
+          if (payload != null && payload.startsWith('chat_')) {
+            final sId = int.tryParse(payload.replaceFirst('chat_', ''));
+            if (sId != null && Get.isRegistered<ChatController>()) {
+              Get.find<ChatController>().rejectChatSession();
+            }
           }
           break;
+
         case CallEventActionCallEnded():
           debugPrint('CallKit: Call Ended');
           break;
+
         case CallEventActionCallTimeout():
           debugPrint('CallKit: Call Timeout');
           break;
+
         default:
           break;
       }
@@ -71,10 +86,15 @@ class CallkitService {
     required String avatar,
     required String type, // 'call' or 'chat'
   }) async {
-    final String notifTitle = type == 'call' ? 'Incoming Call' : 'Chat Request';
-    final String nameCallerParam = type == 'call' ? callerName : 'Chat Req: $callerName';
+    final String notifTitle =
+        type == 'call' ? 'Incoming Call' : 'Chat Request';
+    final String nameCallerParam =
+        type == 'call' ? callerName : 'Chat Req: $callerName';
     final String payloadStr = '${type}_$sessionId';
-    final String safeAvatar = (avatar.isNotEmpty && avatar != 'null') ? avatar : 'assets/images/app_logo.png';
+    final String safeAvatar =
+        (avatar.isNotEmpty && avatar != 'null')
+            ? avatar
+            : 'assets/images/app_logo.png';
 
     CallKitParams callKitParams = CallKitParams(
       id: sessionId,
