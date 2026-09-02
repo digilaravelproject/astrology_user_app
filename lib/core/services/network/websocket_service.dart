@@ -15,7 +15,6 @@ import '../../../core/constants/app_urls.dart';
 import '../../utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
-import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';

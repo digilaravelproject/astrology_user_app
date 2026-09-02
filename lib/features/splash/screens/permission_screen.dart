@@ -20,6 +20,7 @@ class _PermissionScreenState extends State<PermissionScreen>
   bool isCameraGranted = false;
   bool isMicrophoneGranted = false;
   bool isNotificationGranted = false;
+  bool isSystemAlertWindowGranted = false;
 
   @override
   void initState() {
@@ -45,13 +46,17 @@ class _PermissionScreenState extends State<PermissionScreen>
     isCameraGranted = await Permission.camera.isGranted;
     isMicrophoneGranted = await Permission.microphone.isGranted;
     isNotificationGranted = await Permission.notification.isGranted;
+    isSystemAlertWindowGranted = await Permission.systemAlertWindow.isGranted;
     if (mounted) {
       setState(() {});
     }
   }
 
   bool get _allPermissionsGranted {
-    return isCameraGranted && isMicrophoneGranted && isNotificationGranted;
+    return isCameraGranted && 
+           isMicrophoneGranted && 
+           isNotificationGranted && 
+           isSystemAlertWindowGranted;
   }
 
   void _navigateToNext() {
@@ -69,6 +74,7 @@ class _PermissionScreenState extends State<PermissionScreen>
       Permission.camera,
       Permission.microphone,
       Permission.notification,
+      Permission.systemAlertWindow,
     ];
 
     await permissions.request();
@@ -82,10 +88,13 @@ class _PermissionScreenState extends State<PermissionScreen>
           await Permission.microphone.isPermanentlyDenied;
       bool notifPermanentlyDenied =
           await Permission.notification.isPermanentlyDenied;
+      bool alertPermanentlyDenied =
+          await Permission.systemAlertWindow.isPermanentlyDenied;
 
       if (cameraPermanentlyDenied ||
           micPermanentlyDenied ||
-          notifPermanentlyDenied) {
+          notifPermanentlyDenied ||
+          alertPermanentlyDenied) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -156,6 +165,13 @@ class _PermissionScreenState extends State<PermissionScreen>
                 description:
                     'To notify you about upcoming sessions and messages.',
                 isGranted: isNotificationGranted,
+              ),
+              const SizedBox(height: 20),
+              _buildPermissionItem(
+                icon: Icons.filter_none,
+                title: 'Display over other apps',
+                description: 'Required to show incoming calls when app is closed.',
+                isGranted: isSystemAlertWindowGranted,
               ),
               const Spacer(),
               if (!_allPermissionsGranted)

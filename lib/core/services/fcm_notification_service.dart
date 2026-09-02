@@ -2,6 +2,7 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
+import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -62,7 +63,16 @@ class FCMNotificationService {
 
     // 4. Foreground Message Handler
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('Foreground Message Received: ${message.notification?.title}');
+      debugPrint('=======================================');
+      debugPrint('[FCM_JSON_DATA] Foreground Message Received!');
+      debugPrint('[FCM_JSON_DATA] Notification Title: ${message.notification?.title}');
+      debugPrint('[FCM_JSON_DATA] Notification Body: ${message.notification?.body}');
+      try {
+        debugPrint('[FCM_JSON_DATA] Message JSON: ${jsonEncode(message.data)}');
+      } catch (e) {
+        debugPrint('[FCM_JSON_DATA] Message Data: ${message.data}');
+      }
+      debugPrint('=======================================');
       if (message.notification != null || message.data.isNotEmpty) {
         final type = message.data['type']?.toString();
         final title =
@@ -182,6 +192,9 @@ class FCMNotificationService {
               rawSessionId.isNotEmpty
                   ? 'call_$rawSessionId'
                   : message.data.toString();
+        } else if (type == 'wallet' || type == 'order') {
+          final refId = message.data['reference_id']?.toString() ?? message.data['entity_id']?.toString() ?? '';
+          structuredPayload = refId.isNotEmpty ? 'wallet_$refId' : message.data.toString();
         } else {
           structuredPayload =
               rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
@@ -270,7 +283,16 @@ class FCMNotificationService {
 
     // 5. Notification Opened Handler
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Notification Opened App: ${message.data}');
+      debugPrint('=======================================');
+      debugPrint('[FCM_JSON_DATA] Notification Opened App!');
+      debugPrint('[FCM_JSON_DATA] Notification Title: ${message.notification?.title}');
+      debugPrint('[FCM_JSON_DATA] Notification Body: ${message.notification?.body}');
+      try {
+        debugPrint('[FCM_JSON_DATA] Message JSON: ${jsonEncode(message.data)}');
+      } catch (e) {
+        debugPrint('[FCM_JSON_DATA] Message Data: ${message.data}');
+      }
+      debugPrint('=======================================');
       _handleNotificationClick(message.data);
     });
 

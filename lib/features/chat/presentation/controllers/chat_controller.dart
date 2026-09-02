@@ -22,7 +22,6 @@ import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/auth/domain/models/user_model.dart';
 
-import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';

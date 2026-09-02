@@ -619,10 +619,16 @@ class _CallScreenState extends State<CallScreen> {
     final providerId = controller.providerId;
     final providerName = controller.providerName ?? 'Astrologer';
     final providerImage = controller.providerImage ?? '';
-    final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
+    
+    // ✅ Fix: Check both helpers so subSessionId is never 0 for package calls
+    final int subSessionId = PackageSessionService.activeSubSessionId ?? 
+                             SessionBottomSheetHelper.activeSubSessionId ?? 
+                             0;
+
+    final bool isPackage = controller.isPackageCall || subSessionId > 0;
 
     Map<String, dynamic> spawnData = {};
-    if (subSessionId > 0 && controller.isPackageCall) {
+    if (subSessionId > 0 && isPackage) {
       try {
         spawnData = await PackageSessionService.spawnChannel(
           subSessionId: subSessionId,
@@ -656,26 +662,32 @@ class _CallScreenState extends State<CallScreen> {
       int activeChatSessionId = 0;
       String chatInitialStatus = 'ongoing';
 
-      if (subSessionId > 0 && controller.isPackageCall) {
-        activeChatSessionId =
-            int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
-        chatInitialStatus = spawnData['chat_status']?.toString() ?? 'ongoing';
+      if (subSessionId > 0 && isPackage) {
+        // ✅ Fix: Backend returns data inside sub_session map
+        final subSessionMap = spawnData['sub_session'] is Map ? spawnData['sub_session'] : {};
+        activeChatSessionId = int.tryParse(
+          (spawnData['chat_session_id'] ?? subSessionMap['chat_session_id'])?.toString() ?? ''
+        ) ?? 0;
+        chatInitialStatus = (spawnData['chat_status'] ?? subSessionMap['chat_status'])?.toString() ?? 'ongoing';
+        
+        // Preserve active IDs
+        PackageSessionService.activeSubSessionId = subSessionId;
+        SessionBottomSheetHelper.activeSubSessionId = subSessionId;
       } else {
+        // Normal Paid Chat fallback
         final response = await apiClient.post(
           AppUrls.initiateChat,
           data: {'provider_id': providerId},
         );
         if (response.isSuccess && response.body != null) {
           final body = response.body['data'] ?? response.body;
-          // API returns { data: { session: { id: 487, status: 'initiated' } } }
           final session = body['session'] ?? body;
-          activeChatSessionId =
-              int.tryParse(session['id']?.toString() ?? '') ?? 0;
+          activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
           chatInitialStatus = session['status']?.toString() ?? 'initiated';
         }
       }
 
-      if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
+      if (Get.isDialogOpen ?? false) Get.back();
 
       Get.to(
         () => ChatScreen(
@@ -683,7 +695,7 @@ class _CallScreenState extends State<CallScreen> {
           astrologerImage: providerImage,
           sessionId: activeChatSessionId,
           initialStatus: chatInitialStatus,
-          isPackageChat: controller.isPackageCall || subSessionId > 0,
+          isPackageChat: isPackage,
         ),
         binding: ChatBinding(),
       );
