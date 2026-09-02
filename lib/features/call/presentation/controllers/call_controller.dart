@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
+import 'package:astro_user/features/wallet/widgets/recharge_bottom_sheet.dart';
 
 class CallController extends GetxController with WidgetsBindingObserver {
   final ApiClient _apiClient = Get.find<ApiClient>();
@@ -275,11 +276,31 @@ class CallController extends GetxController with WidgetsBindingObserver {
 
           _startRingingTimeout();
         }
-      } else {
-        status.value = CallStatus.idle;
-        CustomSnackbar.showError(
-          response.body?['message']?.toString() ?? 'Failed to initiate call.',
-        );
+        final msg = response.body?['message']?.toString() ?? 'Failed to initiate call.';
+        if (msg.toLowerCase().contains('insufficient balance')) {
+          // Extract the minimum amount required if possible, otherwise fallback to 0
+          double neededAmount = 0.0;
+          final match = RegExp(r'minimum (\d+)').firstMatch(msg);
+          if (match != null) {
+            neededAmount = double.tryParse(match.group(1) ?? '0') ?? 0.0;
+          }
+          if (Get.context != null) {
+            showModalBottomSheet(
+              context: Get.context!,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder:
+                  (context) => RechargeBottomSheet(
+                    neededAmount: neededAmount,
+                    serviceType: 'call',
+                  ),
+            );
+          } else {
+            CustomSnackbar.showError(msg);
+          }
+        } else {
+          CustomSnackbar.showError(msg);
+        }
         cleanUp();
       }
     } catch (e) {

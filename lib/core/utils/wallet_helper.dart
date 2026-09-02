@@ -181,13 +181,31 @@ class WalletHelper {
                             binding: ChatBinding(),
                           );
                         } else {
+                          final msg = response.message;
                           if (response.statusCode == 400 &&
-                              response.message.toLowerCase().contains(
+                              msg.toLowerCase().contains(
                                 "pending or waiting request",
                               )) {
                             _handlePendingSession(context, apiClient);
+                          } else if (msg.toLowerCase().contains("insufficient balance")) {
+                            Get.back(); // close the current "Ready to Connect" bottom sheet
+                            double neededAmount = 0.0;
+                            final match = RegExp(r'minimum (\d+)').firstMatch(msg);
+                            if (match != null) {
+                              neededAmount = double.tryParse(match.group(1) ?? '0') ?? 0.0;
+                            }
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder:
+                                  (context) => RechargeBottomSheet(
+                                    neededAmount: neededAmount,
+                                    serviceType: 'chat',
+                                  ),
+                            );
                           } else {
-                            CustomSnackbar.showError(response.message);
+                            CustomSnackbar.showError(msg);
                           }
                         }
                       } catch (e) {
