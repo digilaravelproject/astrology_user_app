@@ -515,6 +515,11 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       if (_sessionId != null && updates.containsKey(_sessionId)) {
         final newStatus = updates[_sessionId!];
         if (newStatus != null && status.value.name != newStatus) {
+          if (status.value == ChatStatus.completed ||
+              status.value == ChatStatus.cancelled ||
+              status.value == ChatStatus.rejected) {
+            return;
+          }
           status.value = ChatStatus.ongoing;
           if (newStatus == 'ongoing' || newStatus == 'accepted') {
             _stopRingtone();
