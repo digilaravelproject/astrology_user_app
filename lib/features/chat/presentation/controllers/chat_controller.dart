@@ -91,6 +91,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   int? _peerId;
   String? _astrologerName;
   Timer? _timer;
+  bool isChatScreenVisible = false;
   String? _startedAt;
   StreamSubscription? _msgSub;
   StreamSubscription? _endSub;
