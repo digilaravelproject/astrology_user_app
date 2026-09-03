@@ -169,14 +169,29 @@ class ForegroundTaskService {
           notificationText: 'Ongoing session • 00:00',
         );
       } else {
-        await FlutterForegroundTask.startService(
-          serviceId: 256,
-          notificationTitle: title,
-          notificationText: 'Ongoing session • 00:00',
-          callback: startCallback,
-          // Use phoneCall service type to prevent dismissal in Android 14+
-          // serviceTypes: [ForegroundServiceTypes.phoneCall], // Note: this is added if supported by the package version
-        );
+        // Add a 1.5s delay to avoid OOM crash on low-RAM devices during WebRTC init
+        await Future.delayed(const Duration(milliseconds: 1500));
+        
+        if (await FlutterForegroundTask.isRunningService) {
+          FlutterForegroundTask.sendDataToTask({
+            'startedAt': startTimeMillis,
+            'sessionType': type,
+            'title': title,
+          });
+          FlutterForegroundTask.updateService(
+            notificationTitle: title,
+            notificationText: 'Ongoing session • 00:00',
+          );
+        } else {
+          await FlutterForegroundTask.startService(
+            serviceId: 256,
+            notificationTitle: title,
+            notificationText: 'Ongoing session • 00:00',
+            callback: startCallback,
+            // Use phoneCall service type to prevent dismissal in Android 14+
+            // serviceTypes: [ForegroundServiceTypes.phoneCall], // Note: this is added if supported by the package version
+          );
+        }
       }
     } catch (e) {
       Logger.d("ForegroundTaskService startService failed: $e");
