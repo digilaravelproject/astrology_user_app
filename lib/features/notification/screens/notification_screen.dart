@@ -8,18 +8,40 @@ import '../controllers/notification_controller.dart';
 import '../domain/models/notification_model.dart';
 import 'notification_detail_screen.dart';
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<NotificationController>();
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
 
-    // Fetch notifications if not already fetching
+class _NotificationScreenState extends State<NotificationScreen> {
+  final NotificationController controller = Get.find<NotificationController>();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchNotifications();
+      controller.fetchNotifications(refresh: true);
     });
 
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        controller.fetchNotifications(refresh: false);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -44,9 +66,31 @@ class NotificationScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Iconsax.tick_circle, color: AppColors.deepPink),
             tooltip: "Mark all as read",
+            onPressed: () => controller.markAllAsRead(),
+          ),
+          IconButton(
+            icon: const Icon(Iconsax.trash, color: Colors.redAccent),
+            tooltip: "Delete all",
             onPressed: () {
-              // Mark all as read logic can be added to controller if needed
-              // For now, we can loop through unread notifications
+              Get.dialog(
+                AlertDialog(
+                  title: const AppText('Clear Notifications'),
+                  content: const AppText('Are you sure you want to delete all notifications?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const AppText('Cancel', color: Colors.grey),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.back();
+                        controller.deleteAllNotifications();
+                      },
+                      child: const AppText('Delete All', color: Colors.redAccent),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],
@@ -63,23 +107,45 @@ class NotificationScreen extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          onRefresh: () => controller.fetchNotifications(),
+          onRefresh: () => controller.fetchNotifications(refresh: true),
           color: AppColors.primaryColor,
           child: ListView.separated(
+            controller: _scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            itemCount: controller.notifications.length,
+            itemCount: controller.notifications.length + (controller.isFetchingMore.value ? 1 : 0),
             separatorBuilder:
                 (context, index) =>
                     const Divider(height: 1, color: Color(0xFFEEEEEE)),
             itemBuilder: (context, index) {
+              if (index == controller.notifications.length) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: CircularProgressIndicator(color: AppColors.primaryColor),
+                  ),
+                );
+              }
               final notification = controller.notifications[index];
-              return GestureDetector(
-                onTap:
-                    () => Get.to(
-                      () =>
-                          NotificationDetailScreen(notification: notification),
-                    ),
-                child: _buildNotificationItem(notification),
+              return Dismissible(
+                key: Key(notification.id.toString()),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20.0),
+                  color: Colors.redAccent,
+                  child: const Icon(Iconsax.trash, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  controller.deleteNotification(notification.id);
+                },
+                child: GestureDetector(
+                  onTap:
+                      () => Get.to(
+                        () =>
+                            NotificationDetailScreen(notification: notification),
+                      ),
+                  child: _buildNotificationItem(notification),
+                ),
               );
             },
           ),

@@ -4,6 +4,7 @@ import '../../../../core/utils/custom_snackbar.dart';
 import '../../../../core/services/network/api_checker.dart';
 import '../../data/models/live_session_model.dart';
 import '../../domain/usecases/live_usecases.dart';
+import '../../../../core/services/network/websocket_service.dart';
 
 class LiveController extends GetxController {
   final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;
@@ -38,10 +39,19 @@ class LiveController extends GetxController {
   final RxBool isSendingSuperChat = false.obs;
 
   Timer? _commentsPollTimer;
+  StreamSubscription<List<LiveSessionModel>>? _activeLiveSessionsSub;
 
-  Future<void> fetchActiveSessions() async {
+  @override
+  void onInit() {
+    super.onInit();
+    _activeLiveSessionsSub = WebSocketService.activeLiveSessionsEvent.stream.listen((sessions) {
+      activeSessions.value = sessions;
+    });
+  }
+
+  Future<void> fetchActiveSessions({bool showLoading = true}) async {
     try {
-      isLoadingSessions.value = true;
+      if (showLoading) isLoadingSessions.value = true;
       final result = await _getActiveSessionsUseCase.call();
       if (result.isSuccess && result.body != null) {
         final List<dynamic> data;
@@ -62,7 +72,7 @@ class LiveController extends GetxController {
     } catch (e) {
       print('[LIVE] Error fetching active sessions: $e');
     } finally {
-      isLoadingSessions.value = false;
+      if (showLoading) isLoadingSessions.value = false;
     }
   }
 
@@ -269,6 +279,7 @@ class LiveController extends GetxController {
 
   @override
   void onClose() {
+    _activeLiveSessionsSub?.cancel();
     _stopCommentsPolling();
     super.onClose();
   }

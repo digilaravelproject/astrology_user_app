@@ -48,6 +48,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   VideoTrack? _remoteVideoTrack;
   bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
+  final List<Widget> _giftAnimations = [];
+  StreamSubscription? _superChatSubscription;
   Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
 
@@ -88,6 +90,22 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
     // Fetch gifts listing
     _giftController.fetchGifts();
+
+    _superChatSubscription = WebSocketService.superChatEvent.stream.listen((
+      event,
+    ) {
+      if (mounted) {
+        final String userName = event['user_name'] ?? 'User';
+        final String giftTitle =
+            event['gift'] != null ? event['gift']['title'] ?? 'Gift' : 'Gift';
+        final String? giftIcon =
+            event['gift'] != null ? event['gift']['icon_url'] : null;
+
+        if (giftIcon != null) {
+          _showGiftAnimation(giftIcon, userName, giftTitle);
+        }
+      }
+    });
 
     // Subscribe to dynamic websocket channel FIRST (must complete before join API)
     try {
@@ -293,6 +311,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   @override
   void dispose() {
+    _superChatSubscription?.cancel();
     _sessionWorker?.dispose();
     _mediaWorker?.dispose();
     _disconnectLiveKit();
@@ -559,11 +578,18 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                             : '${AppUrls.baseImageUrl}$rawImage')
                                         : '';
                                 return CustomImageWidget(
-                                  imagePath:
-                                      image.isNotEmpty
-                                          ? image
-                                          : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop",
+                                  imagePath: image.isNotEmpty ? image : null,
                                   fit: BoxFit.cover,
+                                  fallbackWidget: Container(
+                                    color: Colors.grey.shade900,
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.person,
+                                        size: 100,
+                                        color: Colors.white.withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ),
                                 );
                               }),
                             ),
@@ -782,6 +808,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ],
             ),
           ),
+
+          // gift animations
+          ..._giftAnimations,
 
           // floating reactions
           Positioned(
@@ -1136,6 +1165,222 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           icon,
           color: isActive ? activeColor : Colors.grey,
           size: 20,
+        ),
+      ),
+    );
+  }
+
+  void _showGiftAnimation(
+    String giftIconUrl,
+    String senderName,
+    String giftName,
+  ) {
+    final key = UniqueKey();
+    setState(() {
+      _giftAnimations.add(
+        _FloatingGiftAnimation(
+          key: key,
+          giftIconUrl: giftIconUrl,
+          senderName: senderName,
+          giftName: giftName,
+          onComplete: () {
+            if (mounted) {
+              setState(() {
+                _giftAnimations.removeWhere((element) => element.key == key);
+              });
+            }
+          },
+        ),
+      );
+    });
+  }
+}
+
+class _FloatingGiftAnimation extends StatefulWidget {
+  final String giftIconUrl;
+  final String senderName;
+  final String giftName;
+  final VoidCallback onComplete;
+
+  const _FloatingGiftAnimation({
+    super.key,
+    required this.giftIconUrl,
+    required this.senderName,
+    required this.giftName,
+    required this.onComplete,
+  });
+
+  @override
+  State<_FloatingGiftAnimation> createState() => _FloatingGiftAnimationState();
+}
+
+class _FloatingGiftAnimationState extends State<_FloatingGiftAnimation>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _rotationAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3000),
+    );
+
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.0,
+          end: 1.1,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
+        weight: 15,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.1,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 10,
+      ),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 60),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInBack)),
+        weight: 15,
+      ),
+    ]).animate(_controller);
+
+    _opacityAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 10),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 75),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 15),
+    ]).animate(_controller);
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.4),
+      end: const Offset(0, -0.6),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _rotationAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: ConstantTween(0.0), weight: 20),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.0,
+          end: 0.08,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 10,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.08,
+          end: -0.08,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 20,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: -0.08,
+          end: 0.05,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 20,
+      ),
+      TweenSequenceItem(
+        tween: Tween(
+          begin: 0.05,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 10,
+      ),
+      TweenSequenceItem(tween: ConstantTween(0.0), weight: 20),
+    ]).animate(_controller);
+
+    _controller.forward().then((_) {
+      widget.onComplete();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Center(
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: FadeTransition(
+            opacity: _opacityAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RotationTransition(
+                    turns: _rotationAnimation,
+                    child: CustomImageWidget(
+                      imagePath: widget.giftIconUrl,
+                      width: 100,
+                      height: 100,
+                      fallbackWidget: const Icon(
+                        Icons.card_giftcard,
+                        size: 80,
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.amber.withOpacity(0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${widget.senderName} ',
+                            style: const TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const TextSpan(
+                            text: 'sent a ',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
+                          ),
+                          TextSpan(
+                            text: widget.giftName,
+                            style: const TextStyle(
+                              color: Colors.pinkAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

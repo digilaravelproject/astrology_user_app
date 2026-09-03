@@ -46,6 +46,10 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   static final RxList<Map<String, dynamic>> presenceUpdates =
       <Map<String, dynamic>>[].obs;
   static final RxMap<int, String> sessionStartTimes = <int, String>{}.obs;
+  static final StreamController<Map<String, dynamic>> superChatEvent =
+      StreamController<Map<String, dynamic>>.broadcast();
+  static final StreamController<List<LiveSessionModel>> activeLiveSessionsEvent =
+      StreamController<List<LiveSessionModel>>.broadcast();
   // Signal: when set to a sessionId, that chat session has been ended remotely
   static final RxInt chatEndedSessionId = (-1).obs;
   static final RxInt chatDismissedSessionId = (-1).obs;
@@ -376,6 +380,14 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           _handleIceCandidateSent(data['data']);
         } else if (event == AppUrls.pusherPing) {
           _send(AppUrls.pusherPong);
+        } else if (event == 'ActiveLiveSessionsUpdated' ||
+            event == 'App\\Events\\ActiveLiveSessionsUpdated' ||
+            event == '.ActiveLiveSessionsUpdated') {
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          Logger.d('|📺 WEBSOCKET EVENT: $event');
+          Logger.d('|📦 Data: ${data['data']}');
+          Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          _handleActiveLiveSessionsUpdated(data['data']);
         } else if (event == AppUrls.eventLiveSessionStarted ||
             event == 'App\\Events\\${AppUrls.eventLiveSessionStarted}' ||
             event == '.${AppUrls.eventLiveSessionStarted}') {
@@ -706,11 +718,42 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     }
   }
 
+  void _broadcastActiveSessions(Map<String, dynamic> eventData) {
+    if (eventData.containsKey('active_sessions')) {
+      try {
+        final List<dynamic> sessionsJson = eventData['active_sessions'];
+        final sessions = sessionsJson.map((e) => LiveSessionModel.fromJson(e)).toList();
+        activeLiveSessionsEvent.add(sessions);
+      } catch (e) {
+        Logger.e('WebSocketService: error parsing active_sessions -> $e');
+      }
+    }
+  }
+
+  void _handleActiveLiveSessionsUpdated(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      _broadcastActiveSessions(eventData);
+    } catch (e) {
+      Logger.e('WebSocketService: error handling ActiveLiveSessionsUpdated -> $e');
+    }
+  }
+
   void _handleLiveSessionStarted(dynamic rawData) {
     try {
-      if (Get.isRegistered<LiveController>()) {
-        Get.find<LiveController>().fetchActiveSessions();
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
       }
+      _broadcastActiveSessions(eventData);
+
     } catch (e) {
       Logger.e('WebSocketService: error handling LiveSessionStarted -> $e');
     }
@@ -841,6 +884,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
         );
         controller.comments.add(newComment);
       }
+      superChatEvent.add(eventData);
     } catch (e) {
       Logger.e('WebSocketService: error handling SuperChatReceived -> $e');
     }
@@ -983,6 +1027,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
       } else if (rawData is Map) {
         eventData = Map<String, dynamic>.from(rawData);
       }
+      _broadcastActiveSessions(eventData);
 
       final int sessionId =
           eventData['session_id'] is int
@@ -1025,6 +1070,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     final Set<String> channelsToSubscribe = {
       AppUrls.privateUserChannel(_userId!),
       'astrologers',
+      'live-sessions',
       ..._subscribedChannels,
     };
 

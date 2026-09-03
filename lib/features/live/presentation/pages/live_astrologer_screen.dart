@@ -9,8 +9,10 @@ import '../../../../core/widgets/custom_app_bar.dart';
 import '../controllers/live_controller.dart';
 import '../../data/models/live_session_model.dart';
 import 'live_room_screen.dart';
+import 'live_pager_screen.dart';
 import '../../../../core/constants/app_urls.dart';
 import '../../../../core/constants/image_constants.dart';
+import 'package:shimmer/shimmer.dart';
 
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
@@ -88,13 +90,29 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
 
                     Obx(() {
                       if (_controller.isLoadingSessions.value) {
-                        return const SizedBox(
-                          height: 200,
-                          child: Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.primaryColor,
-                            ),
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 18,
+                            crossAxisSpacing: 18,
+                            childAspectRatio: 0.78,
                           ),
+                          itemCount: 4, // Show 4 shimmer placeholders
+                          itemBuilder: (context, index) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade100,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                              ),
+                            );
+                          },
                         );
                       }
 
@@ -138,24 +156,18 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
                         itemBuilder: (context, index) {
                           final session = _controller.activeSessions[index];
                           return GestureDetector(
-                            onTap:
-                                () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => LiveRoomScreen(
-                                          sessionId: session.id,
-                                          astrologerName:
-                                              session.astrologer?.name ??
-                                              'Astrologer',
-                                          astrologerImage:
-                                              session
-                                                  .astrologer
-                                                  ?.profilePhoto ??
-                                              '',
-                                        ),
-                                  ),
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => LivePagerScreen(
+                                        initialIndex: index,
+                                      ),
                                 ),
+                              );
+                              _controller.fetchActiveSessions(showLoading: false);
+                            },
                             child: _buildLiveCard(session),
                           );
                         },
@@ -338,17 +350,34 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         borderRadius: BorderRadius.circular(24),
         child: Stack(
           children: [
-            CustomImageWidget(
-              imagePath:
-                  (session.astrologer?.profilePhoto != null &&
-                          session.astrologer!.profilePhoto!.isNotEmpty)
-                      ? (session.astrologer!.profilePhoto!.startsWith('http')
-                          ? session.astrologer!.profilePhoto!
-                          : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
-                      : '',
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Builder(
+              builder: (context) {
+                final rawImage = session.astrologer?.profilePhoto ?? '';
+                final imagePath = rawImage.isNotEmpty
+                    ? (rawImage.startsWith('http')
+                        ? rawImage
+                        : '${AppUrls.baseImageUrl}$rawImage')
+                    : null;
+                final astroName = session.astrologer?.name ?? 'A';
+                final initial = astroName.isNotEmpty ? astroName[0].toUpperCase() : 'A';
+                return CustomImageWidget(
+                  imagePath: imagePath,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  fallbackWidget: Container(
+                    color: Colors.grey.shade800,
+                    child: Center(
+                      child: AppText(
+                        initial,
+                        fontSize: 60,
+                        color: Colors.white54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              }
             ),
             Container(
               decoration: BoxDecoration(

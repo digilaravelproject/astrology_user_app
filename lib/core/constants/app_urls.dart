@@ -74,12 +74,18 @@ class AppUrls {
   static const String removeDeviceToken = '/api/v1/user/remove-token';
   static String getNotificationCount(int userId) =>
       '/api/v1/user/notifications/count?user_id=$userId';
-  static String getNotifications(int userId) =>
-      '/api/v1/user/notifications?user_id=$userId';
+  static String getNotifications(int userId, {int page = 1}) =>
+      '/api/v1/user/notifications?user_id=$userId&page=$page';
   static String getNotificationById(int id, int userId) =>
       '/api/v1/user/notifications/$id?user_id=$userId';
   static String markNotificationRead(int id, int userId) =>
       '/api/v1/user/notifications/$id/mark-read?user_id=$userId';
+  static String markAllNotificationsRead(int userId) =>
+      '/api/v1/user/notifications/mark-all-read?user_id=$userId';
+  static String deleteNotification(int id, int userId) =>
+      '/api/v1/user/notifications/$id?user_id=$userId';
+  static String deleteAllNotifications(int userId) =>
+      '/api/v1/user/notifications/delete-all?user_id=$userId';
 
   // Gifts
   static const String gifts = '/api/v1/gifts';
