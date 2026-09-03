@@ -91,7 +91,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   int? _peerId;
   String? _astrologerName;
   Timer? _timer;
-  bool isChatScreenVisible = false;
   String? _startedAt;
   StreamSubscription? _msgSub;
   StreamSubscription? _endSub;
@@ -202,7 +201,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
   @override
   void onInit() {
     super.onInit();
-    isChatScreenVisible = true;
     WidgetsBinding.instance.addObserver(this);
     scrollController.addListener(_scrollListener);
     ForegroundTaskService.listenTaskData((data) {
@@ -678,8 +676,7 @@ class ChatController extends GetxController with WidgetsBindingObserver {
           elapsedSeconds.value++;
           if (_sessionId != null) {
             final genStart =
-                DateTime.now()
-                    .toUtc()
+                DateTime.now().toUtc()
                     .subtract(Duration(seconds: elapsedSeconds.value))
                     .toIso8601String();
             _startedAt = genStart;
@@ -918,19 +915,11 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     // Immediately close UI for smooth UX
     status.value = ChatStatus.completed;
     _timer?.cancel();
-    _timer = null;
     LocalNotificationService.cancelChatNotification();
-
-    try {
-      ForegroundTaskService.stopService();
-    } catch (_) {}
+    FlutterBackgroundService().invoke('stopService');
 
     FloatingChatBubble.dismiss();
-
-    final wasVisible = isChatScreenVisible;
-    isChatScreenVisible = false;
-
-    if (wasVisible) {
+    if (Get.isRegistered<ChatController>()) {
       Get.back();
     }
 
@@ -978,18 +967,13 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     _stopRingtone();
     status.value = ChatStatus.completed;
     _timer?.cancel();
-    _timer = null;
     LocalNotificationService.cancelChatNotification();
-
-    try {
-      ForegroundTaskService.stopService();
-    } catch (_) {}
+    FlutterBackgroundService().invoke('stopService');
 
     FloatingChatBubble.dismiss();
-    final wasVisible = isChatScreenVisible;
-    isChatScreenVisible = false;
 
-    if (wasVisible) {
+    // Immediately close screen for smooth UX
+    if (Get.isRegistered<ChatController>()) {
       Get.back();
     }
 
@@ -1019,8 +1003,6 @@ class ChatController extends GetxController with WidgetsBindingObserver {
       );
       return;
     }
-
-    isChatScreenVisible = false;
     WebSocketService.activeSessionId = null;
     final startStr =
         _startedAt ??

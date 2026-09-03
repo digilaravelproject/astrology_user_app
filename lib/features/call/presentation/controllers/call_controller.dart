@@ -278,8 +278,7 @@ class CallController extends GetxController with WidgetsBindingObserver {
         }
       } else {
         status.value = CallStatus.idle;
-        final msg =
-            response.body?['message']?.toString() ?? 'Failed to initiate call.';
+        final msg = response.body?['message']?.toString() ?? 'Failed to initiate call.';
         if (msg.toLowerCase().contains('insufficient balance')) {
           // Extract the minimum amount required if possible, otherwise fallback to 0
           double neededAmount = 0.0;
@@ -387,9 +386,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
         }
 
         final sId = sessionId ?? 0;
-        final wasVisible = isCallScreenVisible;
         cleanUp();
-        if (wasVisible) {
+        if (isCallScreenVisible) {
           Get.back();
         }
       } else {
@@ -397,9 +395,8 @@ class CallController extends GetxController with WidgetsBindingObserver {
           response.message ??
               'Failed to end call properly, but cleaning up locally.',
         );
-        final wasVisible = isCallScreenVisible;
         cleanUp();
-        if (wasVisible) {
+        if (isCallScreenVisible) {
           Get.back();
         }
       }
