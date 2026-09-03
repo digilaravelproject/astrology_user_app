@@ -17,6 +17,8 @@ import 'package:astro_user/core/services/local_notification_service.dart';
 
 import 'features/chat/presentation/widgets/overlay_main.dart';
 
+import 'package:astro_user/core/services/foreground_task_service.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
@@ -43,6 +45,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         type == 'CHAT_DISMISSED') {
       LocalNotificationService.cancelChatNotification();
       LocalNotificationService.cancelAll();
+      ForegroundTaskService.stopService();
     } else if (title.contains('Call Ended') ||
         type == 'call_ended' ||
         type == 'CALL_ENDED' ||
@@ -51,6 +54,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         type == 'CALL_DISMISSED') {
       LocalNotificationService.cancelCallNotification();
       LocalNotificationService.cancelAll();
+      ForegroundTaskService.stopService();
     }
     if (data.containsKey('session')) {
       final sessionData =
