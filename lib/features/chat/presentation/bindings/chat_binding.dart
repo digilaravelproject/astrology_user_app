@@ -1,8 +1,4 @@
 import 'package:get/get.dart';
-import 'package:astro_user/core/services/network/api_client.dart';
-import 'package:astro_user/features/chat/data/datasources/chat_local_data_source.dart';
-import 'package:astro_user/features/chat/data/datasources/chat_remote_data_source.dart';
-import 'package:astro_user/features/chat/data/repositories/chat_repository_impl.dart';
 import 'package:astro_user/features/chat/domain/repositories/i_chat_repository.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/reject_chat_session_usecase.dart';
@@ -11,12 +7,12 @@ import 'package:astro_user/features/chat/domain/usecases/mark_messages_read_usec
 import 'package:astro_user/features/chat/domain/usecases/send_attachment_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/send_text_message_usecase.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_session_controller.dart';
+import 'package:astro_user/features/chat/presentation/controllers/chat_message_controller.dart';
 
 class ChatBinding extends Bindings {
   @override
   void dependencies() {
-    // Data sources and Repositories are now provided globally in InitialBindings
-
     // 3. Use Cases
     Get.lazyPut(() => LoadChatHistoryUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => SendTextMessageUseCase(Get.find<IChatRepository>()), fenix: true);
@@ -25,15 +21,29 @@ class ChatBinding extends Bindings {
     Get.lazyPut(() => EndChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => RejectChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
 
-    // 4. Controller
+    // 4. Controllers
     Get.lazyPut(
-      () => ChatController(
+      () => ChatSessionController(
+        endChatSessionUseCase: Get.find<EndChatSessionUseCase>(),
+        rejectChatSessionUseCase: Get.find<RejectChatSessionUseCase>(),
+      ),
+      fenix: true,
+    );
+
+    Get.lazyPut(
+      () => ChatMessageController(
         loadChatHistoryUseCase: Get.find<LoadChatHistoryUseCase>(),
         sendTextMessageUseCase: Get.find<SendTextMessageUseCase>(),
         sendAttachmentUseCase: Get.find<SendAttachmentUseCase>(),
         markMessagesReadUseCase: Get.find<MarkMessagesReadUseCase>(),
-        endChatSessionUseCase: Get.find<EndChatSessionUseCase>(),
-        rejectChatSessionUseCase: Get.find<RejectChatSessionUseCase>(),
+      ),
+      fenix: true,
+    );
+
+    Get.lazyPut(
+      () => ChatController(
+        session: Get.find<ChatSessionController>(),
+        messaging: Get.find<ChatMessageController>(),
       ),
       fenix: true,
     );

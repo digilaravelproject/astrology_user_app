@@ -11,7 +11,7 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});

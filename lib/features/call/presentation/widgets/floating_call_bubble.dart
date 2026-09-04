@@ -9,6 +9,7 @@ import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/routes/app_routes.dart';
 
 class FloatingCallBubble {
   static int? sessionId;
@@ -44,7 +45,7 @@ class FloatingCallBubble {
             onTapCallback?.call();
           } else {
             FloatingCallBubble.dismiss();
-            Get.to(() => const CallScreen());
+            Get.toNamed(AppRoutes.callScreen);
           }
         });
       }
@@ -267,7 +268,7 @@ class _FloatingCallBubbleWidgetState extends State<FloatingCallBubbleWidget> {
             if (FloatingCallBubble.onTapCallback != null) {
               FloatingCallBubble.onTapCallback?.call();
             } else {
-              Get.to(() => const CallScreen());
+              Get.toNamed(AppRoutes.callScreen);
             }
           },
           child: Container(

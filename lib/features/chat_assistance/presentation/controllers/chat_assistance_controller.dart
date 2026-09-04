@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';

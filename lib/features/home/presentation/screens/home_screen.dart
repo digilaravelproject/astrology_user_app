@@ -25,7 +25,7 @@ import 'package:astro_user/features/wallet/presentation/screens/wallet_screen.da
 import 'package:astro_user/features/notification/presentation/screens/notification_screen.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';

@@ -14,6 +14,7 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:astro_user/routes/app_routes.dart';
 
 class WalletHelper {
   static Future<void> checkBalanceAndProceed({
@@ -153,12 +154,12 @@ class WalletHelper {
                             }
                           }
                           
-                          Get.to(() => ChatScreen(
-                            astrologerName: name,
-                            astrologerImage: imageUrl,
-                            sessionId: sessionId,
-                            initialStatus: 'initiated',
-                          ), binding: ChatBinding());
+                          Get.toNamed(AppRoutes.chatScreen, arguments: {
+                            'astrologerName': name,
+                            'astrologerImage': imageUrl,
+                            'sessionId': sessionId,
+                            'initialStatus': 'initiated',
+                          });
                         } else {
                           if (response.statusCode == 400 && response.message.toLowerCase().contains("pending or waiting request")) {
                             _handlePendingSession(context, apiClient);
@@ -186,12 +187,10 @@ class WalletHelper {
                         Get.back(); // close bottom sheet
                         
                         // Find or put CallController
-                        final callController = Get.isRegistered<CallController>()
-                            ? Get.find<CallController>()
-                            : Get.put(CallController());
+                        final callController = Get.find<CallController>();
                             
                         // Navigate to webrtc CallScreen
-                        Get.to(() => const CallScreen());
+                        Get.toNamed(AppRoutes.callScreen);
                         
                         // Start the call
                         callController.initiateCall(

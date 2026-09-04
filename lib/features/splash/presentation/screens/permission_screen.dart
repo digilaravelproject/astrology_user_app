@@ -6,7 +6,7 @@ import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 
 class PermissionScreen extends StatefulWidget {
   const PermissionScreen({super.key});
@@ -46,6 +46,10 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
     isNotificationGranted = await Permission.notification.isGranted;
     if (mounted) {
       setState(() {});
+    }
+
+    if (_allPermissionsGranted) {
+      _navigateToNext();
     }
   }
 
@@ -173,27 +177,6 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
                     ),
                   ),
                 ),
-              if (!_allPermissionsGranted) const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _navigateToNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: AppText(
-                    'Go to Dashboard',
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
             ],
           ),
         ),

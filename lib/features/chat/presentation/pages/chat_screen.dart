@@ -18,7 +18,7 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/features/kundli/kundli_screen.dart';
 import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:swipe_to/swipe_to.dart';
@@ -1062,9 +1062,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   if (Get.isDialogOpen ?? false) Get.back();
 
                   // Initiate call
-                  final callController = Get.isRegistered<CallController>()
-                      ? Get.find<CallController>()
-                      : Get.put(CallController());
+                  final callController = Get.find<CallController>();
                   
                   await callController.initiateCall(
                     providerId: providerId,

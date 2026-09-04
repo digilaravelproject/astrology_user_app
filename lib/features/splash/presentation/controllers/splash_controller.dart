@@ -5,7 +5,7 @@ import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/features/splash/data/datasources/splash_service.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/fcm_notification_service.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -39,9 +39,7 @@ class SplashController extends GetxController {
         bool micGranted = await Permission.microphone.isGranted;
         bool notifGranted = await Permission.notification.isGranted;
 
-        bool hasSeenPermission = SharedPrefs.getBool(AppConstants.hasSeenPermission) ?? false;
-
-        if ((cameraGranted && micGranted && notifGranted) || hasSeenPermission) {
+        if (cameraGranted && micGranted && notifGranted) {
           // Check if user is logged in
           final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
 

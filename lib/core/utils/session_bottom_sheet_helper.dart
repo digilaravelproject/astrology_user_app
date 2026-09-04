@@ -17,8 +17,9 @@ import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:astro_user/routes/app_routes.dart';
 
 class SessionBottomSheetHelper {
   static int? activeSubSessionId;
@@ -337,13 +338,13 @@ class SessionBottomSheetHelper {
                                 
                                 activeSubSessionId = result.subSession.id;
                                 
-                                Get.to(() => ChatScreen(
-                                  astrologerName: currentAstro.name,
-                                  astrologerImage: currentAstro.profilePhoto != null ? '${AppUrls.baseImageUrl}${currentAstro.profilePhoto}' : '',
-                                  sessionId: result.linkedChatSession!.id,
-                                  initialStatus: 'initiated',
-                                  isPackageChat: true,
-                                ), binding: ChatBinding());
+                                Get.toNamed(AppRoutes.chatScreen, arguments: {
+                                  'astrologerName': currentAstro.name,
+                                  'astrologerImage': currentAstro.profilePhoto != null ? '${AppUrls.baseImageUrl}${currentAstro.profilePhoto}' : '',
+                                  'sessionId': result.linkedChatSession!.id,
+                                  'initialStatus': 'initiated',
+                                  'isPackageChat': true,
+                                });
                               } catch (e) {
                                 Navigator.pop(context); // Dismiss loading dialog
                                 CustomSnackbar.showError(e.toString());
@@ -389,11 +390,9 @@ class SessionBottomSheetHelper {
                               if (permissionStatus.isGranted) {
                                 Navigator.pop(context); // Dismiss bottom sheet
                                 
-                                final callController = Get.isRegistered<CallController>()
-                                    ? Get.find<CallController>()
-                                    : Get.put(CallController());
+                                final callController = Get.find<CallController>();
                                     
-                                Get.to(() => const CallScreen());
+                                Get.toNamed(AppRoutes.callScreen);
                                 
                                 callController.initiateCall(
                                   providerId: currentAstro.userId,

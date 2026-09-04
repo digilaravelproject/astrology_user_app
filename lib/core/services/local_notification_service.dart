@@ -10,6 +10,7 @@ import 'package:astro_user/features/chat/presentation/controllers/chat_controlle
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
+import 'package:astro_user/routes/app_routes.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -55,7 +56,7 @@ class LocalNotificationService {
           }
           if (!isVisible) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              Get.to(() => const CallScreen());
+              Get.toNamed(AppRoutes.callScreen);
             });
           }
         } else if (FloatingChatBubble.onTapCallback != null) {

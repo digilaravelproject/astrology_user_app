@@ -17,7 +17,7 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';

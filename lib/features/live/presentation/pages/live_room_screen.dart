@@ -15,7 +15,7 @@ import 'package:astro_user/features/astrologers/presentation/controllers/astrolo
 import 'package:astro_user/features/astrologers/data/models/gift_model.dart' as model;
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/astrologers/presentation/bindings/astrologers_binding.dart';

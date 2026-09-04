@@ -43,8 +43,11 @@ import 'package:astro_user/features/support/presentation/bindings/support_bindin
 import 'package:astro_user/features/profile/presentation/screens/faq_screen.dart';
 import 'package:astro_user/features/profile/presentation/screens/privacy_policy_screen.dart';
 import 'package:astro_user/features/profile/presentation/screens/terms_and_conditions_screen.dart';
+import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/features/notification/presentation/screens/notification_screen.dart';
 import 'package:astro_user/features/notification/presentation/bindings/notification_binding.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+
 import 'app_routes.dart';
 
 class RouteHelper {
@@ -279,6 +282,24 @@ class RouteHelper {
       page: () => const KundliMatchScreen(),
       transition: Transition.fadeIn,
       binding: KundliBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.chatScreen,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return ChatScreen(
+          astrologerName: args['astrologerName'] ?? 'Astrologer',
+          astrologerImage: args['astrologerImage'] ?? '',
+          sessionId: args['sessionId'] ?? 0,
+          initialStatus: args['initialStatus'] ?? 'ongoing',
+          isPackageChat: args['isPackageChat'] ?? false,
+        );
+      },
+      binding: ChatBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.callScreen,
+      page: () => const CallScreen(),
     ),
   ];
 }

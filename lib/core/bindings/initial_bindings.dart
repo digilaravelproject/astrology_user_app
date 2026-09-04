@@ -1,3 +1,6 @@
+import 'package:astro_user/features/call/presentation/controllers/call_session_controller.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_webrtc_controller.dart';
+
 import 'package:get/get.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/live/presentation/bindings/live_binding.dart';
@@ -13,7 +16,7 @@ import 'package:astro_user/features/splash/presentation/controllers/splash_contr
 import 'package:astro_user/features/splash/domain/repositories/splash_repository.dart';
 import 'package:astro_user/features/splash/data/datasources/splash_service.dart';
 import 'package:astro_user/core/services/payment/razorpay/razorpay_service.dart';
-import 'package:astro_user/core/services/network/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/features/chat/data/datasources/chat_remote_data_source.dart';
 import 'package:astro_user/features/chat/data/datasources/chat_local_data_source.dart';
 import 'package:astro_user/features/chat/data/repositories/chat_repository_impl.dart';
@@ -82,7 +85,9 @@ class InitialBindings extends Bindings {
     );
 
     // Call dependencies
-    Get.put(CallController(), permanent: true);
+    Get.put(CallSessionController(), permanent: true);
+    Get.put(CallWebRTCController(), permanent: true);
+    Get.put(CallController(session: Get.find<CallSessionController>(), webrtc: Get.find<CallWebRTCController>()), permanent: true);
 
     // Live dependencies
     LiveBinding().dependencies();
