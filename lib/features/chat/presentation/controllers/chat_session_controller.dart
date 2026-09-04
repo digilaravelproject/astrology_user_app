@@ -69,9 +69,9 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
             endChatSession();
           }
         } else if (data['action'] == 'tap') {
-          if (_orchestrator.astrologerId != null) {
-            Get.toNamed(Routes.chatScreen, arguments: {
-              'astrologer_id': _orchestrator.astrologerId,
+          if (_orchestrator.peerId != null) {
+            Get.toNamed(AppRoutes.chatScreen, arguments: {
+              'astrologer_id': _orchestrator.peerId,
               'astrologer_name': _orchestrator.astrologerName,
             });
           }

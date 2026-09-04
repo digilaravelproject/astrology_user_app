@@ -281,9 +281,9 @@ class LocalNotificationService {
       );
     } catch (_) {}
     try {
-      await ForegroundTaskService.startService(
+      await ForegroundTaskService.startActiveSessionNotification(
         title: title,
-        text: body,
+        type: 'Chat',
       );
     } catch (e) {
       debugPrint("ForegroundTaskService start ignored due to OS policy: $e");

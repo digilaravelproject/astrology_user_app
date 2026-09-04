@@ -57,11 +57,11 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
       if (data is Map) {
         if (data['action'] == 'hangup') {
           if (sessionId != null) {
-            handleCallEnded('user_hung_up');
+            handleCallEnded({'reason': 'user_hung_up'});
           }
         } else if (data['action'] == 'tap') {
           if (providerId != null) {
-            Get.toNamed(Routes.callScreen);
+            Get.toNamed(AppRoutes.callScreen);
           }
         }
       }
