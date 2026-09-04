@@ -9,6 +9,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/widgets/network_ping_indicator.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
@@ -59,9 +60,17 @@ class _CallScreenState extends State<CallScreen> {
         final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
         final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
 
-        return Stack(
-          fit: StackFit.expand,
-          children: [
+        return GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (controller.isPackageCall && details.primaryVelocity != null) {
+              if (details.primaryVelocity! < -300 || details.primaryVelocity! > 300) {
+                _showSwitchToChatDialog(context);
+              }
+            }
+          },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
             // Blurred profile background image
             if (controller.providerImage != null && controller.providerImage!.isNotEmpty)
               CachedNetworkImage(
@@ -159,6 +168,12 @@ class _CallScreenState extends State<CallScreen> {
                               ],
                             ],
                           ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Obx(() => NetworkPingIndicator(
+                                pingMs: controller.currentPingMs.value,
+                              )),
                         ),
                       ],
                     ),
@@ -276,6 +291,7 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
           ],
+        ),
         );
       }),
     );

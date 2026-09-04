@@ -63,9 +63,18 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
     ForegroundTaskService.listenTaskData((data) {
-      if (data is Map && data['action'] == 'hangup') {
-        if (_orchestrator.sessionId != null) {
-          endChatSession();
+      if (data is Map) {
+        if (data['action'] == 'hangup') {
+          if (_orchestrator.sessionId != null) {
+            endChatSession();
+          }
+        } else if (data['action'] == 'tap') {
+          if (_orchestrator.astrologerId != null) {
+            Get.toNamed(Routes.chatScreen, arguments: {
+              'astrologer_id': _orchestrator.astrologerId,
+              'astrologer_name': _orchestrator.astrologerName,
+            });
+          }
         }
       }
     });
@@ -133,7 +142,11 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
             elapsedSeconds.value = diff >= 0 ? diff : 0;
             setupTimer(startedAt);
             final startedAtMillis = effectiveStart.millisecondsSinceEpoch;
-            LocalNotificationService.showOngoingChatNotification(sessionId: sid, title: 'Chat in progress', body: 'Active chat with ${_orchestrator.astrologerName ?? 'Astrologer'}', startedAtMillis: startedAtMillis);
+            ForegroundTaskService.startActiveSessionNotification(
+              title: 'Active Chat with ${_orchestrator.astrologerName ?? 'Astrologer'}',
+              type: 'Chat',
+              startedAt: effectiveStart,
+            );
           }
         }
       }

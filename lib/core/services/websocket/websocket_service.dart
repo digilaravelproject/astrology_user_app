@@ -55,6 +55,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   static Map<int, String> get sessionStartTimes => WebSocketState.sessionStartTimes;
 
   // Chat
+  static RxInt get currentPingMs => WebSocketState.currentPingMs;
   static RxMap<int, String> get sessionStatusUpdates => WebSocketState.sessionStatusUpdates;
   static RxList<Map<String, dynamic>> get incomingMessages => WebSocketState.incomingMessages;
   static RxList<Map<String, dynamic>> get messageStatusUpdates => WebSocketState.messageStatusUpdates;
@@ -124,6 +125,8 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
     });
   }
 
+  DateTime? _lastPingSentAt;
+
   void _sendHeartbeat() {
     try {
       _pongTimeoutTimer?.cancel();
@@ -131,6 +134,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
         Logger.w('|⚠️ WebSocket pong timeout! Socket is unresponsive. Forcing reconnect...');
         _forceDisconnectAndReconnect();
       });
+      _lastPingSentAt = DateTime.now();
       _sendRaw(jsonEncode({
         "event": AppUrls.pusherPing,
         "data": {}
@@ -283,6 +287,11 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         } else if (event == AppUrls.pusherPing) {
           _send(AppUrls.pusherPong);
+        } else if (event == AppUrls.pusherPong) {
+          if (_lastPingSentAt != null) {
+            WebSocketState.currentPingMs.value = DateTime.now().difference(_lastPingSentAt!).inMilliseconds;
+            _lastPingSentAt = null;
+          }
         } else if (event != null) {
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           Logger.d('|🔔 WEBSOCKET EVENT ROUTED: $event');

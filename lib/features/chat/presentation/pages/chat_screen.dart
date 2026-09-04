@@ -8,6 +8,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/core/widgets/custom_app_bar.dart';
+import 'package:astro_user/core/widgets/custom_text_field.dart';
+import 'package:astro_user/core/widgets/network_ping_indicator.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
@@ -154,6 +156,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 return Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    NetworkPingIndicator(pingMs: _controller.currentPingMs.value),
+                    const SizedBox(width: 8),
                     // Call switch icon ONLY for package/session chats
                     if (widget.isPackageChat)
                       IconButton(
@@ -190,8 +194,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             }),
           ],
         ),
-        body: Container(
-          decoration: const BoxDecoration(
+        body: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (widget.isPackageChat && details.primaryVelocity != null) {
+              if (details.primaryVelocity! < -300 || details.primaryVelocity! > 300) {
+                _showSwitchToCallConfirmation(context);
+              }
+            }
+          },
+          child: Container(
+            decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/images/background.png'),
               fit: BoxFit.cover,
@@ -570,7 +582,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildRingingScreen() {

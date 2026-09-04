@@ -53,6 +53,19 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
         handlePackageTerminated();
       }
     });
+    ForegroundTaskService.listenTaskData((data) {
+      if (data is Map) {
+        if (data['action'] == 'hangup') {
+          if (sessionId != null) {
+            handleCallEnded('user_hung_up');
+          }
+        } else if (data['action'] == 'tap') {
+          if (providerId != null) {
+            Get.toNamed(Routes.callScreen);
+          }
+        }
+      }
+    });
   }
 
   void setupWebSocketListeners() {
@@ -183,11 +196,14 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
 
   void showOngoingNotification({int? startedAtMillis}) {
     if (sessionId != null) {
-      LocalNotificationService.showOngoingCallNotification(
-        sessionId: sessionId!,
-        title: 'Active Call in Progress',
-        body: 'Talking with $providerName',
-        startedAtMillis: startedAtMillis,
+      DateTime? startedAt;
+      if (startedAtMillis != null) {
+        startedAt = DateTime.fromMillisecondsSinceEpoch(startedAtMillis);
+      }
+      ForegroundTaskService.startActiveSessionNotification(
+        title: 'Active Call with $providerName',
+        type: 'Call',
+        startedAt: startedAt,
       );
     }
   }

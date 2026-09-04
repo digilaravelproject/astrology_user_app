@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' hide navigator;
@@ -15,6 +16,9 @@ class WebRTCService {
 
   bool _isRemoteDescriptionSet = false;
   final List<RTCIceCandidate> _remoteCandidateQueue = [];
+
+  final RxInt currentPingMs = 0.obs;
+  Timer? _pingTimer;
 
   final Map<String, dynamic> _iceConfig = {
     'iceServers': [
@@ -102,6 +106,13 @@ class WebRTCService {
 
       peerConnection!.onIceConnectionState = (state) {
         Logger.d('WebRTCService: Connection state changed -> $state');
+        if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          _startPingTimer();
+        } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
+                   state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+                   state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          _stopPingTimer();
+        }
         if (onConnectionStateChanged != null) {
           onConnectionStateChanged!(state);
         }
@@ -167,6 +178,13 @@ class WebRTCService {
 
       peerConnection!.onIceConnectionState = (state) {
         Logger.d('WebRTCService: Connection state changed -> $state');
+        if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          _startPingTimer();
+        } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
+                   state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+                   state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          _stopPingTimer();
+        }
         if (onConnectionStateChanged != null) {
           onConnectionStateChanged!(state);
         }
@@ -260,6 +278,36 @@ class WebRTCService {
     }
   }
 
+  void _startPingTimer() {
+    _stopPingTimer();
+    _pingTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      if (peerConnection == null) {
+        _stopPingTimer();
+        return;
+      }
+      try {
+        final stats = await peerConnection!.getStats();
+        for (var report in stats) {
+          if (report.type == 'candidate-pair' && report.values['state'] == 'succeeded') {
+            final double? rtt = report.values['currentRoundTripTime'];
+            if (rtt != null) {
+              currentPingMs.value = (rtt * 1000).toInt();
+            }
+            break;
+          }
+        }
+      } catch (e) {
+        Logger.e('WebRTCService: Error getting stats for ping -> $e');
+      }
+    });
+  }
+
+  void _stopPingTimer() {
+    _pingTimer?.cancel();
+    _pingTimer = null;
+    currentPingMs.value = 0;
+  }
+
   Future<void> _sendIceCandidate(int sessionId, RTCIceCandidate candidate) async {
     try {
       final apiClient = Get.find<ApiClient>();
@@ -283,6 +331,7 @@ class WebRTCService {
 
   void dispose() {
     try {
+      _stopPingTimer();
       toggleSpeaker(false);
       toggleMute(false);
       localStream?.getTracks().forEach((track) => track.stop());

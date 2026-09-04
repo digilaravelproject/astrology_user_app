@@ -201,9 +201,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         wsUrl,
         token,
         connectOptions: ConnectOptions(
-          rtcConfiguration: RTCConfiguration(
-            iceServers: iceServers,
-          ),
+          rtcConfiguration: RTCConfiguration(iceServers: iceServers),
         ),
         roomOptions: const RoomOptions(
           adaptiveStream: true,
