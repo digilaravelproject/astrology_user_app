@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart' as sax;
-import '../theme/app_colors.dart';
-import '../constants/app_constants.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
 
 class LocationResult {
   final String displayName;

@@ -6,14 +6,14 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
-import '../../../features/live/data/models/live_session_model.dart';
-import '../storage/token_manger.dart';
-import '../storage/shared_prefs.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../features/auth/domain/models/user_model.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/core/services/storage/token_manger.dart';
+import 'package:astro_user/core/services/storage/shared_prefs.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/features/auth/data/models/user_model.dart';
 import 'api_client.dart';
-import '../../../core/constants/app_urls.dart';
-import '../../utils/logger.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
@@ -28,7 +28,7 @@ import 'package:astro_user/features/chat/domain/usecases/sync_message_status_use
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
-import 'package:astro_user/features/astrologers/controllers/astrologer_controller.dart';
+import 'package:astro_user/features/astrologers/presentation/controllers/astrologer_controller.dart';
 
 class WebSocketService extends GetxService with WidgetsBindingObserver {
   WebSocketChannel? _channel;

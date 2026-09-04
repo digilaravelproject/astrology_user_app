@@ -1,5 +1,5 @@
-import '../models/remedy_model.dart';
-import '../services/remedy_service.dart';
+import 'package:astro_user/features/home/data/models/remedy_model.dart';
+import 'package:astro_user/features/home/data/datasources/remedy_service.dart';
 
 class GetRemediesUseCase {
   final RemedyService _remedyService;

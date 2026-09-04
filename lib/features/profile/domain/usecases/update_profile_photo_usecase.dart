@@ -1,6 +1,6 @@
 import 'package:image_picker/image_picker.dart';
-import '../../../../features/auth/domain/models/user_model.dart';
-import '../services/profile_service.dart';
+import 'package:astro_user/features/auth/data/models/user_model.dart';
+import 'package:astro_user/features/profile/data/datasources/profile_service.dart';
 
 class UpdateProfilePhotoUseCase {
   final ProfileService _profileService;

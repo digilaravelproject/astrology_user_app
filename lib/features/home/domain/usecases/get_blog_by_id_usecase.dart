@@ -1,5 +1,5 @@
-import '../models/blog_model.dart';
-import '../services/blog_service.dart';
+import 'package:astro_user/features/home/data/models/blog_model.dart';
+import 'package:astro_user/features/home/data/datasources/blog_service.dart';
 
 class GetBlogByIdUseCase {
   final BlogService _blogService;

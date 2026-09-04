@@ -3,13 +3,13 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:astro_user/core/services/storage/token_manger.dart';
 import 'package:get/get.dart' as getx;
-import '../../../routes/route_helper.dart';
-import '../../constants/app_constants.dart';
-import '../../utils/custom_snackbar.dart';
-import '../../utils/logger.dart';
-import '../storage/shared_prefs.dart';
+import 'package:astro_user/routes/route_helper.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/logger.dart';
+import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'response_model.dart';
-import '../../widgets/error_screen.dart';
+import 'package:astro_user/core/widgets/error_screen.dart';
 
 class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {

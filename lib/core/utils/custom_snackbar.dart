@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../widgets/app_text.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/widgets/app_text.dart';
 
 class CustomSnackbar {
   static final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();

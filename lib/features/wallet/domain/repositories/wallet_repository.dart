@@ -1,8 +1,8 @@
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/constants/app_urls.dart';
-import '../models/wallet_model.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/features/wallet/data/models/wallet_model.dart';
 
-import '../models/wallet_top_up_response_model.dart';
+import 'package:astro_user/features/wallet/data/models/wallet_top_up_response_model.dart';
 
 abstract class WalletRepositoryInterface {
   Future<WalletModel?> getWallet();

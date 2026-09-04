@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/widgets/custom_image_widget.dart';
-import '../controllers/localization_controller.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
+import 'package:astro_user/features/language/presentation/controllers/localization_controller.dart';
 
 class LanguageBottomSheet extends StatelessWidget {
   final LocalizationController controller;

@@ -6,7 +6,7 @@ import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
-import 'package:astro_user/features/auth/domain/models/user_model.dart';
+import 'package:astro_user/features/auth/data/models/user_model.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'dart:io';

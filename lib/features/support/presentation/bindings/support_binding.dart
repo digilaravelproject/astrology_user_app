@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
-import '../../../../core/services/network/api_client.dart';
-import '../../domain/repositories/support_repository.dart';
-import '../../domain/usecases/get_faq_usecase.dart';
-import '../../domain/usecases/get_payment_policy_usecase.dart';
-import '../../domain/usecases/get_privacy_policy_usecase.dart';
-import '../../domain/usecases/get_terms_and_conditions_usecase.dart';
-import '../controllers/support_controller.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/features/support/domain/repositories/support_repository.dart';
+import 'package:astro_user/features/support/domain/usecases/get_faq_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_payment_policy_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_privacy_policy_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_terms_and_conditions_usecase.dart';
+import 'package:astro_user/features/support/presentation/controllers/support_controller.dart';
 
 class SupportBinding extends Bindings {
   @override

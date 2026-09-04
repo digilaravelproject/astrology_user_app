@@ -19,7 +19,7 @@ import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
-import 'package:astro_user/features/auth/domain/models/user_model.dart';
+import 'package:astro_user/features/auth/data/models/user_model.dart';
 
 import 'package:astro_user/features/chat/presentation/widgets/chat_summary_dialog.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
@@ -30,7 +30,7 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_session.dart';
-import 'package:astro_user/features/auth/controllers/auth_controller.dart';
+import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ChatController extends GetxController with WidgetsBindingObserver {

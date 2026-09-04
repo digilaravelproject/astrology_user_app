@@ -1,15 +1,15 @@
 import 'dart:convert';
 import 'package:astro_user/core/constants/app_urls.dart';
-import '../../../../core/services/network/astrology_api_client.dart';
+import 'package:astro_user/core/services/network/astrology_api_client.dart';
 
-import '../../../../core/services/network/api_client.dart';
-import '../../domain/repositories/kundli_repository.dart';
-import '../models/kundli_request_model.dart';
-import '../models/kundli_response_model.dart';
-import '../models/create_kundli_request_model.dart';
-import '../models/create_kundli_response_model.dart';
-import '../models/kundli_list_response_model.dart';
-import '../models/kundli_detail_response_model.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/features/matching/domain/repositories/kundli_repository.dart';
+import 'package:astro_user/features/matching/data/models/kundli_request_model.dart';
+import 'package:astro_user/features/matching/data/models/kundli_response_model.dart';
+import 'package:astro_user/features/matching/data/models/create_kundli_request_model.dart';
+import 'package:astro_user/features/matching/data/models/create_kundli_response_model.dart';
+import 'package:astro_user/features/matching/data/models/kundli_list_response_model.dart';
+import 'package:astro_user/features/matching/data/models/kundli_detail_response_model.dart';
 
 class KundliRepositoryImpl implements KundliRepository {
   final ApiClient apiClient;

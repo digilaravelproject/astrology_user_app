@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/image_constants.dart';
+import 'package:astro_user/core/constants/image_constants.dart';
 
 class AppLogo extends StatelessWidget {
   final double size;

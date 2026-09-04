@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
 
 enum BackgroundType { zodiac, icons }
 

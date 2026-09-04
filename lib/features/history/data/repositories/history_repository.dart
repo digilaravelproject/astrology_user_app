@@ -1,5 +1,5 @@
-import 'package:astro_user/features/history/domain/models/chat_session_model.dart';
-import 'package:astro_user/features/call/domain/models/call_session_model.dart';
+import 'package:astro_user/features/history/data/models/chat_session_model.dart';
+import 'package:astro_user/features/call/data/models/call_session_model.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/response_model.dart';

@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
-import '../../domain/models/faq_model.dart';
-import '../../domain/usecases/get_faq_usecase.dart';
-import '../../domain/usecases/get_payment_policy_usecase.dart';
-import '../../domain/usecases/get_privacy_policy_usecase.dart';
-import '../../domain/usecases/get_terms_and_conditions_usecase.dart';
+import 'package:astro_user/features/support/data/models/faq_model.dart';
+import 'package:astro_user/features/support/domain/usecases/get_faq_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_payment_policy_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_privacy_policy_usecase.dart';
+import 'package:astro_user/features/support/domain/usecases/get_terms_and_conditions_usecase.dart';
 
 class SupportController extends GetxController {
   final GetFAQUseCase _getFAQUseCase;

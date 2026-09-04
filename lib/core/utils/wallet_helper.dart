@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../features/chat/presentation/pages/chat_screen.dart';
-import '../../features/chat/presentation/bindings/chat_binding.dart';
-import '../../features/call/presentation/pages/call_screen.dart';
-import '../../features/call/presentation/controllers/call_controller.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/widgets/app_text.dart';
-import '../../core/widgets/custom_button.dart';
-import '../../features/wallet/widgets/recharge_bottom_sheet.dart';
-import '../services/network/api_client.dart';
-import '../../core/constants/app_urls.dart';
-import '../../core/utils/custom_snackbar.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:astro_user/core/widgets/custom_button.dart';
+import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 

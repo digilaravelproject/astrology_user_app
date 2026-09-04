@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../theme/app_colors.dart';
-import '../../../constants/app_constants.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
 
 class RazorpayConfig {
   static const String currency = 'INR';

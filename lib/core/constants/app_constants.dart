@@ -1,4 +1,4 @@
-import '../services/config/env_config.dart';
+import 'package:astro_user/core/services/config/env_config.dart';
 import 'app_urls.dart';
 
 class AppConstants {
@@ -25,6 +25,7 @@ class AppConstants {
     static const String token = 'token';
     static const String userData = 'user_data';
     static const String isLoggedIn = 'is_logged_in';
+    static const String hasSeenPermission = 'has_seen_permission';
     
     // Default Settings
     static const String defaultLanguage = 'en';

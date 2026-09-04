@@ -7,7 +7,7 @@ import 'package:astro_user/features/panchang/data/models/panchang_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_text.dart';
 import '../../../core/widgets/custom_app_bar.dart';
-import 'controllers/panchang_controller.dart';
+import 'presentation/controllers/panchang_controller.dart';
 
 class PanchangScreen extends GetView<PanchangController> {
   const PanchangScreen({super.key});

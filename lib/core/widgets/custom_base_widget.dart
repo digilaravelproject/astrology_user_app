@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../utils/ui_spacer.dart';
+import 'package:astro_user/core/utils/ui_spacer.dart';
 
 class CustomBaseWidget extends StatefulWidget {
   final bool useSafeArea;

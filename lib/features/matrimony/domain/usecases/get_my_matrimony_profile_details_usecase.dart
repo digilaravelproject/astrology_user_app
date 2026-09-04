@@ -1,5 +1,5 @@
-import '../../../../core/services/network/response_model.dart';
-import '../services/matrimony_service.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/matrimony/data/datasources/matrimony_service.dart';
 
 class GetMyMatrimonyProfileDetailsUseCase {
   final MatrimonyServiceInterface _service;

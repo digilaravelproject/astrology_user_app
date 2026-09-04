@@ -1,5 +1,5 @@
 import 'package:astro_user/features/history/data/repositories/history_repository.dart';
-import 'package:astro_user/features/history/domain/models/chat_session_model.dart';
+import 'package:astro_user/features/history/data/models/chat_session_model.dart';
 
 class GetChatSessionsUseCase {
   final HistoryRepository _repository;

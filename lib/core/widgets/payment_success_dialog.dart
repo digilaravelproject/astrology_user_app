@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import '../theme/app_colors.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
 import 'app_text.dart';
 import 'custom_button.dart';
 

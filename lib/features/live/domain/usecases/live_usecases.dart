@@ -1,5 +1,5 @@
-import '../../../../core/services/network/response_model.dart';
-import '../repositories/live_repository.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/live/domain/repositories/live_repository.dart';
 
 class GetActiveLiveSessionsUseCase {
   final LiveRepository repository;

@@ -1,6 +1,6 @@
 import 'package:astro_user/core/services/network/astrology_api_client.dart';
 import 'package:astro_user/core/utils/logger.dart';
-import '../models/shadbala_model.dart';
+import 'package:astro_user/features/kundli/data/models/shadbala_model.dart';
 
 class ShadbalaRepository {
   final AstrologyApiClient _client;

@@ -1,6 +1,6 @@
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'razorpay_config.dart';
-import '../../../utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 class RazorpayService {
   late Razorpay _razorpay;

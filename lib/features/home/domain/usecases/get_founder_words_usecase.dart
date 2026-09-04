@@ -1,6 +1,6 @@
-import '../../../../core/services/network/response_model.dart';
-import '../models/founder_model.dart';
-import '../services/founder_service.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/home/data/models/founder_model.dart';
+import 'package:astro_user/features/home/data/datasources/founder_service.dart';
 
 class GetFounderWordsUseCase {
   final FounderService _service;

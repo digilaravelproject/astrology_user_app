@@ -9,6 +9,8 @@ import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 
+import '../controllers/chat_controller.dart';
+
 
 class FloatingChatBubble {
   static final RxInt unreadCount = 0.obs;

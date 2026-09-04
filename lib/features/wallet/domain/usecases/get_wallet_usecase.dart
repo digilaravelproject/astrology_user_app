@@ -1,5 +1,5 @@
-import '../services/wallet_service.dart';
-import '../models/wallet_model.dart';
+import 'package:astro_user/features/wallet/data/datasources/wallet_service.dart';
+import 'package:astro_user/features/wallet/data/models/wallet_model.dart';
 
 class GetWalletUseCase {
   final WalletServiceInterface service;

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:get/get.dart';
-import '../../../../core/utils/custom_snackbar.dart';
-import '../../../../core/services/network/api_checker.dart';
-import '../../data/models/live_session_model.dart';
-import '../../domain/usecases/live_usecases.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/services/network/api_checker.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/features/live/domain/usecases/live_usecases.dart';
 
 class LiveController extends GetxController {
   final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;

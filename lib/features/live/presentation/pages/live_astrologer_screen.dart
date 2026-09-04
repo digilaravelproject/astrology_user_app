@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/widgets/app_text.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/custom_image_widget.dart';
-import '../../../../core/widgets/coming_soon_screen.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
-import '../controllers/live_controller.dart';
-import '../../data/models/live_session_model.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
+import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/widgets/custom_image_widget.dart';
+import 'package:astro_user/core/widgets/coming_soon_screen.dart';
+import 'package:astro_user/core/widgets/custom_app_bar.dart';
+import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'live_room_screen.dart';
-import '../../../../core/constants/app_urls.dart';
-import '../../../../core/constants/image_constants.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/constants/image_constants.dart';
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
 

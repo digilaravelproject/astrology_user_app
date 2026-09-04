@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../features/astrologers/domain/models/astrologer_model.dart';
-import '../../features/wallet/controllers/wallet_controller.dart';
-import '../theme/app_colors.dart';
-import '../widgets/app_text.dart';
-import '../widgets/custom_button.dart';
-import '../constants/app_strings.dart';
+import 'package:astro_user/features/astrologers/data/models/astrologer_model.dart';
+import 'package:astro_user/features/wallet/presentation/controllers/wallet_controller.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:astro_user/core/widgets/custom_button.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 
-import '../../features/wallet/widgets/recharge_bottom_sheet.dart';
-import '../services/network/api_client.dart';
-import '../constants/app_urls.dart';
-import '../utils/custom_snackbar.dart';
-import '../../features/astrologers/controllers/astrologer_controller.dart';
-import '../../features/call/presentation/pages/call_screen.dart';
-import '../../features/call/presentation/controllers/call_controller.dart';
-import '../../features/chat/presentation/pages/chat_screen.dart';
-import '../../features/chat/presentation/bindings/chat_binding.dart';
-import '../services/network/websocket_service.dart';
+import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/features/astrologers/presentation/controllers/astrologer_controller.dart';
+import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SessionBottomSheetHelper {

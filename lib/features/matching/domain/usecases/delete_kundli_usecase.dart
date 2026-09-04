@@ -1,4 +1,4 @@
-import '../repositories/kundli_repository.dart';
+import 'package:astro_user/features/matching/domain/repositories/kundli_repository.dart';
 
 class DeleteKundliUseCase {
   final KundliRepository repository;

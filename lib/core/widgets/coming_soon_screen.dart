@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_colors.dart';
-import '../constants/app_strings.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 
 class ComingSoonScreen extends StatelessWidget {
   final String title;

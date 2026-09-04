@@ -1,7 +1,7 @@
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/services/network/response_model.dart';
-import '../services/matrimony_service.dart';
-import '../models/matrimony_profile_model.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/matrimony/data/datasources/matrimony_service.dart';
+import 'package:astro_user/features/matrimony/data/models/matrimony_profile_model.dart';
 
 class UpdateMatrimonyProfileUseCase {
   final MatrimonyServiceInterface _service;

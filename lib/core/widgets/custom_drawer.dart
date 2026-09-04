@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_colors.dart';
-import '../constants/app_strings.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 import 'app_text.dart';
 import 'custom_image_widget.dart';
-import '../../features/auth/controllers/auth_controller.dart';
-import '../../features/wallet/screens/wallet_screen.dart';
-import '../../features/profile/screens/profile_screen.dart';
-import '../../features/profile/bindings/profile_binding.dart';
-import '../../features/history/screens/history_screen.dart';
-import '../../features/notification/screens/notification_screen.dart'; // Assuming chat history might be here or similar
+import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:astro_user/features/wallet/presentation/screens/wallet_screen.dart';
+import 'package:astro_user/features/profile/presentation/screens/profile_screen.dart';
+import 'package:astro_user/features/profile/presentation/bindings/profile_binding.dart';
+import 'package:astro_user/features/history/presentation/screens/history_screen.dart';
+import 'package:astro_user/features/notification/presentation/screens/notification_screen.dart'; // Assuming chat history might be here or similar
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);

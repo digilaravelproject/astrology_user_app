@@ -1,8 +1,8 @@
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/services/network/multipart.dart';
-import '../../../../core/services/network/response_model.dart';
-import '../../../../core/constants/app_urls.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/multipart.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
 
 class ProfileRepository {
   final ApiClient apiClient;

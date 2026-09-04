@@ -7,12 +7,12 @@ import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:get/get.dart';
-import '../../utils/logger.dart';
-import '../storage/token_manger.dart';
+import 'package:astro_user/core/utils/logger.dart';
+import 'package:astro_user/core/services/storage/token_manger.dart';
 import 'api_checker.dart';
 import 'multipart.dart';
 import 'network_info.dart';
-import '../../widgets/no_internet_screen.dart';
+import 'package:astro_user/core/widgets/no_internet_screen.dart';
 import 'response_model.dart';
 
 class ApiClient {

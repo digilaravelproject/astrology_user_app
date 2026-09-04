@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import '../theme/app_colors.dart';
-import '../widgets/app_text.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/widgets/app_text.dart';
 
 class ImagePickerHelper {
   static final ImagePicker _picker = ImagePicker();

@@ -1,5 +1,5 @@
-import '../models/gift_history_model.dart';
-import '../services/gift_service.dart';
+import 'package:astro_user/features/astrologers/data/models/gift_history_model.dart';
+import 'package:astro_user/features/astrologers/data/datasources/gift_service.dart';
 
 class GetGiftHistoryUseCase {
   final GiftService service;

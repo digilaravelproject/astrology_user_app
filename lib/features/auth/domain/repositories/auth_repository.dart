@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/services/network/response_model.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
 import 'auth_repository_interface.dart';
 
 class AuthRepository implements AuthRepositoryInterface {

@@ -20,7 +20,7 @@ import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/network/websocket_service.dart';
 import 'package:astro_user/features/kundli/kundli_screen.dart';
-import 'package:astro_user/features/auth/controllers/auth_controller.dart';
+import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:swipe_to/swipe_to.dart';
 
 class ChatScreen extends StatefulWidget {

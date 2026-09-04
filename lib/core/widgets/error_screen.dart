@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_strings.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:get/get.dart';
 
 class ErrorScreen extends StatelessWidget {

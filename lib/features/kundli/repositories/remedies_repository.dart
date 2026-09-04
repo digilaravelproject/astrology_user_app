@@ -1,6 +1,6 @@
 import 'package:astro_user/core/services/network/astrology_api_client.dart';
 import 'package:astro_user/core/utils/logger.dart';
-import '../models/remedies_model.dart';
+import 'package:astro_user/features/kundli/data/models/remedies_model.dart';
 
 class RemediesRepository {
   final AstrologyApiClient _client;

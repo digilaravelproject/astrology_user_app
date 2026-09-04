@@ -1,9 +1,9 @@
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/services/network/multipart.dart';
-import '../../../../core/services/network/response_model.dart';
-import '../../../../core/constants/app_urls.dart';
-import '../models/matrimony_profile_model.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/multipart.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/features/matrimony/data/models/matrimony_profile_model.dart';
 
 abstract class MatrimonyRepositoryInterface {
   Future<ResponseModel> saveProfile(MatrimonyProfileModel profile, XFile? photo);

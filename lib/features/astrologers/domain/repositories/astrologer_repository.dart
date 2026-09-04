@@ -1,6 +1,6 @@
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/services/network/response_model.dart';
-import '../../../../core/constants/app_urls.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
 
 class AstrologerRepository {
   final ApiClient apiClient;

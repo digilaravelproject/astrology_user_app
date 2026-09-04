@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'core/theme/theme_controller.dart';
-import 'features/language/controllers/localization_controller.dart';
+import 'features/language/presentation/controllers/localization_controller.dart';
 import 'init_app.dart';
 import 'routes/route_helper.dart';
 import 'core/bindings/initial_bindings.dart';
@@ -109,7 +109,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: localizationController.languages
-          .map((lang) => Locale(lang.languageCode, lang.countryCode))
+          .map((lang) => Locale(lang.languageCode!, lang.countryCode!))
           .toList(),
       builder: (context, child) {
         return SafeArea(

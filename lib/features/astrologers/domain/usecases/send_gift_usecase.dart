@@ -1,5 +1,5 @@
-import '../../../../core/services/network/response_model.dart';
-import '../services/gift_service.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/astrologers/data/datasources/gift_service.dart';
 
 class SendGiftUseCase {
   final GiftService service;

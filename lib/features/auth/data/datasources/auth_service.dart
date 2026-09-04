@@ -1,0 +1,100 @@
+import 'package:astro_user/core/services/storage/token_manger.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/services/storage/shared_prefs.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
+import 'package:astro_user/features/auth/data/models/user_model.dart';
+import 'package:astro_user/features/auth/domain/repositories/auth_repository.dart';
+import 'auth_service_interface.dart';
+
+class AuthService implements AuthServiceInterface {
+  final AuthRepository _authRepository;
+
+  AuthService(this._authRepository);
+
+  @override
+  Future<ResponseModel> updateProfile(int userId, Map<String, dynamic> data) async {
+    return await _authRepository.updateProfile(userId, data);
+  }
+
+  @override
+  Future<ResponseModel> sendOtp(String phone) async {
+    return await _authRepository.sendOtp(phone);
+  }
+
+  @override
+  Future<ResponseModel> resendOtp(String phone) async {
+    return await _authRepository.resendOtp(phone);
+  }
+
+  @override
+  Future<ResponseModel> signup(String name, String mobile) async {
+    return await _authRepository.signup(name, mobile);
+  }
+
+  @override
+  Future<ResponseModel> login(String mobile) async {
+    return await _authRepository.login(mobile);
+  }
+
+  @override
+  Future<ResponseModel> verifyOtp(String mobile, String otp) async {
+    return await _authRepository.verifyOtp(mobile, otp);
+  }
+
+  @override
+  Future<void> saveUserInfo(UserModel user) async {
+    await SharedPrefs.setString(AppConstants.userData, user.toJsonString());
+    await SharedPrefs.setBool(AppConstants.isLoggedIn, true);
+  }
+
+  @override
+  Future<void> saveUserToken(String userToken) async {
+    await TokenManager.saveToken(userToken);
+  }
+
+  @override
+  Future<void> clearUserInfo() async {
+    await SharedPrefs.remove(AppConstants.userData);
+    await TokenManager.clearToken();
+    await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    return SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+  }
+
+  @override
+  Future<UserModel?> getUserInfo() async {
+    final userJsonString = SharedPrefs.getString(AppConstants.userData);
+    if (userJsonString == null || userJsonString.isEmpty) {
+      return null;
+    }
+    return UserModel.fromJsonString(userJsonString);
+  }
+
+  @override
+  Future<ResponseModel> logout() async {
+    final response = await _authRepository.logout();
+    if (response.isSuccess) {
+      await clearUserInfo();
+    }
+    return response;
+  }
+
+  @override
+  Future<ResponseModel> deleteAccount() async {
+    final response = await _authRepository.deleteAccount();
+    if (response.isSuccess) {
+      await clearUserInfo();
+    }
+    return response;
+  }
+
+  // @override
+  // Future<void> clearUserInfo() async {
+  //   await SharedPrefs.remove(AppConstants.userData);
+  //   await TokenManager.clearToken();
+  //   await SharedPrefs.setBool(AppConstants.isLoggedIn, false);
+  // }
+}
