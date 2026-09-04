@@ -103,6 +103,10 @@ class WebSocketState {
   static final StreamController<Map<String, dynamic>> astrologerAvailabilityEvent =
       StreamController.broadcast();
 
+  /// Broadcast stream: emits when active live sessions list updates globally.
+  static final StreamController<Map<String, dynamic>> activeLiveSessionsUpdatedEvent =
+      StreamController.broadcast();
+
   // ─── Prepaid Package State ─────────────────────────────────────────────────
   /// Remaining seconds in the active prepaid package session.
   static final RxInt packageRemainingSeconds = 0.obs;

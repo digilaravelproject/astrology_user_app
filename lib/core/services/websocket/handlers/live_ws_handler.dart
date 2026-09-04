@@ -319,4 +319,14 @@ class LiveWsHandler {
       Logger.e('LiveWsHandler: error handling LiveSessionStarted -> $e');
     }
   }
+
+  static void handleActiveLiveSessionsUpdated(dynamic rawData) {
+    try {
+      if (Get.isRegistered<LiveController>()) {
+        Get.find<LiveController>().fetchActiveSessions();
+      }
+    } catch (e) {
+      Logger.e('LiveWsHandler: error handling ActiveLiveSessionsUpdated -> $e');
+    }
+  }
 }

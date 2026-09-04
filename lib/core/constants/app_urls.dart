@@ -165,6 +165,7 @@ class AppUrls {
   static const String eventAstrologerMediaStatusChanged = 'AstrologerMediaStatusChanged';
   static const String eventLiveSessionStarted = 'LiveSessionStarted';
   static const String eventViewerCountUpdated = 'ViewerCountUpdated';
+  static const String eventActiveLiveSessionsUpdated = 'ActiveLiveSessionsUpdated';
   static const String eventNewLiveComment = 'NewLiveComment';
   static const String eventSuperChatReceived = 'SuperChatReceived';
   static const String eventAstrologerBroadcastStarted = 'AstrologerBroadcastStarted';
