@@ -18,7 +18,7 @@ abstract class IChatRemoteDataSource {
   Future<ResponseModel> markMessagesRead(int sessionId);
   Future<ResponseModel> syncMessageStatus(int sessionId, List<int> messageIds, String status);
   Future<ResponseModel> endChatSession(int sessionId);
-  Future<ResponseModel> rejectChatSession(int sessionId);
+  Future<ResponseModel> cancelChatSession(int sessionId);
 }
 
 class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
@@ -127,9 +127,9 @@ class ChatRemoteDataSourceImpl implements IChatRemoteDataSource {
   }
 
   @override
-  Future<ResponseModel> rejectChatSession(int sessionId) async {
+  Future<ResponseModel> cancelChatSession(int sessionId) async {
     return await _apiClient.post(
-      AppUrls.rejectChatSession(sessionId),
+      AppUrls.cancelChatSession(sessionId),
       data: {},
       handleError: false,
       showToaster: false,

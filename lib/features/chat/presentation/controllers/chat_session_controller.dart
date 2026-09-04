@@ -12,7 +12,7 @@ import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/routes/app_routes.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
-import 'package:astro_user/features/chat/domain/usecases/reject_chat_session_usecase.dart';
+import 'package:astro_user/features/chat/domain/usecases/cancel_chat_session_usecase.dart';
 import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
@@ -26,13 +26,13 @@ import 'chat_controller.dart';
 
 class ChatSessionController extends GetxController with WidgetsBindingObserver {
   final EndChatSessionUseCase _endChatSessionUseCase;
-  final RejectChatSessionUseCase _rejectChatSessionUseCase;
+  final CancelChatSessionUseCase _cancelChatSessionUseCase;
 
   ChatSessionController({
     required EndChatSessionUseCase endChatSessionUseCase,
-    required RejectChatSessionUseCase rejectChatSessionUseCase,
+    required CancelChatSessionUseCase cancelChatSessionUseCase,
   })  : _endChatSessionUseCase = endChatSessionUseCase,
-        _rejectChatSessionUseCase = rejectChatSessionUseCase;
+        _cancelChatSessionUseCase = cancelChatSessionUseCase;
 
   final RxString status = 'connecting'.obs;
   final RxInt elapsedSeconds = 0.obs;
@@ -308,7 +308,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  Future<void> rejectChatSession() async {
+  Future<void> cancelChatSession() async {
     if (_orchestrator.sessionId == null) {
       Get.back();
       return;
@@ -322,7 +322,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     FloatingChatBubble.dismiss();
     if (Get.isRegistered<ChatController>()) Get.back();
     try {
-      await _rejectChatSessionUseCase.execute(targetId);
+      await _cancelChatSessionUseCase.execute(targetId);
     } catch (_) {} finally {
       LocalNotificationService.cancelOngoingChatNotification(targetId);
       FloatingChatBubble.dismiss();

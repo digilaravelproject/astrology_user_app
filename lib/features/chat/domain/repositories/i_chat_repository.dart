@@ -23,5 +23,5 @@ abstract class IChatRepository {
   Future<void> markMessagesRead(int sessionId);
   Future<void> syncMessageStatus({required int sessionId, required List<int> messageIds, required String status});
   Future<ChatSession?> endChatSession(int sessionId);
-  Future<void> rejectChatSession(int sessionId);
+  Future<void> cancelChatSession(int sessionId);
 }

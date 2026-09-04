@@ -801,7 +801,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
             // Cancel request button
             GestureDetector(
-              onTap: () => _controller.rejectChatSession(),
+              onTap: () => _controller.cancelChatSession(),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
                 decoration: BoxDecoration(

@@ -191,7 +191,7 @@ class ChatRepositoryImpl implements IChatRepository {
   }
 
   @override
-  Future<void> rejectChatSession(int sessionId) async {
-    await _remoteDataSource.rejectChatSession(sessionId);
+  Future<void> cancelChatSession(int sessionId) async {
+    await _remoteDataSource.cancelChatSession(sessionId);
   }
 }

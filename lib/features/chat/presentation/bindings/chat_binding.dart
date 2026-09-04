@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:astro_user/features/chat/domain/repositories/i_chat_repository.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
-import 'package:astro_user/features/chat/domain/usecases/reject_chat_session_usecase.dart';
+import 'package:astro_user/features/chat/domain/usecases/cancel_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/load_chat_history_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/mark_messages_read_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/send_attachment_usecase.dart';
@@ -19,13 +19,13 @@ class ChatBinding extends Bindings {
     Get.lazyPut(() => SendAttachmentUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => MarkMessagesReadUseCase(Get.find<IChatRepository>()), fenix: true);
     Get.lazyPut(() => EndChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
-    Get.lazyPut(() => RejectChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
+    Get.lazyPut(() => CancelChatSessionUseCase(Get.find<IChatRepository>()), fenix: true);
 
     // 4. Controllers
     Get.lazyPut(
       () => ChatSessionController(
         endChatSessionUseCase: Get.find<EndChatSessionUseCase>(),
-        rejectChatSessionUseCase: Get.find<RejectChatSessionUseCase>(),
+        cancelChatSessionUseCase: Get.find<CancelChatSessionUseCase>(),
       ),
       fenix: true,
     );

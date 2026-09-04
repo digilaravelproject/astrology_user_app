@@ -250,7 +250,7 @@ class WalletHelper {
         Get.back(); // close dialog
         Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
         try {
-          final cancelRes = await apiClient.post(AppUrls.rejectChatSession(sessionId));
+          final cancelRes = await apiClient.post(AppUrls.cancelChatSession(sessionId));
           Get.back(); // close loader
           if (cancelRes.isSuccess) {
             CustomSnackbar.showSuccess("Pending request cancelled. You can now start a new chat.");
