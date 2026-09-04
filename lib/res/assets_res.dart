@@ -7,7 +7,7 @@ class AssetsRes {
   AssetsRes._();
 
   static const String PROJECT_NAME = 'astro_user';
-  static const String PROJECT_VERSION = '1.0.0+1';
+  static const String PROJECT_VERSION = '1.0.3+4';
   static const String GENRAL_SOUND_BOTH = 'assets/audio/genral_sound_both.mp3';
   static const String USER_APP_SOUND = 'assets/audio/user_app_sound.mp3';
   static const String BUBBLE_IMG = 'assets/icons/bubble_img.png';
@@ -19,6 +19,7 @@ class AssetsRes {
   static const String BACKGROUND = 'assets/images/background.png';
   static const String BG_JOIN_SESSION_HOME = 'assets/images/bg_join_session_home.jpeg';
   static const String BG_LOGIN = 'assets/images/bg_login.jpeg';
-  static const String BUBBLE_IMG_IMAGE = 'assets/images/bubble_img.png';
+  static const String BUBBLE_IMG = 'assets/images/bubble_img.png';
   static const String LIVE_SESSION_BG = 'assets/images/live_session_bg.png';
+  static const String FIX_JSON = 'assets/translations/fix_json.js';
 }
