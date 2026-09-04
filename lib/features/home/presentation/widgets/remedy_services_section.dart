@@ -3,6 +3,7 @@ import 'package:astro_user/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/core/constants/app_strings.dart';
+import 'package:get/get.dart';
 
 class RemedyServicesSection extends StatelessWidget {
   const RemedyServicesSection({super.key});
@@ -70,7 +71,7 @@ class RemedyServicesSection extends StatelessWidget {
                   size: 18,
                 ),
                 const SizedBox(width: 8),
-                const AppText('Explore Remedy Blogs & Services'.tr,
+                AppText('Explore Remedy Blogs & Services'.tr,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.deepPink,

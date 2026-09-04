@@ -3,6 +3,7 @@ import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/services/websocket/websocket_state.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:get/get.dart';
 
 class CallWsHandler {
   static void handleCallAccepted(dynamic rawData) {

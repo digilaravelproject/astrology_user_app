@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:get/get.dart';
 
 class OverlayChatBubbleApp extends StatelessWidget {
   const OverlayChatBubbleApp({super.key});
@@ -148,7 +149,7 @@ class _OverlayChatBubbleWidgetState extends State<OverlayChatBubbleWidget> {
                     ),
                     child: Builder(builder: (context) {
                       if (_status == 'initiated' || _status == 'ringing') {
-                        return const Text('Waiting'.tr,
+                        return Text('Waiting'.tr,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 9,

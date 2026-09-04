@@ -1,4 +1,5 @@
 import 'wallet_model.dart';
+import 'package:get/get.dart';
 
 class WalletTopUpResponseModel {
   final String status;

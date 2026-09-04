@@ -1,6 +1,7 @@
 import 'package:astro_user/core/services/network/response_model.dart';
 import 'package:astro_user/features/astrologers/data/models/astrologer_model.dart';
 import 'package:astro_user/features/astrologers/data/datasources/astrologer_service.dart';
+import 'package:get/get.dart';
 
 class PaginatedAstrologersResult {
   final List<AstrologerModel> astrologers;

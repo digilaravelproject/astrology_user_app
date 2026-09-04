@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:get/get.dart';
 
 class ShopServicesSection extends StatelessWidget {
   const ShopServicesSection({Key? key}) : super(key: key);
@@ -65,7 +66,7 @@ class ShopServicesSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const AppText("✨".tr, fontSize: 18),
+        AppText("✨".tr, fontSize: 18),
         const SizedBox(width: 8),
         Flexible(
           child: AppText(
@@ -78,7 +79,7 @@ class ShopServicesSection extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        const AppText("✨".tr, fontSize: 18),
+        AppText("✨".tr, fontSize: 18),
       ],
     );
   }

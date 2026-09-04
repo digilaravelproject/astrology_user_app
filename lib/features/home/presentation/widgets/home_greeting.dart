@@ -3,6 +3,7 @@ import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:get/get.dart';
 
 class HomeGreeting extends StatelessWidget {
   final String? name;

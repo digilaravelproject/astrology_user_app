@@ -4,6 +4,7 @@ import 'package:astro_user/features/chat/data/models/chat_message_model.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_session.dart';
 import 'package:astro_user/features/chat/domain/repositories/i_chat_repository.dart';
+import 'package:get/get.dart';
 
 class ChatRepositoryImpl implements IChatRepository {
   final IChatRemoteDataSource _remoteDataSource;

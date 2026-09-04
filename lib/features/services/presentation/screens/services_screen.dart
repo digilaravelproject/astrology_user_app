@@ -5,6 +5,7 @@ import 'package:astro_user/core/widgets/custom_image_widget.dart';
 import 'package:astro_user/core/widgets/coming_soon_screen.dart';
 import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
+import 'package:get/get.dart';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});

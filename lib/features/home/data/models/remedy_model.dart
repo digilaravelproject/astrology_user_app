@@ -1,4 +1,5 @@
 import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:get/get.dart';
 
 class RemedyModel {
   final int id;

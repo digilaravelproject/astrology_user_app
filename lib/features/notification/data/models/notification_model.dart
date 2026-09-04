@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 class NotificationModel {
   final int id;
   final String title;

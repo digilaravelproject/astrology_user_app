@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
+import 'package:get/get.dart';
 
 class ServiceSectionRow extends StatelessWidget {
   const ServiceSectionRow({Key? key}) : super(key: key);
@@ -83,7 +84,7 @@ class ServiceSectionRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const AppText("❤️".tr, fontSize: 22),
+        AppText("❤️".tr, fontSize: 22),
       ],
     );
   }

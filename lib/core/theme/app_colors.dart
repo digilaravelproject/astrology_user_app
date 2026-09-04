@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class AppColors {
   // Light theme colors - Updated to Peach/Coral/Burgundy Theme from image

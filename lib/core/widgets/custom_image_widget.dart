@@ -5,6 +5,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:astro_user/core/constants/image_constants.dart';
 import 'shimmer_widget.dart';
+import 'package:get/get.dart';
 
 /// Enum to represent different image types
 enum ImageType { svg, svgString, png, network, file, gif, unknown }

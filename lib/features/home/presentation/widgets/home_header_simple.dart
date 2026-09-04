@@ -3,6 +3,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_image_widget.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/app_text.dart';
+import 'package:get/get.dart';
 
 class HomeHeaderSimple extends StatelessWidget {
   final String userName;
@@ -38,7 +39,7 @@ class HomeHeaderSimple extends StatelessWidget {
                 color: AppColors.primaryColor,
                 letterSpacing: -0.5,
               ),
-              const AppText("👋".tr,
+              AppText("👋".tr,
                 fontSize: 24,
               ),
             ],

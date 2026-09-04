@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:get/get.dart';
 
 /*class UserModel {
   final int id;
