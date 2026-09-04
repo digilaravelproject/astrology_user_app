@@ -32,7 +32,7 @@ class KPTab extends StatelessWidget {
 
       final data = kpController.kpFullReportModel.value?.data;
       if (data == null) {
-        return const Center(
+        return Center(
           child: Padding(
             padding: EdgeInsets.all(24.0),
             child: AppText("No KP data available".tr),
@@ -60,7 +60,7 @@ class KPTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AppText("Ruling Planets".tr, fontSize: 16, fontWeight: FontWeight.bold),
+        AppText("Ruling Planets".tr, fontSize: 16, fontWeight: FontWeight.bold),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
@@ -78,7 +78,7 @@ class KPTab extends StatelessWidget {
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(flex: 3, child: AppText("Factor".tr, fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87)),
                     Expanded(flex: 2, child: Center(child: AppText("Sign Lord".tr, fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87))),
@@ -98,7 +98,7 @@ class KPTab extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 child: Row(
                   children: [
-                    const Expanded(flex: 3, child: AppText("Day Lord".tr, fontSize: 13, fontWeight: FontWeight.bold)),
+                    Expanded(flex: 3, child: AppText("Day Lord".tr, fontSize: 13, fontWeight: FontWeight.bold)),
                     Expanded(
                       flex: 6,
                       child: Center(
@@ -141,7 +141,7 @@ class KPTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AppText("KP Planets".tr, fontSize: 16, fontWeight: FontWeight.bold),
+        AppText("KP Planets".tr, fontSize: 16, fontWeight: FontWeight.bold),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
@@ -159,7 +159,7 @@ class KPTab extends StatelessWidget {
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(flex: 2, child: AppText("Planet".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
                     Expanded(flex: 2, child: Center(child: AppText("Degree".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87))),
@@ -195,7 +195,7 @@ class KPTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AppText("KP Cusps (Houses)".tr, fontSize: 16, fontWeight: FontWeight.bold),
+        AppText("KP Cusps (Houses)".tr, fontSize: 16, fontWeight: FontWeight.bold),
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
@@ -213,7 +213,7 @@ class KPTab extends StatelessWidget {
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(flex: 1, child: AppText("House".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
                     Expanded(flex: 2, child: Center(child: AppText("Degree".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87))),

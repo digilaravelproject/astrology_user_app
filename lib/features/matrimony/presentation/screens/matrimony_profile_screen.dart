@@ -637,7 +637,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const AppText('Report Profile'.tr,
+            AppText('Report Profile'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.primaryColor,

@@ -49,11 +49,11 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Failed to load content".tr),
+                Text("Failed to load content".tr),
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: _loadContent,
-                  child: const Text("Retry".tr),
+                  child: Text("Retry".tr),
                 ),
               ],
             ),

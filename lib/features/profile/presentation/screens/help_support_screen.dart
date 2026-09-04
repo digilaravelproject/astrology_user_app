@@ -68,12 +68,12 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const AppText("Failed to load contact info".tr, color: Colors.grey),
+                AppText("Failed to load contact info".tr, color: Colors.grey),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadData,
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.deepPink),
-                  child: const AppText("Retry".tr, color: Colors.white),
+                  child: AppText("Retry".tr, color: Colors.white),
                 ),
               ],
             ),
@@ -90,7 +90,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
               children: [
                 if (_emails.isNotEmpty) ...[
                   const SizedBox(height: 25),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
                     child: AppText("Email Support".tr, fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
@@ -107,7 +107,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
                 if (_phones.isNotEmpty) ...[
                   const SizedBox(height: 25),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
                     child: AppText("Call Support".tr, fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),

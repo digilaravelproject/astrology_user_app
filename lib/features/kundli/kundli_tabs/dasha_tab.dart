@@ -48,7 +48,7 @@ class DashaTab extends StatelessWidget {
                   child: Column(
                     children: [
                       // Header Row
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Row(
                           children: [
@@ -62,7 +62,7 @@ class DashaTab extends StatelessWidget {
                       const Divider(height: 1, color: Color(0xFFEEEEEE)),
 
                       if (controller.currentDashaItems.isEmpty && !controller.isLoading.value)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.all(20.0),
                           child: Center(child: AppText("No dasha details available.".tr)),
                         )

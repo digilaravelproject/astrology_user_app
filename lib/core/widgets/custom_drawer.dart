@@ -103,7 +103,7 @@ class CustomDrawer extends StatelessWidget {
                             child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
                           ),
                           const SizedBox(height: 20),
-                          const AppText('Logout'.tr,
+                          AppText('Logout'.tr,
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF2E1A47),

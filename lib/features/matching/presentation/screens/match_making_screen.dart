@@ -109,14 +109,14 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
               const SizedBox(height: 60),
               
               // Description
-              const AppText('The stars reveal compatibility'.tr,
+              AppText('The stars reveal compatibility'.tr,
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF2D3142),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-              const AppText('Our astrology-based matchmaking reveals the\nstrengths and challenges in your connections.'.tr,
+              AppText('Our astrology-based matchmaking reveals the\nstrengths and challenges in your connections.'.tr,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF6B7280),
@@ -151,7 +151,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
                     ),
                     elevation: 2,
                   ),
-                  child: const AppText('Check Compatibility'.tr,
+                  child: AppText('Check Compatibility'.tr,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -224,7 +224,7 @@ class _MatchMakingScreenState extends State<MatchMakingScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const AppText('ADD'.tr,
+                AppText('ADD'.tr,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF2D3142),
@@ -332,7 +332,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppText('Add Profile'.tr,
+            AppText('Add Profile'.tr,
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: Color(0xFF2D3142),
@@ -358,7 +358,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
             const SizedBox(height: 16),
             
             // Gender
-            const AppText('Gender'.tr,
+            AppText('Gender'.tr,
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xFF6B7280),
@@ -444,7 +444,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text('Select Birth Date'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
@@ -534,7 +534,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text('Select Birth Time'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
@@ -629,7 +629,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const AppText('Reset'.tr,
+                    child: AppText('Reset'.tr,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF6B7280),
@@ -652,7 +652,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const AppText('Save'.tr,
+                    child: AppText('Save'.tr,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,

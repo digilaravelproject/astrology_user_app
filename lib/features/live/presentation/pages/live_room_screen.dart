@@ -351,7 +351,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                          return const Center(child: CircularProgressIndicator(color: Colors.orange));
                       }
                       if (_giftController.gifts.isEmpty) {
-                         return const Center(child: Text("No gifts available".tr, style: TextStyle(color: Colors.white70)));
+                         return Center(child: Text("No gifts available".tr, style: TextStyle(color: Colors.white70)));
                       }
                       return GridView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -522,7 +522,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                 children: [
                                   const Icon(Icons.videocam_off, color: Colors.white70, size: 64),
                                   const SizedBox(height: 12),
-                                  const Text("Camera is Stopped".tr,
+                                  Text("Camera is Stopped".tr,
                                     style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -717,7 +717,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     children: [
                       const Icon(Icons.videocam_off, color: Colors.white70, size: 64),
                       const SizedBox(height: 12),
-                      const Text("Live Session Ended".tr,
+                      Text("Live Session Ended".tr,
                         style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 24),
@@ -727,7 +727,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () => Navigator.pop(context),
-                        child: const Text("Go Back".tr),
+                        child: Text("Go Back".tr),
                       ),
                     ],
                   ),

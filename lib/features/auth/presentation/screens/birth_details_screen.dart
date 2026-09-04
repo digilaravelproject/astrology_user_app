@@ -429,7 +429,7 @@ class _BirthDetailsScreenState extends State<BirthDetailsScreen> {
       onTap: () async {
         final result = await Navigator.of(context, rootNavigator: true).push<LocationResult>(
           MaterialPageRoute(
-            builder: (_) => const LocationSearchScreen(title: "Select Place of Birth".tr),
+            builder: (_) => LocationSearchScreen(title: "Select Place of Birth".tr),
             fullscreenDialog: true,
           ),
         );

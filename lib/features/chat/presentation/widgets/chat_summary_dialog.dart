@@ -102,7 +102,7 @@ class ChatSummaryDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const AppText('Done'.tr,
+                child: AppText('Done'.tr,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,

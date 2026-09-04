@@ -307,7 +307,7 @@ class PanchangScreen extends GetView<PanchangController> {
             children: [
               const Icon(Icons.auto_awesome, color: Colors.orangeAccent, size: 20),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: AppText("Daily Cosmic Guidance".tr,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -337,7 +337,7 @@ class PanchangScreen extends GetView<PanchangController> {
           AppText(guidance.summary, fontSize: 13, color: Colors.black87, height: 1.4),
           if (guidance.bestActivities.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const AppText("Best Activities Today:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
+            AppText("Best Activities Today:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -354,7 +354,7 @@ class PanchangScreen extends GetView<PanchangController> {
           ],
           if (guidance.activitiesToAvoid.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const AppText("Activities to Avoid:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
+            AppText("Activities to Avoid:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.red),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -371,7 +371,7 @@ class PanchangScreen extends GetView<PanchangController> {
           ],
           if (guidance.tips.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const AppText("Daily Tips:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
+            AppText("Daily Tips:".tr, fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
             const SizedBox(height: 8),
             ...guidance.tips.map((tip) => Padding(
               padding: const EdgeInsets.only(bottom: 6),
@@ -399,7 +399,7 @@ class PanchangScreen extends GetView<PanchangController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 4, bottom: 12),
           child: AppText('Panchang Components'.tr, fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -854,7 +854,7 @@ class PanchangScreen extends GetView<PanchangController> {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.calendar_month, size: 14, color: themeColor),
                       SizedBox(width: 6),
                       AppText("MASA (MONTH)".tr,
@@ -1043,7 +1043,7 @@ class PanchangScreen extends GetView<PanchangController> {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.park_outlined, size: 14, color: themeColor),
                       SizedBox(width: 6),
                       AppText("RITU (SEASON)".tr,
@@ -1216,7 +1216,7 @@ class PanchangScreen extends GetView<PanchangController> {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(Icons.explore, size: 14, color: themeColor),
                       SizedBox(width: 6),
                       AppText("DISHA SHOOL (TRAVEL ADVISORY)".tr,

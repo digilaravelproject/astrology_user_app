@@ -73,7 +73,7 @@ class ReferralScreen extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Clipboard.setData(const ClipboardData(text: "ASTRO2024".tr));
+                      Clipboard.setData(ClipboardData(text: "ASTRO2024".tr));
                       CustomSnackbar.showInfo("Referral code copied to clipboard");
                     },
                     child: Container(

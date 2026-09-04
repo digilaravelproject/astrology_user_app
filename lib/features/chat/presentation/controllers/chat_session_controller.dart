@@ -190,7 +190,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     FloatingChatBubble.dismiss();
     WebSocketService.activeSessionId = null;
     Get.back();
-    Get.dialog(AlertDialog(title: const Text("Session Expired".tr), content: const Text("Your prepaid package session has expired. Conversation has ended.".tr), actions: [TextButton(onPressed: () => Get.back(), child: const Text("OK".tr))]));
+    Get.dialog(AlertDialog(title: Text("Session Expired".tr), content: Text("Your prepaid package session has expired. Conversation has ended.".tr), actions: [TextButton(onPressed: () => Get.back(), child: Text("OK".tr))]));
   }
 
   void setupTimer(String? startedAtString) {

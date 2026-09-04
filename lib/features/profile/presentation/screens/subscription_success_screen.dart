@@ -52,7 +52,7 @@ class SubscriptionSuccessScreen extends StatelessWidget {
               
               const SizedBox(height: 40),
               
-              const AppText('Subscription Successful'.tr,
+              AppText('Subscription Successful'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF2D3142),

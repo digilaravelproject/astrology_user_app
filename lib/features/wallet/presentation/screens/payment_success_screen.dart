@@ -44,7 +44,7 @@ class PaymentSuccessScreen extends StatelessWidget {
               
               const SizedBox(height: 40),
               
-              const AppText('Payment Successful'.tr,
+              AppText('Payment Successful'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF2E1A47),

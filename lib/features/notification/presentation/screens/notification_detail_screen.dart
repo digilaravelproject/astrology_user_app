@@ -51,12 +51,12 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
             onPressed: () {
               Get.dialog(
                 AlertDialog(
-                  title: const Text('Delete Notification'.tr),
-                  content: const Text('Are you sure you want to delete this notification?'.tr),
+                  title: Text('Delete Notification'.tr),
+                  content: Text('Are you sure you want to delete this notification?'.tr),
                   actions: [
                     TextButton(
                       onPressed: () => Get.back(),
-                      child: const Text('Cancel'.tr),
+                      child: Text('Cancel'.tr),
                     ),
                     TextButton(
                       onPressed: () {
@@ -64,7 +64,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
                         controller.deleteNotification(widget.notification.id);
                         Get.back();
                       },
-                      child: const Text('Delete'.tr, style: TextStyle(color: Colors.red)),
+                      child: Text('Delete'.tr, style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),

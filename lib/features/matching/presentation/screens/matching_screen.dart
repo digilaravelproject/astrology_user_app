@@ -920,7 +920,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const AppText("Generate Horoscope".tr,
+                    : AppText("Generate Horoscope".tr,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -1003,7 +1003,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               const SizedBox(height: 20),
               
               // Title
-              const AppText('Delete Kundli?'.tr,
+              AppText('Delete Kundli?'.tr,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textColorPrimary,
@@ -1038,7 +1038,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const AppText('Cancel'.tr,
+                        child: AppText('Cancel'.tr,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textColorPrimary,
@@ -1089,7 +1089,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           ),
                           elevation: 0,
                         ),
-                        child: const AppText('Delete'.tr,
+                        child: AppText('Delete'.tr,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -1218,7 +1218,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           rootNavigator: true,
                         ).push<LocationResult>(
                           MaterialPageRoute(
-                            builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'.tr),
+                            builder: (_) => LocationSearchScreen(title: 'Select Birth Place'.tr),
                             fullscreenDialog: true,
                           ),
                         );
@@ -1592,7 +1592,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Text('Select Birth Date'.tr,
                       style: TextStyle(
@@ -1676,7 +1676,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Text('Select Birth Time'.tr,
                       style: TextStyle(
@@ -1790,7 +1790,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     ),
                     child: TextField(
                       onChanged: (val) => setSheetState(() => searchQuery = val),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'Search...'.tr,
                         prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryColor),
                         border: InputBorder.none,
@@ -2014,7 +2014,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppText('Add Profile'.tr,
+            AppText('Add Profile'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textColorPrimary,
@@ -2040,7 +2040,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
             const SizedBox(height: 14),
 
             // Gender
-            const AppText('Gender'.tr,
+            AppText('Gender'.tr,
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: AppColors.textColorSecondary,
@@ -2126,7 +2126,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text('Select Birth Date'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
@@ -2216,7 +2216,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
                                 child: Text('Select Birth Time'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
@@ -2286,7 +2286,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               onTap: () async {
                 final result = await Navigator.of(context, rootNavigator: true)
                     .push<LocationResult>(MaterialPageRoute(
-                  builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'.tr),
+                  builder: (_) => LocationSearchScreen(title: 'Select Birth Place'.tr),
                   fullscreenDialog: true,
                 ));
                 if (result != null) {
@@ -2322,7 +2322,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const AppText('Reset'.tr,
+                    child: AppText('Reset'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textColorSecondary,
@@ -2345,7 +2345,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const AppText('Save'.tr,
+                    child: AppText('Save'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -2475,7 +2475,7 @@ Widget _buildAddProfileCircle(VoidCallback onTap) {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AppText('ADD'.tr,
+              AppText('ADD'.tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryColor,

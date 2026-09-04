@@ -196,7 +196,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 },
                 activeColor: const Color(0xFFD81B60),
               ),
-              const AppText('Save'.tr,
+              AppText('Save'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFD81B60),
@@ -214,7 +214,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: const Color(0xFFD81B60).withOpacity(0.3)),
             ),
-            child: const Center(
+            child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -246,7 +246,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 ),
                 elevation: 2,
               ),
-              child: const AppText('SHOW MATCH'.tr,
+              child: AppText('SHOW MATCH'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -363,7 +363,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 },
                 activeColor: const Color(0xFFD81B60),
               ),
-              const AppText('Save'.tr,
+              AppText('Save'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFD81B60),
@@ -381,7 +381,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: const Color(0xFFD81B60).withOpacity(0.3)),
             ),
-            child: const Center(
+            child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -413,7 +413,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 ),
                 elevation: 2,
               ),
-              child: const AppText('SHOW MATCH'.tr,
+              child: AppText('SHOW MATCH'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -498,7 +498,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Text('Select Birth Date'.tr,
                       style: TextStyle(
@@ -539,7 +539,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text('Done'.tr,
+                      child: Text('Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
                       ),
                     ),
@@ -581,7 +581,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
                     child: Text('Select Birth Time'.tr,
                       style: TextStyle(
@@ -620,7 +620,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text('Done'.tr,
+                      child: Text('Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
                       ),
                     ),

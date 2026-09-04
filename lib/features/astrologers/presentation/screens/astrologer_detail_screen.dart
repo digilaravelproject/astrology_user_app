@@ -233,7 +233,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                         // Profile Header Card
                         if (_astrologer != null) _buildProfileHeaderCard(_astrologer!),
                         if (_astrologer == null && !_isLoading) 
-                          const Center(
+                          Center(
                             child: Padding(
                               padding: EdgeInsets.only(top: 100),
                               child: AppText('Astrologer data not found'.tr, color: Colors.grey),
@@ -1187,7 +1187,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
       }
       
       if (_controller.gifts.isEmpty) {
-        return const Center(
+        return Center(
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Text('No gifts available'.tr),
@@ -1413,7 +1413,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           children: [
             const Icon(Icons.support_agent, color: AppColors.primaryColor, size: 24),
             const SizedBox(width: 8),
-            const AppText('Assistance Chat'.tr, fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
+            AppText('Assistance Chat'.tr, fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
             const Spacer(),
             const Icon(Icons.chevron_right, color: AppColors.primaryColor),
           ],

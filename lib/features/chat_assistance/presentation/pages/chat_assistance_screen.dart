@@ -118,7 +118,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                 }
                 
                 if (controller.messages.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: AppText('Send a message to get assistance.'.tr,
                       color: Colors.grey,
                     ),

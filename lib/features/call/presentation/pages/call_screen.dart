@@ -346,7 +346,7 @@ class _CallScreenState extends State<CallScreen> {
               ),
             ),
             // Title
-            const Row(
+            Row(
               children: [
                 Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
                 SizedBox(width: 8),
@@ -398,7 +398,7 @@ class _CallScreenState extends State<CallScreen> {
               width: double.infinity,
               child: TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel'.tr, style: TextStyle(color: Colors.grey, fontSize: 15)),
+                child: Text('Cancel'.tr, style: TextStyle(color: Colors.grey, fontSize: 15)),
               ),
             ),
           ],
@@ -413,12 +413,12 @@ class _CallScreenState extends State<CallScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('End Consultation'.tr, style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Are you sure you want to end this consultation?'.tr),
+        title: Text('End Consultation'.tr, style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to end this consultation?'.tr),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('Cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -430,7 +430,7 @@ class _CallScreenState extends State<CallScreen> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('End Session'.tr),
+            child: Text('End Session'.tr),
           ),
         ],
       ),
@@ -492,7 +492,7 @@ class _CallScreenState extends State<CallScreen> {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
-          children: const [
+          children: [
             Icon(Icons.chat_bubble_rounded, color: AppColors.primaryColor, size: 22),
             SizedBox(width: 10),
             Text('Switch to Chat'.tr, style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
@@ -505,7 +505,7 @@ class _CallScreenState extends State<CallScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('Cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -513,7 +513,7 @@ class _CallScreenState extends State<CallScreen> {
               _switchToChat();
             },
             icon: const Icon(Icons.chat_bubble_rounded, size: 16),
-            label: const Text('Switch'.tr),
+            label: Text('Switch'.tr),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryColor,
               foregroundColor: Colors.white,
@@ -681,7 +681,7 @@ class _CallScreenState extends State<CallScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        const Text('End'.tr,
+        Text('End'.tr,
           style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
         ),
       ],

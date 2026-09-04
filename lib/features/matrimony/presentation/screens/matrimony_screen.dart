@@ -88,7 +88,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const AppText('Filters'.tr,
+                    AppText('Filters'.tr,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Colors.black87,
@@ -107,7 +107,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             _controller.getMatrimonyProfile();
 
                           },
-                          child: const AppText('CLEAR ALL'.tr,
+                          child: AppText('CLEAR ALL'.tr,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryColor,
@@ -201,7 +201,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        child: const AppText('CLOSE'.tr,
+                        child: AppText('CLOSE'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryColor,
@@ -230,7 +230,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                           }
 
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('Filters applied successfully!'.tr),
                               backgroundColor: Colors.green,
                               behavior: SnackBarBehavior.floating,
@@ -246,7 +246,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        child: const AppText('APPLY'.tr,
+                        child: AppText('APPLY'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -707,7 +707,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              const AppText('Unlock Premium Access'.tr,
+              AppText('Unlock Premium Access'.tr,
                 fontSize: 26,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF2D3142),

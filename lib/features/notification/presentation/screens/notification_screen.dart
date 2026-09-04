@@ -56,19 +56,19 @@ class NotificationScreen extends StatelessWidget {
                     } else if (value == 'clear_all') {
                       Get.dialog(
                         AlertDialog(
-                          title: const Text('Clear All Notifications'.tr),
-                          content: const Text('Are you sure you want to delete all notifications?'.tr),
+                          title: Text('Clear All Notifications'.tr),
+                          content: Text('Are you sure you want to delete all notifications?'.tr),
                           actions: [
                             TextButton(
                               onPressed: () => Get.back(),
-                              child: const Text('Cancel'.tr),
+                              child: Text('Cancel'.tr),
                             ),
                             TextButton(
                               onPressed: () {
                                 Get.back();
                                 controller.deleteAllNotifications();
                               },
-                              child: const Text('Delete All'.tr, style: TextStyle(color: Colors.red)),
+                              child: Text('Delete All'.tr, style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         ),

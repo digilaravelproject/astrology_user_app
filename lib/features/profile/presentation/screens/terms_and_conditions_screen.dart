@@ -31,7 +31,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
 
         final termsData = controller.termsAndConditionsData.value;
         if (termsData == null || termsData.content.isEmpty) {
-          return const Center(
+          return Center(
             child: AppText("Terms and Conditions are not available at the moment.".tr,
               fontSize: 16,
               color: Colors.grey,

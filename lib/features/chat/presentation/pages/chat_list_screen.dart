@@ -116,7 +116,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               size: 22,
                             ),
                             const SizedBox(width: 8),
-                            const AppText('Top Astrologers'.tr,
+                            AppText('Top Astrologers'.tr,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryColor,
@@ -201,7 +201,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
                 final astrologers = astrologerController.filteredAstrologers;
                 if (astrologers.isEmpty && !astrologerController.isFilteredLoading.value) {
-                  return const SliverToBoxAdapter(
+                  return SliverToBoxAdapter(
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.only(top: 50),

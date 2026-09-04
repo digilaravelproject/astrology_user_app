@@ -178,7 +178,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
-                          child: const AppText("End Chat".tr,
+                          child: AppText("End Chat".tr,
                             color: Colors.red,
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
@@ -733,7 +733,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         bottomLeft: Radius.circular(14),
                       ),
                     ),
-                    child: const Text('Namaste, mujhe aapki guidance chahiye...'.tr,
+                    child: Text('Namaste, mujhe aapki guidance chahiye...'.tr,
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
@@ -857,19 +857,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("End Chat".tr),
-          content: const Text("Are you sure you want to end this chat session?".tr),
+          title: Text("End Chat".tr),
+          content: Text("Are you sure you want to end this chat session?".tr),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel".tr),
+              child: Text("Cancel".tr),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _controller.terminateEntireSession();
               },
-              child: const Text("End Chat".tr, style: TextStyle(color: Colors.red)),
+              child: Text("End Chat".tr, style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -904,7 +904,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             ),
             // Title
-            const Row(
+            Row(
               children: [
                 Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
                 SizedBox(width: 8),
@@ -956,7 +956,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               width: double.infinity,
               child: TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel'.tr, style: TextStyle(color: Colors.grey, fontSize: 15)),
+                child: Text('Cancel'.tr, style: TextStyle(color: Colors.grey, fontSize: 15)),
               ),
             ),
           ],
@@ -1016,12 +1016,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("Switch to Call".tr),
-        content: const Text("Are you sure you want to end this chat session and switch to a call?".tr),
+        title: Text("Switch to Call".tr),
+        content: Text("Are you sure you want to end this chat session and switch to a call?".tr),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text("Cancel".tr),
+            child: Text("Cancel".tr),
           ),
           TextButton(
             onPressed: () async {
@@ -1088,7 +1088,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 CustomSnackbar.showError("Failed to switch: $e");
               }
             },
-            child: const Text("Switch".tr,
+            child: Text("Switch".tr,
               style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),

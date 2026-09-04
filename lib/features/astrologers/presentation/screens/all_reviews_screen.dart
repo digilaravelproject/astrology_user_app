@@ -43,7 +43,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
           icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const AppText('All Reviews'.tr,
+        title: AppText('All Reviews'.tr,
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: Color(0xFF2D2D2D),
@@ -53,7 +53,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
         final reviews = _controller.reviews;
 
         if (reviews.isEmpty) {
-          return const Center(
+          return Center(
             child: AppText('No reviews yet'.tr,
               fontSize: 16,
               color: Colors.grey,
