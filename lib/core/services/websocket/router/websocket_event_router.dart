@@ -13,32 +13,32 @@ class WebSocketEventRouter {
     } else if (event == AppUrls.eventChatEnded) {
       ChatWsHandler.handleChatEnded(data);
     } else if (event == AppUrls.eventChatDismissed ||
-        event == 'App\\Events\\ChatDismissed' ||
-        event == '.ChatDismissed') {
+        event == 'App\\Events\\${AppUrls.eventChatDismissed}' ||
+        event == '.${AppUrls.eventChatDismissed}') {
       ChatWsHandler.handleChatDismissed(data);
     } else if (event == AppUrls.eventMessageSent ||
-        event == 'App\\Events\\MessageSent') {
+        event == 'App\\Events\\${AppUrls.eventMessageSent}') {
       ChatWsHandler.handleMessageSent(data);
     } else if (event == AppUrls.eventMessageStatusUpdated ||
-        event == 'App\\Events\\MessageStatusUpdated') {
+        event == 'App\\Events\\${AppUrls.eventMessageStatusUpdated}') {
       ChatWsHandler.handleMessageStatusUpdated(data);
     } else if (event == AppUrls.eventPresenceUpdated ||
-        event == 'App\\Events\\PresenceUpdated') {
+        event == 'App\\Events\\${AppUrls.eventPresenceUpdated}') {
       ChatWsHandler.handlePresenceUpdated(data);
     } else if (event == AppUrls.eventCallAccepted ||
-        event == 'App\\Events\\CallAccepted') {
+        event == 'App\\Events\\${AppUrls.eventCallAccepted}') {
       CallWsHandler.handleCallAccepted(data);
     } else if (event == AppUrls.eventCallDismissed ||
-        event == 'App\\Events\\CallDismissed') {
+        event == 'App\\Events\\${AppUrls.eventCallDismissed}') {
       CallWsHandler.handleCallDismissed(data);
     } else if (event == AppUrls.eventCallEnded ||
-        event == 'App\\Events\\CallEnded') {
+        event == 'App\\Events\\${AppUrls.eventCallEnded}') {
       CallWsHandler.handleCallEnded(data);
     } else if (event == AppUrls.eventIceCandidateSent ||
-        event == 'App\\Events\\IceCandidateSent') {
+        event == 'App\\Events\\${AppUrls.eventIceCandidateSent}') {
       CallWsHandler.handleIceCandidateSent(data);
     } else if (event == AppUrls.eventWebRtcSdpUpdated ||
-        event == 'App\\Events\\WebRtcSdpUpdated') {
+        event == 'App\\Events\\${AppUrls.eventWebRtcSdpUpdated}') {
       CallWsHandler.handleWebRtcSdpUpdated(data);
     } else if (event == AppUrls.eventViewerCountUpdated ||
         event == 'App\\Events\\${AppUrls.eventViewerCountUpdated}' ||
@@ -80,13 +80,13 @@ class WebSocketEventRouter {
         event == '.${AppUrls.eventUserLeftLiveSession}') {
       LiveWsHandler.handleUserLeftLiveSession(data);
     } else if (event == AppUrls.eventChatAssistanceMessageSent ||
-        event == 'App\\Events\\ChatAssistanceMessageSent') {
+        event == 'App\\Events\\${AppUrls.eventChatAssistanceMessageSent}') {
       ChatWsHandler.handleMessageSent(data);
     } else if (event == AppUrls.eventChatAssistanceMessageStatusUpdated ||
-        event == 'App\\Events\\ChatAssistanceMessageStatusUpdated') {
+        event == 'App\\Events\\${AppUrls.eventChatAssistanceMessageStatusUpdated}') {
       ChatWsHandler.handleMessageStatusUpdated(data);
     } else if (event == AppUrls.eventChatAssistanceLimitReached ||
-        event == 'App\\Events\\ChatAssistanceLimitReached') {
+        event == 'App\\Events\\${AppUrls.eventChatAssistanceLimitReached}') {
       ChatWsHandler.handleChatAssistanceLimitReached(data);
     } else if (event == AppUrls.eventPackageSubSessionStarted ||
         event == 'App\\Events\\${AppUrls.eventPackageSubSessionStarted}') {
@@ -100,13 +100,13 @@ class WebSocketEventRouter {
     } else if (event == AppUrls.eventPackageSessionStateUpdated ||
         event == 'App\\Events\\${AppUrls.eventPackageSessionStateUpdated}') {
       PackageWsHandler.handlePackageSessionStateUpdated(data);
-    } else if (event == 'AstrologerAvailabilityUpdated' ||
-        event == '.AstrologerAvailabilityUpdated' ||
-        event == 'App\\Events\\AstrologerAvailabilityUpdated') {
+    } else if (event == AppUrls.eventAstrologerAvailabilityUpdated ||
+        event == '.${AppUrls.eventAstrologerAvailabilityUpdated}' ||
+        event == 'App\\Events\\${AppUrls.eventAstrologerAvailabilityUpdated}') {
       AstrologerWsHandler.handleAstrologerAvailabilityUpdated(data);
-    } else if (event == 'UserForceLoggedOut' ||
-        event == '.UserForceLoggedOut' ||
-        event == 'App\\Events\\UserForceLoggedOut') {
+    } else if (event == AppUrls.eventUserForceLoggedOut ||
+        event == '.${AppUrls.eventUserForceLoggedOut}' ||
+        event == 'App\\Events\\${AppUrls.eventUserForceLoggedOut}') {
       AuthWsHandler.handleForceLoggedOut(data);
     }
   }
