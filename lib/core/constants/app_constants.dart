@@ -3,7 +3,7 @@ import 'app_urls.dart';
 
 class AppConstants {
     static String appName = EnvConfig.appName;
-    static String baseUrl = AppUrls.baseUrl;
+    static String baseUrl = AppUrls.apiUrl;
     static const String fontFamily = 'Poppins';
     static const String defaultTag = 'PCB_APP'; // default tag for log checking
     static const String googleMapApiKey = 'AIzaSyA4mCZDv97Ks802PCQgStmdkQfQXe7ZT2Y';

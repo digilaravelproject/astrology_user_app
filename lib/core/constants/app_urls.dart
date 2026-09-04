@@ -1,165 +1,170 @@
+import 'package:astro_user/core/services/config/env_config.dart';
+
 class AppUrls {
   // ==========================================
   // Core Configuration
   // ==========================================
-  static String baseUrl = "https://suryapathkundli.com";
-  static const String baseImageUrl = "https://suryapathkundli.com/storage/";
-  static const String webSocketUrl = "wss://suryapathkundli.com/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
-  static const String broadcastingAuth = "/api/v1/broadcasting/auth";
+  static const String apiVersion = "v1";
+  static String get baseUrl => EnvConfig.baseUrl;
+  static String get apiUrl => "$baseUrl/api/$apiVersion";
+  static String get baseImageUrl => "$baseUrl/storage/";
+  static String get webSocketUrl =>
+      "${baseUrl.replaceFirst('https://', 'wss://').replaceFirst('http://', 'ws://')}/app/astrology-key?protocol=7&client=js&version=8.4.0-rc2&flash=false";
+  static const String broadcastingAuth = "/broadcasting/auth";
 
   // ==========================================
   // Authentication & Onboarding
   // ==========================================
-  static String sendOtp = "/api/v1/user/send-otp";
-  static String verifyOtp = "/api/v1/user/verify-otp";
-  static String resendOtp = "/api/v1/user/resend-otp";
-  static const String deleteAccount = '/api/v1/user/delete-account';
-  static const String logout = '/api/v1/user/logout';
+  static String sendOtp = "/user/send-otp";
+  static String verifyOtp = "/user/verify-otp";
+  static String resendOtp = "/user/resend-otp";
+  static const String deleteAccount = '/user/delete-account';
+  static const String logout = '/user/logout';
 
   // ==========================================
   // Profile
   // ==========================================
-  static String getProfile(int id) => "/api/v1/user/profile/$id";
-  static String updateProfile(int id) => "/api/v1/user/profile/$id";
-  static String updateProfilePhoto = "/api/v1/user/profile/photo";
-  static String updateProfileInApp = "/api/v1/user/profileInAppUpdate";
+  static String getProfile(int id) => "/user/profile/$id";
+  static String updateProfile(int id) => "/user/profile/$id";
+  static String updateProfilePhoto = "/user/profile/photo";
+  static String updateProfileInApp = "/user/profileInAppUpdate";
 
   // ==========================================
   // Notifications & Device Tokens
   // ==========================================
-  static const String registerDeviceToken = '/api/v1/user/device-token';
-  static const String removeDeviceToken = '/api/v1/user/remove-token';
-  static String getNotificationCount(int userId) => '/api/v1/user/notifications/count';
-  static String getNotifications(int userId) => '/api/v1/user/notifications';
-  static String getNotificationById(int id, int userId) => '/api/v1/user/notifications/$id';
-  static String markNotificationRead(int id, int userId) => '/api/v1/user/notifications/$id/mark-read';
-  static const String markAllNotificationsRead = '/api/v1/user/notifications/mark-all-read';
-  static String deleteNotification(int id) => '/api/v1/user/notifications/$id';
-  static const String deleteAllNotifications = '/api/v1/user/notifications/delete-all';
+  static const String registerDeviceToken = '/user/device-token';
+  static const String removeDeviceToken = '/user/remove-token';
+  static String getNotificationCount(int userId) => '/user/notifications/count';
+  static String getNotifications(int userId) => '/user/notifications';
+  static String getNotificationById(int id, int userId) => '/user/notifications/$id';
+  static String markNotificationRead(int id, int userId) => '/user/notifications/$id/mark-read';
+  static const String markAllNotificationsRead = '/user/notifications/mark-all-read';
+  static String deleteNotification(int id) => '/user/notifications/$id';
+  static const String deleteAllNotifications = '/user/notifications/delete-all';
 
   // ==========================================
   // Astrologers & Matrimony
   // ==========================================
-  static const String astrologers = '/api/v1/user/astrologers';
-  static String getAstrologerDetails(int id) => '/api/v1/user/astrologers/$id';
-  static const String following = '/api/v1/user/following';
-  static String blockAstrologer(int id) => '/api/v1/user/astrologers/$id/block';
-  static String unblockAstrologer(int id) => '/api/v1/user/astrologers/$id/unblock';
-  static const String blockedAstrologers = '/api/v1/user/blocked-astrologers';
+  static const String astrologers = '/user/astrologers';
+  static String getAstrologerDetails(int id) => '/user/astrologers/$id';
+  static const String following = '/user/following';
+  static String blockAstrologer(int id) => '/user/astrologers/$id/block';
+  static String unblockAstrologer(int id) => '/user/astrologers/$id/unblock';
+  static const String blockedAstrologers = '/user/blocked-astrologers';
 
-  static const String getMatrimonyProfile = '/api/v1/user/matrimony/profiles';
-  static const String matrimonyProfile = '/api/v1/user/matrimony/profile';
-  static const String updateMatrimonyProfile = '/api/v1/user/matrimony/update_profile';
-  static String getMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles/$id';
-  static String getMyMatrimonyProfileDetails(int id) => '/api/v1/user/matrimony/profiles_user_id/$id';
-  static String matrimonySearch(String query) => '/api/v1/user/matrimony/search?q=$query';
+  static const String getMatrimonyProfile = '/user/matrimony/profiles';
+  static const String matrimonyProfile = '/user/matrimony/profile';
+  static const String updateMatrimonyProfile = '/user/matrimony/update_profile';
+  static String getMatrimonyProfileDetails(int id) => '/user/matrimony/profiles/$id';
+  static String getMyMatrimonyProfileDetails(int id) => '/user/matrimony/profiles_user_id/$id';
+  static String matrimonySearch(String query) => '/user/matrimony/search?q=$query';
   static String blockMatrimonyProfile(int id) => '$astrologers/$id/block';
   static String reportMatrimonyProfile(int id) => '$astrologers/$id/report';
 
   // ==========================================
   // Wallet, Subscriptions & Packages
   // ==========================================
-  static const String wallet = '/api/v1/user/wallet';
-  static const String walletTopup = '/api/v1/user/wallet/topup';
-  static const String walletTopupVerify = '/api/v1/user/wallet/verify-topup';
-  static const String walletTransactions = '/api/v1/user/wallet/transactions';
-  static String walletInvoice(int transactionId) => '/api/v1/user/wallet/transactions/$transactionId/invoice';
+  static const String wallet = '/user/wallet';
+  static const String walletTopup = '/user/wallet/topup';
+  static const String walletTopupVerify = '/user/wallet/verify-topup';
+  static const String walletTransactions = '/user/wallet/transactions';
+  static String walletInvoice(int transactionId) => '/user/wallet/transactions/$transactionId/invoice';
 
-  static const String plans = '/api/v1/user/plans';
-  static const String upgradePlans = '/api/v1/user/plans/upgrade';
-  static const String upgradePlansVerify = '/api/v1/user/plans/upgrade/verify';
+  static const String plans = '/user/plans';
+  static const String upgradePlans = '/user/plans/upgrade';
+  static const String upgradePlansVerify = '/user/plans/upgrade/verify';
   
-  static const String purchasePackage = '/api/v1/user/packages/purchase';
-  static const String packageActiveStatus = '/api/v1/user/packages/active-status';
-  static const String packageSessionStart = '/api/v1/user/packages/session/start';
-  static const String packageSessionEnd = '/api/v1/user/packages/session/end';
-  static const String packageSpawnChannel = '/api/v1/user/packages/session/spawn-channel';
-  static const String packageSwitchChannel = '/api/v1/user/packages/session/switch-channel';
-  static const String packageTerminateChannel = '/api/v1/user/packages/session/terminate-channel';
-  static const String packageHeartbeat = '/api/v1/user/packages/session/heartbeat';
-  static const String packageActiveBanner = '/api/v1/user/packages/active-banner';
+  static const String purchasePackage = '/user/packages/purchase';
+  static const String packageActiveStatus = '/user/packages/active-status';
+  static const String packageSessionStart = '/user/packages/session/start';
+  static const String packageSessionEnd = '/user/packages/session/end';
+  static const String packageSpawnChannel = '/user/packages/session/spawn-channel';
+  static const String packageSwitchChannel = '/user/packages/session/switch-channel';
+  static const String packageTerminateChannel = '/user/packages/session/terminate-channel';
+  static const String packageHeartbeat = '/user/packages/session/heartbeat';
+  static const String packageActiveBanner = '/user/packages/active-banner';
 
   // ==========================================
   // Live Streaming APIs
   // ==========================================
-  static const String activeLiveSessions = "/api/v1/user/live/now";
-  static String liveSessionDetail(int id) => "/api/v1/user/live/$id";
-  static String joinLiveSession(int id) => "/api/v1/user/live/$id/join";
-  static String leaveLiveSession(int id) => "/api/v1/user/live/$id/leave";
-  static String getLiveComments(int id) => "/api/v1/user/live/$id/comments";
-  static String sendLiveComment(int id) => "/api/v1/user/live/$id/comment";
-  static String sendSuperChat(int id) => "/api/v1/user/live/$id/super-chat";
-  static String watchLiveSession(int id) => "/api/v1/user/live/$id/watch";
+  static const String activeLiveSessions = "/user/live/now";
+  static String liveSessionDetail(int id) => "/user/live/$id";
+  static String joinLiveSession(int id) => "/user/live/$id/join";
+  static String leaveLiveSession(int id) => "/user/live/$id/leave";
+  static String getLiveComments(int id) => "/user/live/$id/comments";
+  static String sendLiveComment(int id) => "/user/live/$id/comment";
+  static String sendSuperChat(int id) => "/user/live/$id/super-chat";
+  static String watchLiveSession(int id) => "/user/live/$id/watch";
 
-  static const String gifts = '/api/v1/gifts';
-  static const String sendGift = '/api/v1/gifts/send';
-  static String getGiftHistory(int id) => '/api/v1/astrologers/$id/gifts';
+  static const String gifts = '/gifts';
+  static const String sendGift = '/gifts/send';
+  static String getGiftHistory(int id) => '/astrologers/$id/gifts';
 
   // ==========================================
   // Call Feature APIs
   // ==========================================
-  static const String initiateCall = '/api/v1/call/initiate';
-  static String acceptCall(int sessionId) => '/api/v1/call/$sessionId/accept';
-  static String rejectCall(int sessionId) => '/api/v1/call/$sessionId/reject';
-  static String cancelCall(int sessionId) => '/api/v1/call/$sessionId/cancel';
-  static String endCallSession(int sessionId) => '/api/v1/call/$sessionId/end';
-  static String updateSdp(int sessionId) => '/api/v1/call/$sessionId/sdp';
-  static String sendIceCandidate(int sessionId) => '/api/v1/call/$sessionId/ice-candidate';
-  static const String turnCredentials = '/api/v1/call/turn-credentials';
-  static const String currentCallSession = '/api/v1/call/current-session';
-  static const String userCallSessions = '/api/v1/call/sessions/user';
-  static const String astrologerCallSessions = '/api/v1/call/sessions/astrologer';
+  static const String initiateCall = '/call/initiate';
+  static String acceptCall(int sessionId) => '/call/$sessionId/accept';
+  static String rejectCall(int sessionId) => '/call/$sessionId/reject';
+  static String cancelCall(int sessionId) => '/call/$sessionId/cancel';
+  static String endCallSession(int sessionId) => '/call/$sessionId/end';
+  static String updateSdp(int sessionId) => '/call/$sessionId/sdp';
+  static String sendIceCandidate(int sessionId) => '/call/$sessionId/ice-candidate';
+  static const String turnCredentials = '/call/turn-credentials';
+  static const String currentCallSession = '/call/current-session';
+  static const String userCallSessions = '/call/sessions/user';
+  static const String astrologerCallSessions = '/call/sessions/astrologer';
 
   // ==========================================
   // Chat Feature APIs
   // ==========================================
-  static const String initiateChat = '/api/v1/chat/initiate';
-  static const String currentSession = '/api/v1/chat/current-session';
-  static String cancelChatSession(int sessionId) => '/api/v1/chat/$sessionId/cancel';
-  static const String getCurrentSession = '/api/v1/chat/sessions/current';
-  static const String userChatSessions = '/api/v1/chat/sessions/user';
-  static String getChatMessages(int sessionId) => '/api/v1/chat/$sessionId/messages';
-  static String sendChatMessage(int sessionId) => '/api/v1/chat/$sessionId/message';
-  static String markChatRead(int sessionId) => '/api/v1/chat/$sessionId/read';
-  static String syncChatStatus(int sessionId) => '/api/v1/chat/$sessionId/sync-status';
-  static String endChatSession(int sessionId) => '/api/v1/chat/$sessionId/end';
-  static const String uploadAttachment = '/api/v1/chat/upload-attachment';
-  static const String markMessagesRead = '/api/v1/chat/messages/read';
+  static const String initiateChat = '/chat/initiate';
+  static const String currentSession = '/chat/current-session';
+  static String cancelChatSession(int sessionId) => '/chat/$sessionId/cancel';
+  static const String getCurrentSession = '/chat/sessions/current';
+  static const String userChatSessions = '/chat/sessions/user';
+  static String getChatMessages(int sessionId) => '/chat/$sessionId/messages';
+  static String sendChatMessage(int sessionId) => '/chat/$sessionId/message';
+  static String markChatRead(int sessionId) => '/chat/$sessionId/read';
+  static String syncChatStatus(int sessionId) => '/chat/$sessionId/sync-status';
+  static String endChatSession(int sessionId) => '/chat/$sessionId/end';
+  static const String uploadAttachment = '/chat/upload-attachment';
+  static const String markMessagesRead = '/chat/messages/read';
 
   // ==========================================
   // Chat Assistance APIs
   // ==========================================
-  static const String initiateChatAssistance = '/api/v1/chat-assistance/initiate';
-  static const String chatAssistanceSessions = '/api/v1/chat-assistance/sessions';
-  static String getChatAssistanceMessages(int sessionId) => '/api/v1/chat-assistance/$sessionId/messages';
-  static String sendChatAssistanceMessage(int sessionId) => '/api/v1/chat-assistance/$sessionId/message';
-  static String syncChatAssistanceStatus(int sessionId) => '/api/v1/chat-assistance/$sessionId/sync-status';
-  static const String getAstrologerChatAssistanceStatus = '/api/v1/chat-assistance/astrologer/status';
+  static const String initiateChatAssistance = '/chat-assistance/initiate';
+  static const String chatAssistanceSessions = '/chat-assistance/sessions';
+  static String getChatAssistanceMessages(int sessionId) => '/chat-assistance/$sessionId/messages';
+  static String sendChatAssistanceMessage(int sessionId) => '/chat-assistance/$sessionId/message';
+  static String syncChatAssistanceStatus(int sessionId) => '/chat-assistance/$sessionId/sync-status';
+  static const String getAstrologerChatAssistanceStatus = '/chat-assistance/astrologer/status';
 
   // ==========================================
   // Kundli, Remedies & Blogs
   // ==========================================
-  static const String createKundali = '/api/v1/kundli/create';
-  static const String getKundali = '/api/v1/kundli';
-  static String getKundaliById(int id) => '/api/v1/kundli/$id';
-  static String updateKundali(int id) => '/api/v1/kundli/$id';
-  static String deleteKundali(int id) => '/api/v1/kundli/$id';
+  static const String createKundali = '/kundli/create';
+  static const String getKundali = '/kundli';
+  static String getKundaliById(int id) => '/kundli/$id';
+  static String updateKundali(int id) => '/kundli/$id';
+  static String deleteKundali(int id) => '/kundli/$id';
 
-  static const String remedies = "/api/v1/user/remedies";
-  static const String blogs = '/api/v1/user/blogs';
+  static const String remedies = "/user/remedies";
+  static const String blogs = '/user/blogs';
 
   // ==========================================
   // Static Pages & Feedbacks
   // ==========================================
-  static const String faqs = '/api/v1/faqs';
-  static const String privacyPolicy = '/api/v1/privacy-policy';
-  static const String paymentPolicy = '/api/v1/payment-policy';
-  static const String termsAndConditions = '/api/v1/terms-and-conditions';
+  static const String faqs = '/faqs';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String paymentPolicy = '/payment-policy';
+  static const String termsAndConditions = '/terms-and-conditions';
   static const String paymentSuccess = '/payment-success';
-  static const String feedback = '/api/v1/feedback';
-  static const String aboutUs = '/api/v1/static-pages/about_us';
-  static const String customerSupport = '/api/v1/static-pages/customer_support';
-  static const String foundersWords = '/api/v1/user/founders-words';
+  static const String feedback = '/feedback';
+  static const String aboutUs = '/static-pages/about_us';
+  static const String customerSupport = '/static-pages/customer_support';
+  static const String foundersWords = '/user/founders-words';
 
   // ==========================================
   // WebSockets Channel Names & Common Events
