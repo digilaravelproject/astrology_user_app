@@ -127,7 +127,7 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.black.withOpacity(0.05)),
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Icon(Icons.info_outline, color: Colors.blueGrey, size: 20),
                                   SizedBox(width: 12),

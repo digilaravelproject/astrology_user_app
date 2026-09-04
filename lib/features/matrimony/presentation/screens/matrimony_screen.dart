@@ -743,7 +743,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       ),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

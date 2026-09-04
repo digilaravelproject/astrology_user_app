@@ -76,7 +76,7 @@ class NotificationScreen extends StatelessWidget {
                     }
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'mark_all_read',
                       child: Row(
                         children: [
@@ -86,7 +86,7 @@ class NotificationScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'clear_all',
                       child: Row(
                         children: [

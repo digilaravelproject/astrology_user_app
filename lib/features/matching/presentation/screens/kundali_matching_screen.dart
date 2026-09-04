@@ -439,7 +439,7 @@ class _DetailsTab extends StatelessWidget {
                   3: FlexColumnWidth(1.6),
                 },
                 children: [
-                  const TableRow(
+                  TableRow(
                     decoration: BoxDecoration(color: AppColors.softPink),
                     children: [
                       Padding(
