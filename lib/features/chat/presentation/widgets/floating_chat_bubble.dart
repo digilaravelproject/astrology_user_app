@@ -146,6 +146,10 @@ class FloatingChatBubble {
   static void updateStatus(String status) {
     chatStatus.value = status;
   }
+
+  // Allow ChatController to sync its timer if the bubble was already running
+  static int get currentElapsedSeconds => _currentElapsedSeconds;
+  static int _currentElapsedSeconds = 0;
 }
 
 class FloatingChatBubbleWidget extends StatefulWidget {
@@ -174,6 +178,14 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
   @override
   void initState() {
     super.initState();
+    // Sync initially if the bubble already had a value (though usually it starts at 0 or syncs from _setupTimer)
+    _elapsedSeconds.value = FloatingChatBubble._currentElapsedSeconds;
+    
+    // Listen to changes and update the static variable
+    ever(_elapsedSeconds, (val) {
+      FloatingChatBubble._currentElapsedSeconds = val;
+    });
+    
     _startTimer();
   }
 
@@ -379,14 +391,16 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                             ),
                           );
                         }
+                        // Evaluate both to ensure Obx registers listeners for both
+                        // Otherwise if ChatController is deleted, Obx gets stuck because
+                        // it was only listening to ChatController's elapsedSeconds.
+                        final fallbackTime = _elapsedSeconds.value;
+                        final timeToDisplay = Get.isRegistered<ChatController>()
+                            ? Get.find<ChatController>().elapsedSeconds.value
+                            : fallbackTime;
+
                         return Text(
-                          // Use ChatController.elapsedSeconds as source of truth
-                          // so bubble, chat screen, and notification all stay in sync.
-                          'Active Chat • ${_formatDuration(
-                            Get.isRegistered<ChatController>()
-                                ? Get.find<ChatController>().elapsedSeconds.value
-                                : _elapsedSeconds.value,
-                          )}',
+                          'Active Chat • ${_formatDuration(timeToDisplay)}',
                           style: const TextStyle(
                             color: Color(0xFFFFD700),
                             fontSize: 12,

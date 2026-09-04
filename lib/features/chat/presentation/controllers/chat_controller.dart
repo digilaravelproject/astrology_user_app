@@ -639,8 +639,18 @@ class ChatController extends GetxController with WidgetsBindingObserver {
     final startedAt = _parseSmartDate(startedAtStr);
 
     if (startedAt != null) {
-      final diff = DateTime.now().difference(startedAt).inSeconds;
-      elapsedSeconds.value = diff >= 0 ? diff : 0;
+      final st = status.value.name.toLowerCase();
+      if (st == 'ongoing' || st == 'accepted') {
+        final diff = DateTime.now().difference(startedAt).inSeconds;
+        
+        if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == _sessionId) {
+          elapsedSeconds.value = FloatingChatBubble.currentElapsedSeconds;
+        } else if (diff >= 0) {
+          elapsedSeconds.value = diff;
+        } else {
+          elapsedSeconds.value = 0;
+        }
+      }
 
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         final st = status.value.name.toLowerCase();
@@ -653,14 +663,17 @@ class ChatController extends GetxController with WidgetsBindingObserver {
         }
         if (st == 'ongoing' || st == 'accepted') {
           final nowDiff = DateTime.now().difference(startedAt).inSeconds;
-          if (nowDiff >= 0) {
+          
+          if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == _sessionId) {
+            elapsedSeconds.value++;
+            FloatingChatBubble.updateStatus(status.value.name);
+          } else if (nowDiff >= 0) {
             elapsedSeconds.value = nowDiff;
           } else {
             elapsedSeconds.value++;
           }
-        } else {
-          elapsedSeconds.value = 0;
         }
+        // Do not reset to 0, just pause updating if not ongoing
       });
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
