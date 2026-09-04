@@ -142,6 +142,7 @@ class AppUrls {
   static String rejectCall(int sessionId) => '/api/v1/call/$sessionId/reject';
   static String cancelCall(int sessionId) => '/api/v1/call/$sessionId/cancel';
   static String endCallSession(int sessionId) => '/api/v1/call/$sessionId/end';
+  static String updateSdp(int sessionId) => '/api/v1/call/$sessionId/sdp';
   static String sendIceCandidate(int sessionId) => '/api/v1/call/$sessionId/ice-candidate';
   static const String currentCallSession = '/api/v1/call/current-session';
   static const String turnCredentials = '/api/v1/call/turn-credentials';
@@ -154,6 +155,7 @@ class AppUrls {
   static const String eventCallDismissed = 'CallDismissed';
   static const String eventCallEnded = 'CallEnded';
   static const String eventIceCandidateSent = 'IceCandidateSent';
+  static const String eventWebRtcSdpUpdated = 'WebRtcSdpUpdated';
 
   // Live Session System Events
   static const String eventUserJoinedLiveSession = 'UserJoinedLiveSession';
