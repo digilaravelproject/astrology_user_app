@@ -94,6 +94,9 @@ class WebSocketEventRouter {
     } else if (event == AppUrls.eventPackageSessionTerminated ||
         event == 'App\\Events\\${AppUrls.eventPackageSessionTerminated}') {
       PackageWsHandler.handlePackageSessionTerminated(data);
+    } else if (event == AppUrls.eventPackageSessionStateUpdated ||
+        event == 'App\\Events\\${AppUrls.eventPackageSessionStateUpdated}') {
+      PackageWsHandler.handlePackageSessionStateUpdated(data);
     } else if (event == 'AstrologerAvailabilityUpdated' ||
         event == '.AstrologerAvailabilityUpdated' ||
         event == 'App\\Events\\AstrologerAvailabilityUpdated') {

@@ -42,6 +42,24 @@ class PackageWsHandler {
     }
   }
 
+  static void handlePackageSessionStateUpdated(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+      final secs = eventData['remaining_seconds'];
+      if (secs != null) {
+        WebSocketState.packageRemainingSeconds.value =
+            int.tryParse(secs?.toString() ?? '') ?? 0;
+      }
+    } catch (e) {
+      Logger.e('PackageWsHandler: error handling PackageSessionStateUpdated -> $e');
+    }
+  }
+
   static void handlePackageSessionTerminated(dynamic rawData) {
     WebSocketState.packageRemainingSeconds.value = 0;
     WebSocketState.isPackageSessionTerminated.value = true;
