@@ -116,8 +116,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                               size: 22,
                             ),
                             const SizedBox(width: 8),
-                            const AppText(
-                              'Top Astrologers',
+                            const AppText('Top Astrologers'.tr,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryColor,
@@ -157,7 +156,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                 const SizedBox(width: 18),
                                 // All Chip
                                 _buildInteractiveChip(
-                                  label: 'All', 
+                                  label: 'All'.tr, 
                                   isSelected: astrologerController.selectedSkills.isEmpty && !isOnlineOnly,
                                   onTap: () => astrologerController.fetchFilteredAstrologers(type: 'all', serviceType: 'chat'),
                                 ),
@@ -175,7 +174,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
                                 // Online Chip
                                 _buildInteractiveChip(
-                                  label: 'Online', 
+                                  label: 'Online'.tr, 
                                   isSelected: isOnlineOnly,
                                   onTap: () => astrologerController.fetchFilteredAstrologers(serviceType: 'chat', online: !isOnlineOnly),
                                 ),
@@ -206,7 +205,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.only(top: 50),
-                        child: AppText('No astrologers available', color: Colors.grey),
+                        child: AppText('No astrologers available'.tr, color: Colors.grey),
                       ),
                     ),
                   );
@@ -765,14 +764,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppText(
-                'Talk to',
+              AppText('Talk to'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.black54,
               ),
-              AppText(
-                'Experts',
+              AppText('Experts'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: const Color(0xFF2E1A47),

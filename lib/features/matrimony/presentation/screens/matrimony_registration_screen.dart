@@ -512,7 +512,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
             color: Colors.black,
           ),
           const SizedBox(height: 32),
-          AppText("Date of Birth", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+          AppText("Date of Birth".tr, fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
           const SizedBox(height: 8),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -629,7 +629,7 @@ class _MatrimonyRegistrationScreenState extends State<MatrimonyRegistrationScree
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AppText("Gender", fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+        AppText("Gender".tr, fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
         const SizedBox(height: 8),
         Row(
           children: [

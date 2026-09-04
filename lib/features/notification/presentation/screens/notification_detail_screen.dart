@@ -32,8 +32,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText(
-          'Notification Details',
+        title: AppText('Notification Details'.tr,
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.black,
@@ -48,16 +47,16 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
         actions: [
           IconButton(
             icon: const Icon(Iconsax.trash, color: Colors.red, size: 20),
-            tooltip: 'Delete Notification',
+            tooltip: 'Delete Notification'.tr,
             onPressed: () {
               Get.dialog(
                 AlertDialog(
-                  title: const Text('Delete Notification'),
-                  content: const Text('Are you sure you want to delete this notification?'),
+                  title: const Text('Delete Notification'.tr),
+                  content: const Text('Are you sure you want to delete this notification?'.tr),
                   actions: [
                     TextButton(
                       onPressed: () => Get.back(),
-                      child: const Text('Cancel'),
+                      child: const Text('Cancel'.tr),
                     ),
                     TextButton(
                       onPressed: () {
@@ -65,7 +64,7 @@ class _NotificationDetailScreenState extends State<NotificationDetailScreen> {
                         controller.deleteNotification(widget.notification.id);
                         Get.back();
                       },
-                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      child: const Text('Delete'.tr, style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),

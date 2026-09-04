@@ -32,8 +32,7 @@ class PaymentPolicyScreen extends StatelessWidget {
         final policyData = controller.paymentPolicyData.value;
         if (policyData == null || policyData.content.isEmpty) {
           return const Center(
-            child: AppText(
-              "Payment Policy is not available at the moment.",
+            child: AppText("Payment Policy is not available at the moment.".tr,
               fontSize: 16,
               color: Colors.grey,
             ),

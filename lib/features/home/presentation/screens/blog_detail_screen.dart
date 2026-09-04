@@ -64,8 +64,7 @@ class _BlogDetailScreenState extends State<BlogDetailScreen> {
             )
           : _blog == null
               ? const Center(
-                  child: AppText(
-                    'Could not load blog detail.',
+                  child: AppText('Could not load blog detail.'.tr,
                     fontSize: 15,
                     color: Colors.black45,
                   ),

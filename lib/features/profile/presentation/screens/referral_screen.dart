@@ -30,16 +30,14 @@ class ReferralScreen extends StatelessWidget {
               errorBuilder: (context, error, stackTrace) => Icon(Iconsax.gift_copy, size: 100, color: AppColors.lightPink),
             ),
             const SizedBox(height: 30),
-            AppText(
-              "Refer a Friend & Earn ₹100",
+            AppText("Refer a Friend & Earn ₹100".tr,
               fontSize: 22,
               fontWeight: FontWeight.w700,
               color: Colors.black87,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            AppText(
-              "Share your referral code with your friends and get ₹100 in your wallet when they sign up.",
+            AppText("Share your referral code with your friends and get ₹100 in your wallet when they sign up.".tr,
               fontSize: 14,
               color: Colors.grey,
               textAlign: TextAlign.center,
@@ -59,15 +57,13 @@ class ReferralScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText(
-                        "Your Referral Code",
+                      AppText("Your Referral Code".tr,
                         fontSize: 12,
                         color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                       const SizedBox(height: 4),
-                      AppText(
-                        "ASTRO2024",
+                      AppText("ASTRO2024".tr,
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: AppColors.deepPink,
@@ -77,7 +73,7 @@ class ReferralScreen extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      Clipboard.setData(const ClipboardData(text: "ASTRO2024"));
+                      Clipboard.setData(const ClipboardData(text: "ASTRO2024".tr));
                       CustomSnackbar.showInfo("Referral code copied to clipboard");
                     },
                     child: Container(
@@ -97,7 +93,7 @@ class ReferralScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             CustomButton(
-              text: "Share Now",
+              text: "Share Now".tr,
               onTap: () {
                 // Share logic
               },

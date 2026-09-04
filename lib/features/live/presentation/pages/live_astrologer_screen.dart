@@ -34,8 +34,7 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
             letterSpacing: -0.5,
           ),
           const SizedBox(width: 4),
-          AppText(
-            'Live Sessions',
+          AppText('Live Sessions'.tr,
             fontSize: 22,
             fontWeight: FontWeight.w900,
             color: const Color(0xFF2D3142),
@@ -102,8 +101,7 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
                         children: [
                           Icon(Icons.video_camera_back_outlined, size: 48, color: Colors.grey.shade300),
                           const SizedBox(height: 12),
-                          AppText(
-                            'No active streams currently.',
+                          AppText('No active streams currently.'.tr,
                             fontSize: 14,
                             color: Colors.grey.shade400,
                             fontWeight: FontWeight.w500,

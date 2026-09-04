@@ -114,8 +114,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const AppText(
-                              'Search for Matches who speak',
+                            const AppText('Search for Matches who speak'.tr,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF4A4A4A),
@@ -134,7 +133,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               child: DropdownButtonFormField<String>(
                                 value: selectedMotherTongue,
                                 decoration: const InputDecoration(
-                                  hintText: 'Mother tongue *',
+                                  hintText: 'Mother tongue *'.tr,
                                   hintStyle: TextStyle(
                                     color: Color(0xFF9E9E9E),
                                     fontSize: 15,
@@ -169,8 +168,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                             ),
                             const SizedBox(height: 30),
                             
-                            const AppText(
-                              'and belong to',
+                            const AppText('and belong to'.tr,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF4A4A4A),
@@ -189,7 +187,7 @@ class _MatrimonySearchScreenState extends State<MatrimonySearchScreen> {
                               child: DropdownButtonFormField<String>(
                                 value: selectedCommunity,
                                 decoration: const InputDecoration(
-                                  hintText: 'Community *',
+                                  hintText: 'Community *'.tr,
                                   hintStyle: TextStyle(
                                     color: Color(0xFF9E9E9E),
                                     fontSize: 15,

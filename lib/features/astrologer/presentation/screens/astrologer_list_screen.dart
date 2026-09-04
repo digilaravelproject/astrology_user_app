@@ -125,12 +125,12 @@ class AstrologerListScreen extends StatelessWidget {
           Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Search"))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Search".tr))),
                 child: _buildIconButton(Icons.search_rounded),
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Filters"))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Filters".tr))),
                 child: _buildIconButton(Icons.tune_rounded),
               ),
             ],
@@ -325,8 +325,7 @@ class AstrologerListScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 3),
-                AppText(
-                  "Vedic, Vastu, Tarot",
+                AppText("Vedic, Vastu, Tarot".tr,
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey.shade600,
@@ -364,12 +363,12 @@ class AstrologerListScreen extends StatelessWidget {
           Column(
             children: [
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Chat Coming Soon"))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Chat Coming Soon".tr))),
                 child: _buildActionButton(Icons.chat_bubble_rounded, AppStrings.chat, AppColors.primaryColor),
               ),
               const SizedBox(height: 12),
               GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Call Coming Soon"))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ComingSoonScreen(title: "Call Coming Soon".tr))),
                 child: _buildActionButton(Icons.call_rounded, AppStrings.call, const Color(0xFF4CAF50)),
               ),
             ],

@@ -70,8 +70,7 @@ class RemedyServicesSection extends StatelessWidget {
                   size: 18,
                 ),
                 const SizedBox(width: 8),
-                const AppText(
-                  'Explore Remedy Blogs & Services',
+                const AppText('Explore Remedy Blogs & Services'.tr,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.deepPink,

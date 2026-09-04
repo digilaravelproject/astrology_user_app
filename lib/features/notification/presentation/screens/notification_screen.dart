@@ -45,7 +45,7 @@ class NotificationScreen extends StatelessWidget {
                 if (controller.unreadCount.value > 0)
                   IconButton(
                     icon: const Icon(Iconsax.tick_circle, color: AppColors.deepPink, size: 22),
-                    tooltip: "Mark all as read",
+                    tooltip: "Mark all as read".tr,
                     onPressed: () => controller.markAllAsRead(),
                   ),
                 PopupMenuButton<String>(
@@ -56,19 +56,19 @@ class NotificationScreen extends StatelessWidget {
                     } else if (value == 'clear_all') {
                       Get.dialog(
                         AlertDialog(
-                          title: const Text('Clear All Notifications'),
-                          content: const Text('Are you sure you want to delete all notifications?'),
+                          title: const Text('Clear All Notifications'.tr),
+                          content: const Text('Are you sure you want to delete all notifications?'.tr),
                           actions: [
                             TextButton(
                               onPressed: () => Get.back(),
-                              child: const Text('Cancel'),
+                              child: const Text('Cancel'.tr),
                             ),
                             TextButton(
                               onPressed: () {
                                 Get.back();
                                 controller.deleteAllNotifications();
                               },
-                              child: const Text('Delete All', style: TextStyle(color: Colors.red)),
+                              child: const Text('Delete All'.tr, style: TextStyle(color: Colors.red)),
                             ),
                           ],
                         ),
@@ -82,7 +82,7 @@ class NotificationScreen extends StatelessWidget {
                         children: [
                           Icon(Iconsax.tick_circle, size: 18, color: AppColors.deepPink),
                           SizedBox(width: 8),
-                          Text('Mark all as read'),
+                          Text('Mark all as read'.tr),
                         ],
                       ),
                     ),
@@ -92,7 +92,7 @@ class NotificationScreen extends StatelessWidget {
                         children: [
                           Icon(Iconsax.trash, size: 18, color: Colors.red),
                           SizedBox(width: 8),
-                          Text('Clear all', style: TextStyle(color: Colors.red)),
+                          Text('Clear all'.tr, style: TextStyle(color: Colors.red)),
                         ],
                       ),
                     ),

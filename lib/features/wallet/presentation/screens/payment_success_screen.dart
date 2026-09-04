@@ -44,8 +44,7 @@ class PaymentSuccessScreen extends StatelessWidget {
               
               const SizedBox(height: 40),
               
-              const AppText(
-                'Payment Successful',
+              const AppText('Payment Successful'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF2E1A47),
@@ -100,7 +99,7 @@ class PaymentSuccessScreen extends StatelessWidget {
               const Spacer(),
               
               CustomButton(
-                text: 'Back to Dashboard',
+                text: 'Back to Dashboard'.tr,
                 fontSize: 16,
                 height: 56,
                 borderRadius: 16,

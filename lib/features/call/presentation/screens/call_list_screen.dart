@@ -117,8 +117,7 @@ class _CallListScreenState extends State<CallListScreen> {
                               size: 22,
                             ),
                             const SizedBox(width: 8),
-                            const AppText(
-                              'Top Astrologers',
+                            const AppText('Top Astrologers'.tr,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primaryColor,
@@ -207,7 +206,7 @@ class _CallListScreenState extends State<CallListScreen> {
                     child: Center(
                       child: Padding(
                         padding: EdgeInsets.only(top: 50),
-                        child: AppText('No astrologers available', color: Colors.grey),
+                        child: AppText('No astrologers available'.tr, color: Colors.grey),
                       ),
                     ),
                   );
@@ -767,14 +766,12 @@ class _CallListScreenState extends State<CallListScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppText(
-                'Talk to',
+              AppText('Talk to'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.black54,
               ),
-              AppText(
-                'Experts',
+              AppText('Experts'.tr,
                 fontSize: 28,
                 fontWeight: FontWeight.w900,
                 color: const Color(0xFF2E1A47),

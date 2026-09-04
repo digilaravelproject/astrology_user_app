@@ -99,35 +99,35 @@ class KundliMatchScreen extends GetView<MatchingController> {
               _ResultsTab(data: data),
               _DetailsTab(data: data),
               _InterpretationTabWidget(
-                title: 'Varna (Spiritual Compatibility)',
+                title: 'Varna (Spiritual Compatibility)'.tr,
                 detail: data?.gunaMilan.varna,
               ),
               _InterpretationTabWidget(
-                title: 'Vasya (Mutual Attraction & Influence)',
+                title: 'Vasya (Mutual Attraction & Influence)'.tr,
                 detail: data?.gunaMilan.vashya,
               ),
               _InterpretationTabWidget(
-                title: 'Tara (Birth Star Harmony)',
+                title: 'Tara (Birth Star Harmony)'.tr,
                 detail: data?.gunaMilan.tara,
               ),
               _InterpretationTabWidget(
-                title: 'Yoni (Physical & Sexual Compatibility)',
+                title: 'Yoni (Physical & Sexual Compatibility)'.tr,
                 detail: data?.gunaMilan.yoni,
               ),
               _InterpretationTabWidget(
-                title: 'Maitri (Mental & Intellectual Harmony)',
+                title: 'Maitri (Mental & Intellectual Harmony)'.tr,
                 detail: data?.gunaMilan.grahaMaitri,
               ),
               _InterpretationTabWidget(
-                title: 'Gana (Temperament & Nature)',
+                title: 'Gana (Temperament & Nature)'.tr,
                 detail: data?.gunaMilan.gana,
               ),
               _InterpretationTabWidget(
-                title: 'Bhakoot (Financial & Family Prosperity)',
+                title: 'Bhakoot (Financial & Family Prosperity)'.tr,
                 detail: data?.gunaMilan.bhakoot,
               ),
               _InterpretationTabWidget(
-                title: 'Nadi (Health & Genetic Compatibility)',
+                title: 'Nadi (Health & Genetic Compatibility)'.tr,
                 detail: data?.gunaMilan.nadi,
               ),
               const _DownloadPdfTab(),
@@ -174,8 +174,7 @@ class _ResultsTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Ashtakoot Matching Points',
+                const Text('Ashtakoot Matching Points'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -236,8 +235,7 @@ class _ResultsTab extends StatelessWidget {
                       _showMarriageMuhuratBottomSheet(context);
                     },
                     icon: const Icon(Icons.calendar_month, color: AppColors.white, size: 20),
-                    label: const Text(
-                      'Upcoming Marriage Muhurat',
+                    label: const Text('Upcoming Marriage Muhurat'.tr,
                       style: TextStyle(
                         color: AppColors.white,
                         fontWeight: FontWeight.bold,
@@ -268,8 +266,7 @@ class _ResultsTab extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        '* Match Result Conclusion:',
+                      const Text('* Match Result Conclusion:'.tr,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -329,8 +326,7 @@ class _ResultsTab extends StatelessWidget {
                       ),
                       elevation: 3,
                     ),
-                    child: const Text(
-                      'Talk To Astrologers',
+                    child: const Text('Talk To Astrologers'.tr,
                       style: TextStyle(
                         color: AppColors.white,
                         fontWeight: FontWeight.bold,
@@ -418,8 +414,7 @@ class _DetailsTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Guna Milan Result in Detail',
+          const Text('Guna Milan Result in Detail'.tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -449,19 +444,19 @@ class _DetailsTab extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                        child: Text('Guna', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                        child: Text('Guna'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                        child: Text('Maximum', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                        child: Text('Maximum'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                        child: Text('Obtained', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                        child: Text('Obtained'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-                        child: Text('Attributes (B/G)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
+                        child: Text('Attributes (B/G)'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primaryColor)),
                       ),
                     ],
                   ),
@@ -679,8 +674,7 @@ class _InterpretationTabWidget extends StatelessWidget {
                 ],
                 if (significance.isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  const Text(
-                    'Astrological Significance:',
+                  const Text('Astrological Significance:'.tr,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -699,8 +693,7 @@ class _InterpretationTabWidget extends StatelessWidget {
                 ],
                 if (tips.isNotEmpty) ...[
                   const SizedBox(height: 14),
-                  const Text(
-                    'Key Recommendations & Tips:',
+                  const Text('Key Recommendations & Tips:'.tr,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -713,7 +706,7 @@ class _InterpretationTabWidget extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('• ', style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
+                            const Text('• '.tr, style: TextStyle(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
                             Expanded(
                               child: Text(
                                 tip,
@@ -745,8 +738,7 @@ class _DownloadPdfTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 20),
-          const Text(
-            'Download your detailed Horoscope Matching PDF report for printing, sharing on email, or WhatsApp.',
+          const Text('Download your detailed Horoscope Matching PDF report for printing, sharing on email, or WhatsApp.'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -760,8 +752,7 @@ class _DownloadPdfTab extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: () => _generateAndShareKundliPdf(context),
             icon: const Icon(Icons.file_download_outlined, color: AppColors.white),
-            label: const Text(
-              'Download PDF',
+            label: const Text('Download PDF'.tr,
               style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.bold,
@@ -894,17 +885,17 @@ class _BirthDetailsTab extends StatelessWidget {
               text: TextSpan(
                 style: const TextStyle(color: AppColors.textColorPrimary, fontSize: 13.5, height: 1.5),
                 children: [
-                  const TextSpan(text: 'Name: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Name: '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: '$name\n'),
-                  const TextSpan(text: 'Birth Date: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Birth Date: '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: '$dob\n'),
-                  const TextSpan(text: 'Birth Time: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Birth Time: '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: '$tob\n'),
-                  const TextSpan(text: 'Birth Place: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Birth Place: '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: '$place\n'),
-                  const TextSpan(text: 'Moon Sign (Rashi): ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Moon Sign (Rashi): '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: '$rashi\n'),
-                  const TextSpan(text: 'Moon Nakshatra: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: 'Moon Nakshatra: '.tr, style: TextStyle(fontWeight: FontWeight.bold)),
                   TextSpan(text: nakshatra),
                 ],
               ),
@@ -988,8 +979,7 @@ void _showMarriageMuhuratBottomSheet(BuildContext context) {
                   children: [
                     Icon(Icons.calendar_month, color: AppColors.primaryColor, size: 22),
                     SizedBox(width: 8),
-                    Text(
-                      'Upcoming Marriage Muhurats',
+                    Text('Upcoming Marriage Muhurats'.tr,
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -1018,8 +1008,7 @@ void _showMarriageMuhuratBottomSheet(BuildContext context) {
                   Get.toNamed(RouteHelper.getPanchangRoute());
                 },
                 icon: const Icon(Icons.auto_awesome, color: AppColors.white, size: 18),
-                label: const Text(
-                  'VIEW DAILY PANCHANG & SHUBH MUHURAT',
+                label: const Text('VIEW DAILY PANCHANG & SHUBH MUHURAT'.tr,
                   style: TextStyle(
                     color: AppColors.white,
                     fontWeight: FontWeight.bold,
@@ -1118,9 +1107,9 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
-                  pw.Text('KUNDLI MATCHING REPORT', style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
+                  pw.Text('KUNDLI MATCHING REPORT'.tr, style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
                   pw.SizedBox(height: 4),
-                  pw.Text('Generated by Astro User App', style: pw.TextStyle(fontSize: 10, color: PdfColors.grey)),
+                  pw.Text('Generated by Astro User App'.tr, style: pw.TextStyle(fontSize: 10, color: PdfColors.grey)),
                   pw.Divider(thickness: 2, color: PdfColor.fromHex('#AD1457')),
                 ],
               ),
@@ -1141,7 +1130,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: [
-                      pw.Text('Compatibility Score', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
+                      pw.Text('Compatibility Score'.tr, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
                       pw.SizedBox(height: 4),
                       pw.Text('$score / $maxScore Points', style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
                     ],
@@ -1149,7 +1138,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                   pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
-                      pw.Text('Verdict', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
+                      pw.Text('Verdict'.tr, style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.grey700)),
                       pw.SizedBox(height: 4),
                       pw.Text(verdict, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#2E7D32'))),
                     ],
@@ -1160,7 +1149,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
             pw.SizedBox(height: 20),
 
             // Birth Details Table
-            pw.Text('Birth Details', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
+            pw.Text('Birth Details'.tr, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
             pw.SizedBox(height: 8),
             pw.Table(
               border: pw.TableBorder.all(color: PdfColors.grey300),
@@ -1168,42 +1157,42 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                 pw.TableRow(
                   decoration: pw.BoxDecoration(color: PdfColors.grey100),
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Field', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Field'.tr, style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text("Boy's Details", style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text("Girl's Details", style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Name')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Name'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(boyName)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(girlName)),
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Date')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Date'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(boyDob)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(girlDob)),
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Time')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Time'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(boyTob)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(girlTob)),
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Place')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Birth Place'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(boyPlace)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(girlPlace)),
                   ],
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Rashi')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Rashi'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
                       mData?.maleInfo?.moonSign.isNotEmpty == true
                           ? mData!.maleInfo!.moonSign
@@ -1218,7 +1207,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                 ),
                 pw.TableRow(
                   children: [
-                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Nakshatra')),
+                    pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Nakshatra'.tr)),
                     pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text(
                       mData?.maleInfo?.moonNakshatra.isNotEmpty == true
                           ? mData!.maleInfo!.moonNakshatra
@@ -1236,7 +1225,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
             pw.SizedBox(height: 20),
 
             // Ashtakoot Guna Milan breakdown
-            pw.Text('Ashtakoot Guna Milan Breakdown', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
+            pw.Text('Ashtakoot Guna Milan Breakdown'.tr, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
             pw.SizedBox(height: 8),
 
             if (mData?.gunaMilan != null) ...[
@@ -1246,10 +1235,10 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
                   pw.TableRow(
                     decoration: pw.BoxDecoration(color: PdfColors.grey100),
                     children: [
-                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Guna Name', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Boy Attr', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Girl Attr', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
-                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Score', style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Guna Name'.tr, style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Boy Attr'.tr, style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Girl Attr'.tr, style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
+                      pw.Padding(padding: const pw.EdgeInsets.all(6), child: pw.Text('Score'.tr, style: pw.TextStyle(fontWeight: pw.FontWeight.bold))),
                     ],
                   ),
                   _buildPdfTableRow('Varna (Work/Ego)', mData!.gunaMilan!.varna),
@@ -1266,7 +1255,7 @@ Future<void> _generateAndShareKundliPdf(BuildContext context) async {
             pw.SizedBox(height: 20),
 
             if (recommendation.isNotEmpty) ...[
-              pw.Text('Recommendation Summary', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
+              pw.Text('Recommendation Summary'.tr, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColor.fromHex('#AD1457'))),
               pw.SizedBox(height: 4),
               pw.Text(recommendation, style: const pw.TextStyle(fontSize: 11)),
             ],

@@ -48,8 +48,7 @@ class LiveSessionSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 24),
-                AppText(
-                  'Live Consultations',
+                AppText('Live Consultations'.tr,
                   fontSize: 13,
                   color: Colors.white.withOpacity(0.8),
                   fontWeight: FontWeight.w500,
@@ -58,8 +57,7 @@ class LiveSessionSection extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    AppText(
-                      'Top Astrologer',
+                    AppText('Top Astrologer'.tr,
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
@@ -136,8 +134,7 @@ class LiveSessionSection extends StatelessWidget {
                                 color: const Color(0xFF2E1A47),
                               ),
                               const SizedBox(height: 2),
-                              AppText(
-                                'Vedic Astrologer',
+                              AppText('Vedic Astrologer'.tr,
                                 fontSize: 11,
                                 color: Colors.grey.shade600,
                                 fontWeight: FontWeight.w500,

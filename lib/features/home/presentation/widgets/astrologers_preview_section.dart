@@ -44,8 +44,7 @@ class AstrologersPreviewSection extends StatelessWidget {
                   color: Colors.grey[300],
                 ),
                 const SizedBox(height: 16),
-                AppText(
-                  'No Astrologers Found',
+                AppText('No Astrologers Found'.tr,
                   color: Colors.grey,
                   fontSize: 16,
                 ),

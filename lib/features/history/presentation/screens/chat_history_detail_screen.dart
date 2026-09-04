@@ -131,8 +131,7 @@ class ChatHistoryDetailScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.check_circle, color: Colors.green, size: 20),
                 const SizedBox(width: 8),
-                AppText(
-                  "This chat session has ended.",
+                AppText("This chat session has ended.".tr,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: Colors.grey.shade600,

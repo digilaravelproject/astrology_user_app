@@ -38,8 +38,7 @@ class HomeHeaderSimple extends StatelessWidget {
                 color: AppColors.primaryColor,
                 letterSpacing: -0.5,
               ),
-              const AppText(
-                "👋",
+              const AppText("👋".tr,
                 fontSize: 24,
               ),
             ],

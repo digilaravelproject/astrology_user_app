@@ -13,8 +13,7 @@ class AstrologersListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: AppText(
-          'Astrologers',
+        title: AppText('Astrologers'.tr,
           fontSize: 18,
           fontWeight: FontWeight.w600,
           color: Colors.black,
@@ -336,8 +335,7 @@ class AstrologersListScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText(
-                        'Reset', // This seems like a placeholder, keeping as per instruction
+                      AppText('Reset'.tr, // This seems like a placeholder, keeping as per instruction
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey,
@@ -355,8 +353,7 @@ class AstrologersListScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    "/min",
+                  Text("/min".tr,
                     style: GoogleFonts.inter(
                       fontSize: 8,
                       fontWeight: FontWeight.w600,

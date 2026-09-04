@@ -37,14 +37,14 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
 
   // Matching Boy Controllers
   final TextEditingController _boysNameController = TextEditingController();
-  final TextEditingController _boysGenderController = TextEditingController(text: 'Male');
+  final TextEditingController _boysGenderController = TextEditingController(text: 'Male'.tr);
   final TextEditingController _boysDobController = TextEditingController();
   final TextEditingController _boysTobController = TextEditingController();
   final TextEditingController _boysPobController = TextEditingController();
 
   // Matching Girl Controllers
   final TextEditingController _girlsNameController = TextEditingController();
-  final TextEditingController _girlsGenderController = TextEditingController(text: 'Female');
+  final TextEditingController _girlsGenderController = TextEditingController(text: 'Female'.tr);
   final TextEditingController _girlsDobController = TextEditingController();
   final TextEditingController _girlsTobController = TextEditingController();
   final TextEditingController _girlsPobController = TextEditingController();
@@ -170,8 +170,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: AppText(
-                          'OPEN KUNDLI',
+                        child: AppText('OPEN KUNDLI'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: _tabController.index == 0
@@ -198,8 +197,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                         borderRadius: BorderRadius.circular(25),
                       ),
                       child: Center(
-                        child: AppText(
-                          'NEW MATCHING',
+                        child: AppText('NEW MATCHING'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: _tabController.index == 1
@@ -922,8 +920,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const AppText(
-                        "Generate Horoscope",
+                    : const AppText("Generate Horoscope".tr,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -1006,8 +1003,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
               const SizedBox(height: 20),
               
               // Title
-              const AppText(
-                'Delete Kundli?',
+              const AppText('Delete Kundli?'.tr,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textColorPrimary,
@@ -1042,8 +1038,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const AppText(
-                          'Cancel',
+                        child: const AppText('Cancel'.tr,
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textColorPrimary,
@@ -1094,8 +1089,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           ),
                           elevation: 0,
                         ),
-                        child: const AppText(
-                          'Delete',
+                        child: const AppText('Delete'.tr,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -1224,7 +1218,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                           rootNavigator: true,
                         ).push<LocationResult>(
                           MaterialPageRoute(
-                            builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
+                            builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'.tr),
                             fullscreenDialog: true,
                           ),
                         );
@@ -1600,8 +1594,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      'Select Birth Date',
+                    child: Text('Select Birth Date'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1685,8 +1678,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      'Select Birth Time',
+                    child: Text('Select Birth Time'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1799,7 +1791,7 @@ class _MatchingScreenState extends State<MatchingScreen> with SingleTickerProvid
                     child: TextField(
                       onChanged: (val) => setSheetState(() => searchQuery = val),
                       decoration: const InputDecoration(
-                        hintText: 'Search...',
+                        hintText: 'Search...'.tr,
                         prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryColor),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -2022,8 +2014,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const AppText(
-              'Add Profile',
+            const AppText('Add Profile'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textColorPrimary,
@@ -2034,7 +2025,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
             TextField(
               controller: _nameController,
               decoration: InputDecoration(
-                hintText: 'Name',
+                hintText: 'Name'.tr,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide(color: Colors.grey.shade300),
@@ -2049,8 +2040,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
             const SizedBox(height: 14),
 
             // Gender
-            const AppText(
-              'Gender',
+            const AppText('Gender'.tr,
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: AppColors.textColorSecondary,
@@ -2071,8 +2061,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         ),
                       ),
                       child: Center(
-                        child: AppText(
-                          'Male',
+                        child: AppText('Male'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: selectedGender == 'Male' ? Colors.white : AppColors.textColorSecondary,
@@ -2095,8 +2084,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         ),
                       ),
                       child: Center(
-                        child: AppText(
-                          'Female',
+                        child: AppText('Female'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: selectedGender == 'Female' ? Colors.white : AppColors.textColorSecondary,
@@ -2140,8 +2128,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
-                                child: Text(
-                                  'Select Birth Date',
+                                child: Text('Select Birth Date'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
                                 ),
                               ),
@@ -2185,7 +2172,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Date of Birth',
+                hintText: 'Date of Birth'.tr,
                 suffixIcon: const Icon(Icons.calendar_today_outlined, size: 20),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -2231,8 +2218,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(vertical: 12),
-                                child: Text(
-                                  'Select Birth Time',
+                                child: Text('Select Birth Time'.tr,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.deepPink),
                                 ),
                               ),
@@ -2278,7 +2264,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Time of Birth',
+                hintText: 'Time of Birth'.tr,
                 suffixIcon: const Icon(Icons.access_time_outlined, size: 20),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -2300,7 +2286,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
               onTap: () async {
                 final result = await Navigator.of(context, rootNavigator: true)
                     .push<LocationResult>(MaterialPageRoute(
-                  builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'),
+                  builder: (_) => const LocationSearchScreen(title: 'Select Birth Place'.tr),
                   fullscreenDialog: true,
                 ));
                 if (result != null) {
@@ -2308,7 +2294,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                 }
               },
               decoration: InputDecoration(
-                hintText: 'Place of Birth',
+                hintText: 'Place of Birth'.tr,
                 suffixIcon: const Icon(Icons.location_on_outlined, size: 20),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -2336,8 +2322,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const AppText(
-                      'Reset',
+                    child: const AppText('Reset'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textColorSecondary,
@@ -2360,8 +2345,7 @@ class _AddProfileBottomSheetState extends State<AddProfileBottomSheet> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const AppText(
-                      'Save',
+                    child: const AppText('Save'.tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
@@ -2491,15 +2475,13 @@ Widget _buildAddProfileCircle(VoidCallback onTap) {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AppText(
-                'ADD',
+              const AppText('ADD'.tr,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primaryColor,
               ),
               const SizedBox(height: 3),
-              AppText(
-                'Click to select profile',
+              AppText('Click to select profile'.tr,
                 fontSize: 9,
                 fontWeight: FontWeight.w400,
                 color: AppColors.textColorSecondary,
@@ -2586,7 +2568,7 @@ void _showSelectionSheet(String title, List<String> items, Function(String) onSe
   //                 child: TextField(
   //                   onChanged: (val) => setSheetState(() => searchQuery = val),
   //                   decoration: const InputDecoration(
-  //                     hintText: 'Search...',
+  //                     hintText: 'Search...'.tr,
   //                     prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryColor),
   //                     border: InputBorder.none,
   //                     contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -2706,16 +2688,14 @@ void _showSelectionSheet(String title, List<String> items, Function(String) onSe
             const SizedBox(height: 40),
 
             // Description
-            const AppText(
-              'The stars reveal compatibility',
+            const AppText('The stars reveal compatibility'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.textColorPrimary,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const AppText(
-              'Our astrology-based matchmaking reveals the\nstrengths and challenges in your connections.',
+            const AppText('Our astrology-based matchmaking reveals the\nstrengths and challenges in your connections.'.tr,
               fontSize: 13,
               fontWeight: FontWeight.w400,
               color: AppColors.textColorSecondary,
@@ -2732,9 +2712,9 @@ void _showSelectionSheet(String title, List<String> items, Function(String) onSe
                 onPressed: () {
                   Get.to(KundliMatchScreen());
                   if (profile1Name != null && profile2Name != null) {
-                    CustomSnackbar.showInfo('Compatibility results coming soon!', title: 'Coming Soon');
+                    CustomSnackbar.showInfo('Compatibility results coming soon!', title: 'Coming Soon'.tr);
                   } else {
-                    CustomSnackbar.showWarning('Please add both profiles to check compatibility', title: 'Add Profiles');
+                    CustomSnackbar.showWarning('Please add both profiles to check compatibility', title: 'Add Profiles'.tr);
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -2744,8 +2724,7 @@ void _showSelectionSheet(String title, List<String> items, Function(String) onSe
                   ),
                   elevation: 2,
                 ),
-                child: const AppText(
-                  'Check Compatibility',
+                child: const AppText('Check Compatibility'.tr,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,

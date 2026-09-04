@@ -162,8 +162,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.6,
                 alignment: Alignment.center,
-                child: AppText(
-                  "No chat history available.",
+                child: AppText("No chat history available.".tr,
                   color: Colors.grey.shade500,
                 ),
               ),
@@ -332,8 +331,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.6,
                 alignment: Alignment.center,
-                child: AppText(
-                  "No call history available.",
+                child: AppText("No call history available.".tr,
                   color: Colors.grey.shade500,
                 ),
               ),

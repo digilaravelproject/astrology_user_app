@@ -543,7 +543,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
         margin: const EdgeInsets.all(20),
         duration: const Duration(seconds: 2),
         action: SnackBarAction(
-          label: 'View',
+          label: 'View'.tr,
           textColor: Colors.white,
           onPressed: () {},
         ),
@@ -637,8 +637,7 @@ class _MatrimonyProfileScreenState extends State<MatrimonyProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const AppText(
-              'Report Profile',
+            const AppText('Report Profile'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: AppColors.primaryColor,

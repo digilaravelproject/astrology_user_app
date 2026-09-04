@@ -166,8 +166,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
                             color: AppColors.goldAccent,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: AppText(
-                            'BEST VALUE',
+                          child: AppText('BEST VALUE'.tr,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: AppColors.deepPink,
@@ -189,8 +188,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    AppText(
-                      'Billed annually • Cancel anytime',
+                    AppText('Billed annually • Cancel anytime'.tr,
                       fontSize: 12,
                       color: AppColors.white.withOpacity(0.8),
                     ),
@@ -204,8 +202,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AppText(
-                      'What\'s included',
+                    AppText('What\'.trs included',
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textColorPrimary,
@@ -291,14 +288,12 @@ class SubscriptionDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            AppText(
-                              '30-Day Money-Back Guarantee',
+                            AppText('30-Day Money-Back Guarantee'.tr,
                               fontWeight: FontWeight.bold,
                               color: AppColors.textColorPrimary,
                               fontSize: 14,
                             ),
-                            AppText(
-                              'Not satisfied? Get a full refund within 30 days.',
+                            AppText('Not satisfied? Get a full refund within 30 days.'.tr,
                               fontSize: 12,
                               color: AppColors.textColorSecondary,
                             ),
@@ -316,7 +311,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
                 child: CustomButton(
-                  text: 'Subscribe Now',
+                  text: 'Subscribe Now'.tr,
                   onTap: () => _handleSubscribe(context, profileController, plan),
                   backgroundColor: AppColors.primaryColor,
                   textColor: AppColors.white,
@@ -346,8 +341,7 @@ class SubscriptionDetailScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: Center(
-                  child: AppText(
-                    'By subscribing, you agree to our Terms of Service & Privacy Policy',
+                  child: AppText('By subscribing, you agree to our Terms of Service & Privacy Policy'.tr,
                     fontSize: 11,
                     color: AppColors.textColorSecondary,
                   ),

@@ -83,7 +83,7 @@ class PaymentSuccessDialog extends StatelessWidget {
             ],
             const SizedBox(height: 24),
             CustomButton(
-              text: 'OK',
+              text: 'OK'.tr,
               fontSize: 16,
               height: 50,
               borderRadius: 12,

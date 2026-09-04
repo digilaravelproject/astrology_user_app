@@ -74,8 +74,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
-                  AppText(
-                    'Assistance Chat',
+                  AppText('Assistance Chat'.tr,
                     fontSize: 12,
                     color: Colors.grey.shade600,
                   ),
@@ -102,8 +101,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   width: double.infinity,
                   color: Colors.orange.shade100,
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: AppText(
-                    'Astrologer has reached their daily reply limit.',
+                  child: AppText('Astrologer has reached their daily reply limit.'.tr,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: Colors.deepOrange.shade800,
@@ -121,8 +119,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                 
                 if (controller.messages.isEmpty) {
                   return const Center(
-                    child: AppText(
-                      'Send a message to get assistance.',
+                    child: AppText('Send a message to get assistance.'.tr,
                       color: Colors.grey,
                     ),
                   );
@@ -463,7 +460,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   child: TextField(
                     controller: controller.messageController,
                     decoration: InputDecoration(
-                      hintText: "Type a message...",
+                      hintText: "Type a message...".tr,
                       hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
                       filled: true,
                       fillColor: const Color(0xFFF5F5F5),
@@ -555,7 +552,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   context: context,
                   icon: Icons.camera_alt,
                   color: Colors.blue,
-                  label: "Camera",
+                  label: "Camera".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickImage(ImageSource.camera);
@@ -565,7 +562,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   context: context,
                   icon: Icons.photo,
                   color: Colors.purple,
-                  label: "Gallery",
+                  label: "Gallery".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickImage(ImageSource.gallery);
@@ -575,7 +572,7 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   context: context,
                   icon: Icons.description,
                   color: Colors.orange,
-                  label: "Document",
+                  label: "Document".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickDocument();

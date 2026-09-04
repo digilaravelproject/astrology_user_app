@@ -52,9 +52,9 @@ class DashaTab extends StatelessWidget {
                         padding: EdgeInsets.symmetric(vertical: 8),
                         child: Row(
                           children: [
-                            Expanded(child: AppText("Planet", fontWeight: FontWeight.bold, fontSize: 12)),
-                            Expanded(child: AppText("Start Date", fontWeight: FontWeight.bold, fontSize: 12)),
-                            Expanded(child: AppText("End Date", fontWeight: FontWeight.bold, fontSize: 12)),
+                            Expanded(child: AppText("Planet".tr, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Expanded(child: AppText("Start Date".tr, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Expanded(child: AppText("End Date".tr, fontWeight: FontWeight.bold, fontSize: 12)),
                             SizedBox(width: 24),
                           ],
                         ),
@@ -64,7 +64,7 @@ class DashaTab extends StatelessWidget {
                       if (controller.currentDashaItems.isEmpty && !controller.isLoading.value)
                         const Padding(
                           padding: EdgeInsets.all(20.0),
-                          child: Center(child: AppText("No dasha details available.")),
+                          child: Center(child: AppText("No dasha details available.".tr)),
                         )
                       else
                         ...controller.currentDashaItems.map((item) {

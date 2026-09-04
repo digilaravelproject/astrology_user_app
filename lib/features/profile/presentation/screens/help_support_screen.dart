@@ -68,12 +68,12 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const AppText("Failed to load contact info", color: Colors.grey),
+                const AppText("Failed to load contact info".tr, color: Colors.grey),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadData,
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.deepPink),
-                  child: const AppText("Retry", color: Colors.white),
+                  child: const AppText("Retry".tr, color: Colors.white),
                 ),
               ],
             ),
@@ -92,13 +92,13 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   const SizedBox(height: 25),
                   const Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: AppText("Email Support", fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+                    child: AppText("Email Support".tr, fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
                   ..._emails.map((email) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _buildSupportOption(
                       icon: Iconsax.sms_copy,
-                      title: "Email",
+                      title: "Email".tr,
                       subtitle: email,
                       onTap: () => _launchEmail(email),
                     ),
@@ -109,13 +109,13 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   const SizedBox(height: 25),
                   const Padding(
                     padding: EdgeInsets.only(left: 4, bottom: 12),
-                    child: AppText("Call Support", fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+                    child: AppText("Call Support".tr, fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
                   ..._phones.map((phone) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: _buildSupportOption(
                       icon: Iconsax.call_copy,
-                      title: "Call",
+                      title: "Call".tr,
                       subtitle: phone,
                       onTap: () => _launchPhone(phone),
                     ),
@@ -124,8 +124,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                 
                 const SizedBox(height: 40),
                 Center(
-                  child: AppText(
-                    "Available 24/7 for your help",
+                  child: AppText("Available 24/7 for your help".tr,
                     fontSize: 12,
                     color: Colors.grey.withOpacity(0.6),
                     fontStyle: FontStyle.italic,

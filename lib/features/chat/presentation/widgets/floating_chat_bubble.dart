@@ -327,8 +327,7 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.5), width: 0.8),
                             ),
-                            child: const Text(
-                              'CHAT',
+                            child: const Text('CHAT'.tr,
                               style: TextStyle(
                                 color: Color(0xFFFFD700),
                                 fontSize: 10,
@@ -343,8 +342,7 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                       Obx(() {
                         final currentStatus = FloatingChatBubble.chatStatus.value;
                         if (currentStatus == 'initiated' || currentStatus == 'ringing' || currentStatus == 'waiting') {
-                          return const Text(
-                            'Waiting for acceptance...',
+                          return const Text('Waiting for acceptance...'.tr,
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 12,
@@ -376,8 +374,7 @@ class _FloatingChatBubbleWidgetState extends State<FloatingChatBubbleWidget> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Text(
-                    'Return',
+                  child: const Text('Return'.tr,
                     style: TextStyle(
                       color: Color(0xFF6A0C22),
                       fontWeight: FontWeight.bold,

@@ -72,8 +72,7 @@ class AstrologyBlogsSection extends StatelessWidget {
                     children: [
                       const Icon(Icons.menu_book_rounded, color: Color(0xFFB57E2F), size: 20), // Book icon
                       const SizedBox(width: 8),
-                      AppText(
-                        'Latest Blogs',
+                      AppText('Latest Blogs'.tr,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF5D1E2D), // Deep burgundy color
@@ -86,8 +85,7 @@ class AstrologyBlogsSection extends StatelessWidget {
                     },
                     child: Row(
                       children: [
-                        AppText(
-                          'View All',
+                        AppText('View All'.tr,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: const Color(0xFF5D1E2D),

@@ -292,7 +292,7 @@ class ChatAssistanceController extends GetxController {
     final tempId = DateTime.now().millisecondsSinceEpoch;
     final localMsg = ChatMessage(
       id: tempId,
-      text: '📷 Sending Image...',
+      text: '📷 Sending Image...'.tr,
       isMe: true,
       time: DateTime.now(),
       status: 'sending...',

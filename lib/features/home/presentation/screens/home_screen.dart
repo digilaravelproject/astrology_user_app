@@ -442,8 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Greeting and Name
           Row(
             children: [
-              AppText(
-                'Hello',
+              AppText('Hello'.tr,
                 fontSize: 16,
                 color: Colors.grey[700],
               ),
@@ -552,8 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             shape: BoxShape.circle,
                           ),
                           child: Center(
-                            child: AppText(
-                              '!',
+                            child: AppText('!'.tr,
                               color: AppColors.deepPink,
                               fontSize: 9,
                               fontWeight: FontWeight.bold,

@@ -185,7 +185,7 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
     return Scaffold(
       backgroundColor: const Color(0xFFFDF9F5),
       appBar: CustomAppBar(
-        title: 'Kundli',
+        title: 'Kundli'.tr,
       ),
 
       body: Column(
@@ -216,7 +216,7 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
                   }
 
                   return KundliChartWidget(
-                    title: "Lagna / Ascendant / D1 Chart",
+                    title: "Lagna / Ascendant / D1 Chart".tr,
                     northIndianSvg: _birthChartController.northChartSvg.value,
                     southIndianSvg: _birthChartController.southChartSvg.value,
                     northIndianPlanetData: northPlanetData,
@@ -244,7 +244,7 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
                   }
 
                   return KundliChartWidget(
-                    title: "Navamsa Chart",
+                    title: "Navamsa Chart".tr,
                     northIndianSvg: _navamshaController.northChartSvg.value,
                     southIndianSvg: _navamshaController.southChartSvg.value,
                     northIndianPlanetData: northPlanetData,
@@ -272,7 +272,7 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
                   }
 
                   return KundliChartWidget(
-                    title: "Transit Chart",
+                    title: "Transit Chart".tr,
                     northIndianSvg: _transitController.northChartSvg.value,
                     southIndianSvg: _transitController.southChartSvg.value,
                     northIndianPlanetData: northPlanetData,
@@ -393,7 +393,7 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
         if (data == null) {
           return const Padding(
             padding: EdgeInsets.all(20.0),
-            child: Center(child: AppText("Failed to load Panchang details.")),
+            child: Center(child: AppText("Failed to load Panchang details.".tr)),
           );
         }
 
@@ -598,9 +598,9 @@ class _KundliScreenState extends State<KundliScreen> with SingleTickerProviderSt
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
-                      Expanded(child: AppText("Planet", fontWeight: FontWeight.bold, fontSize: 12)),
-                      Expanded(child: AppText("Start Date", fontWeight: FontWeight.bold, fontSize: 12)),
-                      Expanded(child: AppText("End Date", fontWeight: FontWeight.bold, fontSize: 12)),
+                      Expanded(child: AppText("Planet".tr, fontWeight: FontWeight.bold, fontSize: 12)),
+                      Expanded(child: AppText("Start Date".tr, fontWeight: FontWeight.bold, fontSize: 12)),
+                      Expanded(child: AppText("End Date".tr, fontWeight: FontWeight.bold, fontSize: 12)),
                       SizedBox(width: 20),
                     ],
                   ),

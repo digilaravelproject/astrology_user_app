@@ -35,15 +35,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                AppText(
-                  "How was your experience?",
+                AppText("How was your experience?".tr,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.black87,
                 ),
                 const SizedBox(height: 10),
-                AppText(
-                  "Your feedback helps us improve",
+                AppText("Your feedback helps us improve".tr,
                   fontSize: 14,
                   color: Colors.grey,
                 ),

@@ -83,7 +83,7 @@ class ServiceSectionRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const AppText("❤️", fontSize: 22),
+        const AppText("❤️".tr, fontSize: 22),
       ],
     );
   }

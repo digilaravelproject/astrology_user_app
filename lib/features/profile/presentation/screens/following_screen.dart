@@ -72,15 +72,13 @@ class FollowingScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                AppText(
-                  'No Following',
+                AppText('No Following'.tr,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Colors.black87,
                 ),
                 const SizedBox(height: 8),
-                AppText(
-                  'You are not following any astrologer yet.',
+                AppText('You are not following any astrologer yet.'.tr,
                   fontSize: 14,
                   color: Colors.grey.shade600,
                   textAlign: TextAlign.center,
@@ -249,8 +247,7 @@ class FollowingScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: AppColors.deepPink.withOpacity(0.3)),
                 ),
-                child: AppText(
-                  "Following",
+                child: AppText("Following".tr,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.deepPink,

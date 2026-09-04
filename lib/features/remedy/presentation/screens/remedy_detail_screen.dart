@@ -62,8 +62,7 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
             ))
           : _remedy == null
               ? const Center(
-                  child: AppText(
-                    'Could not load remedy detail.',
+                  child: AppText('Could not load remedy detail.'.tr,
                     fontSize: 15,
                     color: Colors.black45,
                   ),
@@ -133,8 +132,7 @@ class _RemedyDetailScreenState extends State<RemedyDetailScreen> {
                                   Icon(Icons.info_outline, color: Colors.blueGrey, size: 20),
                                   const SizedBox(width: 12),
                                   Expanded(
-                                    child: AppText(
-                                      'Consult with an expert astrologer for personalized remedies based on your birth chart.',
+                                    child: AppText('Consult with an expert astrologer for personalized remedies based on your birth chart.'.tr,
                                       fontSize: 12,
                                       color: Colors.blueGrey,
                                       fontStyle: FontStyle.italic,

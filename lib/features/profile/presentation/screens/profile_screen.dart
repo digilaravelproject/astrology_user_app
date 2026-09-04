@@ -381,15 +381,13 @@ class ProfileScreen extends StatelessWidget {
                           child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
                         ),
                         const SizedBox(height: 20),
-                        const AppText(
-                          'Logout',
+                        const AppText('Logout'.tr,
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF2E1A47),
                         ),
                         const SizedBox(height: 12),
-                        AppText(
-                          'Are you sure you want to logout from your account?',
+                        AppText('Are you sure you want to logout from your account?'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[600],
@@ -406,7 +404,7 @@ class ProfileScreen extends StatelessWidget {
                                   side: BorderSide(color: Colors.grey[300]!),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
-                                child: AppText('Cancel', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                child: AppText('Cancel'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -422,7 +420,7 @@ class ProfileScreen extends StatelessWidget {
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
-                                child: const AppText('Logout', fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                child: const AppText('Logout'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
                               ),
                             ),
                           ],
@@ -446,8 +444,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
                 const SizedBox(width: 8),
-                AppText(
-                  'Log Out',
+                AppText('Log Out'.tr,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.red,
@@ -460,8 +457,7 @@ class ProfileScreen extends StatelessWidget {
 
           TextButton(
             onPressed: () => authController.deleteAccount(),
-            child: const AppText(
-              'Delete Account',
+            child: const AppText('Delete Account'.tr,
               fontSize: 14,
               fontWeight: FontWeight.w600,
               color: Colors.red,

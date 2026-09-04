@@ -88,8 +88,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const AppText(
-                      'Filters',
+                    const AppText('Filters'.tr,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Colors.black87,
@@ -108,8 +107,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             _controller.getMatrimonyProfile();
 
                           },
-                          child: const AppText(
-                            'CLEAR ALL',
+                          child: const AppText('CLEAR ALL'.tr,
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryColor,
@@ -203,8 +201,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        child: const AppText(
-                          'CLOSE',
+                        child: const AppText('CLOSE'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primaryColor,
@@ -234,7 +231,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Filters applied successfully!'),
+                              content: Text('Filters applied successfully!'.tr),
                               backgroundColor: Colors.green,
                               behavior: SnackBarBehavior.floating,
                               margin: EdgeInsets.all(20),
@@ -249,8 +246,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
-                        child: const AppText(
-                          'APPLY',
+                        child: const AppText('APPLY'.tr,
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -711,16 +707,14 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-              const AppText(
-                'Unlock Premium Access',
+              const AppText('Unlock Premium Access'.tr,
                 fontSize: 26,
                 fontWeight: FontWeight.w900,
                 color: Color(0xFF2D3142),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              AppText(
-                'Unlock the power of Matrimony! Purchase a membership plan to view detailed profiles and find your perfect life partner today.',
+              AppText('Unlock the power of Matrimony! Purchase a membership plan to view detailed profiles and find your perfect life partner today.'.tr,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[600],
@@ -755,8 +749,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                       children: [
                         Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 20),
                         SizedBox(width: 10),
-                        AppText(
-                          'Buy Membership Now',
+                        AppText('Buy Membership Now'.tr,
                           color: Colors.white,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
@@ -771,8 +764,7 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                 onPressed: () {
                   _controller.refreshRegistrationStatusFromServer();
                 },
-                child: AppText(
-                  'Already purchased? Refresh',
+                child: AppText('Already purchased? Refresh'.tr,
                   color: AppColors.primaryColor.withOpacity(0.8),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

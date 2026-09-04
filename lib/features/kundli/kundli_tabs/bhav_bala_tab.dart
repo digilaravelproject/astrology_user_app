@@ -63,7 +63,7 @@ class BhavBalaTab extends StatelessWidget {
                   borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
                 ),
                 child: const Center(
-                  child: AppText("Bhav Bala", fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                  child: AppText("Bhav Bala".tr, fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                 ),
               ),
               Padding(

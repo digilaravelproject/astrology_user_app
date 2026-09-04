@@ -65,7 +65,7 @@ class ShopServicesSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const AppText("✨", fontSize: 18),
+        const AppText("✨".tr, fontSize: 18),
         const SizedBox(width: 8),
         Flexible(
           child: AppText(
@@ -78,7 +78,7 @@ class ShopServicesSection extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        const AppText("✨", fontSize: 18),
+        const AppText("✨".tr, fontSize: 18),
       ],
     );
   }
@@ -182,17 +182,17 @@ class ShopServicesSection extends StatelessWidget {
         Positioned(
           top: 12,
           left: 16,
-          child: AppText("✨", fontSize: 13, color: Colors.white.withOpacity(0.75)),
+          child: AppText("✨".tr, fontSize: 13, color: Colors.white.withOpacity(0.75)),
         ),
         Positioned(
           top: 24,
           right: 22,
-          child: AppText("✨", fontSize: 11, color: Colors.white.withOpacity(0.65)),
+          child: AppText("✨".tr, fontSize: 11, color: Colors.white.withOpacity(0.65)),
         ),
         Positioned(
           bottom: 16,
           left: 24,
-          child: AppText("✨", fontSize: 9, color: Colors.white.withOpacity(0.55)),
+          child: AppText("✨".tr, fontSize: 9, color: Colors.white.withOpacity(0.55)),
         ),
       ],
     );
@@ -330,12 +330,12 @@ class ShopServicesSection extends StatelessWidget {
         Positioned(
           bottom: 10,
           left: 10,
-          child: AppText("✨", fontSize: 9, color: Colors.orange.shade200),
+          child: AppText("✨".tr, fontSize: 9, color: Colors.orange.shade200),
         ),
         Positioned(
           top: 12,
           right: 12,
-          child: AppText("✨", fontSize: 7, color: Colors.pink.shade100),
+          child: AppText("✨".tr, fontSize: 7, color: Colors.pink.shade100),
         ),
       ],
     );

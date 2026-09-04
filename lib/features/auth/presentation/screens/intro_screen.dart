@@ -166,8 +166,7 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
             right: 20,
             child: TextButton(
               onPressed: () => Get.offAllNamed(RouteHelper.getLoginRoute()),
-              child: Text(
-                'SKIP',
+              child: Text('SKIP'.tr,
                 style: GoogleFonts.poppins(
                   color: AppColors.primaryColor,
                   fontWeight: FontWeight.w600,
@@ -287,8 +286,7 @@ class _IntroScreenState extends State<IntroScreen> with SingleTickerProviderStat
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: Column(
                 children: [
-                  Text(
-                    "KNOW YOUR\nFUTURE FROM",
+                  Text("KNOW YOUR\nFUTURE FROM".tr,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                       fontSize: 14,

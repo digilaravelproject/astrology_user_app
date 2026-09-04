@@ -43,8 +43,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
           icon: const Icon(Icons.arrow_back, color: Color(0xFF2D2D2D)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const AppText(
-          'All Reviews',
+        title: const AppText('All Reviews'.tr,
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: Color(0xFF2D2D2D),
@@ -55,8 +54,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
 
         if (reviews.isEmpty) {
           return const Center(
-            child: AppText(
-              'No reviews yet',
+            child: AppText('No reviews yet'.tr,
               fontSize: 16,
               color: Colors.grey,
             ),
@@ -134,7 +132,7 @@ class _AllReviewsScreenState extends State<AllReviewsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText('Reply from Astrologer', fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87),
+                  AppText('Reply from Astrologer'.tr, fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87),
                   const SizedBox(height: 4),
                   AppText(
                     review.reply!,

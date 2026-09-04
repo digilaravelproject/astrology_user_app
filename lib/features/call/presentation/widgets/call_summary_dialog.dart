@@ -64,15 +64,13 @@ class CallSummaryDialog extends StatelessWidget {
             const SizedBox(height: 20),
             
             // Title
-            AppText(
-              'Call Session Ended',
+            AppText('Call Session Ended'.tr,
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: const Color(0xFF2E1A47),
             ),
             const SizedBox(height: 6),
-            AppText(
-              'Here is the summary of your call session',
+            AppText('Here is the summary of your call session'.tr,
               fontSize: 12,
               color: Colors.grey.shade500,
               fontWeight: FontWeight.w500,
@@ -104,8 +102,7 @@ class CallSummaryDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const AppText(
-                  'Done',
+                child: const AppText('Done'.tr,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,

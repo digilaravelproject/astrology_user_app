@@ -53,8 +53,7 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppText(
-                    'Gift History',
+                  AppText('Gift History'.tr,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF2E1A47),
@@ -205,8 +204,7 @@ class _GiftHistoryBottomSheetState extends State<GiftHistoryBottomSheet> {
         children: [
           Icon(Icons.history, size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
-          AppText(
-            'No gifts sent yet',
+          AppText('No gifts sent yet'.tr,
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: Colors.grey[400],

@@ -82,7 +82,7 @@ class _WavingEmojiState extends State<WavingEmoji> with SingleTickerProviderStat
       builder: (context, child) {
         return Transform.rotate(
           angle: (_controller.value - 0.5) * 0.4,
-          child: AppText("👋", fontSize: 20),
+          child: AppText("👋".tr, fontSize: 20),
         );
       },
     );

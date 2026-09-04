@@ -162,7 +162,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     if (widget.isPackageChat)
                       IconButton(
                         icon: const Icon(Icons.swap_calls_rounded, color: Colors.green, size: 26),
-                        tooltip: "Switch to Call",
+                        tooltip: "Switch to Call".tr,
                         onPressed: () => _showSwitchToCallConfirmation(context),
                       ),
                     const SizedBox(width: 4),
@@ -178,8 +178,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
-                          child: const AppText(
-                            "End Chat",
+                          child: const AppText("End Chat".tr,
                             color: Colors.red,
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
@@ -540,7 +539,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             child: TextField(
                               controller: _controller.messageController,
                               decoration: InputDecoration(
-                                hintText: "Type a message...",
+                                hintText: "Type a message...".tr,
                                 filled: true,
                                 fillColor: const Color(0xFFF5F5F5),
                                 border: OutlineInputBorder(
@@ -705,8 +704,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 color: AppColors.deepPink.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(
-                'Chat Request Sent',
+              child: Text('Chat Request Sent'.tr,
                 style: TextStyle(
                   fontSize: 13,
                   color: AppColors.deepPink,
@@ -735,8 +733,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         bottomLeft: Radius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Namaste, mujhe aapki guidance chahiye...',
+                    child: const Text('Namaste, mujhe aapki guidance chahiye...'.tr,
                       style: TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ),
@@ -785,8 +782,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             AnimatedBuilder(
               animation: _dotController,
               builder: (context, child) {
-                return Text(
-                  'Waiting for astrologer to accept',
+                return Text('Waiting for astrologer to accept'.tr,
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade500,
@@ -814,8 +810,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   children: [
                     Icon(Icons.close_rounded, color: Colors.red.shade400, size: 18),
                     const SizedBox(width: 8),
-                    Text(
-                      'Cancel Request',
+                    Text('Cancel Request'.tr,
                       style: TextStyle(
                         color: Colors.red.shade400,
                         fontWeight: FontWeight.w600,
@@ -843,8 +838,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Opacity(
         opacity: opacity.clamp(0.2, 1.0),
-        child: Text(
-          '.',
+        child: Text('.'.tr,
           style: TextStyle(
             fontSize: 22,
             color: AppColors.deepPink,
@@ -863,19 +857,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("End Chat"),
-          content: const Text("Are you sure you want to end this chat session?"),
+          title: const Text("End Chat".tr),
+          content: const Text("Are you sure you want to end this chat session?".tr),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+              child: const Text("Cancel".tr),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _controller.terminateEntireSession();
               },
-              child: const Text("End Chat", style: TextStyle(color: Colors.red)),
+              child: const Text("End Chat".tr, style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
@@ -914,8 +908,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               children: [
                 Icon(Icons.help_outline_rounded, color: Color(0xFF6B21A8), size: 22),
                 SizedBox(width: 8),
-                Text(
-                  'End Consultation Options',
+                Text('End Consultation Options'.tr,
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)),
                 ),
               ],
@@ -935,8 +928,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               icon: Icons.chat_bubble_outline_rounded,
               iconColor: Colors.blue.shade700,
               bgColor: Colors.blue.shade50,
-              title: 'End Chat Only (Continue Calling)',
-              subtitle: 'Closes chat window and returns you to the call.',
+              title: 'End Chat Only (Continue Calling)'.tr,
+              subtitle: 'Closes chat window and returns you to the call.'.tr,
               onTap: () {
                 Navigator.of(ctx).pop();
                 _controller.terminateChannelOnly();
@@ -949,8 +942,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               icon: Icons.cancel_rounded,
               iconColor: Colors.red,
               bgColor: Colors.red.shade50,
-              title: 'End Entire Session',
-              subtitle: 'Completes consultation and finalises package time.',
+              title: 'End Entire Session'.tr,
+              subtitle: 'Completes consultation and finalises package time.'.tr,
               onTap: () {
                 Navigator.of(ctx).pop();
                 _controller.terminateEntireSession();
@@ -963,7 +956,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               width: double.infinity,
               child: TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontSize: 15)),
+                child: const Text('Cancel'.tr, style: TextStyle(color: Colors.grey, fontSize: 15)),
               ),
             ),
           ],
@@ -1023,12 +1016,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text("Switch to Call"),
-        content: const Text("Are you sure you want to end this chat session and switch to a call?"),
+        title: const Text("Switch to Call".tr),
+        content: const Text("Are you sure you want to end this chat session and switch to a call?".tr),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text("Cancel"),
+            child: const Text("Cancel".tr),
           ),
           TextButton(
             onPressed: () async {
@@ -1095,8 +1088,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 CustomSnackbar.showError("Failed to switch: $e");
               }
             },
-            child: const Text(
-              "Switch",
+            child: const Text("Switch".tr,
               style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),
@@ -1215,7 +1207,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildAttachmentOption(
                   icon: Iconsax.camera,
                   color: Colors.blue,
-                  label: "Camera",
+                  label: "Camera".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickImage(ImageSource.camera);
@@ -1224,7 +1216,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildAttachmentOption(
                   icon: Iconsax.gallery,
                   color: Colors.purple,
-                  label: "Gallery",
+                  label: "Gallery".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickImage(ImageSource.gallery);
@@ -1233,7 +1225,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 _buildAttachmentOption(
                   icon: Iconsax.document,
                   color: Colors.orange,
-                  label: "Document",
+                  label: "Document".tr,
                   onTap: () {
                     Navigator.of(context).pop();
                     _pickDocument();

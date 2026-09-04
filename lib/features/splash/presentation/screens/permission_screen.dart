@@ -91,9 +91,9 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Some permissions are permanently denied. Please enable them in settings.'),
+              content: const Text('Some permissions are permanently denied. Please enable them in settings.'.tr),
               action: SnackBarAction(
-                label: 'Settings',
+                label: 'Settings'.tr,
                 onPressed: () {
                   openAppSettings();
                 },
@@ -124,35 +124,33 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
                 ),
               ),
               const SizedBox(height: 30),
-              AppText(
-                'Required Permissions',
+              AppText('Required Permissions'.tr,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
               const SizedBox(height: 10),
-              AppText(
-                'To provide you with the best experience, we need access to the following permissions.',
+              AppText('To provide you with the best experience, we need access to the following permissions.'.tr,
                 color: Colors.grey.shade600,
                 fontSize: 14,
               ),
               const SizedBox(height: 40),
               _buildPermissionItem(
                 icon: Icons.camera_alt_outlined,
-                title: 'Camera',
+                title: 'Camera'.tr,
                 description: 'Required for video calls with astrologers.',
                 isGranted: isCameraGranted,
               ),
               const SizedBox(height: 20),
               _buildPermissionItem(
                 icon: Icons.mic_none_outlined,
-                title: 'Microphone',
+                title: 'Microphone'.tr,
                 description: 'Required for voice and video calls.',
                 isGranted: isMicrophoneGranted,
               ),
               const SizedBox(height: 20),
               _buildPermissionItem(
                 icon: Icons.notifications_none_outlined,
-                title: 'Notifications',
+                title: 'Notifications'.tr,
                 description: 'To notify you about upcoming sessions and messages.',
                 isGranted: isNotificationGranted,
               ),
@@ -169,8 +167,7 @@ class _PermissionScreenState extends State<PermissionScreen> with WidgetsBinding
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: AppText(
-                      'Allow Permissions',
+                    child: AppText('Allow Permissions'.tr,
                       color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

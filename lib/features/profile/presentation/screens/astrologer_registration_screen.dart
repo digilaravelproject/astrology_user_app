@@ -33,16 +33,14 @@ class AstrologerRegistrationScreen extends StatelessWidget {
                 children: [
                   Icon(Iconsax.user_add_copy, size: 48, color: AppColors.deepPink),
                   const SizedBox(height: 16),
-                  AppText(
-                    "Join our Team of Experts",
+                  AppText("Join our Team of Experts".tr,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Colors.black87,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
-                  AppText(
-                    "Share your wisdom and help people find their path.",
+                  AppText("Share your wisdom and help people find their path.".tr,
                     fontSize: 14,
                     color: Colors.black54,
                     textAlign: TextAlign.center,
@@ -63,7 +61,7 @@ class AstrologerRegistrationScreen extends StatelessWidget {
             
             const SizedBox(height: 40),
             CustomButton(
-              text: "Submit Application",
+              text: "Submit Application".tr,
               onTap: () {
                  Get.back();
                  CustomSnackbar.showSuccess("Application Submitted Successfully");

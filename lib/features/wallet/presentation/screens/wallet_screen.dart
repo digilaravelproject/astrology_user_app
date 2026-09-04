@@ -152,8 +152,7 @@ class WalletScreen extends StatelessWidget {
                   children: [
                     Icon(Icons.history_rounded, size: 64, color: Colors.grey.shade300),
                     const SizedBox(height: 16),
-                    AppText(
-                      "No transactions found",
+                    AppText("No transactions found".tr,
                       fontSize: 14,
                       color: Colors.grey.shade500,
                       fontWeight: FontWeight.w500,

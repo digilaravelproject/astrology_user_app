@@ -236,7 +236,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                           const Center(
                             child: Padding(
                               padding: EdgeInsets.only(top: 100),
-                              child: AppText('Astrologer data not found', color: Colors.grey),
+                              child: AppText('Astrologer data not found'.tr, color: Colors.grey),
                             ),
                           ),
                         if (_astrologer != null && _astrologer!.bio.isNotEmpty)
@@ -478,16 +478,14 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     ),
                     const SizedBox(height: 20),
                     Center(
-                      child: AppText(
-                        "Report Astrologer",
+                      child: AppText("Report Astrologer".tr,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    AppText(
-                      "Why do you want to report?",
+                    AppText("Why do you want to report?".tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -506,7 +504,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       child: TextField(
                         controller: _reasonController,
                         decoration: InputDecoration(
-                          hintText: "Enter reason for reporting...",
+                          hintText: "Enter reason for reporting...".tr,
                           border: InputBorder.none,
                         ),
                       ),
@@ -551,7 +549,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: CustomButton(
-                        text: "Report",
+                        text: "Report".tr,
                         backgroundColor: AppColors.primaryColor,
                         onTap: () async {
                           final reason = _reasonController.text.trim();
@@ -627,8 +625,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                     ),
                     const SizedBox(height: 20),
                     Center(
-                      child: AppText(
-                        "Write a Review",
+                      child: AppText("Write a Review".tr,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Colors.black87,
@@ -655,8 +652,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    AppText(
-                      "Share your experience",
+                    AppText("Share your experience".tr,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -938,7 +934,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                               fontWeight: FontWeight.w900,
                               color: AppColors.deepPink,
                             ),
-                            AppText('/min', fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
+                            AppText('/min'.tr, fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textColorPrimary),
                             if (astro.hasOffer) ...[
                               const SizedBox(width: 6),
                               Container(
@@ -1020,8 +1016,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                 children: [
                    Icon(Icons.star_rate_rounded, color: AppColors.deepPink, size: 24),
                   const SizedBox(width: 8),
-                  AppText(
-                    'User Reviews',
+                  AppText('User Reviews'.tr,
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     color: AppColors.deepPink,
@@ -1042,8 +1037,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
                       children: [
                         Icon(Icons.add_comment_rounded, size: 14, color: AppColors.deepPink),
                         const SizedBox(width: 4),
-                        AppText(
-                          'Write',
+                        AppText('Write'.tr,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.deepPink,
@@ -1061,8 +1055,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           if (reviews.isEmpty) ...[
             const SizedBox(height: 16),
             Center(
-              child: AppText(
-                'No reviews yet. Be the first to review!',
+              child: AppText('No reviews yet. Be the first to review!'.tr,
                 fontSize: 13,
                 color: AppColors.textColorHint,
                 fontWeight: FontWeight.w500,
@@ -1074,8 +1067,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
             GestureDetector(
               onTap: () => _navigateToAllReviews(),
               child: Center(
-                child: AppText(
-                  'See all',
+                child: AppText('See all'.tr,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.deepPink,
@@ -1198,7 +1190,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
         return const Center(
           child: Padding(
             padding: EdgeInsets.all(20),
-            child: Text('No gifts available'),
+            child: Text('No gifts available'.tr),
           ),
         );
       }
@@ -1421,7 +1413,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
           children: [
             const Icon(Icons.support_agent, color: AppColors.primaryColor, size: 24),
             const SizedBox(width: 8),
-            const AppText('Assistance Chat', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
+            const AppText('Assistance Chat'.tr, fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor),
             const Spacer(),
             const Icon(Icons.chevron_right, color: AppColors.primaryColor),
           ],
@@ -1441,7 +1433,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
               const Icon(Icons.card_giftcard, color: AppColors.primaryColor, size: 20),
               const SizedBox(width: 8),
               Expanded(
-                child: AppText('Send Gifts', fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor, maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: AppText('Send Gifts'.tr, fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.primaryColor, maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
               const SizedBox(width: 4),
               GestureDetector(
@@ -1525,8 +1517,7 @@ class _BioTextState extends State<_BioText> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppText(
-            'About Astrologer',
+          AppText('About Astrologer'.tr,
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppColors.textColorPrimary,

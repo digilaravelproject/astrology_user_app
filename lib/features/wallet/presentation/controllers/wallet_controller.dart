@@ -157,11 +157,11 @@ class WalletController extends GetxController {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    CustomSnackbar.showError(response.message ?? 'Unknown error', title: 'Payment Failed');
+    CustomSnackbar.showError(response.message ?? 'Unknown error', title: 'Payment Failed'.tr);
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    CustomSnackbar.showInfo(response.walletName ?? '', title: 'External Wallet');
+    CustomSnackbar.showInfo(response.walletName ?? '', title: 'External Wallet'.tr);
   }
 
   String get balance => wallet.value?.balance ?? '0.00';

@@ -196,8 +196,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 },
                 activeColor: const Color(0xFFD81B60),
               ),
-              const AppText(
-                'Save',
+              const AppText('Save'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFD81B60),
@@ -219,8 +218,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AppText(
-                    'Type or Paste Birth Details',
+                  AppText('Type or Paste Birth Details'.tr,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFD81B60),
@@ -248,8 +246,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 ),
                 elevation: 2,
               ),
-              child: const AppText(
-                'SHOW MATCH',
+              child: const AppText('SHOW MATCH'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -366,8 +363,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 },
                 activeColor: const Color(0xFFD81B60),
               ),
-              const AppText(
-                'Save',
+              const AppText('Save'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFD81B60),
@@ -389,8 +385,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AppText(
-                    'Type or Paste Birth Details',
+                  AppText('Type or Paste Birth Details'.tr,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFFD81B60),
@@ -418,8 +413,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                 ),
                 elevation: 2,
               ),
-              child: const AppText(
-                'SHOW MATCH',
+              child: const AppText('SHOW MATCH'.tr,
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -506,8 +500,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      'Select Birth Date',
+                    child: Text('Select Birth Date'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -546,8 +539,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text(
-                        'Done',
+                      child: const Text('Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
                       ),
                     ),
@@ -591,8 +583,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                   ),
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      'Select Birth Time',
+                    child: Text('Select Birth Time'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -629,8 +620,7 @@ class _KundliMatchingScreenState extends State<KundliMatchingScreen> with Single
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      child: const Text(
-                        'Done',
+                      child: const Text('Done'.tr,
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF8B0D31)),
                       ),
                     ),
