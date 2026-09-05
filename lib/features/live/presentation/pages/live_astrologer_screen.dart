@@ -11,6 +11,8 @@ import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'live_room_screen.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/constants/image_constants.dart';
+import 'package:shimmer/shimmer.dart';
+
 class LiveAstrologerScreen extends StatefulWidget {
   const LiveAstrologerScreen({super.key});
 
@@ -46,12 +48,27 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
   }
 
   late LiveController _controller;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _controller = Get.find<LiveController>();
-    _controller.fetchActiveSessions();
+    _controller.fetchActiveSessions(isRefresh: true);
+    
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+        if (!_controller.isLoadingSessions.value && !_controller.isFetchingMore.value && !_controller.hasReachedMax.value) {
+          _controller.fetchActiveSessions();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -71,9 +88,10 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
           backgroundColor: Colors.transparent,
       body: SafeArea(
         child: RefreshIndicator(
-        onRefresh: () => _controller.fetchActiveSessions(),
+        onRefresh: () => _controller.fetchActiveSessions(isRefresh: true),
         color: AppColors.primaryColor,
         child: SingleChildScrollView(
+          controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,12 +101,30 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
               _buildSectionTitle(),
               
               Obx(() {
-                if (_controller.isLoadingSessions.value) {
-                  return const SizedBox(
-                    height: 200,
-                    child: Center(
-                      child: CircularProgressIndicator(color: AppColors.primaryColor),
+                if (_controller.isLoadingSessions.value && _controller.activeSessions.isEmpty) {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 18,
+                      crossAxisSpacing: 18,
+                      childAspectRatio: 0.78,
                     ),
+                    itemCount: 6,
+                    itemBuilder: (context, index) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 }
                 
@@ -142,6 +178,17 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
                     );
                   },
                 );
+              }),
+              Obx(() {
+                if (_controller.isFetchingMore.value) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.primaryColor),
+                    ),
+                  );
+                }
+                return const SizedBox(height: 0);
               }),
               const SizedBox(height: 280),
             ],

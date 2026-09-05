@@ -96,6 +96,7 @@ class LiveWsHandler {
         final exists = controller.comments.any((c) => c.id == id);
         if (!exists) {
           controller.comments.add(newComment);
+          controller.comments.refresh();
         }
       }
     } catch (e) {
@@ -131,6 +132,8 @@ class LiveWsHandler {
           createdAt: DateTime.now(),
         );
         controller.comments.add(newComment);
+        controller.comments.refresh();
+        controller.showSuperChatAnimation(newComment);
       }
     } catch (e) {
       Logger.e('LiveWsHandler: error handling SuperChatReceived -> $e');

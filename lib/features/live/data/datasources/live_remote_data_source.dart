@@ -7,9 +7,9 @@ class LiveRemoteDataSource {
 
   LiveRemoteDataSource(this._apiClient);
 
-  Future<ResponseModel> getActiveLiveSessions() async {
-    print('[LIVE_DS] Getting active live sessions');
-    final result = await _apiClient.get(AppUrls.activeLiveSessions);
+  Future<ResponseModel> getActiveLiveSessions({int page = 1}) async {
+    print('[LIVE_DS] Getting active live sessions page $page');
+    final result = await _apiClient.get('${AppUrls.activeLiveSessions}?page=$page');
     return result;
   }
 

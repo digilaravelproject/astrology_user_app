@@ -5,8 +5,8 @@ class GetActiveLiveSessionsUseCase {
   final LiveRepository repository;
   GetActiveLiveSessionsUseCase(this.repository);
 
-  Future<ResponseModel> call() async {
-    return await repository.getActiveLiveSessions();
+  Future<ResponseModel> call({int page = 1}) async {
+    return await repository.getActiveLiveSessions(page: page);
   }
 }
 

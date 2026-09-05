@@ -528,10 +528,41 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   void _goToPrevSession() => _navigateToSession(_currentIndex - 1);
   void _goToNextSession() => _navigateToSession(_currentIndex + 1);
 
+  Future<void> _showExitConfirmation() async {
+    final shouldLeave = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey.shade900,
+        title: const Text('Leave Stream?', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to leave this live session?', style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Leave', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldLeave == true && mounted) {
+      Navigator.pop(context); // Actually leave
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        _showExitConfirmation();
+      },
+      child: GestureDetector(
+        onHorizontalDragEnd: (details) {
         final velocity = details.primaryVelocity ?? 0;
         if (velocity < -300) {
           // Swipe Left → next session
@@ -746,6 +777,40 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             }),
           ),
 
+          // Top gradient for header visibility
+          Positioned(
+            top: 0, left: 0, right: 0,
+            height: 120,
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Bottom gradient for comments/inputs visibility
+          Positioned(
+            bottom: 0, left: 0, right: 0,
+            height: 350,
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: true,
@@ -757,35 +822,79 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
                       children: [
-                        _buildCircleActionIcon(Icons.arrow_back, () => Navigator.pop(context)),
-                        const SizedBox(width: 8),
                         _buildAstrologerInfoPanel(),
                         const Spacer(),
-                        Obx(() {
-                          final session = _liveController.currentSession.value;
-                          final isEnded = session?.status == 'completed';
-                          if (isEnded) return const SizedBox.shrink();
-                          
-                          final isAstrologerMuted = !_liveController.isAudioOn.value;
-                          final isUserMuted = _isSpeakerMuted;
-                          final isActuallyMuted = isAstrologerMuted || isUserMuted;
-                          
-                          return Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            child: _buildRightActionButton(
-                              icon: isActuallyMuted ? Icons.volume_off : Icons.volume_up,
-                              onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
-                              isActive: !isAstrologerMuted,
-                              activeColor: isActuallyMuted ? Colors.white : Colors.green,
-                            ),
-                          );
-                        }),
+                        _buildCircleActionIcon(Icons.close, () => _showExitConfirmation()),
                       ],
                     ),
                   ),
                 ),
 
                 const Spacer(),
+                
+                // Super Chat Banner
+                Obx(() {
+                  final superChat = _liveController.activeSuperChat.value;
+                  if (superChat == null) return const SizedBox.shrink();
+                  
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.orange.withOpacity(0.8), Colors.deepOrange.withOpacity(0.8)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.yellow, width: 1.5),
+                    ),
+                    child: Row(
+                      children: [
+                        if (superChat.userAvatar != null && superChat.userAvatar!.isNotEmpty)
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(
+                              superChat.userAvatar!.startsWith('http') 
+                                  ? superChat.userAvatar! 
+                                  : '${AppUrls.baseImageUrl}${superChat.userAvatar}'
+                            ),
+                          )
+                        else
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.white24,
+                            child: Text(
+                              superChat.userName.isNotEmpty ? superChat.userName.substring(0, 1).toUpperCase() : 'U',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                superChat.userName,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              Text(
+                                superChat.message,
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (superChat.giftIconUrl != null)
+                          Image.network(
+                            superChat.giftIconUrl!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.contain,
+                          ),
+                      ],
+                    ),
+                  );
+                }),
 
                 // Comments feed & comment bar
                 Obx(() {
@@ -810,14 +919,37 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                         
                         // Input controls
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
                               child: _buildCommentInput(),
                             ),
                             const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: _showGiftSheet,
-                              child: _buildCircleIconButton(Icons.wallet_giftcard_rounded, Colors.white),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Obx(() {
+                                  final session = _liveController.currentSession.value;
+                                  final isEnded = session?.status == 'completed';
+                                  if (isEnded) return const SizedBox.shrink();
+                                  
+                                  final isAstrologerMuted = !_liveController.isAudioOn.value;
+                                  final isUserMuted = _isSpeakerMuted;
+                                  final isActuallyMuted = isAstrologerMuted || isUserMuted;
+                                  
+                                  return _buildRightActionButton(
+                                    icon: isActuallyMuted ? Icons.volume_off : Icons.volume_up,
+                                    onTap: isAstrologerMuted ? null : _toggleSpeakerMute,
+                                    isActive: !isAstrologerMuted,
+                                    activeColor: isActuallyMuted ? Colors.white : Colors.green,
+                                  );
+                                }),
+                                const SizedBox(height: 16),
+                                GestureDetector(
+                                  onTap: _showGiftSheet,
+                                  child: _buildCircleIconButton(Icons.wallet_giftcard_rounded, Colors.white),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -905,6 +1037,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
         ],
       ),
+    ),
     ),
     );
   }
@@ -1258,17 +1391,17 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
+        width: 50,
+        height: 50,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white24, width: 1),
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.white.withOpacity(0.3)),
         ),
         child: Icon(
           icon,
-          color: isActive ? activeColor : Colors.grey,
-          size: 20,
+          color: isActive ? activeColor : Colors.white,
+          size: 24,
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:astro_user/core/services/network/response_model.dart';
 
 abstract class LiveRepository {
-  Future<ResponseModel> getActiveLiveSessions();
+  Future<ResponseModel> getActiveLiveSessions({int page = 1});
   Future<ResponseModel> getLiveSessionDetail(int id);
   Future<ResponseModel> joinLiveSession(int id);
   Future<ResponseModel> leaveLiveSession(int id);

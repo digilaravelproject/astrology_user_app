@@ -30,6 +30,8 @@ class LiveController extends GetxController {
   final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
   final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
   final RxList<LiveCommentModel> comments = <LiveCommentModel>[].obs;
+  final Rx<LiveCommentModel?> activeSuperChat = Rx<LiveCommentModel?>(null);
+  Timer? _superChatTimer;
   final RxBool isCameraOn = true.obs;
   final RxBool isAudioOn = true.obs;
   
@@ -38,28 +40,77 @@ class LiveController extends GetxController {
   final RxBool isSendingComment = false.obs;
   final RxBool isSendingSuperChat = false.obs;
   
+  int _currentPage = 1;
+  final RxBool hasReachedMax = false.obs;
+  final RxBool isFetchingMore = false.obs;
+  
   Timer? _commentsPollTimer;
 
-  Future<void> fetchActiveSessions() async {
+  void showSuperChatAnimation(LiveCommentModel superChat) {
+    activeSuperChat.value = superChat;
+    _superChatTimer?.cancel();
+    _superChatTimer = Timer(const Duration(seconds: 4), () {
+      activeSuperChat.value = null;
+    });
+  }
+
+  Future<void> fetchActiveSessions({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _currentPage = 1;
+      hasReachedMax.value = false;
+    }
+    if (hasReachedMax.value) return;
+
     try {
-      isLoadingSessions.value = true;
-      final result = await _getActiveSessionsUseCase.call();
+      if (isRefresh || _currentPage == 1) {
+        isLoadingSessions.value = true;
+      } else {
+        isFetchingMore.value = true;
+      }
+      
+      final result = await _getActiveSessionsUseCase.call(page: _currentPage);
       if (result.isSuccess && result.body != null) {
         final List<dynamic> data;
         if (result.body is List) {
           data = result.body;
         } else if (result.body is Map) {
           data = result.body['data'] is List ? result.body['data'] : (result.body['body'] is List ? result.body['body'] : []);
+          
+          if (result.body['meta'] != null && result.body['meta']['last_page'] != null) {
+            hasReachedMax.value = _currentPage >= result.body['meta']['last_page'];
+          } else if (result.body['data'] is Map && result.body['data']['last_page'] != null) {
+            hasReachedMax.value = _currentPage >= result.body['data']['last_page'];
+          }
         } else {
           data = [];
         }
-        activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        
+        final newSessions = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        
+        if (isRefresh || _currentPage == 1) {
+          activeSessions.value = newSessions;
+        } else {
+          final uniqueNewSessions = newSessions.where((newS) => !activeSessions.any((existingS) => existingS.id == newS.id)).toList();
+          
+          if (uniqueNewSessions.isEmpty && newSessions.isNotEmpty) {
+            hasReachedMax.value = true;
+          } else {
+            activeSessions.addAll(uniqueNewSessions);
+          }
+        }
+        
+        if (newSessions.isEmpty) {
+          hasReachedMax.value = true;
+        } else if (!hasReachedMax.value) {
+          _currentPage++;
+        }
         print('[LIVE] Loaded ${activeSessions.length} active live sessions');
       }
     } catch (e) {
       print('[LIVE] Error fetching active sessions: $e');
     } finally {
       isLoadingSessions.value = false;
+      isFetchingMore.value = false;
     }
   }
 
@@ -105,6 +156,12 @@ class LiveController extends GetxController {
   }
 
   Future<void> joinSession(int id) async {
+    // Clear previous session state to prevent data leaking during navigation
+    currentSession.value = null;
+    comments.clear();
+    activeSuperChat.value = null;
+    _superChatTimer?.cancel();
+    
     isCameraOn.value = true;
     isAudioOn.value = true;
     try {
@@ -128,7 +185,7 @@ class LiveController extends GetxController {
           
           final lastComments = body['last_comments'] ?? body['data']?['last_comments'];
           if (lastComments is List) {
-            comments.value = lastComments.map((json) => LiveCommentModel.fromJson(json)).toList();
+            comments.assignAll(lastComments.map((json) => LiveCommentModel.fromJson(json)).toList());
           }
         }
         

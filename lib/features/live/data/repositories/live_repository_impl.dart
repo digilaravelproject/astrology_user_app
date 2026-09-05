@@ -8,8 +8,8 @@ class LiveRepositoryImpl implements LiveRepository {
   LiveRepositoryImpl(this.dataSource);
 
   @override
-  Future<ResponseModel> getActiveLiveSessions() async {
-    return await dataSource.getActiveLiveSessions();
+  Future<ResponseModel> getActiveLiveSessions({int page = 1}) async {
+    return await dataSource.getActiveLiveSessions(page: page);
   }
 
   @override

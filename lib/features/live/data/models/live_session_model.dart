@@ -68,6 +68,7 @@ class LiveSessionModel {
 
 class LiveAstrologerModel {
   final int id;
+  final int? userId;
   final String name;
   final String? profilePhoto;
   final String? gender;
@@ -75,6 +76,7 @@ class LiveAstrologerModel {
 
   LiveAstrologerModel({
     required this.id,
+    this.userId,
     required this.name,
     this.profilePhoto,
     this.gender,
@@ -84,6 +86,7 @@ class LiveAstrologerModel {
   factory LiveAstrologerModel.fromJson(Map<String, dynamic> json) {
     return LiveAstrologerModel(
       id: json['id'],
+      userId: json['user_id'],
       name: json['name'] ?? '',
       profilePhoto: json['profile_photo'],
       gender: json['gender'],
@@ -94,6 +97,7 @@ class LiveAstrologerModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'user_id': userId,
       'name': name,
       'profile_photo': profilePhoto,
       'gender': gender,
