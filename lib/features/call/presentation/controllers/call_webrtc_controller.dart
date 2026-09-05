@@ -72,17 +72,23 @@ class CallWebRTCController extends GetxController {
       } else {
         _orchestrator.status.value = 'idle';
         CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate call.');
+        final wasVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
+        if (wasVisible) Get.back();
       }
     } catch (e) {
       _orchestrator.status.value = 'idle';
+      final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
+      if (wasVisible) Get.back();
     }
   }
 
   Future<void> cancelCall() async {
     if (_orchestrator.sessionId == null) {
+      final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
+      if (wasVisible) Get.back();
       return;
     }
     try {
@@ -96,7 +102,9 @@ class CallWebRTCController extends GetxController {
         CustomSnackbar.showSuccess('Call cancelled.');
       }
     } catch (e) {} finally {
+      final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
+      if (wasVisible) Get.back();
     }
   }
 

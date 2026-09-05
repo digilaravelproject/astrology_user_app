@@ -185,7 +185,9 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
       if (status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') {
         status.value = 'missed';
         CustomSnackbar.showError('Call unanswered.');
+        final wasVisible = isCallScreenVisible;
         cleanUp();
+        if (wasVisible) Get.back();
       }
     });
   }
