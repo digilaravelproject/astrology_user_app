@@ -35,18 +35,14 @@ class CallWebRTCController extends GetxController {
       _orchestrator.status.value = 'dialing';
       final offerDescription = await _orchestrator.webrtcService.createOffer(0);
 
+      // Unified endpoint: POST /call/initiate
+      // Backend auto-detects if user has an active package and sets session_type accordingly
       final response = await _apiClient.post(
-        isPackageSession ? AppUrls.packageSessionStart : AppUrls.initiateCall,
-        data: isPackageSession
-            ? {
-                'astrologer_id': providerId,
-                'mode': 'call',
-                'offer': offerDescription.sdp,
-              }
-            : {
-                'provider_id': providerId,
-                'offer': offerDescription.sdp,
-              },
+        AppUrls.initiateCall,
+        data: {
+          'provider_id': providerId,
+          'offer': offerDescription.sdp,
+        },
         handleError: true,
         showErrorScreen: false,
       );
@@ -56,21 +52,12 @@ class CallWebRTCController extends GetxController {
         final sessionData = bodyMap is Map 
             ? (bodyMap['session'] ?? bodyMap['call_session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']?['call_session']) 
             : null;
-        if (isPackageSession) {
-          final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
-          if (subSessionData != null) {
-            SessionBottomSheetHelper.activeSubSessionId = int.tryParse(subSessionData['id']?.toString() ?? '');
-          }
-          final remainingSecs = bodyMap is Map
-              ? (bodyMap['remaining_duration'] ?? bodyMap['data']?['remaining_duration'])
-              : null;
-          if (remainingSecs != null) {
-            WebSocketService.packageRemainingSeconds.value = int.tryParse(remainingSecs.toString()) ?? 0;
-          }
-        }
         if (sessionData != null) {
           _orchestrator.session.sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
           _orchestrator.webrtcService.activeSessionId = _orchestrator.sessionId;
+          // Detect session_type from new API response
+          final sType = sessionData['session_type']?.toString();
+          _orchestrator.session.isPackageCall = sType == 'prepaid' || isPackageSession;
           final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
 
           if (sessionStatus == 'waiting') {
@@ -116,22 +103,17 @@ class CallWebRTCController extends GetxController {
   Future<void> endCall() async {
     if (_orchestrator.sessionId == null) return;
     try {
-      final response = _orchestrator.session.isPackageCall && SessionBottomSheetHelper.activeSubSessionId != null
-          ? await _apiClient.post(
-              AppUrls.packageSessionEnd,
-              data: {'sub_session_id': SessionBottomSheetHelper.activeSubSessionId},
-            )
-          : await _apiClient.post(
-              AppUrls.endCallSession(_orchestrator.sessionId!),
-              handleError: true,
-              showErrorScreen: false,
-            );
+      // Unified endpoint: POST /call/{sessionId}/end
+      // Backend auto-detects session_type (normal/prepaid) and settles billing accordingly
+      final response = await _apiClient.post(
+          AppUrls.endCallSession(_orchestrator.sessionId!),
+          handleError: true,
+          showErrorScreen: false,
+      );
       if (response.isSuccess) {
         if (_orchestrator.session.isSummaryShown) return;
         _orchestrator.session.isSummaryShown = true;
-        
         _orchestrator.status.value = 'completed';
-        CustomSnackbar.showSuccess('Call ended successfully.');
         
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
@@ -146,65 +128,13 @@ class CallWebRTCController extends GetxController {
   }
 
   Future<void> terminateChannelOnly() async {
-    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
-    if (subId == null) return;
-    try {
-      await PackageSessionService.terminateChannel(
-        subSessionId: subId,
-        channelType: 'call',
-        action: 'channel_only',
-      );
-
-      final chatSessId = _orchestrator.session.activeChatSessionId ?? 0;
-      final pName = _orchestrator.session.providerName ?? 'Astrologer';
-      final pImage = _orchestrator.session.providerImage ?? '';
-
-      final wasVisible = _orchestrator.isCallScreenVisible;
-      _orchestrator.session.cleanUp();
-      if (wasVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
-        if (Get.isDialogOpen ?? false) Get.back();
-        Get.back();
-      }
-
-      if (chatSessId > 0) {
-        Get.to(
-          () => ChatScreen(
-            astrologerName: pName,
-            astrologerImage: pImage,
-            sessionId: chatSessId,
-            initialStatus: 'ongoing',
-            isPackageChat: true,
-          ),
-          binding: ChatBinding(),
-        );
-      }
-    } catch (e) {
-      CustomSnackbar.showError('Failed to end call. Please try again.');
-    }
+    // Unified endpoint: /call/{id}/end handles session_type automatically
+    await endCall();
   }
 
   Future<void> terminateEntireSession() async {
-    final subId = PackageSessionService.activeSubSessionId ?? SessionBottomSheetHelper.activeSubSessionId;
-    if (subId == null) {
-      await endCall();
-      return;
-    }
-    try {
-      await PackageSessionService.terminateChannel(
-        subSessionId: subId,
-        channelType: 'call',
-        action: 'complete_session',
-      );
-      _orchestrator.status.value = 'completed';
-      final wasVisible = _orchestrator.isCallScreenVisible;
-      _orchestrator.session.cleanUp();
-      if (wasVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
-        if (Get.isDialogOpen ?? false) Get.back();
-        Get.back();
-      }
-    } catch (e) {
-      await endCall();
-    }
+    // Unified endpoint: /call/{id}/end handles both normal & prepaid session_type
+    await endCall();
   }
 
   Future<void> handleCallAccepted(String answerSdp) async {
@@ -241,17 +171,12 @@ class CallWebRTCController extends GetxController {
             _orchestrator.webrtcService.activeSessionId = _orchestrator.sessionId;
             _orchestrator.status.value = sessionStatus!;
             
-            _orchestrator.session.isPackageCall = (session['is_prepaid'] == true ||
+            // New API: use session_type field. Fallback to old flags for backward compatibility.
+            _orchestrator.session.isPackageCall = 
+                session['session_type']?.toString() == 'prepaid' ||
+                session['is_prepaid'] == true ||
                 session['is_package_session'] == true ||
-                session['billing_mode'] == 'prepaid' ||
-                (bodyMap is Map && (
-                  bodyMap['is_prepaid'] == true ||
-                  bodyMap['is_package_session'] == true ||
-                  bodyMap['billing_mode'] == 'prepaid' ||
-                  bodyMap['data']?['is_prepaid'] == true ||
-                  bodyMap['data']?['is_package_session'] == true ||
-                  bodyMap['data']?['billing_mode'] == 'prepaid'
-                )));
+                session['billing_mode'] == 'prepaid';
             
             _orchestrator.session.providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];

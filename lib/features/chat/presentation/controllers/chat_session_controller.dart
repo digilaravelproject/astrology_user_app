@@ -284,23 +284,22 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> terminateChannelOnly() async {
-    final subId = SessionBottomSheetHelper.activeSubSessionId;
-    if (subId == null) return;
+    // Unified endpoint: /chat/{id}/end handles session_type automatically
+    if (_orchestrator.sessionId == null) return;
     try {
       isLoading.value = true;
-      // Close UI immediately
       status.value = 'ended';
       timer?.cancel();
       ForegroundTaskService.stopService();
-      if (_orchestrator.sessionId != null) LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
       Get.back();
-      // Call backend API to actually terminate the chat channel
-      await PackageSessionService.terminateChannel(
-        subSessionId: subId,
-        channelType: 'chat',
-        action: 'channel_only',
+      // Call unified end endpoint — backend detects session_type (normal/prepaid) automatically
+      await Get.find<ApiClient>().post(
+        AppUrls.endChatSession(_orchestrator.sessionId!),
+        handleError: false,
+        showErrorScreen: false,
       );
     } catch (e) {
       Logger.e('terminateChannelOnly error: $e');
@@ -310,34 +309,8 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> terminateEntireSession() async {
-    final subId = SessionBottomSheetHelper.activeSubSessionId;
-    if (subId == null) {
-      await endChatSession();
-      return;
-    }
-    try {
-      isLoading.value = true;
-      // Close UI immediately
-      status.value = 'ended';
-      timer?.cancel();
-      ForegroundTaskService.stopService();
-      if (_orchestrator.sessionId != null) LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
-      FloatingChatBubble.dismiss();
-      WebSocketService.activeSessionId = null;
-      Get.back();
-      // Call backend API to actually end the entire session
-      await PackageSessionService.terminateChannel(
-        subSessionId: subId,
-        channelType: 'chat',
-        action: 'complete_session',
-      );
-    } catch (e) {
-      Logger.e('terminateEntireSession error: $e');
-      // Fallback to regular end
-      await endChatSession();
-    } finally {
-      isLoading.value = false;
-    }
+    // Unified endpoint: /chat/{id}/end handles both normal & prepaid session_type
+    await endChatSession();
   }
 
   Future<void> cancelChatSession() async {
@@ -365,17 +338,9 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     if (_orchestrator.sessionId == null) return;
     isLoading.value = true;
     try {
-      ChatSession? session;
-      if (isPackageChat && SessionBottomSheetHelper.activeSubSessionId != null) {
-        final response = await Get.find<ApiClient>().post(AppUrls.packageSessionEnd, data: {'sub_session_id': SessionBottomSheetHelper.activeSubSessionId});
-        if (response.isSuccess) {
-          final data = response.body is Map<String, dynamic> ? response.body : {};
-          final int duration = data['sub_session']?['duration_used'] ?? 0;
-          session = ChatSession(id: _orchestrator.sessionId!, durationSeconds: duration, totalCost: 0.0);
-        }
-      } else {
-        session = await _endChatSessionUseCase.execute(_orchestrator.sessionId!);
-      }
+      // Unified endpoint: POST /chat/{sessionId}/end
+      // Backend auto-detects session_type (normal/prepaid) and settles billing accordingly
+      final session = await _endChatSessionUseCase.execute(_orchestrator.sessionId!);
       status.value = 'ended';
       timer?.cancel();
       ForegroundTaskService.stopService();

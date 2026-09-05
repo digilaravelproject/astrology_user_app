@@ -80,7 +80,8 @@ class AppUrls {
   static const String packageSessionEnd = '/user/packages/session/end';
   static const String packageSpawnChannel = '/user/packages/session/spawn-channel';
   static const String packageSwitchChannel = '/user/packages/session/switch-channel';
-  static const String packageTerminateChannel = '/user/packages/session/terminate-channel';
+  // Note: terminate-channel endpoint removed. Use /call/{id}/end or /chat/{id}/end instead.
+
   static const String packageHeartbeat = '/user/packages/session/heartbeat';
   static const String packageActiveBanner = '/user/packages/active-banner';
 
