@@ -1,5 +1,6 @@
 class LiveSessionModel {
   final int id;
+  final int? astrologerId;
   final String title;
   final String? description;
   final String sessionType;
@@ -14,6 +15,7 @@ class LiveSessionModel {
 
   LiveSessionModel({
     required this.id,
+    this.astrologerId,
     required this.title,
     this.description,
     required this.sessionType,
@@ -30,6 +32,7 @@ class LiveSessionModel {
   factory LiveSessionModel.fromJson(Map<String, dynamic> json) {
     return LiveSessionModel(
       id: json['id'],
+      astrologerId: json['astrologer_id'],
       title: json['title'] ?? '',
       description: json['description'],
       sessionType: json['session_type'] ?? 'public',

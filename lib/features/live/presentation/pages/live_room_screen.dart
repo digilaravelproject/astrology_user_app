@@ -1,3 +1,4 @@
+import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -93,8 +94,8 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     _liveController = Get.find<LiveController>();
 
     final initialSession = widget.allSessions.firstWhereOrNull((s) => s.id == widget.sessionId);
-    if (initialSession?.astrologer != null) {
-      _fetchAstrologerDetails(initialSession!.astrologer!.id);
+    if (initialSession?.astrologerId != null) {
+      _fetchAstrologerDetails(initialSession!.astrologerId!);
     }
 
     if (!Get.isRegistered<AstrologerController>()) {
@@ -779,7 +780,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             ),
                           );
                         }),
-                        _buildViewerCount(),
                       ],
                     ),
                   ),
@@ -990,10 +990,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   GestureDetector(
                     onTap: _toggleFollow,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _isFollowing.value ? Colors.white.withOpacity(0.2) : Colors.amber,
-                        borderRadius: BorderRadius.circular(12),
+                        color: _isFollowing.value ? Colors.grey : AppColors.deepPink,
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: _isFollowLoading.value
                           ? const SizedBox(
@@ -1002,9 +1002,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                               child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1.5),
                             )
                           : Text(
-                              _isFollowing.value ? 'Following' : 'Follow',
-                              style: TextStyle(
-                                color: _isFollowing.value ? Colors.white : Colors.black87,
+                              _isFollowing.value ? 'Following'.tr : 'Follow'.tr,
+                              style: const TextStyle(
+                                color: Colors.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1269,21 +1269,25 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Future<void> _toggleFollow() async {
     if (_isFollowLoading.value) return;
     
-    final astrologerId = _liveController.currentSession.value?.astrologer?.id;
+    final initialSession = widget.allSessions.firstWhereOrNull((s) => s.id == widget.sessionId);
+    final astrologerId = initialSession?.astrologerId ?? _liveController.currentSession.value?.astrologerId;
+    
     if (astrologerId == null || astrologerId == 0) return;
 
     try {
       _isFollowLoading.value = true;
       if (Get.isRegistered<AstrologerController>()) {
-        final result = await Get.find<AstrologerController>().followAstrologer(astrologerId);
+        final astroController = Get.find<AstrologerController>();
+        final result = await astroController.followAstrologer(astrologerId);
         if (result.isSuccess) {
           _isFollowing.value = !_isFollowing.value;
+          astroController.isFollowing.value = _isFollowing.value;
+        } else {
+          CustomSnackbar.showError(result.message);
         }
-      } else {
-        print('[LIVE] AstrologerController not registered');
       }
     } catch (e) {
-      print('[LIVE] Error toggling follow: $e');
+      debugPrint('[LIVE] Error toggling follow: $e');
     } finally {
       _isFollowLoading.value = false;
     }
