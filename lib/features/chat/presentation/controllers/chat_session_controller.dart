@@ -288,6 +288,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     if (subId == null) return;
     try {
       isLoading.value = true;
+      // Close UI immediately
       status.value = 'ended';
       timer?.cancel();
       ForegroundTaskService.stopService();
@@ -295,7 +296,15 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
       Get.back();
-    } catch (_) {} finally {
+      // Call backend API to actually terminate the chat channel
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'chat',
+        action: 'channel_only',
+      );
+    } catch (e) {
+      Logger.e('terminateChannelOnly error: $e');
+    } finally {
       isLoading.value = false;
     }
   }
@@ -308,6 +317,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     }
     try {
       isLoading.value = true;
+      // Close UI immediately
       status.value = 'ended';
       timer?.cancel();
       ForegroundTaskService.stopService();
@@ -315,7 +325,15 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
       Get.back();
-    } catch (_) {
+      // Call backend API to actually end the entire session
+      await PackageSessionService.terminateChannel(
+        subSessionId: subId,
+        channelType: 'chat',
+        action: 'complete_session',
+      );
+    } catch (e) {
+      Logger.e('terminateEntireSession error: $e');
+      // Fallback to regular end
       await endChatSession();
     } finally {
       isLoading.value = false;

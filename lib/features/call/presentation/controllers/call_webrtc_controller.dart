@@ -135,7 +135,10 @@ class CallWebRTCController extends GetxController {
         
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
-        if (wasCallScreenVisible) Get.back();
+        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+          if (Get.isDialogOpen ?? false) Get.back();
+          Get.back();
+        }
       }
     } catch (e) {
       _orchestrator.session.cleanUp();
@@ -158,7 +161,10 @@ class CallWebRTCController extends GetxController {
 
       final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
-      if (wasVisible) Get.back();
+      if (wasVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back();
+      }
 
       if (chatSessId > 0) {
         Get.to(
@@ -192,7 +198,10 @@ class CallWebRTCController extends GetxController {
       _orchestrator.status.value = 'completed';
       final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
-      if (wasVisible) Get.back();
+      if (wasVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back();
+      }
     } catch (e) {
       await endCall();
     }

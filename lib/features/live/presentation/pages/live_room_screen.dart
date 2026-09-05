@@ -850,6 +850,26 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             }),
           ),
           
+          // Navigation buttons (Left and Right)
+          if (_currentIndex > 0)
+            Positioned(
+              left: 10,
+              top: MediaQuery.of(context).size.height / 2 - 20,
+              child: _buildNavButton(
+                icon: Icons.chevron_left,
+                onTap: _goToPrevSession,
+              ),
+            ),
+          if (_currentIndex < widget.allSessions.length - 1)
+            Positioned(
+              right: 10,
+              top: MediaQuery.of(context).size.height / 2 - 20,
+              child: _buildNavButton(
+                icon: Icons.chevron_right,
+                onTap: _goToNextSession,
+              ),
+            ),
+
           // Live Session Ended Overlay
           Positioned.fill(
             child: Obx(() {
@@ -1264,6 +1284,21 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         _followerCount.value = astrologerDetails.totalOrders ?? 0;
       }
     }
+  }
+
+  Widget _buildNavButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: const BoxDecoration(
+          color: Colors.black45,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: Colors.white, size: 32),
+      ),
+    );
   }
 
   Future<void> _toggleFollow() async {

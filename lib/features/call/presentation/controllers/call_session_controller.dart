@@ -156,9 +156,12 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (wasCallScreenVisible) Get.back();
-    });
+    if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      Get.back(); // Pop the call screen
+    }
   }
 
   void handlePackageTerminated() {

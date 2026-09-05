@@ -32,7 +32,7 @@ class LiveSessionModel {
   factory LiveSessionModel.fromJson(Map<String, dynamic> json) {
     return LiveSessionModel(
       id: json['id'],
-      astrologerId: json['astrologer_id'],
+      astrologerId: json['astrologer_id'] ?? json['astrologer']?['id'],
       title: json['title'] ?? '',
       description: json['description'],
       sessionType: json['session_type'] ?? 'public',
