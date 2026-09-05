@@ -24,12 +24,16 @@ class LiveRoomScreen extends StatefulWidget {
   final int sessionId;
   final String astrologerName;
   final String astrologerImage;
+  final List<LiveSessionModel> allSessions;
+  final int initialIndex;
 
   const LiveRoomScreen({
     super.key,
     required this.sessionId,
     this.astrologerName = "Priya Sharma",
     this.astrologerImage = "",
+    this.allSessions = const [],
+    this.initialIndex = 0,
   });
 
   @override
@@ -38,6 +42,9 @@ class LiveRoomScreen extends StatefulWidget {
 
 class _LiveRoomScreenState extends State<LiveRoomScreen> {
   late LiveController _liveController;
+  final RxBool _isFollowing = false.obs;
+  final RxBool _isFollowLoading = false.obs;
+  final RxInt _followerCount = 0.obs;
   late final AstrologerController _giftController;
   
   final List<Widget> _reactions = [];
@@ -50,6 +57,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   Worker? _sessionWorker;
   Worker? _mediaWorker;
   bool _isSpeakerMuted = false;
+
+  // Navigation between live sessions
+  late int _currentIndex;
+
 
 
   void _toggleSpeakerMute() async {
@@ -78,7 +89,14 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex;
     _liveController = Get.find<LiveController>();
+
+    final initialSession = widget.allSessions.firstWhereOrNull((s) => s.id == widget.sessionId);
+    if (initialSession?.astrologer != null) {
+      _fetchAstrologerDetails(initialSession!.astrologer!.id);
+    }
+
     if (!Get.isRegistered<AstrologerController>()) {
       AstrologersBinding().dependencies();
     }
@@ -112,6 +130,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       }
     });
 
+    // Automatically trigger animation for new superchats
+    ever(_liveController.comments, (List<LiveCommentModel> currentComments) {
+      if (currentComments.isNotEmpty) {
+        final lastComment = currentComments.last;
+        // Check if the latest comment is a super chat (has giftIconUrl)
+        if (lastComment.giftIconUrl != null) {
+          _addReaction(lastComment.giftIconUrl);
+        }
+      }
+    });
     _mediaWorker = ever(_liveController.isAudioOn, (isAudioOn) async {
       final room = _room;
       if (room == null) return;
@@ -454,10 +482,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
-  void _addReaction() {
+  void _addReaction([String? imageUrl]) {
     setState(() {
       _reactions.add(
-        const FloatingReaction(),
+        FloatingReaction(imageUrl: imageUrl, key: UniqueKey()),
       );
     });
     Timer(const Duration(seconds: 3), () {
@@ -469,12 +497,53 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
   }
 
+  void _navigateToSession(int newIndex) {
+    if (widget.allSessions.isEmpty) return;
+    if (newIndex < 0 || newIndex >= widget.allSessions.length) return;
+    final session = widget.allSessions[newIndex];
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => LiveRoomScreen(
+          sessionId: session.id,
+          astrologerName: session.astrologer?.name ?? 'Astrologer',
+          astrologerImage: session.astrologer?.profilePhoto ?? '',
+          allSessions: widget.allSessions,
+          initialIndex: newIndex,
+        ),
+        transitionsBuilder: (_, animation, __, child) {
+          final isGoingRight = newIndex > _currentIndex;
+          final tween = Tween<Offset>(
+            begin: Offset(isGoingRight ? 1.0 : -1.0, 0),
+            end: Offset.zero,
+          ).chain(CurveTween(curve: Curves.easeInOut));
+          return SlideTransition(position: animation.drive(tween), child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    );
+  }
+
+  void _goToPrevSession() => _navigateToSession(_currentIndex - 1);
+  void _goToNextSession() => _navigateToSession(_currentIndex + 1);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
+    return GestureDetector(
+      onHorizontalDragEnd: (details) {
+        final velocity = details.primaryVelocity ?? 0;
+        if (velocity < -300) {
+          // Swipe Left → next session
+          _goToNextSession();
+        } else if (velocity > 300) {
+          // Swipe Right → prev session
+          _goToPrevSession();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
           // 1. Live camera stream backdrop / video player
           Positioned.fill(
             child: Obx(() {
@@ -497,41 +566,111 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                       ? rawImage
                                       : '${AppUrls.baseImageUrl}$rawImage')
                                   : '';
-                              return CustomImageWidget(
-                                imagePath: image.isNotEmpty ? image : "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop", 
-                                fit: BoxFit.cover,
-                              );
+                              
+                              if (image.isNotEmpty) {
+                                return CustomImageWidget(
+                                  imagePath: image, 
+                                  fit: BoxFit.cover,
+                                );
+                              } else {
+                                return Container(
+                                  color: AppColors.deepPink.withOpacity(0.15),
+                                  child: Center(
+                                    child: Text(
+                                      widget.astrologerName.isNotEmpty ? widget.astrologerName.substring(0, 1).toUpperCase() : 'A',
+                                      style: TextStyle(
+                                        fontSize: 120,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.deepPink.withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
                             }),
                           ),
                   ),
                   
                   if (!isCameraOn)
                     Positioned.fill(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                        child: Container(
-                          color: Colors.black.withOpacity(0.4),
-                          child: Center(
-                            child: Obx(() {
-                              final session = _liveController.currentSession.value;
-                              final isEnded = session?.status == 'completed';
-                              if (isEnded) return const SizedBox.shrink();
-                              
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.videocam_off, color: Colors.white70, size: 64),
-                                  const SizedBox(height: 12),
-                                  Text("Camera is Stopped".tr,
-                                    style: TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold),
+                      child: Obx(() {
+                        final currentSession = _liveController.currentSession.value;
+                        final rawImage = currentSession?.astrologer?.profilePhoto ?? widget.astrologerImage;
+                        final image = rawImage.isNotEmpty
+                            ? (rawImage.startsWith('http') ? rawImage : '${AppUrls.baseImageUrl}$rawImage')
+                            : '';
+                        final session = currentSession;
+                        final isEnded = session?.status == 'completed';
+
+                        return Stack(
+                          children: [
+                            // Background: image or letter
+                            Positioned.fill(
+                              child: image.isNotEmpty
+                                  ? Stack(
+                                      children: [
+                                        CustomImageWidget(imagePath: image, fit: BoxFit.cover),
+                                        BackdropFilter(
+                                          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                          child: Container(color: Colors.black.withOpacity(0.5)),
+                                        ),
+                                      ],
+                                    )
+                                  : Container(
+                                      color: AppColors.deepPink.withOpacity(0.12),
+                                      child: Center(
+                                        child: Text(
+                                          widget.astrologerName.isNotEmpty
+                                              ? widget.astrologerName.substring(0, 1).toUpperCase()
+                                              : '',
+                                          style: TextStyle(
+                                            fontSize: 160,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.deepPink.withOpacity(0.3),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                            // Camera off indicator
+                            if (!isEnded)
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.55),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: Colors.white.withOpacity(0.15)),
                                   ),
-                                ],
-                              );
-                            }),
-                        ),
-                      ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.15),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.videocam_off_rounded, color: Colors.white, size: 32),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "Camera is Stopped".tr,
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.9),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        );
+                      }),
                     ),
-                  ),
 
 
                 ],
@@ -563,6 +702,49 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
             }),
           ),
 
+          // Mic muted indicator — shown when audio off but camera is still on
+          Positioned(
+            top: 0, bottom: 0, left: 0, right: 0,
+            child: Obx(() {
+              final isAudioOn = _liveController.isAudioOn.value;
+              final isCameraOn = _liveController.isCameraOn.value;
+              if (isAudioOn || !isCameraOn) return const SizedBox.shrink();
+              return Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.55),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.15)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.15),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.mic_off_rounded, color: Colors.amber, size: 32),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Astrologer's Mic is Mute",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ),
+
           Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: true,
@@ -576,41 +758,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       children: [
                         _buildCircleActionIcon(Icons.arrow_back, () => Navigator.pop(context)),
                         const SizedBox(width: 8),
-                        Flexible(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildAstrologerAvatar(),
-                                const SizedBox(width: 8),
-                                Flexible(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Flexible(
-                                        child: Obx(() => AppText(
-                                          _liveController.currentSession.value?.astrologer?.name ?? widget.astrologerName,
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          overflow: TextOverflow.ellipsis,
-                                        )),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      const Icon(Icons.verified, color: Colors.blue, size: 14),
-                                      const SizedBox(width: 4),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        _buildAstrologerInfoPanel(),
                         const Spacer(),
                         Obx(() {
                           final session = _liveController.currentSession.value;
@@ -737,6 +885,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -754,7 +903,124 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     );
   }
 
-  Widget _buildAstrologerAvatar() {
+
+  Widget _buildAstrologerInfoPanel() {
+    return Obx(() {
+      final session = _liveController.currentSession.value;
+      final astrologer = session?.astrologer;
+      final name = astrologer?.name ?? widget.astrologerName;
+      final followers = _followerCount.value;
+      final liveCount = session?.viewerCount ?? 0;
+
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Avatar with LIVE badge
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              _buildAstrologerAvatar(size: 40),
+              Positioned(
+                bottom: -4,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'LIVE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 10),
+          // Name and Stats/Button
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name.isNotEmpty ? (name.length > 15 ? '${name.substring(0, 15)}...' : name) : 'Astrologer',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      shadows: [
+                        Shadow(color: Colors.black54, blurRadius: 2, offset: Offset(0, 1))
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.verified, color: Colors.blue, size: 14),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.remove_red_eye_outlined, color: Colors.white, size: 12),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$liveCount',
+                    style: const TextStyle(color: Colors.white, fontSize: 12, shadows: [Shadow(color: Colors.black54, blurRadius: 2, offset: Offset(0, 1))]),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(Icons.person, color: Colors.white, size: 12),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$followers',
+                    style: const TextStyle(color: Colors.white, fontSize: 12, shadows: [Shadow(color: Colors.black54, blurRadius: 2, offset: Offset(0, 1))]),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: _toggleFollow,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _isFollowing.value ? Colors.white.withOpacity(0.2) : Colors.amber,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: _isFollowLoading.value
+                          ? const SizedBox(
+                              width: 10,
+                              height: 10,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1.5),
+                            )
+                          : Text(
+                              _isFollowing.value ? 'Following' : 'Follow',
+                              style: TextStyle(
+                                color: _isFollowing.value ? Colors.white : Colors.black87,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildAstrologerAvatar({double size = 32}) {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
@@ -769,7 +1035,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
           return CircleAvatar(
             radius: 17,
             backgroundImage: image.isNotEmpty ? NetworkImage(image) : null,
-            child: image.isEmpty ? const Icon(Icons.person, color: Colors.white) : null,
+            child: image.isEmpty 
+              ? Text(
+                  widget.astrologerName.isNotEmpty ? widget.astrologerName.substring(0, 1).toUpperCase() : '',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                ) 
+              : null,
           );
         }),
         Container(
@@ -839,15 +1110,15 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       width: 24,
                       height: 24,
                       color: Colors.grey.shade800,
-                      child: avatarUrl != null
-                          ? CachedNetworkImage(
-                              imageUrl: avatarUrl,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const Icon(Icons.person, size: 12, color: Colors.white),
-                              errorWidget: (context, url, error) => const Icon(Icons.person, size: 12, color: Colors.white),
-                            )
-                          : const Icon(Icons.person, size: 12, color: Colors.white),
-                    ),
+                          child: avatarUrl != null
+                              ? CachedNetworkImage(
+                                  imageUrl: avatarUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Center(child: Text(comment.userName.isNotEmpty ? comment.userName.substring(0, 1).toUpperCase() : '', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+                                  errorWidget: (context, url, error) => Center(child: Text(comment.userName.isNotEmpty ? comment.userName.substring(0, 1).toUpperCase() : '', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+                                )
+                              : Center(child: Text(comment.userName.isNotEmpty ? comment.userName.substring(0, 1).toUpperCase() : '', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))),
+                        ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -982,10 +1253,47 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       ),
     );
   }
+
+
+  Future<void> _fetchAstrologerDetails(int id) async {
+    if (Get.isRegistered<AstrologerController>()) {
+      final astroController = Get.find<AstrologerController>();
+      final astrologerDetails = await astroController.fetchAstrologerById(id);
+      if (astrologerDetails != null) {
+        _isFollowing.value = astrologerDetails.isFollowed;
+        _followerCount.value = astrologerDetails.totalOrders ?? 0;
+      }
+    }
+  }
+
+  Future<void> _toggleFollow() async {
+    if (_isFollowLoading.value) return;
+    
+    final astrologerId = _liveController.currentSession.value?.astrologer?.id;
+    if (astrologerId == null || astrologerId == 0) return;
+
+    try {
+      _isFollowLoading.value = true;
+      if (Get.isRegistered<AstrologerController>()) {
+        final result = await Get.find<AstrologerController>().followAstrologer(astrologerId);
+        if (result.isSuccess) {
+          _isFollowing.value = !_isFollowing.value;
+        }
+      } else {
+        print('[LIVE] AstrologerController not registered');
+      }
+    } catch (e) {
+      print('[LIVE] Error toggling follow: $e');
+    } finally {
+      _isFollowLoading.value = false;
+    }
+  }
+
 }
 
 class FloatingReaction extends StatefulWidget {
-  const FloatingReaction({super.key});
+  final String? imageUrl;
+  const FloatingReaction({super.key, this.imageUrl});
 
   @override
   State<FloatingReaction> createState() => _FloatingReactionState();
@@ -1032,7 +1340,15 @@ class _FloatingReactionState extends State<FloatingReaction> with SingleTickerPr
             opacity: opacity,
             child: Transform.scale(
               scale: scale,
-              child: const Icon(Icons.favorite, color: Colors.red, size: 24),
+              child: widget.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: widget.imageUrl!,
+                      width: 40,
+                      height: 40,
+                      placeholder: (context, url) => const Icon(Icons.card_giftcard, color: Colors.orange, size: 32),
+                      errorWidget: (context, url, error) => const Icon(Icons.card_giftcard, color: Colors.orange, size: 32),
+                    )
+                  : const Icon(Icons.favorite, color: Colors.red, size: 24),
             ),
           ),
         );

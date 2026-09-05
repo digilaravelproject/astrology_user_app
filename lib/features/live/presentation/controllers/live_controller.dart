@@ -63,6 +63,18 @@ class LiveController extends GetxController {
     }
   }
 
+  void updateActiveSessionsFromEvent(dynamic rawData) {
+    try {
+      if (rawData != null && rawData['active_sessions'] is List) {
+        final List<dynamic> data = rawData['active_sessions'];
+        activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        print('[LIVE] Updated active live sessions from WS event. Count: ${activeSessions.length}');
+      }
+    } catch (e) {
+      print('[LIVE] Error updating active sessions from WS event: $e');
+    }
+  }
+
   Future<void> fetchSessionDetail(int id) async {
     try {
       isLoadingDetail.value = true;

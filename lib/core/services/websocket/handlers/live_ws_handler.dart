@@ -322,8 +322,15 @@ class LiveWsHandler {
 
   static void handleActiveLiveSessionsUpdated(dynamic rawData) {
     try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
       if (Get.isRegistered<LiveController>()) {
-        Get.find<LiveController>().fetchActiveSessions();
+        Get.find<LiveController>().updateActiveSessionsFromEvent(eventData);
       }
     } catch (e) {
       Logger.e('LiveWsHandler: error handling ActiveLiveSessionsUpdated -> $e');

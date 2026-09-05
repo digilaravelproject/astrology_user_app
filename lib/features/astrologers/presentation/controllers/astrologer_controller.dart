@@ -21,6 +21,7 @@ import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_
 import '../../../../core/services/network/response_model.dart';
 import '../../../../core/utils/custom_snackbar.dart';
 import 'package:flutter/material.dart';
+import 'package:astro_user/core/services/websocket/websocket_state.dart';
 
 class AstrologerController extends GetxController {
   final GetAstrologersUseCase _getAstrologersUseCase;
@@ -117,6 +118,41 @@ class AstrologerController extends GetxController {
     
     // Setup debouncer for search
     debounce(searchQuery, (_) => fetchAstrologers(isRefresh: true), time: const Duration(milliseconds: 500));
+    
+    // Listen to real-time availability updates
+    _setupAvailabilityListener();
+  }
+
+  void _setupAvailabilityListener() {
+    WebSocketState.astrologerAvailabilityEvent.stream.listen((eventData) {
+      final int? astrologerId = eventData['astrologer_id'] ?? eventData['id'];
+      if (astrologerId == null) return;
+
+      final bool isOnline = eventData['is_online'] ?? eventData['status'] == 'Online';
+      final bool isBusy = eventData['is_busy'] ?? false;
+      final bool isChatEnabled = eventData['is_chat_enabled'] ?? eventData['chat_enabled'] ?? false;
+      final bool isCallEnabled = eventData['is_call_enabled'] ?? eventData['call_enabled'] ?? false;
+      final bool isVideoCallEnabled = eventData['is_video_call_enabled'] ?? eventData['video_call_enabled'] ?? false;
+      
+      void updateList(RxList<AstrologerModel> list) {
+        final int index = list.indexWhere((a) => a.id == astrologerId);
+        if (index != -1) {
+          final astrologer = list[index];
+          list[index] = astrologer.copyWith(
+            isOnline: isOnline,
+            isBusy: isBusy,
+            isChatEnabled: isChatEnabled,
+            isCallEnabled: isCallEnabled,
+            isVideoCallEnabled: isVideoCallEnabled,
+          );
+        }
+      }
+
+      updateList(astrologers);
+      updateList(filteredAstrologers);
+      updateList(topAstrologers);
+      updateList(searchResults);
+    });
   }
 
   Future<void> fetchTopAstrologers({String? serviceType}) async {

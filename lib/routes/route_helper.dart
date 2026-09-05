@@ -292,6 +292,7 @@ class RouteHelper {
           astrologerImage: args['astrologerImage'] ?? '',
           sessionId: args['sessionId'] ?? 0,
           initialStatus: args['initialStatus'] ?? 'ongoing',
+          startedAtString: args['startedAtString'],
           isPackageChat: args['isPackageChat'] ?? false,
         );
       },

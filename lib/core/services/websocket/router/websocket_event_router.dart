@@ -56,13 +56,18 @@ class WebSocketEventRouter {
         event == 'App\\Events\\${AppUrls.eventLiveSessionStarted}' ||
         event == '.${AppUrls.eventLiveSessionStarted}') {
       LiveWsHandler.handleLiveSessionStarted(data);
+      // Also update the active sessions list from this event (fallback)
+      LiveWsHandler.handleActiveLiveSessionsUpdated(data);
     } else if (event == AppUrls.eventActiveLiveSessionsUpdated ||
-        event == 'App\\Events\\${AppUrls.eventActiveLiveSessionsUpdated}') {
+        event == 'App\\Events\\${AppUrls.eventActiveLiveSessionsUpdated}' ||
+        event == '.${AppUrls.eventActiveLiveSessionsUpdated}') {
       LiveWsHandler.handleActiveLiveSessionsUpdated(data);
     } else if (event == AppUrls.eventLiveSessionEnded ||
         event == 'App\\Events\\${AppUrls.eventLiveSessionEnded}' ||
         event == '.${AppUrls.eventLiveSessionEnded}') {
       LiveWsHandler.handleLiveSessionEnded(data);
+      // Also update the active sessions list from this event (fallback)
+      LiveWsHandler.handleActiveLiveSessionsUpdated(data);
     } else if (event == AppUrls.eventAstrologerBroadcastStarted ||
         event == 'App\\Events\\${AppUrls.eventAstrologerBroadcastStarted}' ||
         event == '.${AppUrls.eventAstrologerBroadcastStarted}') {

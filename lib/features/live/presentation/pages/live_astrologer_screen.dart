@@ -133,6 +133,8 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
                             sessionId: session.id,
                             astrologerName: session.astrologer?.name ?? 'Astrologer',
                             astrologerImage: session.astrologer?.profilePhoto ?? '',
+                            allSessions: _controller.activeSessions.toList(),
+                            initialIndex: index,
                           ),
                         ),
                       ),
@@ -311,15 +313,41 @@ class _LiveAstrologerScreenState extends State<LiveAstrologerScreen> {
         borderRadius: BorderRadius.circular(24),
         child: Stack(
           children: [
-            CustomImageWidget(
-              imagePath: (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
-                  ? (session.astrologer!.profilePhoto!.startsWith('http')
-                      ? session.astrologer!.profilePhoto!
-                      : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
-                  : '',
-              height: double.infinity,
-              width: double.infinity,
-              fit: BoxFit.cover,
+            Builder(
+              builder: (context) {
+                final imageUrl = (session.astrologer?.profilePhoto != null && session.astrologer!.profilePhoto!.isNotEmpty)
+                    ? (session.astrologer!.profilePhoto!.startsWith('http')
+                        ? session.astrologer!.profilePhoto!
+                        : '${AppUrls.baseImageUrl}${session.astrologer!.profilePhoto}')
+                    : '';
+
+                if (imageUrl.isNotEmpty) {
+                  return CustomImageWidget(
+                    imagePath: imageUrl,
+                    height: double.infinity,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  );
+                } else {
+                  return Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    color: AppColors.deepPink.withOpacity(0.15),
+                    child: Center(
+                      child: Text(
+                        (session.astrologer?.name?.isNotEmpty ?? false)
+                            ? session.astrologer!.name!.substring(0, 1).toUpperCase()
+                            : '',
+                        style: TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.deepPink.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
             Container(
               decoration: BoxDecoration(

@@ -87,7 +87,26 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
         final ctx = Get.context;
         if (ctx != null) minimizeToBubble(ctx, _orchestrator.astrologerName!, "", shouldPop: false);
       }
+    } else if (state == AppLifecycleState.resumed) {
+      _checkPendingChatSession();
     }
+  }
+
+  Future<void> _checkPendingChatSession() async {
+    try {
+      final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession, handleError: false, showErrorScreen: false);
+      if (!response.isSuccess) return;
+
+      final body = response.body;
+      final sessionData = body is Map ? (body['session'] ?? body['data']?['session'] ?? body['data']) : null;
+      final String sessionStatus = sessionData != null ? (sessionData['status']?.toString() ?? '') : '';
+
+      if (sessionData == null || (sessionStatus != 'initiated' && sessionStatus != 'ongoing')) {
+        if (_orchestrator.sessionId != null && (status.value == 'ongoing' || status.value == 'initiated')) {
+          handleChatEndedByPeer();
+        }
+      }
+    } catch (_) {}
   }
 
   void setupSessionListeners() {
@@ -129,14 +148,9 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
           if (newStatus == 'ongoing' || newStatus == 'accepted') {
             stopRingtone();
             final startedAtStr = WebSocketService.sessionStartTimes[sid];
-            DateTime? serverStartTime;
-            if (startedAtStr != null && startedAtStr.isNotEmpty) {
-              String isoUtc = startedAtStr.trim().replaceAll(' ', 'T');
-              if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) isoUtc += 'Z';
-              serverStartTime = DateTime.tryParse(isoUtc)?.toLocal();
-            }
+            final serverStartTime = parseSmartDate(startedAtStr);
             final effectiveStart = serverStartTime ?? DateTime.now();
-            startedAt = effectiveStart.toIso8601String();
+            startedAt = effectiveStart.toUtc().toIso8601String();
             WebSocketService.sessionStartTimes[sid] = startedAt!;
             final diff = DateTime.now().difference(effectiveStart).inSeconds;
             elapsedSeconds.value = diff >= 0 ? diff : 0;

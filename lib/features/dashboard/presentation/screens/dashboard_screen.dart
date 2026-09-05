@@ -11,6 +11,7 @@ import 'package:astro_user/features/matrimony/presentation/screens/matrimony_scr
 import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:astro_user/core/widgets/custom_bottom_nav_bar.dart';
 import 'package:astro_user/features/matrimony/presentation/controllers/matrimony_controller.dart';
+import 'package:astro_user/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -135,15 +136,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               startedAt: startedAt,
               onTap: () {
                 final currentStatus = FloatingChatBubble.chatStatus.value;
-                Get.to(
-                      () => ChatScreen(
-                    astrologerName: name,
-                    astrologerImage: '',
-                    sessionId: sessionId,
-                    initialStatus: currentStatus,
-                    startedAtString: startedAt,
-                  ),
-                  binding: ChatBinding(),
+                Get.toNamed(
+                  AppRoutes.chatScreen,
+                  arguments: {
+                    'astrologerName': name,
+                    'astrologerImage': '',
+                    'sessionId': sessionId,
+                    'initialStatus': currentStatus,
+                    'startedAtString': startedAt,
+                  },
                 );
               }
           );

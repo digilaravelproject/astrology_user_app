@@ -643,7 +643,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                             child: Text(
                               widget.astrologerName.isNotEmpty
                                   ? widget.astrologerName.substring(0, 1).toUpperCase()
-                                  : 'A',
+                                  : '',
                               style: TextStyle(
                                 fontSize: 44,
                                 fontWeight: FontWeight.bold,
@@ -656,7 +656,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                           child: Text(
                             widget.astrologerName.isNotEmpty
                                 ? widget.astrologerName.substring(0, 1).toUpperCase()
-                                : 'A',
+                                : '',
                             style: TextStyle(
                               fontSize: 44,
                               fontWeight: FontWeight.bold,

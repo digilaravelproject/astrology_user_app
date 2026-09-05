@@ -367,6 +367,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
       AppUrls.privateUserChannel(_userId!),
       AppUrls.presenceRoomChannel,
       'astrologers',
+      'live-sessions',
       ..._subscribedChannels,
     };
 

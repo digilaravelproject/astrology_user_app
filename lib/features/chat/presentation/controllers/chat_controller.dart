@@ -75,10 +75,15 @@ class ChatController extends GetxController {
 
     WebSocketService.activeSessionId = sessionId;
 
+    final effectiveStart = startedAtString != null ? session.parseSmartDate(startedAtString) : null;
+    final startTime = effectiveStart ?? DateTime.now();
+    WebSocketService.sessionStartTimes[sessionId] = startTime.toUtc().toIso8601String();
+    ForegroundTaskService.startActiveSessionNotification(title: 'Active Chat'.tr, type: 'Chat', startedAt: startTime);
+
     messaging.loadHistory();
     session.setupTimer(startedAtString);
 
-    final startedAtStr = startedAtString ?? WebSocketService.sessionStartTimes[sessionId];
+    final startedAtStr = WebSocketService.sessionStartTimes[sessionId];
     int? startedAtMillis;
     if (startedAtStr != null) {
       final startedAt = DateTime.tryParse(startedAtStr);

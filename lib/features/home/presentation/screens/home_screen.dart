@@ -317,14 +317,14 @@ class _HomeScreenState extends State<HomeScreen> {
             startedAt: startedAt,
             onTap: () {
               final currentStatus = FloatingChatBubble.chatStatus.value;
-              Get.to(
-                () => ChatScreen(
-                  astrologerName: name,
-                  astrologerImage: '',
-                  sessionId: sessionId,
-                  initialStatus: currentStatus,
-                ),
-                binding: ChatBinding(),
+              Get.toNamed(
+                AppRoutes.chatScreen,
+                arguments: {
+                  'astrologerName': name,
+                  'astrologerImage': '',
+                  'sessionId': sessionId,
+                  'initialStatus': currentStatus,
+                },
               );
             },
           );
