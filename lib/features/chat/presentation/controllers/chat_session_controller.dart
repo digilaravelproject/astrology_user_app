@@ -295,6 +295,9 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
       Get.back();
+      if (_orchestrator.sessionId != null) {
+        WebSocketService.sessionStatusUpdates[_orchestrator.sessionId!] = 'ended';
+      }
       // Call unified end endpoint — backend detects session_type (normal/prepaid) automatically
       await Get.find<ApiClient>().post(
         AppUrls.endChatSession(_orchestrator.sessionId!),
@@ -331,6 +334,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     } catch (_) {} finally {
       LocalNotificationService.cancelOngoingChatNotification(targetId);
       FloatingChatBubble.dismiss();
+      WebSocketService.sessionStatusUpdates[targetId] = 'ended';
     }
   }
 
@@ -347,6 +351,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
       FloatingChatBubble.dismiss();
       if (session != null) WebSocketService.activeSessionId = null;
+      WebSocketService.sessionStatusUpdates[_orchestrator.sessionId!] = 'ended';
     } catch (e) {
       CustomSnackbar.showError(e.toString());
     } finally {
