@@ -145,6 +145,7 @@ flutter:
     - assets/images/bubble_img.png
     - assets/images/live_session_bg.png
     - assets/images/services/
+    - assets/images/splash_logo.gif
     - assets/language/
     - assets/translations/
   # To add assets to your application, add an assets section, like this:

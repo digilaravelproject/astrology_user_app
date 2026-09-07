@@ -49,49 +49,113 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            CosmicBackground(),
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0xFF5A0010), // Rich dark maroon
+                Color(0xFF140003), // Very dark deep red/black
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              const CosmicBackground(opacity: 0.1),
 
+              SafeArea(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 1500),
+                        curve: Curves.easeOutBack,
+                        builder: (context, entryValue, child) {
+                          final opacity = entryValue.clamp(0.0, 1.0);
 
-            SafeArea(
-              child: Center(
-                child: TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: 1),
-                  duration: const Duration(milliseconds: 1200),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, entryValue, child) {
-                    final opacity = entryValue.clamp(0.0, 1.0);
-
-                    return AnimatedBuilder(
-                      animation: _floatAnimation,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(
-                            0,
-                            (-30 * (1 - entryValue)) +
-                                (entryValue >= 0.99 ? _floatAnimation.value : 0),
-                          ),
-                          child: Opacity(
-                            opacity: opacity,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(24),
-                              child: Image.asset(
-                                ImageConstants.app_Logo, // Apna logo/image
-                                width: 220,
-                                height: 220,
-                                fit: BoxFit.contain,
+                          return AnimatedBuilder(
+                            animation: _floatAnimation,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(
+                                  0,
+                                  (-40 * (1 - entryValue)) +
+                                      (entryValue >= 0.99 ? _floatAnimation.value : 0),
+                                ),
+                                child: Transform.scale(
+                                  scale: 0.8 + (0.2 * entryValue),
+                                  child: Opacity(
+                                    opacity: opacity,
+                                    child: Container(
+                                      width: 260,
+                                      height: 260,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: const Color(0xFFFFD700).withOpacity(0.5),
+                                          width: 2,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFFFFD700).withOpacity(0.3),
+                                            blurRadius: 60,
+                                            spreadRadius: 10,
+                                          ),
+                                          BoxShadow(
+                                            color: const Color(0xFFD84315).withOpacity(0.4),
+                                            blurRadius: 30,
+                                            spreadRadius: 5,
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          'assets/images/splash_logo.gif',
+                                          width: 260,
+                                          height: 260,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 40),
+                      // Animated Text below the logo
+                      TweenAnimationBuilder<double>(
+                        tween: Tween<double>(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 1200),
+                        curve: Curves.easeIn,
+                        builder: (context, value, child) {
+                          return Opacity(
+                            opacity: value,
+                            child: Transform.translate(
+                              offset: Offset(0, 20 * (1 - value)),
+                              child: AppText(
+                                "Awaken Your Stars",
+                                style: GoogleFonts.dmSerifDisplay(
+                                  fontSize: 28,
+                                  color: const Color(0xFFFFD700),
+                                  letterSpacing: 1.5,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
             /*SafeArea(
               child: Column(
@@ -218,8 +282,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSplashCard({
     required BuildContext context,
