@@ -141,7 +141,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             child: Transform.translate(
                               offset: Offset(0, 20 * (1 - value)),
                               child: AppText(
-                                "Awaken Your Stars",
+                                AppStrings.appName,
                                 style: GoogleFonts.dmSerifDisplay(
                                   fontSize: 28,
                                   color: const Color(0xFFFFD700),

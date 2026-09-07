@@ -565,4 +565,9 @@ class ApiClient {
       return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
     }
   }
+
+  Future<void> clearCache() async {
+    _lastWatchTimestamp = null;
+    _lastWatchResponse = null;
+  }
 }

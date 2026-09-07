@@ -10,6 +10,9 @@ import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'response_model.dart';
 import 'package:astro_user/core/widgets/error_screen.dart';
+import 'package:astro_user/core/services/fcm_notification_service.dart' as astro_fcm;
+import 'package:astro_user/core/services/websocket/websocket_service.dart' as astro_ws;
+import 'package:astro_user/core/services/network/api_client.dart';
 
 class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
@@ -454,8 +457,29 @@ class ApiChecker {
     );
   }
 
-  static void _logout() {
-    SharedPrefs.remove(AppConstants.userData);
+  static void _logout() async {
+    try {
+      if (getx.Get.isRegistered<astro_fcm.FCMNotificationService>()) {
+        await astro_fcm.FCMNotificationService.removeDeviceToken();
+      } else {
+        // Since FCMNotificationService uses static methods
+        await astro_fcm.FCMNotificationService.removeDeviceToken();
+      }
+    } catch (_) {}
+
+    try {
+      if (getx.Get.isRegistered<astro_ws.WebSocketService>()) {
+        getx.Get.find<astro_ws.WebSocketService>().disconnect();
+      }
+    } catch (_) {}
+
+    try {
+      if (getx.Get.isRegistered<ApiClient>()) {
+        await getx.Get.find<ApiClient>().clearCache();
+      }
+    } catch (_) {}
+
+    await SharedPrefs.clear();
     SharedPrefs.setBool(AppConstants.isLoggedIn, false);
     TokenManager.clearToken();
     getx.Get.offAllNamed(RouteHelper.getLoginRoute());
