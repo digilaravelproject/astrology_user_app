@@ -25,19 +25,7 @@ class FCMNotificationService {
   // ─────────────────────────────────────────────────────
 
   static Future<void> initialize() async {
-    // 1. Request Notification Permission
-    _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: false,
-      provisional: false,
-    ).then((settings) {
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        debugPrint('User granted notification permission');
-      } else {
-        debugPrint('User declined notification permission');
-      }
-    });
+    // 1. Notification Permission is now requested in PermissionScreen
 
     // 2. Get & Register Device Token
     try {

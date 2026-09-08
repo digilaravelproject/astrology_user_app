@@ -38,6 +38,17 @@ class ApiClient {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
+        if (ApiChecker.isLoggingOut) {
+          Logger.w('|🚫 Request blocked: App is logging out (${options.path})');
+          return handler.reject(
+            DioException(
+              requestOptions: options,
+              type: DioExceptionType.cancel,
+              error: 'Request blocked due to logout in progress',
+            ),
+          );
+        }
+
         String token = '';
         if (options.headers['no_auth'] == true) {
           options.headers.remove('no_auth');
@@ -148,12 +159,18 @@ class ApiClient {
         final isLastAttempt = attempt == maxRetries;
         
         bool is429 = false;
-        if (e is DioException && e.response?.statusCode == 429) {
-          is429 = true;
+        bool is401 = false;
+        bool isCancel = false;
+        if (e is DioException) {
+          if (e.response?.statusCode == 429) is429 = true;
+          if (e.response?.statusCode == 401) is401 = true;
+          if (e.type == DioExceptionType.cancel) isCancel = true;
         }
 
-        if (isLastAttempt) {
-          Logger.e('|❌ Max retries reached for GET: $path. Error: $e');
+        if (isLastAttempt || is401 || isCancel) {
+          if (!is401 && !isCancel) {
+            Logger.e('|❌ Max retries reached for GET: $path. Error: $e');
+          }
           return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
         }
 
@@ -227,12 +244,18 @@ class ApiClient {
         final isLastAttempt = attempt == maxRetries;
         
         bool is429 = false;
-        if (e is DioException && e.response?.statusCode == 429) {
-          is429 = true;
+        bool is401 = false;
+        bool isCancel = false;
+        if (e is DioException) {
+          if (e.response?.statusCode == 429) is429 = true;
+          if (e.response?.statusCode == 401) is401 = true;
+          if (e.type == DioExceptionType.cancel) isCancel = true;
         }
 
-        if (isLastAttempt) {
-          Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
+        if (isLastAttempt || is401 || isCancel) {
+          if (!is401 && !isCancel) {
+            Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
+          }
           return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
         }
 

@@ -88,7 +88,10 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
         if (ctx != null) minimizeToBubble(ctx, _orchestrator.astrologerName!, "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
-      _checkPendingChatSession();
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+      if (isLoggedIn) {
+        _checkPendingChatSession();
+      }
     }
   }
 

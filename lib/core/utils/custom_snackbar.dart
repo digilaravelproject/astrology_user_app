@@ -47,27 +47,47 @@ class CustomSnackbar {
   }
 
   static void showSuccess(String message, {String title = 'Success'}) {
-    // Disabled per user request
-  }
-
-  static void showError(String message, {String title = 'Error'}) {
-    // Disabled per user request
-  }
-
-  static void showInfo(String message, {String title = 'Info'}) {
-    // Disabled per user request
-  }
-
-  static void showWarning(String message, {String title = 'Warning'}) {
-    // Disabled per user request
-  }
-
-  static void showApiError(String message, {String title = 'Error'}) {
     _show(
       title: title,
       message: message,
-      backgroundColor: AppColors.errorColor,
-      icon: Icons.error_rounded,
+      backgroundColor: Colors.green,
+      icon: Icons.check_circle_rounded,
     );
+  }
+
+  static void showError(String message, {String title = 'Error'}) {
+    // _show(
+    //   title: title,
+    //   message: message,
+    //   backgroundColor: AppColors.errorColor,
+    //   icon: Icons.error_rounded,
+    // );
+  }
+
+  static void showInfo(String message, {String title = 'Info'}) {
+    _show(
+      title: title,
+      message: message,
+      backgroundColor: Colors.blue,
+      icon: Icons.info_rounded,
+    );
+  }
+
+  static void showWarning(String message, {String title = 'Warning'}) {
+    _show(
+      title: title,
+      message: message,
+      backgroundColor: Colors.orange,
+      icon: Icons.warning_rounded,
+    );
+  }
+
+  static void showApiError(String message, {String title = 'Error'}) {
+    // _show(
+    //   title: title,
+    //   message: message,
+    //   backgroundColor: AppColors.errorColor,
+    //   icon: Icons.error_rounded,
+    // );
   }
 }

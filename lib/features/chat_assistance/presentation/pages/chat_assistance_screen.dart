@@ -450,57 +450,66 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
               }
               return const SizedBox.shrink();
             }),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline, color: Colors.grey),
-                  onPressed: () => _showAttachmentBottomSheet(context),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: controller.messageController,
-                    decoration: InputDecoration(
-                      hintText: "Type a message...".tr,
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                      filled: true,
-                      fillColor: const Color(0xFFF5F5F5),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: controller.messageController,
+              builder: (context, value, child) {
+                final hasText = value.text.trim().isNotEmpty;
+                return Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline, color: Colors.grey, size: 22),
+                      onPressed: () => _showAttachmentBottomSheet(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 40),
                     ),
-                    textCapitalization: TextCapitalization.sentences,
-                    minLines: 1,
-                    maxLines: 4,
-                    enabled: !controller.limitReached.value,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Obx(() => GestureDetector(
-                  onTap: controller.limitReached.value ? null : controller.sendMessage,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: controller.limitReached.value ? Colors.grey : AppColors.deepPink,
-                      shape: BoxShape.circle,
+                    Expanded(
+                      child: TextField(
+                        controller: controller.messageController,
+                        decoration: InputDecoration(
+                          hintText: "Type a message...".tr,
+                          hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                          filled: true,
+                          fillColor: const Color(0xFFF5F5F5),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                        textCapitalization: TextCapitalization.sentences,
+                        minLines: 1,
+                        maxLines: 4,
+                        enabled: !controller.limitReached.value,
+                      ),
                     ),
-                    child: const Icon(
-                      Iconsax.send_1_copy,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                )),
-              ],
+                    if (hasText)
+                      Obx(() => GestureDetector(
+                        onTap: controller.limitReached.value ? null : controller.sendMessage,
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: controller.limitReached.value ? Colors.grey : AppColors.deepPink,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Iconsax.send_1_copy,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                      )),
+                  ],
+                );
+              },
             ),
           ],
         ),

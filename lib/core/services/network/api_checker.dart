@@ -38,13 +38,14 @@ class ApiChecker {
           return response; // Return as is if not a map
         }
       case 401:
-        _showErrorMessage(response, 'Unauthorized');
+        final errorMessage = response.data is Map ? (response.data['msg'] ?? response.data['message'] ?? 'Unauthorized') : 'Unauthorized';
+        if (!isLoggingOut) _showErrorMessage(response, errorMessage);
         _logout();
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
           type: DioExceptionType.badResponse,
-          error: 'Unauthorized',
+          error: errorMessage,
         );
       case 403:
         _showErrorMessage(response, 'Forbidden');
@@ -154,11 +155,12 @@ class ApiChecker {
 
         case DioExceptionType.badResponse:
           if (error.response?.statusCode == 401) {
-            CustomSnackbar.showError('Session expired. Please login again.');
+            final errorMessage = error.response?.data is Map ? (error.response?.data['msg'] ?? error.response?.data['message'] ?? 'Session expired. Please login again.') : 'Session expired. Please login again.';
+            if (!isLoggingOut) CustomSnackbar.showError(errorMessage);
             _logout();
-            return const ResponseModel(
+            return ResponseModel(
               isSuccess: false,
-              message: 'Unauthorized',
+              message: errorMessage,
               statusCode: 401,
             );
           }
@@ -304,13 +306,14 @@ class ApiChecker {
     final statusCode = response.statusCode ?? 500;
 
     if (statusCode == 401) {
-      if (showToaster) {
-        CustomSnackbar.showError('Session expired. Please login again.');
+      final errorMessage = response.data is Map ? (response.data['msg'] ?? response.data['message'] ?? 'Session expired. Please login again.') : 'Session expired. Please login again.';
+      if (showToaster && !isLoggingOut) {
+        CustomSnackbar.showError(errorMessage);
       }
       _logout();
-      return const ResponseModel(
+      return ResponseModel(
         isSuccess: false,
-        message: 'Unauthorized',
+        message: errorMessage,
         statusCode: 401,
       );
     }
@@ -412,6 +415,7 @@ class ApiChecker {
   }
 
   static void _showErrorMessage(Response response, [String? defaultMessage]) {
+    if (isLoggingOut) return;
     String? message;
     if (response.data is Map) {
       message = response.data['msg'] ?? response.data['message'];
@@ -420,6 +424,7 @@ class ApiChecker {
   }
 
   static void _showValidationErrors(Response response) {
+    if (isLoggingOut) return;
     if (response.data != null && response.data is Map<String, dynamic>) {
       try {
         final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
@@ -457,7 +462,19 @@ class ApiChecker {
     );
   }
 
+  static bool isLoggingOut = false;
+
   static void _logout() async {
+    if (isLoggingOut) return;
+    
+    // Prevent logout loop and navigation if already on Login or OTP screens
+    final currentRoute = getx.Get.currentRoute;
+    if (currentRoute == RouteHelper.getLoginRoute() || currentRoute == RouteHelper.getOtpRoute()) {
+      return;
+    }
+
+    isLoggingOut = true;
+
     try {
       if (getx.Get.isRegistered<astro_fcm.FCMNotificationService>()) {
         await astro_fcm.FCMNotificationService.removeDeviceToken();
@@ -482,6 +499,12 @@ class ApiChecker {
     await SharedPrefs.clear();
     SharedPrefs.setBool(AppConstants.isLoggedIn, false);
     TokenManager.clearToken();
-    getx.Get.offAllNamed(RouteHelper.getLoginRoute());
+    if (getx.Get.currentRoute != RouteHelper.getLoginRoute()) {
+      getx.Get.offAllNamed(RouteHelper.getLoginRoute());
+    }
+
+    Future.delayed(const Duration(seconds: 2), () {
+      isLoggingOut = false;
+    });
   }
 }

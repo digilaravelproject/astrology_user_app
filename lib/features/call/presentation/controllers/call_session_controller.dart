@@ -13,6 +13,8 @@ import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'call_controller.dart';
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/core/services/storage/shared_prefs.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
 
 class CallSessionController extends GetxController with WidgetsBindingObserver {
   final RxString status = 'idle'.obs;
@@ -250,7 +252,10 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
         minimizeToBubble(Get.context!, providerName!, providerImage ?? "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
-      _orchestrator.webrtc.checkCurrentActiveCallSession();
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+      if (isLoggedIn) {
+        _orchestrator.webrtc.checkCurrentActiveCallSession();
+      }
     }
   }
 

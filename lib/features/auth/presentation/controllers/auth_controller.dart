@@ -265,6 +265,15 @@ class AuthController extends GetxController {
       if (updatedUser != null) {
         currentUser.value = updatedUser;
         await Get.find<AuthService>().saveUserInfo(updatedUser);
+        
+        // Ensure WebSocket is connected for new users after profile completes
+        try {
+          Get.find<WebSocketService>().connect();
+          FCMNotificationService.registerDeviceToken(null);
+        } catch (e) {
+          print('WebSocket connection error after profile update: $e');
+        }
+
         CustomSnackbar.showSuccess('Profile updated successfully');
         Get.offAllNamed(RouteHelper.getDashboardRoute());
       } else {

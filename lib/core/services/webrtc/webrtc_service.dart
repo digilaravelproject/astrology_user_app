@@ -23,6 +23,11 @@ class WebRTCService {
   final Map<String, dynamic> _iceConfig = {
     'iceServers': [
       {'urls': AppConstants.webrtcStunServer},
+      {
+        'urls': AppConstants.liveKitTurnServerUrl,
+        'username': AppConstants.liveKitTurnUsername,
+        'credential': AppConstants.liveKitTurnCredential,
+      },
     ],
     'sdpSemantics': 'unified-plan',
   };
@@ -38,7 +43,16 @@ class WebRTCService {
   Future<void> initLocalStream() async {
     try {
       final Map<String, dynamic> mediaConstraints = {
-        'audio': true,
+        'audio': {
+          'echoCancellation': true,
+          'noiseSuppression': true,
+          'autoGainControl': true,
+          'googEchoCancellation': true,
+          'googNoiseSuppression': true,
+          'googAutoGainControl': true,
+          'googHighpassFilter': true,
+          'googTypingNoiseDetection': true,
+        },
         'video': false,
       };
       localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
