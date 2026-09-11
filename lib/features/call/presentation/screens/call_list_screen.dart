@@ -664,7 +664,7 @@ class _CallListScreenState extends State<CallListScreen> {
                         borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : (astro.isPurchase == true ? Colors.green : Colors.orange),
                         onTap: () {
                           if (!astro.isOnline || astro.isBusy) {
-                            CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                            CustomSnackbar.showInfo(astro.isBusy ? 'Busy with other user' : 'Astrologer is offline.');
                             return;
                           }
                           SessionBottomSheetHelper.show(context, astro);

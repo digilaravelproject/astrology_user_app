@@ -1,4 +1,6 @@
 {
+  "1": "1",
+  "5629": "5629",
   "No blogs found": "வலைப்பதிவுகள் எதுவும் இல்லை",
   "Call Session Ended": "அழைப்பு அமர்வு முடிந்தது",
   "No chart available": "விளக்கப்படம் இல்லை",
@@ -39,7 +41,6 @@
   "My Account": "எனது கணக்கு",
   "Cancel Request": "கோரிக்கையை ரத்துசெய்",
   "The stars reveal compatibility": "The stars reveal compatibility",
-  "5629": "5629",
   "Blocked Astrologers": "தடுக்கப்பட்ட ஜோதிடர்கள்",
   "Moon Nakshatra: ": "சந்திர நட்சத்திரம்:",
   "Chat": "Chat",
@@ -106,7 +107,7 @@
   "Monthly Earnings": "மாதாந்திர வருவாய்",
   "0.00": "0.00",
   "Cancellation Factors": "ரத்து காரணிகள்",
-  "Astrologer is currently engaged in another session.": "Astrologer is currently engaged in another session.",
+  "Astrologer is currently d in another session.": "Astrologer is currently d in another session.",
   "Price Increase": "Price Increase",
   "Yes, Save": "Yes, Save",
   "ID:": "ஐடி:",
@@ -366,7 +367,7 @@
   "Only ": "மட்டுமே",
   "Buy Membership Now": "இப்போது உறுப்பினர் வாங்கவும்",
   "Mark all as read": "அனைத்தையும் படித்ததாகக் குறிக்கவும்",
-  "Engaged": "Engaged",
+  "d": "d",
   "₹": null,
   "Your prepaid package session has expired. Conversation has ended.": "Your prepaid package session has expired. Conversation has ended.",
   "Daily message reply limit reached. You cannot send more replies today.": "தினசரி செய்தி பதில் வரம்பை அடைந்தது. இன்று அதிக பதில்களை அனுப்ப முடியாது.",
@@ -840,7 +841,6 @@
   "Weekly": "Weekly",
   "Select start date": "தொடக்க தேதியைத் தேர்ந்தெடுக்கவும்",
   "Ashtakoot Guna Milan Breakdown": "அஷ்டகூத் குண மிலன் முறிவு",
-  "1": "1",
   "Failed to load Panchang details.": "Panchang விவரங்களை ஏற்றுவதில் தோல்வி.",
   "Try searching with a different name": "வேறு பெயரில் தேட முயற்சிக்கவும்",
   "8m": "8மீ",
@@ -959,5 +959,8 @@
   "Session": "அமர்வு",
   "Always Online": "எப்போதும் ஆன்லைனில்",
   "Inappropriate Content": "பொருத்தமற்ற உள்ளடக்கம்",
-  "Upcoming": "வரவிருக்கிறது"
+  "Upcoming": "வரவிருக்கிறது",
+  "Busy with other user": "மற்ற பயனருடன் பிஸியாக உள்ளார்",
+  "Astrologer is currently engaged.": "மற்ற பயனருடன் பிஸியாக உள்ளார்",
+  "Engaged": "மற்ற பயனருடன் பிஸியாக உள்ளார்"
 }

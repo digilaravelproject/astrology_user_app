@@ -1,4 +1,6 @@
 {
+  "1": "1",
+  "5629": "5629",
   "No blogs found": "कोई ब्लॉग नहीं मिला",
   "Call Session Ended": "कॉल सत्र समाप्त हुआ",
   "No chart available": "No chart available",
@@ -39,7 +41,6 @@
   "My Account": "My Account",
   "Cancel Request": "Cancel Request",
   "The stars reveal compatibility": "सितारे अनुकूलता दर्शाते हैं",
-  "5629": "5629",
   "Blocked Astrologers": "ज्योतिषियों को रोका",
   "Moon Nakshatra: ": "चंद्र नक्षत्र:",
   "Chat": "Chat",
@@ -106,7 +107,7 @@
   "Monthly Earnings": "Monthly Earnings",
   "0.00": "0.00",
   "Cancellation Factors": "Cancellation Factors",
-  "Astrologer is currently engaged in another session.": "Astrologer is currently engaged in another session.",
+  "Astrologer is currently d in another session.": "Astrologer is currently d in another session.",
   "Price Increase": "मूल्य वृद्धि",
   "Yes, Save": "Yes, Save",
   "ID:": "ID:",
@@ -366,7 +367,7 @@
   "Only ": "Only ",
   "Buy Membership Now": "अभी सदस्यता खरीदें",
   "Mark all as read": "Mark all as read",
-  "Engaged": "Engaged",
+  "d": "d",
   "₹": "₹",
   "Your prepaid package session has expired. Conversation has ended.": "आपका प्रीपेड पैकेज सत्र समाप्त हो गया है. बातचीत ख़त्म हो गई.",
   "Daily message reply limit reached. You cannot send more replies today.": "Daily message reply limit reached. You cannot send more replies today.",
@@ -840,7 +841,6 @@
   "Weekly": "साप्ताहिक",
   "Select start date": "Select start date",
   "Ashtakoot Guna Milan Breakdown": "अष्टकूट गुण मिलान विच्छेद",
-  "1": "1",
   "Failed to load Panchang details.": "पंचांग विवरण लोड करने में विफल.",
   "Try searching with a different name": "Try searching with a different name",
   "8m": "8",
@@ -959,5 +959,8 @@
   "Session": "सत्र",
   "Always Online": "Always Online",
   "Inappropriate Content": "अनुपयुक्त सामग्री",
-  "Upcoming": "Upcoming"
+  "Upcoming": "Upcoming",
+  "Busy with other user": "अन्य उपयोगकर्ता के साथ व्यस्त",
+  "Astrologer is currently engaged.": "अन्य उपयोगकर्ता के साथ व्यस्त",
+  "Engaged": "अन्य उपयोगकर्ता के साथ व्यस्त"
 }

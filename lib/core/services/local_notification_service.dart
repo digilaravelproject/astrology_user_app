@@ -11,6 +11,32 @@ import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/core/services/fcm_notification_service.dart';
+
+/// Top-level function required by flutter_local_notifications for background
+/// notification tap handling (Android only). Must be annotated with
+/// @pragma('vm:entry-point') so the Dart compiler does not tree-shake it.
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse response) {
+  // This runs in a background isolate — GetX / navigator are NOT available.
+  // Store the intent as a pending static field so DashboardScreen can consume
+  // it once the widget tree is ready.
+  final payload = response.payload;
+  if (payload == null || payload.isEmpty) return;
+
+  debugPrint('[LocalNotification][BG] Background tap payload: $payload');
+
+  if (payload.startsWith('live_')) {
+    final sessionIdStr = payload.replaceFirst('live_', '');
+    final int? sessionId = int.tryParse(sessionIdStr);
+    if (sessionId != null) {
+      // Store as pending — DashboardScreen initState will consume this.
+      FCMNotificationService.pendingLiveSessionId = sessionId;
+      FCMNotificationService.pendingNotificationData = {'session_id': sessionIdStr};
+      debugPrint('[LocalNotification][BG] Stored pendingLiveSessionId=$sessionId');
+    }
+  }
+}
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -27,6 +53,7 @@ class LocalNotificationService {
 
     await _notificationsPlugin.initialize(
       initializationSettings,
+      onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // Tap handler: routes to the correct screen based on payload prefix
         final payload = response.payload;

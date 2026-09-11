@@ -19,6 +19,7 @@ class ApiClient {
   final Dio _dio;
   static DateTime? _lastWatchTimestamp;
   static ResponseModel? _lastWatchResponse;
+  static String? _lastWatchPath;
 
   ApiClient() : _dio = Dio() {
     _initializeDio();
@@ -194,6 +195,7 @@ class ApiClient {
         bool showToaster = AppConstants.showToaster,
         bool showErrorScreen = AppConstants.isHandleErrorScreen,
         bool showInternetScreen = AppConstants.isHandleInternetScreen,
+        int maxRetries = 3,
       }) async {
     if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
       return const ResponseModel(isSuccess: false, message: 'No internet connection');
@@ -201,7 +203,9 @@ class ApiClient {
 
     if (path.contains('/watch')) {
       final now = DateTime.now();
-      if (_lastWatchTimestamp != null && now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
+      if (_lastWatchTimestamp != null &&
+          _lastWatchPath == path &&
+          now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
         Logger.d('|🛡️ Debounced /watch call to avoid rate limit. Time since last call: ${now.difference(_lastWatchTimestamp!).inSeconds}s. Returning cached response.');
         if (_lastWatchResponse != null) {
           return _lastWatchResponse!;
@@ -210,12 +214,13 @@ class ApiClient {
         }
       }
       _lastWatchTimestamp = now;
+      _lastWatchPath = path;
     }
 
-    int maxRetries = 3;
+    int _maxRetries = maxRetries;
     List<int> backoffs = [1, 2, 4];
 
-    for (int attempt = 0; attempt <= maxRetries; attempt++) {
+    for (int attempt = 0; attempt <= _maxRetries; attempt++) {
       try {
         final response = await _dio.post(
           path,
@@ -241,7 +246,7 @@ class ApiClient {
 
         return result;
       } catch (e) {
-        final isLastAttempt = attempt == maxRetries;
+        final isLastAttempt = attempt == _maxRetries;
         
         bool is429 = false;
         bool is401 = false;

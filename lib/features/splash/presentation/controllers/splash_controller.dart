@@ -7,7 +7,6 @@ import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/features/splash/data/datasources/splash_service.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/fcm_notification_service.dart';
-import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SplashController extends GetxController {
@@ -47,35 +46,8 @@ class SplashController extends GetxController {
             Get.find<WebSocketService>().connect();
             FCMNotificationService.registerDeviceToken(null);
             Get.offAllNamed(RouteHelper.getDashboardRoute());
-
-            // ── Consume pending cold-start notification ──────────────────────
-            // After Dashboard is loaded, navigate to the target screen.
-            final pendingSessionId = FCMNotificationService.pendingLiveSessionId;
-            final pendingData = FCMNotificationService.pendingNotificationData;
-            if (pendingSessionId != null) {
-              // Clear the pending intent so it isn't consumed again
-              FCMNotificationService.pendingLiveSessionId = null;
-              FCMNotificationService.pendingNotificationData = null;
-
-              final astrologerName =
-                  pendingData?['astrologer_name']?.toString() ?? 'Astrologer';
-              final astrologerImage =
-                  pendingData?['astrologer_avatar']?.toString() ??
-                  pendingData?['astrologer_image']?.toString() ??
-                  '';
-
-              // Short delay so the Dashboard widget tree is fully built
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Future.delayed(const Duration(milliseconds: 300), () {
-                  Get.to(() => LiveRoomScreen(
-                    sessionId: pendingSessionId,
-                    astrologerName: astrologerName,
-                    astrologerImage: astrologerImage,
-                  ));
-                });
-              });
-            }
-            // ──────────────────────────────────────────────────────────────────────────────
+            // DashboardScreen.initState() will consume FCMNotificationService.pendingLiveSessionId
+            // with a guaranteed postFrameCallback + 500 ms delay — no race condition here.
           } else {
             Get.offAllNamed(RouteHelper.getLoginRoute());
           }

@@ -286,8 +286,9 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
           Logger.d('|✅ WEBSOCKET SUBSCRIPTION SUCCESS');
           Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         } else if (event == AppUrls.pusherPing) {
-          _send(AppUrls.pusherPong);
+          _sendRaw(jsonEncode({"event": AppUrls.pusherPong, "data": {}}));
         } else if (event == AppUrls.pusherPong) {
+          _pongTimeoutTimer?.cancel();
           if (_lastPingSentAt != null) {
             WebSocketState.currentPingMs.value = DateTime.now().difference(_lastPingSentAt!).inMilliseconds;
             _lastPingSentAt = null;

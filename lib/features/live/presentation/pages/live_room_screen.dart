@@ -57,6 +57,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   bool _isLiveKitConnected = false;
   Worker? _sessionWorker;
   Worker? _mediaWorker;
+  Worker? _commentWorker;
   bool _isSpeakerMuted = false;
 
   // Navigation between live sessions
@@ -66,9 +67,11 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
 
   void _toggleSpeakerMute() async {
     final room = _room;
-    setState(() {
-      _isSpeakerMuted = !_isSpeakerMuted;
-    });
+    if (mounted) {
+      setState(() {
+        _isSpeakerMuted = !_isSpeakerMuted;
+      });
+    }
     
     if (room == null) return;
     
@@ -103,7 +106,9 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     }
     _giftController = Get.find<AstrologerController>();
     _commentController.addListener(() {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     
     // Fetch gifts listing
@@ -132,7 +137,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     });
 
     // Automatically trigger animation for new superchats
-    ever(_liveController.comments, (List<LiveCommentModel> currentComments) {
+    _commentWorker = ever(_liveController.comments, (List<LiveCommentModel> currentComments) {
       if (currentComments.isNotEmpty) {
         final lastComment = currentComments.last;
         // Check if the latest comment is a super chat (has giftIconUrl)
@@ -322,6 +327,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   void dispose() {
     _sessionWorker?.dispose();
     _mediaWorker?.dispose();
+    _commentWorker?.dispose();
     _disconnectLiveKit();
     _liveController.leaveSession(widget.sessionId);
     _commentController.dispose();
@@ -484,11 +490,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   }
 
   void _addReaction([String? imageUrl]) {
-    setState(() {
-      _reactions.add(
-        FloatingReaction(imageUrl: imageUrl, key: UniqueKey()),
-      );
-    });
+    if (mounted) {
+      setState(() {
+        _reactions.add(
+          FloatingReaction(imageUrl: imageUrl, key: UniqueKey()),
+        );
+      });
+    }
     Timer(const Duration(seconds: 3), () {
       if (mounted && _reactions.isNotEmpty) {
         setState(() {

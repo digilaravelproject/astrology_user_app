@@ -210,7 +210,7 @@ class SessionBottomSheetHelper {
                   final bool hasChat = currentAstro.isChatEnabled == true;
                   final bool hasCall = currentAstro.isCallEnabled == true;
                   final bool isActuallyBusy = currentAstro.isBusy || 
-                                              currentAstro.availabilityStatus.toLowerCase() == 'engaged' || 
+                                              currentAstro.availabilityStatus.toLowerCase() == 'd' ||
                                               currentAstro.availabilityStatus.toLowerCase() == 'busy';
                   final bool isActuallyOffline = !currentAstro.isOnline || (!hasChat && !hasCall);
 
@@ -220,7 +220,7 @@ class SessionBottomSheetHelper {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              CustomSnackbar.showInfo('Astrologer is currently engaged in another session.'.tr);
+                              CustomSnackbar.showInfo('Busy with other user'.tr);
                             },
                             child: Container(
                               height: 48,
@@ -242,7 +242,7 @@ class SessionBottomSheetHelper {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    'Astrologer is Currently Engaged'.tr,
+                                    'Busy with other user'.tr,
                                     style: GoogleFonts.poppins(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -318,7 +318,7 @@ class SessionBottomSheetHelper {
                             borderColor: (!currentAstro.isOnline || currentAstro.isBusy) ? Colors.grey : Colors.transparent,
                             onTap: () async {
                               if (!currentAstro.isOnline || currentAstro.isBusy) {
-                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Busy with other user' : 'Astrologer is offline.');
                                 return;
                               }
                               showDialog(
@@ -375,7 +375,7 @@ class SessionBottomSheetHelper {
                             ),
                             onTap: () async {
                               if (!currentAstro.isOnline || currentAstro.isBusy) {
-                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                                CustomSnackbar.showInfo(currentAstro.isBusy ? 'Busy with other user' : 'Astrologer is offline.');
                                 return;
                               }
                               var permissionStatus = await Permission.microphone.status;

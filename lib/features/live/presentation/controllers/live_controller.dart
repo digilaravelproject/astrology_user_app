@@ -4,7 +4,8 @@ import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/core/services/network/api_checker.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'package:astro_user/features/live/domain/usecases/live_usecases.dart';
-
+import 'package:flutter/material.dart';
+import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
 class LiveController extends GetxController {
   final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;
   final GetLiveSessionDetailUseCase _getSessionDetailUseCase;
@@ -276,11 +277,14 @@ class LiveController extends GetxController {
       isSendingSuperChat.value = true;
       final result = await _sendSuperChatUseCase.call(sessionId, giftId, message);
       if (result.isSuccess) {
-        CustomSnackbar.showSuccess('Super Chat sent successfully! 🎉');
         await fetchComments(sessionId);
         return true;
       } else {
-        CustomSnackbar.showError(result.message);
+        if (result.message.toLowerCase().contains('insufficient balance')) {
+          _showInsufficientBalanceSheet();
+        } else {
+          CustomSnackbar.showError(result.message);
+        }
         return false;
       }
     } catch (e) {
@@ -290,6 +294,14 @@ class LiveController extends GetxController {
     } finally {
       isSendingSuperChat.value = false;
     }
+  }
+
+  void _showInsufficientBalanceSheet() {
+    Get.bottomSheet(
+      const RechargeBottomSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
   }
 
   void _startCommentsPolling(int sessionId) {

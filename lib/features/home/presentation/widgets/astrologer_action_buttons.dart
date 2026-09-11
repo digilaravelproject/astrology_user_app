@@ -59,7 +59,7 @@ class AstrologerActionButtons extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Engaged'.tr,
+                      'Busy with other user'.tr,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -79,7 +79,7 @@ class AstrologerActionButtons extends StatelessWidget {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  CustomSnackbar.showInfo('Astrologer is currently engaged in another session.'.tr);
+                  CustomSnackbar.showInfo('Busy with other user'.tr);
                 },
                 child: Container(
                   height: 34,
@@ -101,7 +101,7 @@ class AstrologerActionButtons extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Engaged'.tr,
+                        'Busy with other user'.tr,
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -213,7 +213,7 @@ class AstrologerActionButtons extends StatelessWidget {
                 onTap: astro.isBlocked == true 
                   ? () => CustomSnackbar.showError("This astrologer is blocked") 
                   : (astro.isBusy == true)
-                      ? () => CustomSnackbar.showInfo('Astrologer is currently engaged.')
+                      ? () => CustomSnackbar.showInfo('Busy with other user')
                       : () {
                           final walletController = Get.find<WalletController>();
                           final double balance = double.tryParse(walletController.balance) ?? 0.0;
@@ -300,7 +300,7 @@ class AstrologerActionButtons extends StatelessWidget {
                 onTap: astro.isBlocked == true 
                   ? () => CustomSnackbar.showError("This astrologer is blocked") 
                   : (astro.isBusy == true)
-                      ? () => CustomSnackbar.showInfo('Astrologer is currently engaged.')
+                      ? () => CustomSnackbar.showInfo('Busy with other user')
                       : () {
                           final walletController = Get.find<WalletController>();
                           final double balance = double.tryParse(walletController.balance) ?? 0.0;
@@ -413,7 +413,7 @@ class AstrologerActionButtons extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 onTap: () {
                   if (astro.isBusy) {
-                    CustomSnackbar.showInfo('Astrologer is currently engaged.');
+                    CustomSnackbar.showInfo('Busy with other user');
                     return;
                   }
                   final walletController = Get.find<WalletController>();
@@ -456,7 +456,7 @@ class AstrologerActionButtons extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 onTap: () {
                   if (astro.isBusy) {
-                    CustomSnackbar.showInfo('Astrologer is currently engaged.');
+                    CustomSnackbar.showInfo('Busy with other user');
                     return;
                   }
                   final walletController = Get.find<WalletController>();

@@ -137,8 +137,10 @@ class WalletController extends GetxController {
         fetchWallet();
         fetchTransactions();
 
-        // Navigate to success screen instead of dialog
-        Get.offNamed(
+        // Navigate to success screen
+        // Use toNamed (not offNamed) so that the previous screen (LiveRoomScreen
+        // or WalletScreen) stays in the stack and user can return to it.
+        Get.toNamed(
           RouteHelper.getPaymentSuccessRoute(),
           arguments: {
             'amount': result.data.transaction.amount,

@@ -163,22 +163,31 @@ class FCMNotificationService {
       if (message != null) {
         debugPrint('[FCMNotificationService] Cold-start notification detected: ${message.data}');
         final data = message.data;
-        final type = data['type']?.toString();
-        final screen = data['screen']?.toString();
-        final notifType = data['notification_type']?.toString();
+        final type = data['type']?.toString().toLowerCase();
+        final screen = data['screen']?.toString().toUpperCase();
+        final notifType = data['notification_type']?.toString().toLowerCase();
 
-        if (type == 'live_stream' || type == 'live' || type == 'live_session' ||
-            screen == 'LIVE_STREAM_SCREEN' || notifType == 'live_session') {
-          // Store the pending live session so SplashController can navigate after boot
+        final bool isLive = type == 'live_stream' ||
+            type == 'live' ||
+            type == 'live_session' ||
+            screen == 'LIVE_STREAM_SCREEN' ||
+            screen == 'LIVE_SESSION_SCREEN' ||
+            notifType == 'live_session' ||
+            notifType == 'live_stream' ||
+            notifType == 'live';
+
+        if (isLive) {
+          // Try every possible session_id key the backend might send
           final sessionIdStr = data['session_id']?.toString() ??
               data['live_session_id']?.toString() ??
+              data['sessionId']?.toString() ??
               data['id']?.toString();
           pendingLiveSessionId = int.tryParse(sessionIdStr ?? '');
           pendingNotificationData = Map<String, dynamic>.from(data);
-          debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId');
+          debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId  data=$data');
         } else {
-          // For other types try after a safe delay
-          Future.delayed(const Duration(milliseconds: 2000), () {
+          // For other types try after a safe delay so routes are ready
+          Future.delayed(const Duration(milliseconds: 2500), () {
             _handleNotificationClick(data);
           });
         }

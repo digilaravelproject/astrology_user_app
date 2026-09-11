@@ -252,7 +252,7 @@ class GunaDetail {
             ]
           : [
               'Maintain your great conversational chemistry; talk through conflicts easily.',
-              'Engage in shared hobbies and intellectual discussions to keep the bond active.',
+              ' in shared hobbies and intellectual discussions to keep the bond active.',
             ];
       case 'gana':
       case 'gan':

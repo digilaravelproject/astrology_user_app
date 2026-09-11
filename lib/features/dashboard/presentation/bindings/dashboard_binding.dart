@@ -163,7 +163,7 @@ class DashboardBinding extends Bindings {
     Get.lazyPut(() => TopUpWalletUseCase(service: Get.find()));
     Get.lazyPut(() => VerifyTopUpUseCase(service: Get.find()));
     Get.lazyPut(() => GetTransactionsUseCase(service: Get.find()));
-    Get.lazyPut(() => WalletController(
+    Get.put(WalletController(
       getWalletUseCase: Get.find(),
       topUpWalletUseCase: Get.find(),
       verifyTopUpUseCase: Get.find(),

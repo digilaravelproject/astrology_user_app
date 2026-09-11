@@ -298,7 +298,7 @@ class _AstrologerSearchScreenState extends State<AstrologerSearchScreen> {
                     borderColor: (!astro.isOnline || astro.isBusy) ? Colors.grey : const Color(0xFF4CAF50),
                     onTap: () {
                       if (!astro.isOnline || astro.isBusy) {
-                        CustomSnackbar.showInfo(astro.isBusy ? 'Astrologer is currently engaged.' : 'Astrologer is offline.');
+                        CustomSnackbar.showInfo(astro.isBusy ? 'Busy with other user' : 'Astrologer is offline.');
                         return;
                       }
                       WalletHelper.checkBalanceAndProceed(

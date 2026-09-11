@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:astro_user/features/notification/data/models/notification_model.dart';
 import 'package:astro_user/features/notification/domain/repositories/notification_repository.dart';
@@ -13,6 +14,12 @@ class NotificationController extends GetxController {
   final isLoading = false.obs;
   final selectedNotification = Rxn<NotificationModel>();
 
+  // Pagination support
+  final ScrollController scrollController = ScrollController();
+  int currentPage = 1;
+  bool hasMore = true;
+  final isFetchingMore = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -21,7 +28,20 @@ class NotificationController extends GetxController {
 
   Future<void> refreshData() async {
     await fetchNotificationCount();
-    await fetchNotifications();
+    await fetchNotificationCount();
+    await fetchNotifications(isRefresh: true);
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+      fetchNotifications(isRefresh: false);
+    }
   }
 
   int get _userId => Get.find<AuthController>().currentUser.value?.id ?? 0;
@@ -47,23 +67,53 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> fetchNotifications() async {
+  Future<void> fetchNotifications({bool isRefresh = true}) async {
     if (_userId == 0) return;
-    isLoading.value = true;
+    
+    if (isRefresh) {
+      currentPage = 1;
+      hasMore = true;
+      isLoading.value = true;
+      notifications.clear();
+      if (!scrollController.hasListeners) {
+        scrollController.addListener(_scrollListener);
+      }
+    } else {
+      if (!hasMore || isFetchingMore.value || isLoading.value) return;
+      isFetchingMore.value = true;
+    }
+
     try {
-      final response = await repository.getNotifications(_userId);
+      final response = await repository.getNotifications(_userId, page: currentPage, perPage: 20);
       if (response.isSuccess && response.body != null) {
         // Since ResponseModel.fromJson already maps json['data'] to body
         final dynamic body = response.body;
         final List<dynamic> dataList = (body is List) 
             ? body 
             : (body?['notifications'] ?? body ?? []);
-        notifications.assignAll(dataList.map((json) => NotificationModel.fromJson(json)).toList());
+            
+        final newItems = dataList.map((json) => NotificationModel.fromJson(json)).toList();
+        
+        if (newItems.isEmpty || newItems.length < 20) {
+          hasMore = false;
+        } else {
+          currentPage++;
+        }
+
+        if (isRefresh) {
+          notifications.assignAll(newItems);
+        } else {
+          notifications.addAll(newItems);
+        }
+      } else {
+        hasMore = false;
       }
     } catch (e) {
       print('Error fetching notifications: $e');
+      hasMore = false;
     } finally {
       isLoading.value = false;
+      isFetchingMore.value = false;
     }
   }
 

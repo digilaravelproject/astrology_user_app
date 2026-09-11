@@ -43,7 +43,7 @@ class LiveRemoteDataSource {
     if (message != null && message.isNotEmpty) {
       data['message'] = message;
     }
-    final result = await _apiClient.post(AppUrls.sendSuperChat(id), data: data);
+    final result = await _apiClient.post(AppUrls.sendSuperChat(id), data: data, maxRetries: 0);
     return result;
   }
 

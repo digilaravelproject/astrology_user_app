@@ -4,7 +4,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/core/widgets/custom_button.dart';
-import 'package:astro_user/routes/route_helper.dart';
+import 'package:astro_user/features/wallet/presentation/controllers/wallet_controller.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   const PaymentSuccessScreen({super.key});
@@ -99,11 +99,21 @@ class PaymentSuccessScreen extends StatelessWidget {
               const Spacer(),
               
               CustomButton(
-                text: 'Back to Dashboard'.tr,
+                text: 'Back'.tr,
                 fontSize: 16,
                 height: 56,
                 borderRadius: 16,
-                onTap: () => Get.offAllNamed(RouteHelper.getDashboardRoute()),
+                onTap: () {
+                  // Refresh wallet balance silently before going back
+                  try {
+                    if (Get.isRegistered<WalletController>()) {
+                      Get.find<WalletController>().fetchWallet();
+                    }
+                  } catch (_) {}
+                  // Pop only the PaymentSuccessScreen — user returns to previous
+                  // screen (LiveRoomScreen, WalletScreen, etc.) without clearing stack.
+                  Get.back();
+                },
               ),
               
               const SizedBox(height: 20),

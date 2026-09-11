@@ -1,4 +1,6 @@
 {
+  "1": "1",
+  "5629": "5629",
   "No blogs found": "No blogs found",
   "Call Session Ended": "Call Session Ended",
   "No chart available": "No chart available",
@@ -39,7 +41,6 @@
   "My Account": "My Account",
   "Cancel Request": "Cancel Request",
   "The stars reveal compatibility": "The stars reveal compatibility",
-  "5629": "5629",
   "Blocked Astrologers": "Blocked Astrologers",
   "Moon Nakshatra: ": "Moon Nakshatra: ",
   "Chat": "Chat",
@@ -106,7 +107,7 @@
   "Monthly Earnings": "Monthly Earnings",
   "0.00": "0.00",
   "Cancellation Factors": "Cancellation Factors",
-  "Astrologer is currently engaged in another session.": "Astrologer is currently engaged in another session.",
+  "Astrologer is currently d in another session.": "Astrologer is currently d in another session.",
   "Price Increase": "Price Increase",
   "Yes, Save": "Yes, Save",
   "ID:": "ID:",
@@ -366,7 +367,7 @@
   "Only ": "Only ",
   "Buy Membership Now": "Buy Membership Now",
   "Mark all as read": "Mark all as read",
-  "Engaged": "Engaged",
+  "d": "d",
   "₹": "₹",
   "Your prepaid package session has expired. Conversation has ended.": "Your prepaid package session has expired. Conversation has ended.",
   "Daily message reply limit reached. You cannot send more replies today.": "Daily message reply limit reached. You cannot send more replies today.",
@@ -840,7 +841,6 @@
   "Weekly": "Weekly",
   "Select start date": "Select start date",
   "Ashtakoot Guna Milan Breakdown": "Ashtakoot Guna Milan Breakdown",
-  "1": "1",
   "Failed to load Panchang details.": "Failed to load Panchang details.",
   "Try searching with a different name": "Try searching with a different name",
   "8m": "8m",
@@ -959,5 +959,8 @@
   "Session": "Session",
   "Always Online": "Always Online",
   "Inappropriate Content": "Inappropriate Content",
-  "Upcoming": "Upcoming"
+  "Upcoming": "Upcoming",
+  "Busy with other user": "Busy with other user",
+  "Astrologer is currently engaged.": "Busy with other user",
+  "Engaged": "Busy with other user"
 }

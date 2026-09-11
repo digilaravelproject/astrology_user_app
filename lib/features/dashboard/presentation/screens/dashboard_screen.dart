@@ -27,6 +27,8 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
+import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
+import 'package:astro_user/core/services/fcm_notification_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -87,7 +89,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // }
       _checkCurrentActiveSession();
       Get.find<CallController>().checkCurrentActiveCallSession();
+
+      // ── Consume pending cold-start / background notification ───────────────
+      // Wait 500 ms so DashboardController & all bindings are fully initialized
+      // before navigating. This is the guaranteed hook point — SplashController
+      // previously had a race condition with only 300 ms.
+      Future.delayed(const Duration(milliseconds: 500), _consumePendingLiveSession);
+      // ──────────────────────────────────────────────────────────────────────
     });
+  }
+
+  /// Consumes any pending Live Session navigation stored by FCMNotificationService
+  /// (cold-start via getInitialMessage) or by notificationTapBackground
+  /// (local notification tapped while app was in background/killed state).
+  void _consumePendingLiveSession() {
+    try {
+      final int? sessionId = FCMNotificationService.pendingLiveSessionId;
+      final Map<String, dynamic>? data = FCMNotificationService.pendingNotificationData;
+
+      if (sessionId == null || sessionId <= 0) return;
+
+      // Clear immediately so repeated rebuilds don't re-navigate
+      FCMNotificationService.pendingLiveSessionId = null;
+      FCMNotificationService.pendingNotificationData = null;
+
+      final String astrologerName =
+          data?['astrologer_name']?.toString() ??
+          data?['astrologerName']?.toString() ??
+          'Astrologer';
+      final String astrologerImage =
+          data?['astrologer_avatar']?.toString() ??
+          data?['astrologer_image']?.toString() ??
+          data?['astrologerImage']?.toString() ??
+          '';
+
+      debugPrint('[DashboardScreen] Consuming pendingLiveSessionId=$sessionId');
+      Get.to(
+        () => LiveRoomScreen(
+          sessionId: sessionId,
+          astrologerName: astrologerName,
+          astrologerImage: astrologerImage,
+        ),
+      );
+    } catch (e) {
+      debugPrint('[DashboardScreen] Error consuming pending live session: $e');
+    }
   }
 
   Future<void> _checkCurrentActiveSession() async {

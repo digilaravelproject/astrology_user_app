@@ -116,10 +116,19 @@ class NotificationScreen extends StatelessWidget {
           onRefresh: () => controller.fetchNotifications(),
           color: AppColors.primaryColor,
           child: ListView.separated(
+            controller: controller.scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            itemCount: controller.notifications.length,
+            itemCount: controller.notifications.length + 1,
             separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0xFFEEEEEE)),
             itemBuilder: (context, index) {
+              if (index == controller.notifications.length) {
+                return Obx(() => controller.isFetchingMore.value 
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : const SizedBox.shrink());
+              }
               final notification = controller.notifications[index];
               return Dismissible(
                 key: ValueKey('user_notif_${notification.id}'),
