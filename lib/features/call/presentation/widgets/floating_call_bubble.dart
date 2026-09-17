@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+// import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
@@ -104,11 +105,13 @@ class FloatingCallBubble {
         await ForegroundTaskService.stopService();
       } catch (_) {}
     }
-    try {
-      if (await FlutterOverlayWindow.isActive()) {
-        await FlutterOverlayWindow.closeOverlay();
-      }
-    } catch (_) {}
+    // try {
+    //   if (Platform.isAndroid) {
+    //     if (await FlutterOverlayWindow.isActive()) {
+    //       await FlutterOverlayWindow.closeOverlay();
+    //     }
+    //   }
+    // } catch (_) {}
   }
 
   static void updateStatus(String status) {
@@ -117,18 +120,20 @@ class FloatingCallBubble {
   }
 
   static Future<void> _syncData() async {
-    if (_isActive.value) {
-      try {
-        if (await FlutterOverlayWindow.isActive()) {
-          await FlutterOverlayWindow.shareData({
-            'type': 'update',
-            'status': callStatus.value,
-            'isCall': true,
-            'unreadCount': 0,
-          });
-        }
-      } catch (_) {}
-    }
+    // if (_isActive.value) {
+    //   try {
+    //     if (Platform.isAndroid) {
+    //       if (await FlutterOverlayWindow.isActive()) {
+    //         await FlutterOverlayWindow.shareData({
+    //           'type': 'update',
+    //           'status': callStatus.value,
+    //           'isCall': true,
+    //           'unreadCount': 0,
+    //         });
+    //       }
+    //     }
+    //   } catch (_) {}
+    // }
   }
 }
 

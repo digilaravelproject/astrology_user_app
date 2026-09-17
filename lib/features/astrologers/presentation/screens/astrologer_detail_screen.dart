@@ -1380,7 +1380,7 @@ class _AstrologerDetailScreenState extends State<AstrologerDetailScreen> {
   }
 
   Widget _buildChatAssistantSection() {
-    if (_astrologer?.isBlocked == true) {
+    if (_astrologer?.isBlocked == true || _astrologer?.isReviewEligible != true) {
       return const SizedBox.shrink();
     }
     return GestureDetector(

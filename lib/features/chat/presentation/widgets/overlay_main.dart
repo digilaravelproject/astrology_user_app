@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+// import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:get/get.dart';
 
 class OverlayChatBubbleApp extends StatelessWidget {
@@ -41,37 +42,39 @@ class _OverlayChatBubbleWidgetState extends State<OverlayChatBubbleWidget> {
   }
 
   void _startListeningToData() {
-    FlutterOverlayWindow.overlayListener.listen((event) {
-      if (event != null && event is Map) {
-        setState(() {
-          _status = event['status'] ?? _status;
-          _name = event['name'] ?? _name;
-          _imageUrl = event['imageUrl'] ?? _imageUrl;
-          _unreadCount = event['unreadCount'] ?? _unreadCount;
-          _isCall = event['isCall'] ?? _isCall;
+    // if (Platform.isAndroid) {
+    //   FlutterOverlayWindow.overlayListener.listen((event) {
+    //     if (event != null && event is Map) {
+    //     setState(() {
+    //       _status = event['status'] ?? _status;
+    //       _name = event['name'] ?? _name;
+    //       _imageUrl = event['imageUrl'] ?? _imageUrl;
+    //       _unreadCount = event['unreadCount'] ?? _unreadCount;
+    //       _isCall = event['isCall'] ?? _isCall;
 
-          if (event['type'] == 'init' || event['type'] == 'update') {
-             final startedAtStr = event['startedAt'];
-             if (startedAtStr != null && startedAtStr.isNotEmpty) {
-                _startedAt = DateTime.tryParse(startedAtStr)?.toLocal();
-             }
-          }
-        });
+    //       if (event['type'] == 'init' || event['type'] == 'update') {
+    //          final startedAtStr = event['startedAt'];
+    //          if (startedAtStr != null && startedAtStr.isNotEmpty) {
+    //             _startedAt = DateTime.tryParse(startedAtStr)?.toLocal();
+    //          }
+    //       }
+    //     });
         
-        if (_status == 'ongoing' && _timer == null) {
-           _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-              setState(() {
-                 if (_startedAt != null) {
-                    final diff = DateTime.now().difference(_startedAt!).inSeconds;
-                    _elapsedSeconds = diff > 0 ? diff : 0;
-                 } else {
-                    _elapsedSeconds++;
-                 }
-              });
-           });
-        }
-      }
-    });
+    //     if (_status == 'ongoing' && _timer == null) {
+    //        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+    //           setState(() {
+    //              if (_startedAt != null) {
+    //                 final diff = DateTime.now().difference(_startedAt!).inSeconds;
+    //                 _elapsedSeconds = diff > 0 ? diff : 0;
+    //              } else {
+    //                 _elapsedSeconds++;
+    //              }
+    //           });
+    //        });
+    //     }
+    //     }
+    //   });
+    // }
   }
 
   @override
@@ -94,7 +97,9 @@ class _OverlayChatBubbleWidgetState extends State<OverlayChatBubbleWidget> {
         onTap: () {
            debugPrint("==== GESTURE DETECTOR TAPPED ====");
            // Try both methods just in case
-           FlutterOverlayWindow.shareData({'action': 'tap'});
+           // if (Platform.isAndroid) {
+           //   FlutterOverlayWindow.shareData({'action': 'tap'});
+           // }
            
            final String portName = _isCall ? 'overlay_call_port' : 'overlay_chat_port';
            final SendPort? sendPort = IsolateNameServer.lookupPortByName(portName);

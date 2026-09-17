@@ -251,7 +251,8 @@ class ChatAssistanceController extends GetxController {
       replyToId: replyToIdVal,
       replyTo: replyMsgVal,
     );
-    messages.insert(0, localMsg); // Assuming reversed list for chat
+    messages.insert(0, localMsg);
+    messages.refresh();
     _scrollToBottom();
 
     try {
@@ -266,8 +267,11 @@ class ChatAssistanceController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (response.isSuccess) {
-          final data = response.body['data']['message'];
-          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
+          dynamic msgData = response.body['data'];
+          if (msgData is Map && msgData.containsKey('message') && msgData['message'] is Map) {
+            msgData = msgData['message'];
+          }
+          final serverId = int.tryParse(msgData['id']?.toString() ?? '') ?? 0;
           messages[index] = messages[index].copyWith(id: serverId, status: 'sent');
         } else {
           messages[index] = messages[index].copyWith(status: 'failed');
@@ -300,6 +304,7 @@ class ChatAssistanceController extends GetxController {
       type: 'image',
     );
     messages.insert(0, localMsg);
+    messages.refresh();
     _scrollToBottom();
 
     try {
@@ -313,9 +318,12 @@ class ChatAssistanceController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (response.isSuccess) {
-          final data = response.body['data']['message'];
-          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
-          final attachmentUrl = data['attachment_url']?.toString();
+          dynamic msgData = response.body['data'];
+          if (msgData is Map && msgData.containsKey('message') && msgData['message'] is Map) {
+            msgData = msgData['message'];
+          }
+          final serverId = int.tryParse(msgData['id']?.toString() ?? '') ?? 0;
+          final attachmentUrl = msgData['attachment_url']?.toString();
           messages[index] = messages[index].copyWith(
             id: serverId, 
             status: 'sent',
@@ -354,6 +362,7 @@ class ChatAssistanceController extends GetxController {
       type: 'document',
     );
     messages.insert(0, localMsg);
+    messages.refresh();
     _scrollToBottom();
 
     try {
@@ -368,9 +377,12 @@ class ChatAssistanceController extends GetxController {
       final index = messages.indexWhere((m) => m.id == tempId);
       if (index != -1) {
         if (response.isSuccess) {
-          final data = response.body['data']['message'];
-          final serverId = int.tryParse(data['id']?.toString() ?? '') ?? 0;
-          final attachmentUrl = data['attachment_url']?.toString();
+          dynamic msgData = response.body['data'];
+          if (msgData is Map && msgData.containsKey('message') && msgData['message'] is Map) {
+            msgData = msgData['message'];
+          }
+          final serverId = int.tryParse(msgData['id']?.toString() ?? '') ?? 0;
+          final attachmentUrl = msgData['attachment_url']?.toString();
           messages[index] = messages[index].copyWith(
             id: serverId, 
             status: 'sent',

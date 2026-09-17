@@ -219,6 +219,22 @@ class FCMNotificationService {
             ));
           }
         }
+      } else if (type == 'assistance_chat' || screen == 'ASSISTANCE_CHAT_SCREEN' || notificationType == 'assistance_chat' || type == 'chat_assistance') {
+        final astrologerIdStr = data['astrologer_id']?.toString() ?? data['sender_id']?.toString() ?? data['user_id']?.toString();
+        if (astrologerIdStr != null && astrologerIdStr.isNotEmpty) {
+          final int? astrologerId = int.tryParse(astrologerIdStr);
+          if (astrologerId != null) {
+            final String astrologerName = data['astrologer_name']?.toString() ?? data['sender_name']?.toString() ?? 'Assistant';
+            final String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
+            
+            final chatAssistanceController = Get.put(ChatAssistanceController());
+            chatAssistanceController.initiateChatAssistance(
+              astrologerId,
+              astroName: astrologerName,
+              astroImage: astrologerImage,
+            );
+          }
+        }
       }
     } catch (e, stackTrace) {
       debugPrint('[FCM_SERVICE] Error handling notification click: $e\n$stackTrace');
