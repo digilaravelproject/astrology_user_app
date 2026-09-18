@@ -19,6 +19,67 @@ class CallWebRTCController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
   CallController get _orchestrator => Get.find<CallController>();
 
+  Future<void> initiateLiveCall({
+    required int providerId,
+    required String providerName,
+    required String providerImage,
+    required int liveSessionId,
+  }) async {
+    try {
+      _orchestrator.session.isSummaryShown = false;
+      _orchestrator.session.providerId = providerId;
+      _orchestrator.session.providerName = providerName;
+      _orchestrator.session.providerImage = providerImage;
+      _orchestrator.session.isPackageCall = false;
+      _orchestrator.session.isLiveCall = true;
+      _orchestrator.session.liveSessionId = liveSessionId;
+
+      _orchestrator.status.value = 'dialing';
+      final offerDescription = await _orchestrator.webrtcService.createOffer(0);
+
+      final response = await _apiClient.post(
+        AppUrls.initiateCall,
+        data: {
+          'provider_id': providerId,
+          'offer': offerDescription.sdp,
+          'live_session_id': liveSessionId,
+        },
+        handleError: true,
+        showErrorScreen: false,
+      );
+
+      if (response.isSuccess) {
+        final bodyMap = response.body;
+        final sessionData = bodyMap is Map 
+            ? (bodyMap['session'] ?? bodyMap['call_session'] ?? bodyMap['data']?['session'] ?? bodyMap['data']?['call_session']) 
+            : null;
+        if (sessionData != null) {
+          _orchestrator.session.sessionId = int.tryParse(sessionData['id']?.toString() ?? '') ?? 0;
+          _orchestrator.webrtcService.activeSessionId = _orchestrator.sessionId;
+          
+          final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
+
+          if (sessionStatus == 'waiting') {
+            _orchestrator.status.value = 'waiting';
+            CustomSnackbar.showInfo('Astrologer busy. You are in queue.');
+          } else {
+            _orchestrator.status.value = 'ringing';
+            // Do not play ringtone for live call, just wait
+            // _orchestrator.session.startRingtone(isIncoming: false);
+          }
+          _orchestrator.session.startRingingTimeout();
+        }
+      } else {
+        _orchestrator.status.value = 'idle';
+        CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate live call.');
+        _orchestrator.session.cleanUp();
+      }
+    } catch (e) {
+      _orchestrator.status.value = 'idle';
+      _orchestrator.session.cleanUp();
+    }
+  }
+
   Future<void> initiateCall({
     required int providerId,
     required String providerName,
@@ -180,11 +241,15 @@ class CallWebRTCController extends GetxController {
             _orchestrator.status.value = sessionStatus!;
             
             // New API: use session_type field. Fallback to old flags for backward compatibility.
+            final sType = session['session_type']?.toString();
             _orchestrator.session.isPackageCall = 
-                session['session_type']?.toString() == 'prepaid' ||
+                sType == 'prepaid' ||
                 session['is_prepaid'] == true ||
                 session['is_package_session'] == true ||
                 session['billing_mode'] == 'prepaid';
+                
+            _orchestrator.session.isLiveCall = sType == 'live';
+            _orchestrator.session.liveSessionId = int.tryParse(session['live_session_id']?.toString() ?? '');
             
             _orchestrator.session.providerId = int.tryParse(session['provider_id']?.toString() ?? '');
             final provider = session['provider'];
@@ -207,7 +272,9 @@ class CallWebRTCController extends GetxController {
                 await _orchestrator.webrtcService.setRemoteAnswer(answer);
               }
             } else if (sessionStatus == 'ringing' || sessionStatus == 'dialing') {
-              _orchestrator.session.startRingtone(isIncoming: false);
+              if (!_orchestrator.session.isLiveCall) {
+                _orchestrator.session.startRingtone(isIncoming: false);
+              }
               _orchestrator.session.startRingingTimeout();
             }
             
@@ -215,7 +282,7 @@ class CallWebRTCController extends GetxController {
             final seconds = (_orchestrator.durationSeconds.value % 60).toString().padLeft(2, '0');
             LocalNotificationService.showOngoingCallNotification(
               sessionId: _orchestrator.sessionId!,
-              title: '${_orchestrator.session.providerName} • Call',
+              title: '${_orchestrator.session.providerName} • ${_orchestrator.session.isLiveCall ? "Live Audio Call" : "Call"}',
               body: 'Tap to return to call session',
               startedAtMillis: () {
                 if (sessionStatus == 'ongoing' && session['started_at'] != null) {
@@ -227,7 +294,7 @@ class CallWebRTCController extends GetxController {
               }(),
             );
 
-            if (!_orchestrator.isCallScreenVisible) {
+            if (!_orchestrator.session.isLiveCall && !_orchestrator.isCallScreenVisible) {
               FloatingCallBubble.show(
                 context: Get.context!,
                 sessionId: _orchestrator.sessionId!,

@@ -4,8 +4,9 @@ import 'package:astro_user/features/chat/presentation/controllers/chat_controlle
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
@@ -99,6 +100,8 @@ class FCMNotificationService {
           structuredPayload = 'live_$rawSessionId';
         } else if (type == 'call' || type == 'CALL_REQUEST' || type == 'CALL_ACCEPTED') {
           structuredPayload = rawSessionId.isNotEmpty ? 'call_$rawSessionId' : message.data.toString();
+        } else if (type == 'assistance_chat' || type == 'chat_assistance') {
+          structuredPayload = jsonEncode(message.data);
         } else {
           structuredPayload = rawSessionId.isNotEmpty ? rawSessionId : message.data.toString();
         }
@@ -151,7 +154,7 @@ class FCMNotificationService {
     // 5. Notification Opened Handler
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint('Notification Opened App: ${message.data}');
-      _handleNotificationClick(message.data);
+      handleNotificationClick(message.data);
     });
 
     // 6. Cold Start / Initial Message Handler
@@ -176,6 +179,9 @@ class FCMNotificationService {
             notifType == 'live_stream' ||
             notifType == 'live';
 
+        final bool isChatAssistance = type == 'assistance_chat' || screen == 'ASSISTANCE_CHAT_SCREEN' || 
+            notifType == 'assistance_chat' || type == 'chat_assistance';
+
         if (isLive) {
           // Try every possible session_id key the backend might send
           final sessionIdStr = data['session_id']?.toString() ??
@@ -185,17 +191,20 @@ class FCMNotificationService {
           pendingLiveSessionId = int.tryParse(sessionIdStr ?? '');
           pendingNotificationData = Map<String, dynamic>.from(data);
           debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId  data=$data');
+        } else if (isChatAssistance) {
+          pendingNotificationData = Map<String, dynamic>.from(data);
+          debugPrint('[FCMNotificationService] Cold-start: pendingNotificationData=$pendingNotificationData');
         } else {
           // For other types try after a safe delay so routes are ready
-          Future.delayed(const Duration(milliseconds: 2500), () {
-            _handleNotificationClick(data);
+          Future.delayed(const Duration(milliseconds: 4500), () {
+            handleNotificationClick(data);
           });
         }
       }
     });
   }
 
-  static void _handleNotificationClick(Map<String, dynamic> data) {
+  static void handleNotificationClick(Map<String, dynamic> data) {
     try {
       debugPrint('[FCM_SERVICE] Handling notification click with data: $data');
       
@@ -224,8 +233,17 @@ class FCMNotificationService {
         if (astrologerIdStr != null && astrologerIdStr.isNotEmpty) {
           final int? astrologerId = int.tryParse(astrologerIdStr);
           if (astrologerId != null) {
-            final String astrologerName = data['astrologer_name']?.toString() ?? data['sender_name']?.toString() ?? 'Assistant';
-            final String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
+            String astrologerName = data['astrologer_name']?.toString() ?? data['sender_name']?.toString() ?? '';
+            String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
+            
+            if (astrologerName.isEmpty && data['user_info'] != null) {
+               try {
+                 final userInfo = data['user_info'] is String ? jsonDecode(data['user_info']) : data['user_info'];
+                 astrologerName = userInfo['name']?.toString() ?? '';
+                 astrologerImage = userInfo['profile_photo']?.toString() ?? userInfo['image']?.toString() ?? '';
+               } catch(_) {}
+            }
+            if (astrologerName.isEmpty) astrologerName = 'Assistant';
             
             final chatAssistanceController = Get.put(ChatAssistanceController());
             chatAssistanceController.initiateChatAssistance(

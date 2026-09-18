@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:astro_user/features/home/presentation/screens/home_screen.dart';
@@ -94,7 +96,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // Wait 500 ms so DashboardController & all bindings are fully initialized
       // before navigating. This is the guaranteed hook point — SplashController
       // previously had a race condition with only 300 ms.
-      Future.delayed(const Duration(milliseconds: 500), _consumePendingLiveSession);
+      Future.delayed(const Duration(milliseconds: 500), _consumePendingNotification);
       // ──────────────────────────────────────────────────────────────────────
     });
   }
@@ -102,37 +104,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Consumes any pending Live Session navigation stored by FCMNotificationService
   /// (cold-start via getInitialMessage) or by notificationTapBackground
   /// (local notification tapped while app was in background/killed state).
-  void _consumePendingLiveSession() {
+  void _consumePendingNotification() async {
     try {
-      final int? sessionId = FCMNotificationService.pendingLiveSessionId;
+      // 1. First check if launched from a local notification
+      try {
+        final launchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
+        if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
+          final payload = launchDetails.notificationResponse?.payload;
+          if (payload != null && payload.isNotEmpty) {
+            final Map<String, dynamic> data = jsonDecode(payload);
+            FCMNotificationService.pendingNotificationData = data;
+            debugPrint('[DashboardScreen] Extracted local notification launch payload');
+          }
+        }
+      } catch (e) {
+        debugPrint('[DashboardScreen] Error checking local notification launch details: $e');
+      }
+
       final Map<String, dynamic>? data = FCMNotificationService.pendingNotificationData;
+      if (data == null) return;
 
-      if (sessionId == null || sessionId <= 0) return;
+      final type = data['type']?.toString().toLowerCase();
+      final screen = data['screen']?.toString().toUpperCase();
+      final notifType = data['notification_type']?.toString().toLowerCase();
 
-      // Clear immediately so repeated rebuilds don't re-navigate
-      FCMNotificationService.pendingLiveSessionId = null;
-      FCMNotificationService.pendingNotificationData = null;
+      final bool isLive = type == 'live_stream' || type == 'live' || type == 'live_session' ||
+          screen == 'LIVE_STREAM_SCREEN' || screen == 'LIVE_SESSION_SCREEN' ||
+          notifType == 'live_session' || notifType == 'live_stream' || notifType == 'live';
 
-      final String astrologerName =
-          data?['astrologer_name']?.toString() ??
-          data?['astrologerName']?.toString() ??
-          'Astrologer';
-      final String astrologerImage =
-          data?['astrologer_avatar']?.toString() ??
-          data?['astrologer_image']?.toString() ??
-          data?['astrologerImage']?.toString() ??
-          '';
+      final bool isChatAssistance = type == 'assistance_chat' || screen == 'ASSISTANCE_CHAT_SCREEN' || 
+          notifType == 'assistance_chat' || type == 'chat_assistance';
 
-      debugPrint('[DashboardScreen] Consuming pendingLiveSessionId=$sessionId');
-      Get.to(
-        () => LiveRoomScreen(
-          sessionId: sessionId,
-          astrologerName: astrologerName,
-          astrologerImage: astrologerImage,
-        ),
-      );
+      if (isLive) {
+        final int? sessionId = FCMNotificationService.pendingLiveSessionId;
+        if (sessionId == null || sessionId <= 0) return;
+        
+        // Clear immediately so repeated rebuilds don't re-navigate
+        FCMNotificationService.pendingLiveSessionId = null;
+        FCMNotificationService.pendingNotificationData = null;
+
+        final String astrologerName =
+            data['astrologer_name']?.toString() ??
+            data['astrologerName']?.toString() ??
+            'Astrologer';
+        final String astrologerImage =
+            data['astrologer_avatar']?.toString() ??
+            data['astrologer_image']?.toString() ??
+            data['astrologerImage']?.toString() ??
+            '';
+
+        debugPrint('[DashboardScreen] Consuming pendingLiveSessionId=$sessionId');
+        Get.to(
+          () => LiveRoomScreen(
+            sessionId: sessionId,
+            astrologerName: astrologerName,
+            astrologerImage: astrologerImage,
+          ),
+        );
+      } else if (isChatAssistance) {
+        FCMNotificationService.pendingNotificationData = null;
+        FCMNotificationService.handleNotificationClick(data);
+      }
     } catch (e) {
-      debugPrint('[DashboardScreen] Error consuming pending live session: $e');
+      debugPrint('[DashboardScreen] Error consuming pending notification: $e');
     }
   }
 

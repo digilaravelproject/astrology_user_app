@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -12,6 +13,9 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:astro_user/routes/app_routes.dart';
 import 'package:astro_user/core/services/fcm_notification_service.dart';
+import 'package:astro_user/features/chat_assistance/presentation/pages/chat_assistance_screen.dart';
+import 'package:astro_user/features/chat_assistance/presentation/bindings/chat_assistance_binding.dart';
+import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 
 /// Top-level function required by flutter_local_notifications for background
 /// notification tap handling (Android only). Must be annotated with
@@ -26,14 +30,20 @@ void notificationTapBackground(NotificationResponse response) {
 
   debugPrint('[LocalNotification][BG] Background tap payload: $payload');
 
-  if (payload.startsWith('live_')) {
-    final sessionIdStr = payload.replaceFirst('live_', '');
-    final int? sessionId = int.tryParse(sessionIdStr);
-    if (sessionId != null) {
-      // Store as pending — DashboardScreen initState will consume this.
-      FCMNotificationService.pendingLiveSessionId = sessionId;
-      FCMNotificationService.pendingNotificationData = {'session_id': sessionIdStr};
-      debugPrint('[LocalNotification][BG] Stored pendingLiveSessionId=$sessionId');
+  try {
+    final Map<String, dynamic> data = jsonDecode(payload);
+    FCMNotificationService.pendingNotificationData = data;
+    debugPrint('[LocalNotification][BG] Stored pending json payload');
+  } catch (_) {
+    // Fallback for old string payloads
+    if (payload.startsWith('live_')) {
+      final sessionIdStr = payload.replaceFirst('live_', '');
+      final int? sessionId = int.tryParse(sessionIdStr);
+      if (sessionId != null) {
+        FCMNotificationService.pendingLiveSessionId = sessionId;
+        FCMNotificationService.pendingNotificationData = {'session_id': sessionIdStr};
+        debugPrint('[LocalNotification][BG] Stored pendingLiveSessionId=$sessionId');
+      }
     }
   }
 }
@@ -91,6 +101,23 @@ class LocalNotificationService {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             FloatingChatBubble.onTapCallback?.call();
           });
+        } else if (payload.startsWith('{') && payload.endsWith('}')) {
+          try {
+            final Map<String, dynamic> data = jsonDecode(payload);
+            final type = data['type']?.toString();
+            if (type == 'assistance_chat' || type == 'chat_assistance') {
+              FCMNotificationService.pendingNotificationData = data;
+              if (Get.currentRoute == '' || Get.currentRoute == '/' || Get.currentRoute == AppRoutes.splash) {
+                return;
+              }
+              FCMNotificationService.pendingNotificationData = null;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                FCMNotificationService.handleNotificationClick(data);
+              });
+            }
+          } catch (e) {
+            debugPrint('[LocalNotificationService] JSON parse error: $e');
+          }
         } else {
           // ── Chat session notification (payload = sessionId as string) ──
           final int? sId = int.tryParse(payload);

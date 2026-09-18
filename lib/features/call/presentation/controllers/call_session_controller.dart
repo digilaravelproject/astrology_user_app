@@ -24,10 +24,12 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   bool isSpeakerOn = false;
   bool isCallScreenVisible = false;
   bool isPackageCall = false;
+  bool isLiveCall = false;
   bool isChatAlsoActive = false;
   int? activeChatSessionId;
 
   int? sessionId;
+  int? liveSessionId;
   int? providerId;
   String? providerName;
   String? providerImage;

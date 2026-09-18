@@ -73,6 +73,8 @@ class LiveAstrologerModel {
   final String? profilePhoto;
   final String? gender;
   final String? dateOfBirth;
+  final String? callRate;
+  final String? originalCallRatePerMinute;
 
   LiveAstrologerModel({
     required this.id,
@@ -81,6 +83,8 @@ class LiveAstrologerModel {
     this.profilePhoto,
     this.gender,
     this.dateOfBirth,
+    this.callRate,
+    this.originalCallRatePerMinute,
   });
 
   factory LiveAstrologerModel.fromJson(Map<String, dynamic> json) {
@@ -91,6 +95,8 @@ class LiveAstrologerModel {
       profilePhoto: json['profile_photo'],
       gender: json['gender'],
       dateOfBirth: json['date_of_birth'],
+      callRate: json['call_rate_per_minute']?.toString() ?? json['call_rate']?.toString(),
+      originalCallRatePerMinute: json['original_call_rate_per_minute']?.toString(),
     );
   }
 
@@ -102,6 +108,8 @@ class LiveAstrologerModel {
       'profile_photo': profilePhoto,
       'gender': gender,
       'date_of_birth': dateOfBirth,
+      'call_rate_per_minute': callRate,
+      'original_call_rate_per_minute': originalCallRatePerMinute,
     };
   }
 }

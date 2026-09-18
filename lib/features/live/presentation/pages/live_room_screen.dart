@@ -12,10 +12,13 @@ import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/core/widgets/custom_image_widget.dart';
 import 'package:astro_user/core/constants/app_strings.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_webrtc_controller.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
 import 'package:astro_user/features/astrologers/presentation/controllers/astrologer_controller.dart';
 import 'package:astro_user/features/astrologers/data/models/gift_model.dart' as model;
 import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/features/astrologers/data/models/astrologer_model.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
@@ -838,6 +841,16 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                   ),
                 ),
 
+                if (Get.isRegistered<CallController>())
+                  Obx(() {
+                    final callController = Get.find<CallController>();
+                    final status = callController.status.value;
+                    if (callController.session.isLiveCall && status != 'idle' && status != 'completed' && status != 'cancelled' && status != 'rejected') {
+                      return _buildLiveCallOverlay(callController);
+                    }
+                    return const SizedBox.shrink();
+                  }),
+
                 const Spacer(),
                 
                 // Super Chat Banner
@@ -935,7 +948,99 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                             const SizedBox(width: 8),
                             Column(
                               mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
+                                Obx(() {
+                                  final session = _liveController.currentSession.value;
+                                  if (session?.status == 'completed' || session?.astrologer == null) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final astrologer = session!.astrologer!;
+                                  final detailed = _detailedAstrologer;
+                                  final callRate = detailed?.callRate ?? astrologer.callRate ?? '0';
+                                  final originalRate = detailed?.originalCallRatePerMinute ?? astrologer.originalCallRatePerMinute;
+                                  
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (Get.isRegistered<CallWebRTCController>()) {
+                                        final provId = detailed?.userId ?? astrologer.userId ?? astrologer.id;
+                                        Get.find<CallWebRTCController>().initiateLiveCall(
+                                          providerId: provId,
+                                          providerName: astrologer.name,
+                                          providerImage: detailed?.profilePhoto ?? astrologer.profilePhoto ?? '',
+                                          liveSessionId: session.id,
+                                        );
+                                      }
+                                    },
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.centerLeft,
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.only(left: 12),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: Colors.amber.shade500,
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                "Call Now",
+                                                style: TextStyle(
+                                                  color: Colors.black87,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  if (originalRate != null && originalRate != callRate && originalRate != '0') ...[
+                                                    Text(
+                                                      "₹$originalRate",
+                                                      style: TextStyle(
+                                                        color: Colors.black54,
+                                                        decoration: TextDecoration.lineThrough,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                  ],
+                                                  Text(
+                                                    "₹$callRate/Min",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: -4,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.green,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.call,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                                const SizedBox(height: 16),
                                 Obx(() {
                                   final session = _liveController.currentSession.value;
                                   final isEnded = session?.status == 'completed';
@@ -1416,11 +1521,90 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   }
 
 
+  AstrologerModel? _detailedAstrologer;
+
+  Widget _buildLiveCallOverlay(CallController controller) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green, width: 1.5),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            backgroundImage: controller.session.providerImage != null && controller.session.providerImage!.isNotEmpty
+                ? NetworkImage(
+                    controller.session.providerImage!.startsWith('http')
+                        ? controller.session.providerImage!
+                        : '${AppUrls.baseImageUrl}${controller.session.providerImage}',
+                  )
+                : null,
+            child: controller.session.providerImage == null || controller.session.providerImage!.isEmpty
+                ? const Icon(Icons.person, color: Colors.white)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  controller.status.value == 'ongoing'
+                      ? 'Live Call Active'
+                      : 'Calling...',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                if (controller.status.value == 'ongoing')
+                  Obx(() {
+                    final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
+                    final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
+                    return Text(
+                      '$minutes:$seconds',
+                      style: const TextStyle(color: Colors.greenAccent, fontSize: 12),
+                    );
+                  }),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              if (Get.isRegistered<CallWebRTCController>()) {
+                Get.find<CallWebRTCController>().terminateEntireSession();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.call_end, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _fetchAstrologerDetails(int id) async {
     if (Get.isRegistered<AstrologerController>()) {
       final astroController = Get.find<AstrologerController>();
       final astrologerDetails = await astroController.fetchAstrologerById(id);
       if (astrologerDetails != null) {
+        if (mounted) {
+          setState(() {
+            _detailedAstrologer = astrologerDetails;
+          });
+        }
         _isFollowing.value = astrologerDetails.isFollowed;
         _followerCount.value = astrologerDetails.totalOrders ?? 0;
       }
