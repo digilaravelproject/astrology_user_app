@@ -181,7 +181,10 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     status.value = 'ended';
     timer?.cancel();
     ForegroundTaskService.stopService();
-    if (_orchestrator.sessionId != null) LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+    if (_orchestrator.sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
+    }
     FloatingChatBubble.dismiss();
     if (Get.isRegistered<AuthController>()) Get.find<AuthController>().checkLoginStatus();
     Future.delayed(const Duration(milliseconds: 400), () {
@@ -194,7 +197,10 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     status.value = 'ended';
     timer?.cancel();
     ForegroundTaskService.stopService();
-    if (_orchestrator.sessionId != null) LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+    if (_orchestrator.sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
+    }
     FloatingChatBubble.dismiss();
     Get.back();
   }
@@ -202,16 +208,27 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   void handlePackageTerminated() {
     status.value = 'ended';
     timer?.cancel();
+    _globalTimerSub?.cancel();
     ForegroundTaskService.stopService();
-    if (_orchestrator.sessionId != null) LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+    if (_orchestrator.sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
+    }
     FloatingChatBubble.dismiss();
     WebSocketService.activeSessionId = null;
     Get.back();
     Get.dialog(AlertDialog(title: Text("Session Expired".tr), content: Text("Your prepaid package session has expired. Conversation has ended.".tr), actions: [TextButton(onPressed: () => Get.back(), child: Text("OK".tr))]));
   }
 
+  StreamSubscription? _globalTimerSub;
+
   void setupTimer(String? startedAtString) {
     timer?.cancel();
+    _globalTimerSub?.cancel();
+    _globalTimerSub = ForegroundTaskService.globalElapsedSeconds.listen((val) {
+      if (val > 0) elapsedSeconds.value = val;
+    });
+
     final currentSt = status.value.toLowerCase();
     if (currentSt == 'ended' || currentSt == 'completed' || currentSt == 'cancelled' || currentSt == 'rejected') return;
 
@@ -219,23 +236,14 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     if (startedAtString != null && sid != null) {
       startedAt = startedAtString;
       WebSocketService.sessionStartTimes[sid] = startedAtString;
+      SharedPrefs.setString('active_session_started_at_$sid', startedAtString);
     }
 
-    final startedAtStr = startedAtString ?? startedAt ?? (sid != null ? WebSocketService.sessionStartTimes[sid] : null);
+    final savedStartedAt = sid != null ? SharedPrefs.getString('active_session_started_at_$sid') : null;
+    final startedAtStr = startedAtString ?? startedAt ?? savedStartedAt ?? (sid != null ? WebSocketService.sessionStartTimes[sid] : null);
     final dt = parseSmartDate(startedAtStr);
 
     if (dt != null) {
-      final st = status.value.toLowerCase();
-      if (st == 'ongoing' || st == 'accepted') {
-        final diff = DateTime.now().difference(dt).inSeconds;
-        if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sid) {
-          elapsedSeconds.value = FloatingChatBubble.currentElapsedSeconds;
-        } else if (diff >= 0) {
-          elapsedSeconds.value = diff;
-        } else {
-          elapsedSeconds.value = 0;
-        }
-      }
       timer = Timer.periodic(const Duration(seconds: 1), (t) {
         final st = status.value.toLowerCase();
         if (st == 'ended' || st == 'completed' || st == 'cancelled' || st == 'rejected') {
@@ -243,14 +251,12 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
           return;
         }
         if (st == 'ongoing' || st == 'accepted') {
-          final nowDiff = DateTime.now().difference(dt).inSeconds;
+          if (ForegroundTaskService.globalElapsedSeconds.value == 0) {
+            final nowDiff = DateTime.now().difference(dt).inSeconds;
+            elapsedSeconds.value = nowDiff > 0 ? nowDiff : 0;
+          }
           if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sid) {
-            elapsedSeconds.value++;
             FloatingChatBubble.updateStatus(status.value);
-          } else if (nowDiff >= 0) {
-            elapsedSeconds.value = nowDiff;
-          } else {
-            elapsedSeconds.value++;
           }
         }
       });
@@ -263,10 +269,11 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
         }
         if (st == 'ongoing' || st == 'accepted') {
           elapsedSeconds.value++;
-          if (sid != null) {
+          if (sid != null && (elapsedSeconds.value % 5 == 0)) { // Save occasionally if not from real startedAt
             final genStart = DateTime.now().subtract(Duration(seconds: elapsedSeconds.value)).toIso8601String();
             startedAt = genStart;
             WebSocketService.sessionStartTimes[sid] = genStart;
+            SharedPrefs.setString('active_session_started_at_$sid', genStart);
           }
         }
       });
@@ -294,7 +301,10 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       status.value = 'ended';
       timer?.cancel();
       ForegroundTaskService.stopService();
-      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      if (_orchestrator.sessionId != null) {
+        LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+        SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
+      }
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
       Get.back();

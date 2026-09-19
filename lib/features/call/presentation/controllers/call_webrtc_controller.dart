@@ -242,7 +242,7 @@ class CallWebRTCController extends GetxController {
 
     final acceptedMillis = DateTime.now().millisecondsSinceEpoch;
     LocalNotificationService.cancelIncomingCallNotification(_orchestrator.sessionId!);
-    _orchestrator.session.startCallTimer();
+    _orchestrator.session.startCallTimer(startedAtMillis: acceptedMillis);
     _orchestrator.session.showOngoingNotification(startedAtMillis: acceptedMillis);
 
     try {
@@ -290,7 +290,7 @@ class CallWebRTCController extends GetxController {
                 final startedAt = DateTime.tryParse(startedAtStr)?.toLocal();
                 if (startedAt != null) {
                   _orchestrator.durationSeconds.value = DateTime.now().difference(startedAt).inSeconds;
-                  _orchestrator.session.startCallTimer();
+                  _orchestrator.session.startCallTimer(startedAtMillis: startedAt.millisecondsSinceEpoch);
                 }
               }
               

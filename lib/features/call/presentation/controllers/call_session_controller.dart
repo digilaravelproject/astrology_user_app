@@ -196,10 +196,35 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     });
   }
 
-  void startCallTimer() {
+  StreamSubscription? _globalTimerSub;
+
+  void startCallTimer({int? startedAtMillis}) {
     callTimer?.cancel();
+    _globalTimerSub?.cancel();
+    _globalTimerSub = ForegroundTaskService.globalElapsedSeconds.listen((val) {
+      if (val > 0) durationSeconds.value = val;
+    });
+
+    final sid = sessionId;
+    if (sid == null) return;
+    
+    int? effectiveStartedAtMillis = startedAtMillis;
+    if (effectiveStartedAtMillis != null) {
+      SharedPrefs.setInt('active_call_started_at_$sid', effectiveStartedAtMillis);
+    } else {
+      effectiveStartedAtMillis = SharedPrefs.getInt('active_call_started_at_$sid');
+      if (effectiveStartedAtMillis == null) {
+        effectiveStartedAtMillis = DateTime.now().millisecondsSinceEpoch;
+        SharedPrefs.setInt('active_call_started_at_$sid', effectiveStartedAtMillis);
+      }
+    }
+    
+    final startedAt = DateTime.fromMillisecondsSinceEpoch(effectiveStartedAtMillis);
     callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      durationSeconds.value++;
+      if (ForegroundTaskService.globalElapsedSeconds.value == 0) {
+        final diff = DateTime.now().difference(startedAt).inSeconds;
+        durationSeconds.value = diff >= 0 ? diff : 0;
+      }
     });
   }
 
@@ -230,8 +255,12 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   void cleanUp() {
     stopRingtone();
     callTimer?.cancel();
+    _globalTimerSub?.cancel();
     ringingTimer?.cancel();
-    if (sessionId != null) LocalNotificationService.cancelOngoingCallNotification(sessionId!);
+    if (sessionId != null) {
+      LocalNotificationService.cancelOngoingCallNotification(sessionId!);
+      SharedPrefs.remove('active_call_started_at_$sessionId');
+    }
     try { ForegroundTaskService.stopService(); } catch (_) {}
     FloatingCallBubble.dismiss();
     _orchestrator.webrtcService.dispose();
