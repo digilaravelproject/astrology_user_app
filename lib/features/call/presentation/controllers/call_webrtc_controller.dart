@@ -14,10 +14,13 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'call_controller.dart';
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
 
 class CallWebRTCController extends GetxController {
   final ApiClient _apiClient = Get.find<ApiClient>();
   CallController get _orchestrator => Get.find<CallController>();
+
+  var isInitiatingLiveCall = false.obs;
 
   Future<void> initiateLiveCall({
     required int providerId,
@@ -34,7 +37,7 @@ class CallWebRTCController extends GetxController {
       _orchestrator.session.isLiveCall = true;
       _orchestrator.session.liveSessionId = liveSessionId;
 
-      _orchestrator.status.value = 'dialing';
+      isInitiatingLiveCall.value = true;
       final offerDescription = await _orchestrator.webrtcService.createOffer(0);
 
       final response = await _apiClient.post(
@@ -47,6 +50,8 @@ class CallWebRTCController extends GetxController {
         handleError: true,
         showErrorScreen: false,
       );
+
+      isInitiatingLiveCall.value = false;
 
       if (response.isSuccess) {
         final bodyMap = response.body;
@@ -71,10 +76,22 @@ class CallWebRTCController extends GetxController {
         }
       } else {
         _orchestrator.status.value = 'idle';
-        CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate live call.');
+        final errorMessage = response.body?['message']?.toString() ?? 'Failed to initiate live call.';
         _orchestrator.session.cleanUp();
+        
+        if (errorMessage.toLowerCase().contains('insufficient balance')) {
+          CustomSnackbar.showError(errorMessage);
+          Get.bottomSheet(
+            const RechargeBottomSheet(),
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+          );
+        } else {
+          CustomSnackbar.showError(errorMessage);
+        }
       }
     } catch (e) {
+      isInitiatingLiveCall.value = false;
       _orchestrator.status.value = 'idle';
       _orchestrator.session.cleanUp();
     }
@@ -132,10 +149,21 @@ class CallWebRTCController extends GetxController {
         }
       } else {
         _orchestrator.status.value = 'idle';
-        CustomSnackbar.showError(response.body?['message']?.toString() ?? 'Failed to initiate call.');
+        final errorMessage = response.body?['message']?.toString() ?? 'Failed to initiate call.';
         final wasVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
         if (wasVisible) Get.back();
+
+        if (errorMessage.toLowerCase().contains('insufficient balance')) {
+          CustomSnackbar.showError(errorMessage);
+          Get.bottomSheet(
+            const RechargeBottomSheet(),
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+          );
+        } else {
+          CustomSnackbar.showError(errorMessage);
+        }
       }
     } catch (e) {
       _orchestrator.status.value = 'idle';

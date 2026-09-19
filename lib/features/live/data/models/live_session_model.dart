@@ -12,6 +12,8 @@ class LiveSessionModel {
   final bool isBroadcasting;
   final bool isCameraOn;
   final bool isAudioOn;
+  final bool isOnCall;
+  final Map<String, dynamic>? activeCall;
 
   LiveSessionModel({
     required this.id,
@@ -27,6 +29,8 @@ class LiveSessionModel {
     this.isBroadcasting = false,
     this.isCameraOn = true,
     this.isAudioOn = true,
+    this.isOnCall = false,
+    this.activeCall,
   });
 
   factory LiveSessionModel.fromJson(Map<String, dynamic> json) {
@@ -44,6 +48,8 @@ class LiveSessionModel {
       isBroadcasting: json['is_broadcasting'] ?? false,
       isCameraOn: json['is_camera_on'] ?? true,
       isAudioOn: json['is_audio_on'] ?? true,
+      isOnCall: json['is_on_call'] ?? false,
+      activeCall: json['active_call'],
     );
   }
 
@@ -61,6 +67,8 @@ class LiveSessionModel {
       'is_broadcasting': isBroadcasting,
       'is_camera_on': isCameraOn,
       'is_audio_on': isAudioOn,
+      'is_on_call': isOnCall,
+      'active_call': activeCall,
     };
   }
 

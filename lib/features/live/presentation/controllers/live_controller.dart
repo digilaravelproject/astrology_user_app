@@ -6,6 +6,8 @@ import 'package:astro_user/features/live/data/models/live_session_model.dart';
 import 'package:astro_user/features/live/domain/usecases/live_usecases.dart';
 import 'package:flutter/material.dart';
 import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
 class LiveController extends GetxController {
   final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;
   final GetLiveSessionDetailUseCase _getSessionDetailUseCase;
@@ -333,6 +335,44 @@ class LiveController extends GetxController {
       print('[LIVE] Error getting watch token: $e');
     }
     return null;
+  }
+
+  Future<void> fetchCallStatus(int id) async {
+    try {
+      if (!Get.isRegistered<ApiClient>()) return;
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppUrls.liveSessionCallStatus(id), handleError: false, showErrorScreen: false);
+      if (response.isSuccess && response.body != null) {
+        final dynamic body = response.body;
+        if (body is Map<String, dynamic> && body['data'] is Map<String, dynamic>) {
+          final data = body['data'];
+          final bool isOnCall = data['is_on_call'] == true || data['is_on_call'] == 'true';
+          final Map<String, dynamic>? activeCall = data['active_call'];
+          
+          if (currentSession.value?.id == id) {
+            currentSession.value = LiveSessionModel(
+              id: currentSession.value!.id,
+              title: currentSession.value!.title,
+              description: currentSession.value!.description,
+              sessionType: currentSession.value!.sessionType,
+              status: currentSession.value!.status,
+              streamUrl: currentSession.value!.streamUrl,
+              viewerCount: currentSession.value!.viewerCount,
+              startedAt: currentSession.value!.startedAt,
+              astrologer: currentSession.value!.astrologer,
+              isBroadcasting: currentSession.value!.isBroadcasting,
+              isCameraOn: currentSession.value!.isCameraOn,
+              isAudioOn: currentSession.value!.isAudioOn,
+              isOnCall: isOnCall,
+              activeCall: activeCall,
+            );
+            currentSession.refresh();
+          }
+        }
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching call status: $e');
+    }
   }
 
   @override

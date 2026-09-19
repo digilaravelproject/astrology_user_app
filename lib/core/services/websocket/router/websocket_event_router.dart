@@ -62,6 +62,10 @@ class WebSocketEventRouter {
         event == 'App\\Events\\${AppUrls.eventActiveLiveSessionsUpdated}' ||
         event == '.${AppUrls.eventActiveLiveSessionsUpdated}') {
       LiveWsHandler.handleActiveLiveSessionsUpdated(data);
+    } else if (event == AppUrls.eventLiveSessionCallStatusUpdated ||
+        event == 'App\\Events\\${AppUrls.eventLiveSessionCallStatusUpdated}' ||
+        event == '.${AppUrls.eventLiveSessionCallStatusUpdated}') {
+      LiveWsHandler.handleLiveSessionCallStatusUpdated(data);
     } else if (event == AppUrls.eventLiveSessionEnded ||
         event == 'App\\Events\\${AppUrls.eventLiveSessionEnded}' ||
         event == '.${AppUrls.eventLiveSessionEnded}') {

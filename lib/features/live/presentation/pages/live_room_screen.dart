@@ -840,6 +840,40 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                     ),
                   ),
                 ),
+                
+                Obx(() {
+                  final session = _liveController.currentSession.value;
+                  if (session != null && session.isOnCall && session.activeCall != null) {
+                    final userName = session.activeCall?['user']?['name'] ?? 'User';
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8, bottom: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.green.withOpacity(0.5)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.call, color: Colors.green, size: 14),
+                            const SizedBox(width: 6),
+                            Text(
+                              "Astrologer is talking to $userName",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
 
                 if (Get.isRegistered<CallController>())
                   Obx(() {
@@ -962,6 +996,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                   
                                   return GestureDetector(
                                     onTap: () {
+                                      if (session.isOnCall) {
+                                        CustomSnackbar.showInfo("Astrologer is currently busy on another call.");
+                                        return;
+                                      }
                                       if (Get.isRegistered<CallWebRTCController>()) {
                                         final provId = detailed?.userId ?? astrologer.userId ?? astrologer.id;
                                         Get.find<CallWebRTCController>().initiateLiveCall(
@@ -980,53 +1018,77 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                                           margin: const EdgeInsets.only(left: 12),
                                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                           decoration: BoxDecoration(
-                                            color: Colors.amber.shade500,
+                                            color: session.isOnCall ? Colors.grey.shade700 : Colors.amber.shade500,
                                             borderRadius: BorderRadius.circular(6),
                                           ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Text(
-                                                "Call Now",
-                                                style: TextStyle(
-                                                  color: Colors.black87,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                              Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  if (originalRate != null && originalRate != callRate && originalRate != '0') ...[
-                                                    Text(
-                                                      "₹$originalRate",
-                                                      style: TextStyle(
-                                                        color: Colors.black54,
-                                                        decoration: TextDecoration.lineThrough,
-                                                        fontSize: 10,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                  ],
-                                                  Text(
-                                                    "₹$callRate/Min",
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontWeight: FontWeight.w600,
+                                          child: session.isOnCall
+                                              ? const Padding(
+                                                  padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                                  child: Text(
+                                                    "Busy on Call",
+                                                    style: TextStyle(
+                                                      color: Colors.white70,
+                                                      fontWeight: FontWeight.bold,
                                                       fontSize: 11,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                                )
+                                              : Obx(() {
+                                                  final isCalling = Get.isRegistered<CallWebRTCController>() && Get.find<CallWebRTCController>().isInitiatingLiveCall.value;
+                                                  return isCalling
+                                                      ? const Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                                          child: SizedBox(
+                                                            height: 16,
+                                                            width: 16,
+                                                            child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                                                          ),
+                                                        )
+                                                      : Column(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            const Text(
+                                                              "Call Now",
+                                                              style: TextStyle(
+                                                                color: Colors.black87,
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                            Row(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                if (originalRate != null && originalRate != callRate && originalRate != '0') ...[
+                                                                  Text(
+                                                                    "₹$originalRate",
+                                                                    style: const TextStyle(
+                                                                      color: Colors.black54,
+                                                                      decoration: TextDecoration.lineThrough,
+                                                                      fontSize: 10,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(width: 4),
+                                                                ],
+                                                                Text(
+                                                                  "₹$callRate/Min",
+                                                                  style: const TextStyle(
+                                                                    color: Colors.black87,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    fontSize: 11,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        );
+                                                }),
                                         ),
                                         Positioned(
                                           left: -4,
                                           child: Container(
                                             padding: const EdgeInsets.all(6),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.green,
+                                            decoration: BoxDecoration(
+                                              color: session.isOnCall ? Colors.grey.shade500 : Colors.green,
                                               shape: BoxShape.circle,
                                             ),
                                             child: const Icon(
@@ -1575,20 +1637,63 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              if (Get.isRegistered<CallWebRTCController>()) {
-                Get.find<CallWebRTCController>().terminateEntireSession();
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  controller.toggleMute();
+                },
+                child: Obx(() => Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: controller.isMuted.value ? Colors.white : Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      ),
+                      child: Icon(
+                        controller.isMuted.value ? Icons.mic_off : Icons.mic,
+                        color: controller.isMuted.value ? Colors.black : Colors.white,
+                        size: 20,
+                      ),
+                    )),
               ),
-              child: const Icon(Icons.call_end, color: Colors.white, size: 20),
-            ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  controller.toggleSpeaker();
+                },
+                child: Obx(() => Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: controller.isSpeakerOn.value ? Colors.white : Colors.white.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      ),
+                      child: Icon(
+                        controller.isSpeakerOn.value ? Icons.volume_up : Icons.volume_down,
+                        color: controller.isSpeakerOn.value ? Colors.black : Colors.white,
+                        size: 20,
+                      ),
+                    )),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
+                  if (Get.isRegistered<CallWebRTCController>()) {
+                    Get.find<CallWebRTCController>().terminateEntireSession();
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.redAccent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.call_end, color: Colors.white, size: 20),
+                ),
+              ),
+            ],
           ),
         ],
       ),

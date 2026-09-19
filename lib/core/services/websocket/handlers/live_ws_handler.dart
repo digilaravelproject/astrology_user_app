@@ -339,4 +339,46 @@ class LiveWsHandler {
       Logger.e('LiveWsHandler: error handling ActiveLiveSessionsUpdated -> $e');
     }
   }
+  static void handleLiveSessionCallStatusUpdated(dynamic rawData) {
+    try {
+      Map<String, dynamic> eventData = {};
+      if (rawData is String) {
+        eventData = jsonDecode(rawData);
+      } else if (rawData is Map) {
+        eventData = Map<String, dynamic>.from(rawData);
+      }
+
+      final int sessionId = eventData['live_session_id'] is int
+          ? eventData['live_session_id']
+          : (int.tryParse(eventData['live_session_id']?.toString() ?? '') ?? 0);
+          
+      final bool isOnCall = eventData['is_on_call'] == true || eventData['is_on_call'] == 'true';
+      final Map<String, dynamic>? activeCall = eventData['active_call'] ?? (eventData['user'] != null ? {'user': eventData['user']} : null);
+
+      if (Get.isRegistered<LiveController>()) {
+        final controller = Get.find<LiveController>();
+        if (controller.currentSession.value?.id == sessionId) {
+          controller.currentSession.value = LiveSessionModel(
+            id: controller.currentSession.value!.id,
+            title: controller.currentSession.value!.title,
+            description: controller.currentSession.value!.description,
+            sessionType: controller.currentSession.value!.sessionType,
+            status: controller.currentSession.value!.status,
+            streamUrl: controller.currentSession.value!.streamUrl,
+            viewerCount: controller.currentSession.value!.viewerCount,
+            startedAt: controller.currentSession.value!.startedAt,
+            astrologer: controller.currentSession.value!.astrologer,
+            isBroadcasting: controller.currentSession.value!.isBroadcasting,
+            isCameraOn: controller.currentSession.value!.isCameraOn,
+            isAudioOn: controller.currentSession.value!.isAudioOn,
+            isOnCall: isOnCall,
+            activeCall: activeCall,
+          );
+          controller.currentSession.refresh();
+        }
+      }
+    } catch (e) {
+      Logger.e('LiveWsHandler: error handling LiveSessionCallStatusUpdated -> $e');
+    }
+  }
 }

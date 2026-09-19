@@ -96,6 +96,7 @@ class AppUrls {
   static String sendLiveComment(int id) => "/user/live/$id/comment";
   static String sendSuperChat(int id) => "/user/live/$id/super-chat";
   static String watchLiveSession(int id) => "/user/live/$id/watch";
+  static String liveSessionCallStatus(int id) => "/user/live/$id/call-status";
 
   static const String gifts = '/gifts';
   static const String sendGift = '/gifts/send';
@@ -214,6 +215,7 @@ class AppUrls {
   static const String eventNewLiveComment = 'NewLiveComment';
   static const String eventSuperChatReceived = 'SuperChatReceived';
   static const String eventAstrologerAvailabilityUpdated = 'AstrologerAvailabilityUpdated';
+  static const String eventLiveSessionCallStatusUpdated = 'LiveSessionCallStatusUpdated';
 
   // ==========================================
   // System Events - Prepaid Packages
