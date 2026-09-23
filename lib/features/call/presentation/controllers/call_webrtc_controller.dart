@@ -8,6 +8,7 @@ import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
+import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
@@ -263,6 +264,9 @@ class CallWebRTCController extends GetxController {
         if (session != null) {
           final sessionStatus = session['status']?.toString();
           if (sessionStatus == 'ongoing' || sessionStatus == 'ringing' || sessionStatus == 'dialing' || sessionStatus == 'waiting') {
+            if (Get.isRegistered<LiveController>()) {
+              Get.find<LiveController>().isAudioOn.value = false;
+            }
             _orchestrator.session.isSummaryShown = false;
             _orchestrator.session.sessionId = int.tryParse(session['id']?.toString() ?? '');
             _orchestrator.webrtcService.activeSessionId = _orchestrator.sessionId;

@@ -9,6 +9,7 @@ import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
+import 'package:astro_user/features/live/presentation/controllers/live_controller.dart';
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'call_controller.dart';
@@ -254,6 +255,9 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
 
   void cleanUp() {
     stopRingtone();
+    if (Get.isRegistered<LiveController>()) {
+      Get.find<LiveController>().isAudioOn.value = true;
+    }
     callTimer?.cancel();
     _globalTimerSub?.cancel();
     ringingTimer?.cancel();
