@@ -75,14 +75,24 @@ class LocalNotificationService {
           // ── Live Stream notification ──
           final sessionIdStr = payload.replaceFirst('live_', '');
           final int? sessionId = int.tryParse(sessionIdStr);
+          debugPrint('[LocalNotificationService] live tap: sessionId=$sessionId');
           if (sessionId != null) {
-            // Use addPostFrameCallback to ensure widget tree is ready
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Get.to(() => LiveRoomScreen(
-                sessionId: sessionId,
-                astrologerName: 'Astrologer',
-                astrologerImage: '',
-              ));
+            // Use pending mechanism — consistent with background/cold-start approach
+            FCMNotificationService.pendingLiveSessionId = sessionId;
+            FCMNotificationService.pendingNotificationData = {'session_id': sessionIdStr, 'type': 'live_stream'};
+            Future.delayed(const Duration(milliseconds: 300), () {
+              // If DashboardScreen is in stack, it will consume pending on resume.
+              // Fallback: navigate directly.
+              final int? sid = FCMNotificationService.pendingLiveSessionId;
+              if (sid != null && sid > 0) {
+                FCMNotificationService.pendingLiveSessionId = null;
+                FCMNotificationService.pendingNotificationData = null;
+                Get.to(() => LiveRoomScreen(
+                  sessionId: sid,
+                  astrologerName: 'Astrologer',
+                  astrologerImage: '',
+                ));
+              }
             });
           }
         } else if (payload.startsWith('call_')) {

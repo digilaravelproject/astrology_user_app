@@ -151,10 +151,47 @@ class FCMNotificationService {
       }
     });
 
-    // 5. Notification Opened Handler
+    // 5. Notification Opened Handler (App in Background — user taps FCM notification)
+    // We MUST use the same pending-data pattern as cold-start.
+    // Direct Get.to() here is unreliable because the widget tree may not be
+    // fully ready when the OS resumes the app.
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Notification Opened App: ${message.data}');
-      handleNotificationClick(message.data);
+      debugPrint('[FCMNotificationService] onMessageOpenedApp: ${message.data}');
+      final data = message.data;
+      final type = data['type']?.toString().toLowerCase();
+      final screen = data['screen']?.toString().toUpperCase();
+      final notifType = data['notification_type']?.toString().toLowerCase();
+
+      final bool isLive = type == 'live_stream' ||
+          type == 'live' ||
+          type == 'live_session' ||
+          screen == 'LIVE_STREAM_SCREEN' ||
+          screen == 'LIVE_SESSION_SCREEN' ||
+          notifType == 'live_session' ||
+          notifType == 'live_stream' ||
+          notifType == 'live';
+
+      if (isLive) {
+        // Store as pending — DashboardScreen._consumePendingNotification() will
+        // navigate to LiveRoomScreen once the widget tree is fully ready.
+        final sessionIdStr = data['session_id']?.toString() ??
+            data['live_session_id']?.toString() ??
+            data['sessionId']?.toString() ??
+            data['id']?.toString();
+        final int? sessionId = int.tryParse(sessionIdStr ?? '');
+        pendingLiveSessionId = sessionId;
+        pendingNotificationData = Map<String, dynamic>.from(data);
+        debugPrint('[FCMNotificationService] onMessageOpenedApp: pendingLiveSessionId=$sessionId data=$data');
+        // Delay slightly so DashboardScreen initState runs first, then trigger consumption
+        Future.delayed(const Duration(milliseconds: 600), () {
+          _tryNavigateToPendingLive();
+        });
+      } else {
+        // Non-live types: safe to navigate directly after a short delay
+        Future.delayed(const Duration(milliseconds: 600), () {
+          handleNotificationClick(data);
+        });
+      }
     });
 
     // 6. Cold Start / Initial Message Handler
@@ -204,6 +241,39 @@ class FCMNotificationService {
     });
   }
 
+  /// Navigate to pending live session — called after a safe delay so the
+  /// widget tree (DashboardScreen) is guaranteed to be fully mounted.
+  static void _tryNavigateToPendingLive() {
+    try {
+      final int? sessionId = pendingLiveSessionId;
+      final Map<String, dynamic>? data = pendingNotificationData;
+      if (sessionId == null || sessionId <= 0 || data == null) return;
+
+      // Clear so repeated calls don't re-navigate
+      pendingLiveSessionId = null;
+      pendingNotificationData = null;
+
+      final String astrologerName =
+          data['astrologer_name']?.toString() ??
+          data['astrologerName']?.toString() ??
+          'Astrologer';
+      final String astrologerImage =
+          data['astrologer_avatar']?.toString() ??
+          data['astrologer_image']?.toString() ??
+          data['astrologerImage']?.toString() ??
+          '';
+
+      debugPrint('[FCMNotificationService] _tryNavigateToPendingLive: sessionId=$sessionId');
+      Get.to(() => LiveRoomScreen(
+        sessionId: sessionId,
+        astrologerName: astrologerName,
+        astrologerImage: astrologerImage,
+      ));
+    } catch (e) {
+      debugPrint('[FCMNotificationService] _tryNavigateToPendingLive error: $e');
+    }
+  }
+
   static void handleNotificationClick(Map<String, dynamic> data) {
     try {
       debugPrint('[FCM_SERVICE] Handling notification click with data: $data');
@@ -211,22 +281,31 @@ class FCMNotificationService {
       final type = data['type']?.toString();
       final screen = data['screen']?.toString();
       final notificationType = data['notification_type']?.toString();
-      
-      if (type == 'live_stream' || screen == 'LIVE_STREAM_SCREEN' || notificationType == 'live_session') {
-        final sessionIdStr = data['session_id']?.toString() ?? data['live_session_id']?.toString() ?? data['id']?.toString();
-        if (sessionIdStr != null && sessionIdStr.isNotEmpty) {
-          final int? sessionId = int.tryParse(sessionIdStr);
-          if (sessionId != null) {
-            final String astrologerName = data['astrologer_name']?.toString() ?? 'Astrologer';
-            final String astrologerImage = data['astrologer_avatar']?.toString() ?? data['astrologer_image']?.toString() ?? '';
-            
-            // Navigate to LiveRoomScreen
-            Get.to(() => LiveRoomScreen(
-              sessionId: sessionId,
-              astrologerName: astrologerName,
-              astrologerImage: astrologerImage,
-            ));
-          }
+      final lowerType = type?.toLowerCase() ?? '';
+
+      final bool isLive = lowerType == 'live_stream' ||
+          lowerType == 'live' ||
+          lowerType == 'live_session' ||
+          screen == 'LIVE_STREAM_SCREEN' ||
+          screen == 'LIVE_SESSION_SCREEN' ||
+          notificationType == 'live_session' ||
+          notificationType == 'live_stream' ||
+          notificationType == 'live';
+
+      if (isLive) {
+        // Use pending mechanism — safe for all app states (foreground/background/killed)
+        final sessionIdStr = data['session_id']?.toString() ??
+            data['live_session_id']?.toString() ??
+            data['sessionId']?.toString() ??
+            data['id']?.toString();
+        final int? sessionId = int.tryParse(sessionIdStr ?? '');
+        if (sessionId != null && sessionId > 0) {
+          pendingLiveSessionId = sessionId;
+          pendingNotificationData = Map<String, dynamic>.from(data);
+          // Navigate after a brief delay to ensure widget tree is ready
+          Future.delayed(const Duration(milliseconds: 300), () {
+            _tryNavigateToPendingLive();
+          });
         }
       } else if (type == 'assistance_chat' || screen == 'ASSISTANCE_CHAT_SCREEN' || notificationType == 'assistance_chat' || type == 'chat_assistance') {
         final astrologerIdStr = data['astrologer_id']?.toString() ?? data['sender_id']?.toString() ?? data['user_id']?.toString();
