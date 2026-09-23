@@ -288,7 +288,15 @@ class LocalNotificationService {
           enableVibration: false,
         ),
       );
-      androidPlugin.requestNotificationsPermission();
+      // requestNotificationsPermission must be guarded — it throws a
+      // NullPointerException if called before the Android context is fully
+      // ready (e.g. in a background isolate or during a cold-start restart).
+      try {
+        await Future.delayed(const Duration(milliseconds: 300));
+        await androidPlugin.requestNotificationsPermission();
+      } catch (e) {
+        debugPrint('[LocalNotificationService] requestNotificationsPermission skipped (context not ready): $e');
+      }
     }
   }
 
