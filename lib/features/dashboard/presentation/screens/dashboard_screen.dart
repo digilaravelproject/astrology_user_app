@@ -111,10 +111,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final launchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
         if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
           final payload = launchDetails.notificationResponse?.payload;
+          debugPrint('[DashboardScreen] Local notification launch payload: $payload');
           if (payload != null && payload.isNotEmpty) {
-            final Map<String, dynamic> data = jsonDecode(payload);
-            FCMNotificationService.pendingNotificationData = data;
-            debugPrint('[DashboardScreen] Extracted local notification launch payload');
+            // Handle live_ string payload directly (e.g. "live_124") —
+            // jsonDecode would fail here because payload is NOT JSON.
+            if (payload.startsWith('live_')) {
+              final sessionIdStr = payload.replaceFirst('live_', '');
+              final int? sessionId = int.tryParse(sessionIdStr);
+              if (sessionId != null && sessionId > 0) {
+                debugPrint('[DashboardScreen] live_ payload → navigating to LiveRoomScreen sessionId=$sessionId');
+                Get.to(() => LiveRoomScreen(
+                  sessionId: sessionId,
+                  astrologerName: 'Astrologer',
+                  astrologerImage: '',
+                ));
+                return;
+              }
+            }
+            // Try JSON decode for other structured payloads
+            try {
+              final Map<String, dynamic> decoded = jsonDecode(payload);
+              FCMNotificationService.pendingNotificationData = decoded;
+              debugPrint('[DashboardScreen] Extracted local notification launch JSON payload');
+            } catch (_) {
+              debugPrint('[DashboardScreen] Payload is not JSON, skipping: $payload');
+            }
           }
         }
       } catch (e) {
