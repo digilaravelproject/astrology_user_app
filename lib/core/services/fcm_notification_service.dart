@@ -228,6 +228,12 @@ class FCMNotificationService {
           pendingLiveSessionId = int.tryParse(sessionIdStr ?? '');
           pendingNotificationData = Map<String, dynamic>.from(data);
           debugPrint('[FCMNotificationService] Cold-start: pendingLiveSessionId=$pendingLiveSessionId  data=$data');
+          
+          // Fallback: aggressively try to navigate after splash screen duration
+          // just in case DashboardScreen missed it.
+          Future.delayed(const Duration(milliseconds: 6000), () {
+            _tryNavigateToPendingLive();
+          });
         } else if (isChatAssistance) {
           pendingNotificationData = Map<String, dynamic>.from(data);
           debugPrint('[FCMNotificationService] Cold-start: pendingNotificationData=$pendingNotificationData');
