@@ -292,8 +292,11 @@ class LocalNotificationService {
       // NullPointerException if called before the Android context is fully
       // ready (e.g. in a background isolate or during a cold-start restart).
       try {
-        await Future.delayed(const Duration(milliseconds: 300));
-        await androidPlugin.requestNotificationsPermission();
+        Future.delayed(const Duration(milliseconds: 300), () {
+          androidPlugin.requestNotificationsPermission().catchError((e) {
+            debugPrint('[LocalNotificationService] requestNotificationsPermission failed: $e');
+          });
+        });
       } catch (e) {
         debugPrint('[LocalNotificationService] requestNotificationsPermission skipped (context not ready): $e');
       }
