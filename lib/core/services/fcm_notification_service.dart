@@ -182,10 +182,7 @@ class FCMNotificationService {
         pendingLiveSessionId = sessionId;
         pendingNotificationData = Map<String, dynamic>.from(data);
         debugPrint('[FCMNotificationService] onMessageOpenedApp: pendingLiveSessionId=$sessionId data=$data');
-        // Delay slightly so DashboardScreen initState runs first, then trigger consumption
-        Future.delayed(const Duration(milliseconds: 600), () {
-          _tryNavigateToPendingLive();
-        });
+        // Navigation will be handled securely by DashboardScreen on AppLifecycleState.resumed
       } else {
         // Non-live types: safe to navigate directly after a short delay
         Future.delayed(const Duration(milliseconds: 600), () {
@@ -231,9 +228,9 @@ class FCMNotificationService {
           
           // Fallback: aggressively try to navigate after splash screen duration
           // just in case DashboardScreen missed it.
-          Future.delayed(const Duration(milliseconds: 6000), () {
-            _tryNavigateToPendingLive();
-          });
+          // Note: Removed the forced Future.delayed navigation because navigating
+          // in the background causes WebRTC (LiveRoomScreen) to crash the Impeller context.
+          // Consumption is strictly handled by DashboardScreen's WidgetsBindingObserver.
         } else if (isChatAssistance) {
           pendingNotificationData = Map<String, dynamic>.from(data);
           debugPrint('[FCMNotificationService] Cold-start: pendingNotificationData=$pendingNotificationData');

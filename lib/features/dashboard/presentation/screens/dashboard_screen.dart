@@ -39,7 +39,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   DateTime? _lastBackPressTime;
   final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
@@ -85,6 +85,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final bool skipPromo = Get.arguments?['skip_promo'] ?? false;
 
+    WidgetsBinding.instance.addObserver(this);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // if (!skipPromo) {
       //   _showPromotionalSheet();
@@ -99,6 +101,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Future.delayed(const Duration(milliseconds: 500), _consumePendingNotification);
       // ──────────────────────────────────────────────────────────────────────
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Consume any pending notifications securely when app is fully resumed
+      _consumePendingNotification();
+    }
   }
 
   /// Consumes any pending Live Session navigation stored by FCMNotificationService

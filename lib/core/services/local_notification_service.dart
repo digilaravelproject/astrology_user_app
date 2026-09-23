@@ -80,20 +80,9 @@ class LocalNotificationService {
             // Use pending mechanism — consistent with background/cold-start approach
             FCMNotificationService.pendingLiveSessionId = sessionId;
             FCMNotificationService.pendingNotificationData = {'session_id': sessionIdStr, 'type': 'live_stream'};
-            Future.delayed(const Duration(milliseconds: 300), () {
-              // If DashboardScreen is in stack, it will consume pending on resume.
-              // Fallback: navigate directly.
-              final int? sid = FCMNotificationService.pendingLiveSessionId;
-              if (sid != null && sid > 0) {
-                FCMNotificationService.pendingLiveSessionId = null;
-                FCMNotificationService.pendingNotificationData = null;
-                Get.to(() => LiveRoomScreen(
-                  sessionId: sid,
-                  astrologerName: 'Astrologer',
-                  astrologerImage: '',
-                ));
-              }
-            });
+            // The navigation will be strictly handled by DashboardScreen's WidgetsBindingObserver
+            // when the app lifecycle reaches AppLifecycleState.resumed.
+            debugPrint('[LocalNotificationService] Set pending state. Waiting for app resume.');
           }
         } else if (payload.startsWith('call_')) {
           // ── Ongoing / Incoming Call notification ──
