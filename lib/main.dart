@@ -14,6 +14,7 @@ import 'core/bindings/initial_bindings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
 
 import 'features/chat/presentation/widgets/overlay_main.dart';
 
@@ -21,6 +22,7 @@ import 'features/chat/presentation/widgets/overlay_main.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await LocalNotificationService.initialize();
+    try { await ForegroundTaskService.init(); } catch (_) {}
     final data = message.data;
     final title = message.notification?.title ?? '';
     final type = data['type']?.toString();

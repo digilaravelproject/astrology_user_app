@@ -170,6 +170,11 @@ class WalletScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final tx = controller.transactions[index];
               final isCredit = tx.transactionType == "credit";
+              
+              final double baseAmt = double.tryParse(tx.baseAmount.toString()) ?? double.tryParse(tx.amount.toString()) ?? 0.0;
+              final double gstAmt = double.tryParse(tx.gstAmount.toString()) ?? 0.0;
+              final double calculatedTotal = baseAmt + gstAmt;
+              
               return GestureDetector(
                 onTap: () => _showTransactionDetailsBottomSheet(context, tx),
                 child: Container(
@@ -239,7 +244,7 @@ class WalletScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               AppText(
-                                "${isCredit ? '+' : '-'} ₹${tx.amount}",
+                                "${isCredit ? '+' : '-'} ₹${calculatedTotal.toStringAsFixed(2)}",
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
                                 color: isCredit ? Colors.green : const Color(0xFF2E1A47),

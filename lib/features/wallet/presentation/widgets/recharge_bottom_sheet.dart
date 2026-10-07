@@ -36,6 +36,10 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    double baseAmount = double.tryParse(_amountController.text) ?? 0.0;
+    double gstAmount = (baseAmount * 18.0) / 100.0;
+    double totalAmount = baseAmount + gstAmount;
+
     return Container(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -54,10 +58,11 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
           _buildHeader(),
           _buildAmountSelector(),
           _buildCustomInput(),
+          _buildGSTDetails(baseAmount, gstAmount, totalAmount),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Obx(() => CustomButton(
-              text: AppStrings.proceedToPay,
+              text: '${AppStrings.proceedToPay} ₹${totalAmount.toStringAsFixed(2)}',
               fontSize: 16,
               height: 55,
               isLoading: walletController.isLoading.value,
@@ -74,8 +79,6 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
                 }
 
                 await walletController.startTopUp(amount);
-                // The bottom sheet can stay open or close based on success callback in controller
-                // If you want it to close here, you can, but it's better handled in controller or after verification
                 if (!walletController.isLoading.value) {
                   Navigator.pop(context);
                 }
@@ -84,6 +87,51 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
           ),
           const SizedBox(height: 30),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGSTDetails(double baseAmount, double gstAmount, double totalAmount) {
+    if (baseAmount <= 0) return const SizedBox();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade50,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppText('Recharge Amount', fontSize: 13, color: Colors.grey.shade700),
+                AppText('₹${baseAmount.toStringAsFixed(2)}', fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2E1A47)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppText('GST (18%)', fontSize: 13, color: Colors.grey.shade700),
+                AppText('+ ₹${gstAmount.toStringAsFixed(2)}', fontSize: 13, fontWeight: FontWeight.w600, color: Colors.green),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Divider(height: 1),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppText('Total Payable', fontSize: 14, fontWeight: FontWeight.bold, color: const Color(0xFF2E1A47)),
+                AppText('₹${totalAmount.toStringAsFixed(2)}', fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primaryColor),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -264,11 +312,11 @@ class _RechargeBottomSheetState extends State<RechargeBottomSheet> {
         controller: _amountController,
         keyboardType: TextInputType.number,
         onChanged: (value) {
-          if (value.isNotEmpty) {
-            setState(() {
+          setState(() {
+            if (value.isNotEmpty) {
               selectedAmount = '';
-            });
-          }
+            }
+          });
         },
         decoration: InputDecoration(
           hintText: AppStrings.enterCustomAmount,

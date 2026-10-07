@@ -74,6 +74,12 @@ class CallWebRTCController extends GetxController {
             // _orchestrator.session.startRingtone(isIncoming: false);
           }
           _orchestrator.session.startRingingTimeout();
+          _orchestrator.minimizeToBubble(
+            Get.context!,
+            _orchestrator.session.providerName ?? 'Astrologer',
+            _orchestrator.session.providerImage ?? '',
+            shouldPop: false,
+          );
         }
       } else {
         _orchestrator.status.value = 'idle';
@@ -326,11 +332,11 @@ class CallWebRTCController extends GetxController {
               }(),
             );
 
-            if (!_orchestrator.session.isLiveCall && !_orchestrator.isCallScreenVisible) {
+            if (!_orchestrator.isCallScreenVisible) {
               FloatingCallBubble.show(
                 context: Get.context!,
                 sessionId: _orchestrator.sessionId!,
-                name: _orchestrator.session.providerName!,
+                name: _orchestrator.session.providerName ?? 'Astrologer',
                 imageUrl: _orchestrator.session.providerImage ?? "",
                 startedAt: session['started_at']?.toString(),
                 status: _orchestrator.status.value,

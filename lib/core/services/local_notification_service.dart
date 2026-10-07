@@ -357,13 +357,11 @@ class LocalNotificationService {
   static Future<void> cancelOngoingChatNotification(int? sessionId) async {
     try {
       await _notificationsPlugin.cancel(ACTIVE_CHAT_NOTIFICATION_ID);
-      if (sessionId != null) {
-        await _notificationsPlugin.cancel(sessionId);
-        await _notificationsPlugin.cancel(sessionId + 100);
-        await _notificationsPlugin.cancel(sessionId + 50000);
-      }
-    } catch (e) {
-      debugPrint("LocalNotificationService cancel exception (handled): $e");
+    } catch (_) {}
+    if (sessionId != null) {
+      try { await _notificationsPlugin.cancel(sessionId); } catch (_) {}
+      try { await _notificationsPlugin.cancel(sessionId + 100); } catch (_) {}
+      try { await _notificationsPlugin.cancel(sessionId + 50000); } catch (_) {}
     }
     try {
       await ForegroundTaskService.stopService();
@@ -456,11 +454,11 @@ class LocalNotificationService {
   }
 
   static Future<void> cancelOngoingCallNotification(int? sessionId) async {
-    await _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID);
+    try { await _notificationsPlugin.cancel(ACTIVE_CALL_NOTIFICATION_ID); } catch (_) {}
     if (sessionId != null) {
-      await _notificationsPlugin.cancel(sessionId);
-      await _notificationsPlugin.cancel(sessionId + 100000);
-      await _notificationsPlugin.cancel(sessionId + 200000);
+      try { await _notificationsPlugin.cancel(sessionId); } catch (_) {}
+      try { await _notificationsPlugin.cancel(sessionId + 100000); } catch (_) {}
+      try { await _notificationsPlugin.cancel(sessionId + 200000); } catch (_) {}
     }
     try {
       await ForegroundTaskService.stopService();
