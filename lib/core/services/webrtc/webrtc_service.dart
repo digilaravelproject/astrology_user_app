@@ -61,7 +61,7 @@ class WebRTCService {
       
       // Force audio routing to speaker and microphone unmute by default
       toggleMute(false);
-      // toggleSpeaker(true); // Moved to onIceConnectionState
+      toggleSpeaker(true); 
     } catch (e) {
       Logger.e('WebRTCService: Error initializing local stream -> $e');
       rethrow;
