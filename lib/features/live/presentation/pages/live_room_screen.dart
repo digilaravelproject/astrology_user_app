@@ -247,6 +247,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       );
       
       _room = room;
+      Hardware.instance.setSpeakerphoneOn(true);
       if (mounted) {
         setState(() {
           _isLiveKitConnected = true;
