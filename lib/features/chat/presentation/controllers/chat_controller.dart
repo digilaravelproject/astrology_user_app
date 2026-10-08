@@ -47,7 +47,8 @@ class ChatController extends GetxController {
     required String astrologerName,
     String? startedAtString,
   }) {
-    if (this.sessionId != sessionId) {
+    bool isNewSession = this.sessionId != sessionId;
+    if (isNewSession) {
       messaging.messages.clear();
       this.sessionId = sessionId;
     }
@@ -68,8 +69,14 @@ class ChatController extends GetxController {
       }
     }
     this.astrologerName = astrologerName;
-    if (session.status.value != 'ongoing' && session.status.value != 'accepted') {
+
+    // Force reset status for new session to prevent stale 'ongoing' state from bypassing ringing UI
+    if (isNewSession || initialStatus == 'initiated' || initialStatus == 'ringing') {
       session.status.value = initialStatus;
+    } else {
+      if (session.status.value != 'ongoing' && session.status.value != 'accepted') {
+        session.status.value = initialStatus;
+      }
     }
     session.startedAt = startedAtString;
 
