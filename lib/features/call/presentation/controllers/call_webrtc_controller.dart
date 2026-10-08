@@ -39,6 +39,10 @@ class CallWebRTCController extends GetxController {
       _orchestrator.session.liveSessionId = liveSessionId;
 
       isInitiatingLiveCall.value = true;
+      
+      // Delay to ensure any UI or LiveKit state updates before grabbing the microphone hardware
+      await Future.delayed(const Duration(milliseconds: 1500));
+      
       final offerDescription = await _orchestrator.webrtcService.createOffer(0);
 
       final response = await _apiClient.post(
