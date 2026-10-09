@@ -247,7 +247,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       );
       
       _room = room;
-      Hardware.instance.setSpeakerphoneOn(true);
+      // Hardware.instance.setSpeakerphoneOn(true); // TEMP HIDDEN FOR EMULATOR
       if (mounted) {
         setState(() {
           _isLiveKitConnected = true;
