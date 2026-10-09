@@ -313,6 +313,17 @@ class CallWebRTCController extends GetxController {
                 await _orchestrator.webrtcService.createOffer(_orchestrator.sessionId!);
                 await _orchestrator.webrtcService.setRemoteAnswer(answer);
               }
+
+              // Process missed ICE candidates from API response
+              if (session['ice_candidates'] is List) {
+                 final candidatesList = session['ice_candidates'] as List;
+                 for (var ice in candidatesList) {
+                   final candidateStr = ice['candidate'];
+                   if (candidateStr != null) {
+                     _orchestrator.webrtcService.addRemoteCandidate(candidateStr.toString());
+                   }
+                 }
+              }
             } else if (sessionStatus == 'ringing' || sessionStatus == 'dialing') {
               if (!_orchestrator.session.isLiveCall) {
                 _orchestrator.session.startRingtone(isIncoming: false);
