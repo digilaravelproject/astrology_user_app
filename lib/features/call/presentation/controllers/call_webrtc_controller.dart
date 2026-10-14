@@ -258,7 +258,10 @@ class CallWebRTCController extends GetxController {
 
     try {
       await _orchestrator.webrtcService.setRemoteAnswer(answerSdp);
-    } catch (e) {}
+      _orchestrator.webrtcService.toggleSpeaker(true);
+    } catch (e) {
+      Logger.e('CallWebRTCController: error in setRemoteAnswer -> $e');
+    }
   }
 
   Future<void> checkCurrentActiveCallSession() async {

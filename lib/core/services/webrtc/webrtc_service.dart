@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' hide navigator;
-import 'package:livekit_client/livekit_client.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
@@ -25,7 +24,11 @@ class WebRTCService {
     'iceServers': [
       {'urls': AppConstants.webrtcStunServer},
       {
-        'urls': AppConstants.liveKitTurnServerUrl,
+        'urls': [
+          AppConstants.liveKitTurnServerUrl,
+          '${AppConstants.liveKitTurnServerUrl}?transport=udp',
+          '${AppConstants.liveKitTurnServerUrl}?transport=tcp',
+        ],
         'username': AppConstants.liveKitTurnUsername,
         'credential': AppConstants.liveKitTurnCredential,
       },
@@ -120,7 +123,7 @@ class WebRTCService {
       };
 
       peerConnection!.onIceConnectionState = (state) {
-        Logger.d('WebRTCService: Connection state changed -> $state');
+        Logger.d('WebRTCService: ICE Connection state changed -> $state');
         if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
           _startPingTimer();
           toggleSpeaker(true); // Ensure speaker is turned on once connection is successful
@@ -134,9 +137,18 @@ class WebRTCService {
         }
       };
 
+      peerConnection!.onConnectionState = (state) {
+        Logger.d('WebRTCService: Peer connection state changed -> $state');
+        if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(true);
+        }
+      };
+
       peerConnection!.onAddStream = (stream) {
         Logger.d('WebRTCService: Remote stream added via onAddStream.');
         remoteStream = stream;
+        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
         }
@@ -144,8 +156,12 @@ class WebRTCService {
 
       peerConnection!.onTrack = (event) {
         Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
+        if (event.track.kind == 'audio') {
+          event.track.enabled = true;
+        }
         if (event.streams.isNotEmpty) {
           remoteStream = event.streams[0];
+          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
           if (onRemoteStreamAdded != null) {
             onRemoteStreamAdded!(remoteStream!);
           }
@@ -203,7 +219,7 @@ class WebRTCService {
       };
 
       peerConnection!.onIceConnectionState = (state) {
-        Logger.d('WebRTCService: Connection state changed -> $state');
+        Logger.d('WebRTCService: ICE Connection state changed -> $state');
         if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
           _startPingTimer();
           toggleSpeaker(true); // Ensure speaker is turned on once connection is successful
@@ -217,11 +233,34 @@ class WebRTCService {
         }
       };
 
+      peerConnection!.onConnectionState = (state) {
+        Logger.d('WebRTCService: Peer connection state changed -> $state');
+        if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(true);
+        }
+      };
+
       peerConnection!.onAddStream = (stream) {
-        Logger.d('WebRTCService: Remote stream added.');
+        Logger.d('WebRTCService: Remote stream added via onAddStream.');
         remoteStream = stream;
+        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
+        }
+      };
+
+      peerConnection!.onTrack = (event) {
+        Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
+        if (event.track.kind == 'audio') {
+          event.track.enabled = true;
+        }
+        if (event.streams.isNotEmpty) {
+          remoteStream = event.streams[0];
+          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+          if (onRemoteStreamAdded != null) {
+            onRemoteStreamAdded!(remoteStream!);
+          }
         }
       };
 

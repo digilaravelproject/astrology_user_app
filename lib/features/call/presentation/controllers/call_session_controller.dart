@@ -119,8 +119,8 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
           final incomingId = int.tryParse(session['id']?.toString() ?? '');
           if (incomingId == sessionId) {
             final candidate = data['candidate']?.toString();
-            final receiverId = data['receiverId'];
-            if (candidate != null && receiverId == WebSocketService.currentUserId) {
+            final receiverId = data['receiverId'] ?? data['receiver_id'];
+            if (candidate != null && (receiverId == null || receiverId == WebSocketService.currentUserId)) {
               _orchestrator.webrtcService.addRemoteCandidate(candidate);
             }
           }
