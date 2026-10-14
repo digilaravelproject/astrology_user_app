@@ -258,7 +258,7 @@ class CallWebRTCController extends GetxController {
 
     try {
       await _orchestrator.webrtcService.setRemoteAnswer(answerSdp);
-      _orchestrator.webrtcService.toggleSpeaker(true);
+      _orchestrator.webrtcService.toggleSpeaker(_orchestrator.isSpeakerOn.value);
     } catch (e) {
       Logger.e('CallWebRTCController: error in setRemoteAnswer -> $e');
     }
