@@ -375,12 +375,13 @@ class WebRTCService {
   void _startPingTimer() {
     _stopPingTimer();
     _pingTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-      if (peerConnection == null) {
+      final pc = peerConnection;
+      if (pc == null) {
         _stopPingTimer();
         return;
       }
       try {
-        final stats = await peerConnection!.getStats();
+        final stats = await pc.getStats();
         for (var report in stats) {
           if (report.type == 'candidate-pair' && report.values['state'] == 'succeeded') {
             final double? rtt = report.values['currentRoundTripTime'];
@@ -391,7 +392,12 @@ class WebRTCService {
           }
         }
       } catch (e) {
-        Logger.e('WebRTCService: Error getting stats for ping -> $e');
+        // PeerConnection may have closed concurrently
+        if (peerConnection == null) {
+          _stopPingTimer();
+        } else {
+          Logger.e('WebRTCService: Error getting stats for ping -> $e');
+        }
       }
     });
   }
