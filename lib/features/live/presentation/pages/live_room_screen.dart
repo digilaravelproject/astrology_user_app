@@ -247,7 +247,12 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
       );
       
       _room = room;
-      // Hardware.instance.setSpeakerphoneOn(true); // TEMP HIDDEN FOR EMULATOR
+      // Ensure speakerphone is on after everything is setup
+      try {
+        await AudioManager.instance.setSpeakerOutputPreferred(true, force: true);
+      } catch (e) {
+        debugPrint('[LIVE] Error setting speakerphone: $e');
+      }
       if (mounted) {
         setState(() {
           _isLiveKitConnected = true;
