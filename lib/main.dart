@@ -34,8 +34,16 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         type == 'chat_summary') {
       await LocalNotificationService.cancelOngoingChatNotification(null);
     } else if (title.contains('Call Ended') ||
+        title.contains('Call Dismissed') ||
+        title.contains('Call Cancelled') ||
+        title.contains('Call Rejected') ||
         type == 'call_ended' ||
-        type == 'CALL_ENDED') {
+        type == 'CALL_ENDED' ||
+        type == 'session_completed' ||
+        type == 'session_ended' ||
+        type == 'call_dismissed' ||
+        type == 'call_cancelled' ||
+        type == 'call_rejected') {
       await LocalNotificationService.cancelOngoingCallNotification(null);
     }
     if (data.containsKey('session')) {

@@ -64,6 +64,10 @@ Future<void> initApp() async {
 
   // Initialize local notifications service
   await LocalNotificationService.initialize();
+  try {
+    await LocalNotificationService.cancelOngoingCallNotification(null);
+    await LocalNotificationService.cancelOngoingChatNotification(null);
+  } catch (_) {}
 
   // Initialize FCM Notification service (Foreground + Background + Terminated)
   await FCMNotificationService.initialize();

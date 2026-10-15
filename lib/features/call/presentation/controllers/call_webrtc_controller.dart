@@ -229,6 +229,13 @@ class CallWebRTCController extends GetxController {
           if (Get.isDialogOpen ?? false) Get.back();
           Get.back();
         }
+      } else {
+        final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
+        _orchestrator.session.cleanUp();
+        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+          if (Get.isDialogOpen ?? false) Get.back();
+          Get.back();
+        }
       }
     } catch (e) {
       _orchestrator.session.cleanUp();

@@ -1,4 +1,5 @@
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
@@ -71,10 +72,17 @@ class FCMNotificationService {
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         } else if (title.contains('Call Ended') ||
+            title.contains('Call Dismissed') ||
+            title.contains('Call Cancelled') ||
+            title.contains('Call Rejected') ||
             type == 'call_ended' ||
             type == 'CALL_ENDED' ||
-            type == 'session_completed') {
+            type == 'session_completed' ||
+            type == 'call_dismissed' ||
+            type == 'call_cancelled' ||
+            type == 'call_rejected') {
           LocalNotificationService.cancelOngoingCallNotification(null);
+          FloatingCallBubble.dismiss(stopForegroundService: true);
           return;
         }
 

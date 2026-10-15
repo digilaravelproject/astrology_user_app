@@ -39,11 +39,17 @@ class CallWsHandler {
         eventData = Map<String, dynamic>.from(rawData);
       }
       final session = eventData['session'];
-      if (session != null) {
-        final int sessionId =
-            session['id'] is int
-                ? session['id']
-                : (int.tryParse(session['id']?.toString() ?? '') ?? 0);
+      final int sessionId =
+          session != null && session['id'] != null
+              ? (session['id'] is int
+                  ? session['id']
+                  : (int.tryParse(session['id']?.toString() ?? '') ?? 0))
+              : 0;
+
+      LocalNotificationService.cancelOngoingCallNotification(sessionId != 0 ? sessionId : null);
+      FloatingCallBubble.dismiss(stopForegroundService: true);
+
+      if (sessionId != 0) {
         final String? reason = eventData['reason']?.toString();
         WebSocketState.callSessionStatusUpdates[sessionId] =
             reason ?? 'dismissed';
