@@ -15,6 +15,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:convert';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
+import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
+import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 
 import 'features/chat/presentation/widgets/overlay_main.dart';
 
@@ -24,15 +26,27 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     await LocalNotificationService.initialize();
     try { await ForegroundTaskService.init(); } catch (_) {}
     final data = message.data;
-    final title = message.notification?.title ?? '';
+    final title = message.notification?.title ?? data['title']?.toString() ?? '';
     final type = data['type']?.toString();
+    final String? reason = data['reason']?.toString().toLowerCase();
+    final rawId = data['session_id'] ?? data['id'] ?? data['chat_session_id'] ?? data['call_session_id'];
+    final int parsedSessionId = int.tryParse(rawId?.toString() ?? '') ?? 0;
 
     if (title.contains('Chat Ended') ||
+        title.contains('Cancelled') ||
+        reason == 'cancelled' ||
+        reason == 'rejected' ||
         type == 'chat_ended' ||
         type == 'CHAT_ENDED' ||
         type == 'session_ended' ||
-        type == 'chat_summary') {
-      await LocalNotificationService.cancelOngoingChatNotification(null);
+        type == 'chat_summary' ||
+        type == 'CHAT_MISSED' ||
+        type?.toLowerCase() == 'chat_dismissed' ||
+        type?.toLowerCase() == 'chat_cancelled' ||
+        type?.toLowerCase() == 'chat_rejected') {
+      await LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
+      try { FloatingChatBubble.dismiss(stopForegroundService: true); } catch (_) {}
+      try { await ForegroundTaskService.stopService(); } catch (_) {}
     } else if (title.contains('Call Ended') ||
         title.contains('Call Dismissed') ||
         title.contains('Call Cancelled') ||
@@ -44,7 +58,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         type == 'call_dismissed' ||
         type == 'call_cancelled' ||
         type == 'call_rejected') {
-      await LocalNotificationService.cancelOngoingCallNotification(null);
+      await LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
+      try { FloatingCallBubble.dismiss(stopForegroundService: true); } catch (_) {}
+      try { await ForegroundTaskService.stopService(); } catch (_) {}
     }
     if (data.containsKey('session')) {
       final sessionData = data['session'] is String 

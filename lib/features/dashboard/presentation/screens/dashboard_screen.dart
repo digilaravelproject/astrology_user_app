@@ -114,6 +114,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     if (state == AppLifecycleState.resumed) {
       // Consume any pending notifications securely when app is fully resumed
       _consumePendingNotification();
+      _checkCurrentActiveSession();
+      if (Get.isRegistered<CallController>()) {
+        Get.find<CallController>().checkCurrentActiveCallSession();
+      }
     }
   }
 
@@ -269,7 +273,13 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                 );
               }
           );
+        } else {
+          LocalNotificationService.cancelOngoingChatNotification(sessionId is int ? sessionId : null);
+          FloatingChatBubble.dismiss(stopForegroundService: true);
         }
+      } else {
+        LocalNotificationService.cancelOngoingChatNotification(null);
+        FloatingChatBubble.dismiss(stopForegroundService: true);
       }
     } catch (e) {
       debugPrint("Error checking active session: $e");

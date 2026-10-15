@@ -49,26 +49,36 @@ class FCMNotificationService {
     // 4. Foreground Message Handler
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground Message Received: ${message.notification?.title}');
-      if (message.notification != null) {
+      if (message.notification != null || message.data.isNotEmpty) {
         final type = message.data['type']?.toString();
-        final title = message.notification?.title ?? '';
+        final title = message.notification?.title ?? message.data['title']?.toString() ?? '';
+        final rawSessionId = message.data['session_id']?.toString() ??
+            message.data['chat_session_id']?.toString() ??
+            message.data['call_session_id']?.toString() ??
+            message.data['chat_assistance_session_id']?.toString() ??
+            message.data['live_session_id']?.toString() ??
+            message.data['id']?.toString() ?? '';
+        final int parsedSessionId = int.tryParse(rawSessionId) ?? 0;
 
         // If chat accepted notification arrives while user is on waiting screen, update status to ongoing
         if (title.contains('Accepted') || type == 'chat_accepted' || type == 'CHAT_ACCEPTED' || type == 'chat') {
-          final int sessionId = int.tryParse(message.data['session_id']?.toString() ?? message.data['id']?.toString() ?? '') ?? 0;
-          if (sessionId > 0) {
-            WebSocketService.sessionStatusUpdates[sessionId] = 'ongoing';
+          if (parsedSessionId > 0) {
+            WebSocketService.sessionStatusUpdates[parsedSessionId] = 'ongoing';
             WebSocketService.sessionStatusUpdates.refresh();
           }
         }
 
         // If chat/call ended message arrives, immediately cancel ongoing timer notification & floating bubble
         if (title.contains('Chat Ended') ||
+            title.contains('Cancelled') ||
             type == 'chat_ended' ||
             type == 'CHAT_ENDED' ||
             type == 'session_ended' ||
-            type == 'chat_summary') {
-          LocalNotificationService.cancelOngoingChatNotification(null);
+            type == 'chat_summary' ||
+            type?.toLowerCase() == 'chat_dismissed' ||
+            type?.toLowerCase() == 'chat_cancelled' ||
+            type?.toLowerCase() == 'chat_rejected') {
+          LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
           FloatingChatBubble.dismiss(stopForegroundService: true);
           return;
         } else if (title.contains('Call Ended') ||
@@ -78,10 +88,11 @@ class FCMNotificationService {
             type == 'call_ended' ||
             type == 'CALL_ENDED' ||
             type == 'session_completed' ||
+            type == 'session_ended' ||
             type == 'call_dismissed' ||
             type == 'call_cancelled' ||
             type == 'call_rejected') {
-          LocalNotificationService.cancelOngoingCallNotification(null);
+          LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
           FloatingCallBubble.dismiss(stopForegroundService: true);
           return;
         }

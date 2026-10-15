@@ -261,8 +261,8 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     callTimer?.cancel();
     _globalTimerSub?.cancel();
     ringingTimer?.cancel();
+    LocalNotificationService.cancelOngoingCallNotification(sessionId);
     if (sessionId != null) {
-      LocalNotificationService.cancelOngoingCallNotification(sessionId!);
       SharedPrefs.remove('active_call_started_at_$sessionId');
     }
     try { ForegroundTaskService.stopService(); } catch (_) {}
