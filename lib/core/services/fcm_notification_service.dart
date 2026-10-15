@@ -108,11 +108,6 @@ class FCMNotificationService {
         // live_ prefix  → LiveRoomScreen
         // call_ prefix  → CallScreen
         // bare int      → ChatScreen
-        final String rawSessionId = message.data['session_id']?.toString() ??
-            message.data['chat_session_id']?.toString() ??
-            message.data['chat_assistance_session_id']?.toString() ??
-            message.data['live_session_id']?.toString() ??
-            message.data['id']?.toString() ?? '';
 
         String structuredPayload;
         if (type == 'live_stream' || type == 'live' || type == 'live_session') {
