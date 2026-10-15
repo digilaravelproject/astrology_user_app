@@ -3,6 +3,9 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <!-- Permissions to Remove -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
@@ -25,7 +28,7 @@
 
     <!-- Application -->
     <application 
-        android:label="SURYA PATH ASTROLOGY GUIDE" 
+        android:label="SURYA PATH ASTROLOGER GUIDE" 
         android:name="${applicationName}" 
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
@@ -33,7 +36,7 @@
         tools:replace="android:allowBackup">
 
         <!-- Main Activity -->
-        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
+        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:showWhenLocked="true" android:turnScreenOn="true" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
 
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme"/>
 
@@ -54,6 +57,13 @@
 
         <!-- Dynamic Icon Service -->
         <service android:name="com.solusibejo.flutter_dynamic_icon_plus.FlutterDynamicIconPlusService" android:stopWithTask="false"/>
+
+        <!-- Foreground Task Service -->
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="microphone|phoneCall|mediaPlayback"
+            android:stopWithTask="false"
+            android:exported="false" />
 
         <!-- Flutter Overlay Window Service -->
         <service android:name="flutter.overlay.window.flutter_overlay_window.OverlayService" android:exported="false" android:foregroundServiceType="mediaPlayback|dataSync|microphone" />

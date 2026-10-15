@@ -75,6 +75,28 @@ class FloatingCallBubble {
     _isActive.value = true;
 
     try {
+      DateTime? startedAtDate;
+      if (startedAt != null && startedAt.isNotEmpty) {
+        String isoUtc = startedAt.trim().replaceAll(' ', 'T');
+        if (!isoUtc.endsWith('Z') &&
+            !isoUtc.contains('+') &&
+            !isoUtc.contains('-')) {
+          isoUtc += 'Z';
+        }
+        startedAtDate = DateTime.tryParse(isoUtc)?.toLocal();
+      }
+
+      final normalizedStatus = status.toLowerCase();
+      if (normalizedStatus == 'ongoing' || normalizedStatus == 'accepted') {
+        await ForegroundTaskService.startActiveSessionNotification(
+          title: 'Active Call with $name',
+          type: 'Call',
+          startedAt: startedAtDate,
+        );
+      } else {
+        await ForegroundTaskService.stopService();
+      }
+
       final String statusText = (status == 'ongoing') 
           ? '$name • Call' 
           : 'Calling $name ($status)...';

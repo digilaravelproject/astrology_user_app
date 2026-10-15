@@ -282,9 +282,13 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      if ((status.value == 'ongoing' || status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') && sessionId != null && providerName != null) {
-        minimizeToBubble(Get.context!, providerName!, providerImage ?? "", shouldPop: false);
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.hidden) {
+      if (status.value == 'ongoing') {
+        showOngoingNotification();
+      }
+      final ctx = Get.context;
+      if (ctx != null && (status.value == 'ongoing' || status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') && sessionId != null && providerName != null) {
+        minimizeToBubble(ctx, providerName!, providerImage ?? "", shouldPop: false);
       }
     } else if (state == AppLifecycleState.resumed) {
       final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;

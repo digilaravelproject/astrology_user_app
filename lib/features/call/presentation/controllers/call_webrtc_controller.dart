@@ -315,13 +315,16 @@ class CallWebRTCController extends GetxController {
                 if (startedAt != null) {
                   _orchestrator.durationSeconds.value = DateTime.now().difference(startedAt).inSeconds;
                   _orchestrator.session.startCallTimer(startedAtMillis: startedAt.millisecondsSinceEpoch);
+                  _orchestrator.session.showOngoingNotification(startedAtMillis: startedAt.millisecondsSinceEpoch);
                 }
               }
               
               final answer = session['answer']?.toString() ?? session['answer_sdp']?.toString();
               if (answer != null && answer.isNotEmpty) {
-                await _orchestrator.webrtcService.createOffer(_orchestrator.sessionId!);
-                await _orchestrator.webrtcService.setRemoteAnswer(answer);
+                if (_orchestrator.webrtcService.peerConnection == null) {
+                  await _orchestrator.webrtcService.createOffer(_orchestrator.sessionId!);
+                  await _orchestrator.webrtcService.setRemoteAnswer(answer);
+                }
               }
 
               // Process missed ICE candidates from API response
