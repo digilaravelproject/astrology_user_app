@@ -169,6 +169,11 @@ class AppUrls {
   static const String foundersWords = '/user/founders-words';
 
   // ==========================================
+  // Location Search API
+  // ==========================================
+  static const String locationSearch = '/location/search';
+
+  // ==========================================
   // WebSockets Channel Names & Common Events
   // ==========================================
   static String privateUserChannel(int userId) => 'private-user.$userId';
