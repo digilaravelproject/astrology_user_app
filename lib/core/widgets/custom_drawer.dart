@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_colors.dart';
-import '../constants/app_strings.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 import 'app_text.dart';
 import 'custom_image_widget.dart';
-import '../../features/auth/controllers/auth_controller.dart';
-import '../../features/wallet/screens/wallet_screen.dart';
-import '../../features/profile/screens/profile_screen.dart';
-import '../../features/history/screens/history_screen.dart';
-import '../../features/notification/screens/notification_screen.dart'; // Assuming chat history might be here or similar
+import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:astro_user/features/wallet/presentation/screens/wallet_screen.dart';
+import 'package:astro_user/features/profile/presentation/screens/profile_screen.dart';
+import 'package:astro_user/features/profile/presentation/bindings/profile_binding.dart';
+import 'package:astro_user/features/history/presentation/screens/history_screen.dart';
+import 'package:astro_user/features/notification/presentation/screens/notification_screen.dart'; // Assuming chat history might be here or similar
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key? key}) : super(key: key);
@@ -50,7 +51,7 @@ class CustomDrawer extends StatelessWidget {
                   AppStrings.myProfileNav,
                   onTap: () {
                     Get.back();
-                    Get.to(() => const ProfileScreen());
+                    Get.to(() => const ProfileScreen(), binding: ProfileBinding());
                   },
                 ),
                 _buildDrawerItem(
@@ -81,7 +82,77 @@ class CustomDrawer extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 Get.back(); // Close drawer
-                authController.logout();
+                Get.dialog(
+                  Dialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.logout_rounded, color: Colors.red, size: 32),
+                          ),
+                          const SizedBox(height: 20),
+                          AppText('Logout'.tr,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2E1A47),
+                          ),
+                          const SizedBox(height: 12),
+                          AppText(
+                            'Are you sure you want to logout from your account?'.tr,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 30),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () => Get.back(),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    side: BorderSide(color: Colors.grey[300]!),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: AppText('Cancel'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Get.back();
+                                    authController.logout();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    backgroundColor: Colors.red,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                  child: AppText('Logout'.tr, fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               },
               borderRadius: BorderRadius.circular(16),
               child: Container(

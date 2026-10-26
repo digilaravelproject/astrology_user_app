@@ -7,16 +7,19 @@ import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 import 'package:get/get.dart';
-import '../../utils/logger.dart';
-import '../storage/token_manger.dart';
+import 'package:astro_user/core/utils/logger.dart';
+import 'package:astro_user/core/services/storage/token_manger.dart';
 import 'api_checker.dart';
 import 'multipart.dart';
 import 'network_info.dart';
-import '../../widgets/no_internet_screen.dart';
+import 'package:astro_user/core/widgets/no_internet_screen.dart';
 import 'response_model.dart';
 
 class ApiClient {
   final Dio _dio;
+  static DateTime? _lastWatchTimestamp;
+  static ResponseModel? _lastWatchResponse;
+  static String? _lastWatchPath;
 
   ApiClient() : _dio = Dio() {
     _initializeDio();
@@ -28,14 +31,40 @@ class ApiClient {
       connectTimeout: const Duration(milliseconds: 30000),
       receiveTimeout: const Duration(milliseconds: 30000),
       contentType: 'application/json',
+      headers: {
+        'Accept': 'application/json',
+      },
       validateStatus: (status) => status! < 500,
     );
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        String token = await TokenManager.getToken() ?? "";
-        options.headers["Authorization"] = "Bearer $token";
-        options.headers["Content-Type"] = "application/json";
+        if (ApiChecker.isLoggingOut) {
+          Logger.w('|🚫 Request blocked: App is logging out (${options.path})');
+          return handler.reject(
+            DioException(
+              requestOptions: options,
+              type: DioExceptionType.cancel,
+              error: 'Request blocked due to logout in progress',
+            ),
+          );
+        }
+
+        String token = '';
+        if (options.headers['no_auth'] == true) {
+          options.headers.remove('no_auth');
+        } else {
+          token = await TokenManager.getToken();
+          if (token.isNotEmpty) {
+            options.headers["Authorization"] = "Bearer $token";
+          }
+        }
+        options.headers["Accept"] = "application/json";
+
+        if (options.path.contains('/user/live/')) {
+          options.receiveTimeout = const Duration(seconds: 60);
+          Logger.d('|⏱️ ReceiveTimeout increased to 60s for live session endpoint: ${options.path}');
+        }
 
         // Detailed request logging
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -58,7 +87,7 @@ class ApiClient {
         Logger.d('|✅ API RESPONSE');
         Logger.d('|📍 URL: ${response.requestOptions.baseUrl}${response.requestOptions.path}');
         Logger.d('|📊 Status Code: ${response.statusCode}');
-        Logger.d('|📨 Response: ${response.data}');
+        Logger.d('|📨 Response1234: ${response.data}');
         Logger.d('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         return handler.next(response);
@@ -70,6 +99,7 @@ class ApiClient {
         Logger.e('|🔧 Method: ${error.requestOptions.method}');
         Logger.e('|⚠️ Error Type: ${error.type}');
         Logger.e('|💬 Error Message: ${error.message}');
+        Logger.e('|🔌 Underlying Error: ${error.error}');
         if (error.response != null) {
           Logger.e('|📊 Status Code: ${error.response?.statusCode}');
           Logger.e('|📨 Response: ${error.response?.data}');
@@ -105,24 +135,52 @@ class ApiClient {
       return const ResponseModel(isSuccess: false, message: 'No internet connection');
     }
 
-    try {
-      final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress,
-      );
+    int maxRetries = 3;
+    List<int> backoffs = [1, 2, 4];
 
-      if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
-      } else {
-        return ApiChecker.checkApi(response, showToaster: showToaster);
+    for (int attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        final response = await _dio.get(
+          path,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onReceiveProgress: onReceiveProgress,
+        );
+
+        final ResponseModel result;
+        if (handleError) {
+          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
+        } else {
+          result = ApiChecker.checkApi(response, showToaster: showToaster);
+        }
+        return result;
+      } catch (e) {
+        final isLastAttempt = attempt == maxRetries;
+        
+        bool is429 = false;
+        bool is401 = false;
+        bool isCancel = false;
+        if (e is DioException) {
+          if (e.response?.statusCode == 429) is429 = true;
+          if (e.response?.statusCode == 401) is401 = true;
+          if (e.type == DioExceptionType.cancel) isCancel = true;
+        }
+
+        if (isLastAttempt || is401 || isCancel) {
+          if (!is401 && !isCancel) {
+            Logger.e('|❌ Max retries reached for GET: $path. Error: $e');
+          }
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+        }
+
+        int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
+        Logger.w('|⚠️ GET request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        await Future.delayed(Duration(seconds: sleepSec));
       }
-    } catch (e) {
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
     }
+    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
   }
 
   Future<ResponseModel> post(
@@ -137,31 +195,81 @@ class ApiClient {
         bool showToaster = AppConstants.showToaster,
         bool showErrorScreen = AppConstants.isHandleErrorScreen,
         bool showInternetScreen = AppConstants.isHandleInternetScreen,
+        int maxRetries = 3,
       }) async {
     if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
       return const ResponseModel(isSuccess: false, message: 'No internet connection');
     }
 
-    try {
-      final response = await _dio.post(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-        onSendProgress: onSendProgress,
-        onReceiveProgress: onReceiveProgress,
-      );
-
-      if (handleError) {
-        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
-      } else {
-        return ApiChecker.checkApi(response, showToaster: showToaster);
+    if (path.contains('/watch')) {
+      final now = DateTime.now();
+      if (_lastWatchTimestamp != null &&
+          _lastWatchPath == path &&
+          now.difference(_lastWatchTimestamp!) < const Duration(seconds: 10)) {
+        Logger.d('|🛡️ Debounced /watch call to avoid rate limit. Time since last call: ${now.difference(_lastWatchTimestamp!).inSeconds}s. Returning cached response.');
+        if (_lastWatchResponse != null) {
+          return _lastWatchResponse!;
+        } else {
+          return const ResponseModel(isSuccess: false, message: 'Request debounced to avoid rate limit');
+        }
       }
-    } catch (e) {
-      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+      _lastWatchTimestamp = now;
+      _lastWatchPath = path;
     }
+
+    int _maxRetries = maxRetries;
+    List<int> backoffs = [1, 2, 4];
+
+    for (int attempt = 0; attempt <= _maxRetries; attempt++) {
+      try {
+        final response = await _dio.post(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+          cancelToken: cancelToken,
+          onSendProgress: onSendProgress,
+          onReceiveProgress: onReceiveProgress,
+        );
+
+        final ResponseModel result;
+        if (handleError) {
+          final res = ApiChecker.checkResponse(response, showToaster: showToaster);
+          result = ResponseModel.fromJson(res.data, statusCode: res.statusCode);
+        } else {
+          result = ApiChecker.checkApi(response, showToaster: showToaster);
+        }
+
+        if (path.contains('/watch') && result.isSuccess) {
+          _lastWatchResponse = result;
+        }
+
+        return result;
+      } catch (e) {
+        final isLastAttempt = attempt == _maxRetries;
+        
+        bool is429 = false;
+        bool is401 = false;
+        bool isCancel = false;
+        if (e is DioException) {
+          if (e.response?.statusCode == 429) is429 = true;
+          if (e.response?.statusCode == 401) is401 = true;
+          if (e.type == DioExceptionType.cancel) isCancel = true;
+        }
+
+        if (isLastAttempt || is401 || isCancel) {
+          if (!is401 && !isCancel) {
+            Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
+          }
+          return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+        }
+
+        int sleepSec = is429 && path.contains('/watch') ? 5 : backoffs[attempt];
+        Logger.w('|⚠️ POST request to $path failed (Attempt ${attempt + 1}/$maxRetries). Retrying in ${sleepSec}s... Error: $e');
+        await Future.delayed(Duration(seconds: sleepSec));
+      }
+    }
+    return const ResponseModel(isSuccess: false, message: 'Failed after retries');
   }
 
   Future<ResponseModel> postMultipartData(
@@ -255,12 +363,153 @@ class ApiClient {
 
       if (handleError) {
         final result = ApiChecker.checkResponse(response, showToaster: showToaster);
-        return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        if (result.data is Map<String, dynamic>) {
+          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        } else {
+          return ResponseModel(
+            isSuccess: result.statusCode == 200 || result.statusCode == 201,
+            message: 'Multipart upload completed with status ${result.statusCode}',
+            statusCode: result.statusCode,
+            body: result.data,
+          );
+        }
       } else {
         return ApiChecker.checkApi(response, showToaster: showToaster);
       }
     } catch (e) {
       Logger.e('ApiClient() => POST Multipart error: $e');
+      return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
+    }
+  }
+
+
+
+
+  Future<ResponseModel> putMultipartData(
+      String path,
+      Map<String, String> body,
+      List<MultipartBody> multipartBody,
+      List<MultipartDocument> otherFile, {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+        CancelToken? cancelToken,
+        ProgressCallback? onSendProgress,
+        ProgressCallback? onReceiveProgress,
+        bool fromChat = false,
+        bool handleError = AppConstants.handleError,
+        bool showToaster = AppConstants.showToaster,
+        bool showErrorScreen = AppConstants.isHandleErrorScreen,
+        bool showInternetScreen = AppConstants.isHandleInternetScreen,
+      }) async {
+
+    if (showInternetScreen && !(await _checkInternetConnection(showDialog: showInternetScreen))) {
+      return const ResponseModel(isSuccess: false, message: 'No internet connection');
+    }
+
+    try {
+      Logger.d('ApiClient() => PUT Multipart request: $path');
+
+      dio.FormData formData = dio.FormData();
+
+      // 🔹 Add body fields
+      body.forEach((key, value) {
+        formData.fields.add(MapEntry(key, value));
+      });
+
+      // 🔹 Add images/files
+      for (MultipartBody multipart in multipartBody) {
+        if (multipart.file != null) {
+          if (kIsWeb) {
+            List<int> bytes = await multipart.file!.readAsBytes();
+            formData.files.add(MapEntry(
+              multipart.key,
+              dio.MultipartFile.fromBytes(
+                bytes,
+                filename: basename(multipart.file!.path),
+                contentType: MediaType('image', 'jpg'),
+              ),
+            ));
+          } else {
+            File file = File(multipart.file!.path);
+            formData.files.add(MapEntry(
+              multipart.key,
+              await dio.MultipartFile.fromFile(
+                file.path,
+                filename: basename(file.path),
+              ),
+            ));
+          }
+        }
+      }
+
+      // 🔹 Other files
+      if (otherFile.isNotEmpty) {
+        for (MultipartDocument file in otherFile) {
+          if (kIsWeb) {
+            if (fromChat) {
+              PlatformFile platformFile = file.file!.files.first;
+              formData.files.add(MapEntry(
+                'image[]',
+                dio.MultipartFile.fromBytes(
+                  platformFile.bytes!,
+                  filename: platformFile.name,
+                ),
+              ));
+            } else {
+              var fileBytes = file.file!.files.first.bytes!;
+              formData.files.add(MapEntry(
+                file.key,
+                dio.MultipartFile.fromBytes(
+                  fileBytes,
+                  filename: file.file!.files.first.name,
+                ),
+              ));
+            }
+          } else {
+            File other = File(file.file!.files.single.path!);
+            formData.files.add(MapEntry(
+              file.key,
+              await dio.MultipartFile.fromFile(
+                other.path,
+                filename: basename(other.path),
+              ),
+            ));
+          }
+        }
+      }
+
+      // 🔥 MAIN CHANGE: POST → PUT
+      final response = await _dio.put(
+        path,
+        data: formData,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress,
+      );
+
+      Logger.d('ApiClient() => PUT Multipart response: ${response.data}');
+
+      if (handleError) {
+        final result = ApiChecker.checkResponse(response, showToaster: showToaster);
+
+        if (result.data is Map<String, dynamic>) {
+          return ResponseModel.fromJson(result.data, statusCode: result.statusCode);
+        } else {
+          return ResponseModel(
+            isSuccess: result.statusCode == 200 || result.statusCode == 201,
+            message: 'Multipart upload completed with status ${result.statusCode}',
+            statusCode: result.statusCode,
+            body: result.data,
+          );
+        }
+      } else {
+        return ApiChecker.checkApi(response, showToaster: showToaster);
+      }
+
+    } catch (e) {
+      Logger.e('ApiClient() => PUT Multipart error: $e');
       return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
     }
   }
@@ -343,5 +592,10 @@ class ApiClient {
       Logger.e('ApiClient() => DELETE error: $e');
       return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);
     }
+  }
+
+  Future<void> clearCache() async {
+    _lastWatchTimestamp = null;
+    _lastWatchResponse = null;
   }
 }

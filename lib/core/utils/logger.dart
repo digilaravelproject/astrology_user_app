@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 
-import '../constants/app_constants.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
 
 class Logger {
 

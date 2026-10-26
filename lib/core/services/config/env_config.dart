@@ -7,7 +7,7 @@ enum Environment {
 }
 
 class EnvConfig {
-  static late final Environment environment;
+  static Environment environment = Environment.development;
 
   static Future<void> load() async {
     print("load() => ENV Loaded: start");

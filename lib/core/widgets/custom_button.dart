@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_colors.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -17,6 +17,7 @@ class CustomButton extends StatelessWidget {
   final double? borderRadius;
   final Color? backgroundColor;
   final IconData? icon;
+  final Color? borderColor;
 
   const CustomButton({
     Key? key,
@@ -34,6 +35,7 @@ class CustomButton extends StatelessWidget {
     this.borderRadius,
     this.icon,
     this.backgroundColor,
+    this.borderColor,
   }) : super(key: key);
 
   @override
@@ -47,16 +49,10 @@ class CustomButton extends StatelessWidget {
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: backgroundColor ?? (gradient == null ? (textColor == AppColors.deepPink ? Colors.white : AppColors.primaryColor) : null),
-            gradient: gradient,
+            color: backgroundColor ?? (gradient == null && textColor == AppColors.deepPink ? Colors.white : null),
+            gradient: gradient ?? (backgroundColor == null && textColor != AppColors.deepPink ? AppColors.primaryGradient : null),
+            border: borderColor != null ? Border.all(color: borderColor!, width: 1) : null,
             borderRadius: BorderRadius.circular(borderRadius ?? height / 2),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryColor.withOpacity(0.3),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
           ),
           child: Center(
             child: isLoading
@@ -79,13 +75,17 @@ class CustomButton extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      Text(
-                        text,
-                        style: GoogleFonts.poppins(
-                          color: textColor ?? Colors.white,
-                          fontSize: fontSize,
-                          fontWeight: fontWeight,
-                          letterSpacing: 0.5,
+                      Flexible(
+                        child: Text(
+                          text,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: GoogleFonts.poppins(
+                            color: textColor ?? Colors.white,
+                            fontSize: fontSize,
+                            fontWeight: fontWeight,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
                     ],

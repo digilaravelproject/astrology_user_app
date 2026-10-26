@@ -1,0 +1,384 @@
+import 'dart:async';
+import 'package:get/get.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/services/network/api_checker.dart';
+import 'package:astro_user/features/live/data/models/live_session_model.dart';
+import 'package:astro_user/features/live/domain/usecases/live_usecases.dart';
+import 'package:flutter/material.dart';
+import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+class LiveController extends GetxController {
+  final GetActiveLiveSessionsUseCase _getActiveSessionsUseCase;
+  final GetLiveSessionDetailUseCase _getSessionDetailUseCase;
+  final JoinLiveSessionUseCase _joinSessionUseCase;
+  final LeaveLiveSessionUseCase _leaveSessionUseCase;
+  final SendLiveCommentUseCase _sendCommentUseCase;
+  final SendSuperChatUseCase _sendSuperChatUseCase;
+  final GetLiveCommentsUseCase _getCommentsUseCase;
+  final WatchLiveSessionUseCase _watchSessionUseCase;
+
+  LiveController(
+    this._getActiveSessionsUseCase,
+    this._getSessionDetailUseCase,
+    this._joinSessionUseCase,
+    this._leaveSessionUseCase,
+    this._sendCommentUseCase,
+    this._sendSuperChatUseCase,
+    this._getCommentsUseCase,
+    this._watchSessionUseCase,
+  );
+
+
+  final RxList<LiveSessionModel> activeSessions = <LiveSessionModel>[].obs;
+  final Rx<LiveSessionModel?> currentSession = Rx<LiveSessionModel?>(null);
+  final RxList<LiveCommentModel> comments = <LiveCommentModel>[].obs;
+  final Rx<LiveCommentModel?> activeSuperChat = Rx<LiveCommentModel?>(null);
+  Timer? _superChatTimer;
+  final RxBool isCameraOn = true.obs;
+  final RxBool isAudioOn = true.obs;
+  
+  final RxBool isLoadingSessions = false.obs;
+  final RxBool isLoadingDetail = false.obs;
+  final RxBool isSendingComment = false.obs;
+  final RxBool isSendingSuperChat = false.obs;
+  
+  int _currentPage = 1;
+  final RxBool hasReachedMax = false.obs;
+  final RxBool isFetchingMore = false.obs;
+  
+  Timer? _commentsPollTimer;
+
+  void showSuperChatAnimation(LiveCommentModel superChat) {
+    activeSuperChat.value = superChat;
+    _superChatTimer?.cancel();
+    _superChatTimer = Timer(const Duration(seconds: 4), () {
+      activeSuperChat.value = null;
+    });
+  }
+
+  Future<void> fetchActiveSessions({bool isRefresh = false}) async {
+    if (isRefresh) {
+      _currentPage = 1;
+      hasReachedMax.value = false;
+    }
+    if (hasReachedMax.value) return;
+
+    try {
+      if (isRefresh || _currentPage == 1) {
+        isLoadingSessions.value = true;
+      } else {
+        isFetchingMore.value = true;
+      }
+      
+      final result = await _getActiveSessionsUseCase.call(page: _currentPage);
+      if (result.isSuccess && result.body != null) {
+        final List<dynamic> data;
+        if (result.body is List) {
+          data = result.body;
+        } else if (result.body is Map) {
+          data = result.body['data'] is List ? result.body['data'] : (result.body['body'] is List ? result.body['body'] : []);
+          
+          if (result.body['meta'] != null && result.body['meta']['last_page'] != null) {
+            hasReachedMax.value = _currentPage >= result.body['meta']['last_page'];
+          } else if (result.body['data'] is Map && result.body['data']['last_page'] != null) {
+            hasReachedMax.value = _currentPage >= result.body['data']['last_page'];
+          }
+        } else {
+          data = [];
+        }
+        
+        final newSessions = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        
+        if (isRefresh || _currentPage == 1) {
+          activeSessions.value = newSessions;
+        } else {
+          final uniqueNewSessions = newSessions.where((newS) => !activeSessions.any((existingS) => existingS.id == newS.id)).toList();
+          
+          if (uniqueNewSessions.isEmpty && newSessions.isNotEmpty) {
+            hasReachedMax.value = true;
+          } else {
+            activeSessions.addAll(uniqueNewSessions);
+          }
+        }
+        
+        if (newSessions.isEmpty) {
+          hasReachedMax.value = true;
+        } else if (!hasReachedMax.value) {
+          _currentPage++;
+        }
+        print('[LIVE] Loaded ${activeSessions.length} active live sessions');
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching active sessions: $e');
+    } finally {
+      isLoadingSessions.value = false;
+      isFetchingMore.value = false;
+    }
+  }
+
+  void updateActiveSessionsFromEvent(dynamic rawData) {
+    try {
+      if (rawData != null && rawData['active_sessions'] is List) {
+        final List<dynamic> data = rawData['active_sessions'];
+        activeSessions.value = data.map((json) => LiveSessionModel.fromJson(json)).toList();
+        print('[LIVE] Updated active live sessions from WS event. Count: ${activeSessions.length}');
+      }
+    } catch (e) {
+      print('[LIVE] Error updating active sessions from WS event: $e');
+    }
+  }
+
+  Future<void> fetchSessionDetail(int id) async {
+    try {
+      isLoadingDetail.value = true;
+      final result = await _getSessionDetailUseCase.call(id);
+      if (result.isSuccess && result.body != null) {
+        final dynamic bodyData = result.body;
+        if (bodyData is Map<String, dynamic>) {
+          if (bodyData.containsKey('id') && bodyData.containsKey('title')) {
+            currentSession.value = LiveSessionModel.fromJson(bodyData);
+          } else if (bodyData['data'] is Map<String, dynamic>) {
+            currentSession.value = LiveSessionModel.fromJson(bodyData['data']);
+          }
+        }
+        if (currentSession.value != null) {
+          isCameraOn.value = currentSession.value!.isCameraOn;
+          isAudioOn.value = currentSession.value!.isAudioOn;
+          if (!currentSession.value!.isBroadcasting) {
+            isCameraOn.value = false;
+            isAudioOn.value = false;
+          }
+        }
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching session detail: $e');
+    } finally {
+      isLoadingDetail.value = false;
+    }
+  }
+
+  Future<void> joinSession(int id) async {
+    // Clear previous session state to prevent data leaking during navigation
+    currentSession.value = null;
+    comments.clear();
+    activeSuperChat.value = null;
+    _superChatTimer?.cancel();
+    
+    isCameraOn.value = true;
+    isAudioOn.value = true;
+    try {
+      final result = await _joinSessionUseCase.call(id);
+      if (result.isSuccess && result.body != null) {
+        print('[LIVE] Successfully joined session $id');
+        final dynamic body = result.body;
+        if (body is Map<String, dynamic>) {
+          final sessionData = body['session'] ?? body['data']?['session'] ?? body['data'];
+          if (sessionData != null) {
+            currentSession.value = LiveSessionModel.fromJson(sessionData);
+            
+            // Set initial camera/audio state
+            isCameraOn.value = currentSession.value!.isCameraOn;
+            isAudioOn.value = currentSession.value!.isAudioOn;
+            if (!currentSession.value!.isBroadcasting) {
+              isCameraOn.value = false;
+              isAudioOn.value = false;
+            }
+          }
+          
+          final lastComments = body['last_comments'] ?? body['data']?['last_comments'];
+          if (lastComments is List) {
+            comments.assignAll(lastComments.map((json) => LiveCommentModel.fromJson(json)).toList());
+          }
+        }
+        
+        // Start polling comments periodically
+        _startCommentsPolling(id);
+      }
+    } catch (e) {
+      print('[LIVE] Error joining session: $e');
+    }
+  }
+
+  Future<void> leaveSession(int id) async {
+    try {
+      _stopCommentsPolling();
+      final result = await _leaveSessionUseCase.call(id);
+      if (result.isSuccess) {
+        print('[LIVE] Successfully left session $id');
+        currentSession.value = null;
+        comments.clear();
+      }
+    } catch (e) {
+      print('[LIVE] Error leaving session: $e');
+    }
+  }
+
+  Future<void> fetchComments(int sessionId) async {
+    try {
+      final result = await _getCommentsUseCase.call(sessionId);
+      if (result.isSuccess && result.body != null) {
+        final List<dynamic> data;
+        if (result.body is List) {
+          data = result.body;
+        } else if (result.body is Map) {
+          final dynamic rawData = result.body['data'];
+          if (rawData is List) {
+            data = rawData;
+          } else if (rawData is Map && rawData['data'] is List) {
+            data = rawData['data'];
+          } else {
+            data = [];
+          }
+        } else {
+          data = [];
+        }
+        final newComments = data.map((json) => LiveCommentModel.fromJson(json)).toList();
+        
+        comments.value = newComments;
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching comments: $e');
+    }
+  }
+
+  Future<void> sendComment(int sessionId, String message) async {
+    if (message.trim().isEmpty) return;
+    try {
+      isSendingComment.value = true;
+      
+      // Optimistic Update
+      final tempComment = LiveCommentModel(
+        id: DateTime.now().millisecondsSinceEpoch,
+        userId: 0,
+        userName: 'You',
+        message: message,
+        createdAt: DateTime.now(),
+      );
+      comments.add(tempComment);
+
+      final result = await _sendCommentUseCase.call(sessionId, message);
+      if (result.isSuccess) {
+        print('[LIVE] Comment sent successfully');
+        // Fetch comments to sync ID
+        await fetchComments(sessionId);
+      } else {
+        // Rollback optimistic update
+        comments.removeWhere((c) => c.id == tempComment.id);
+        CustomSnackbar.showError(result.message);
+      }
+    } catch (e) {
+      print('[LIVE] Error sending comment: $e');
+    } finally {
+      isSendingComment.value = false;
+    }
+  }
+
+  Future<bool> sendSuperChat(int sessionId, int giftId, String? message) async {
+    try {
+      isSendingSuperChat.value = true;
+      final result = await _sendSuperChatUseCase.call(sessionId, giftId, message);
+      if (result.isSuccess) {
+        await fetchComments(sessionId);
+        return true;
+      } else {
+        if (result.message.toLowerCase().contains('insufficient balance')) {
+          _showInsufficientBalanceSheet();
+        } else {
+          CustomSnackbar.showError(result.message);
+        }
+        return false;
+      }
+    } catch (e) {
+      print('[LIVE] Error sending Super Chat: $e');
+      CustomSnackbar.showError('Transaction failed: $e');
+      return false;
+    } finally {
+      isSendingSuperChat.value = false;
+    }
+  }
+
+  void _showInsufficientBalanceSheet() {
+    Get.bottomSheet(
+      const RechargeBottomSheet(),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  void _startCommentsPolling(int sessionId) {
+    _stopCommentsPolling();
+    fetchComments(sessionId);
+    fetchSessionDetail(sessionId);
+  }
+
+  void _stopCommentsPolling() {
+    _commentsPollTimer?.cancel();
+    _commentsPollTimer = null;
+  }
+
+  Future<Map<String, dynamic>?> watchLiveSession(int id) async {
+    try {
+      final result = await _watchSessionUseCase.call(id);
+      if (result.isSuccess && result.body != null) {
+        final dynamic body = result.body;
+        if (body is Map<String, dynamic>) {
+          if (body['data'] is Map<String, dynamic>) {
+            return body['data'];
+          }
+          return body;
+        }
+      } else {
+        print('[LIVE] Watch token generation failed: ${result.message}');
+      }
+    } catch (e) {
+      print('[LIVE] Error getting watch token: $e');
+    }
+    return null;
+  }
+
+  Future<void> fetchCallStatus(int id) async {
+    try {
+      if (!Get.isRegistered<ApiClient>()) return;
+      final apiClient = Get.find<ApiClient>();
+      final response = await apiClient.get(AppUrls.liveSessionCallStatus(id), handleError: false, showErrorScreen: false);
+      if (response.isSuccess && response.body != null) {
+        final dynamic body = response.body;
+        if (body is Map<String, dynamic> && body['data'] is Map<String, dynamic>) {
+          final data = body['data'];
+          final bool isOnCall = data['is_on_call'] == true || data['is_on_call'] == 'true';
+          final Map<String, dynamic>? activeCall = data['active_call'];
+          
+          if (currentSession.value?.id == id) {
+            currentSession.value = LiveSessionModel(
+              id: currentSession.value!.id,
+              title: currentSession.value!.title,
+              description: currentSession.value!.description,
+              sessionType: currentSession.value!.sessionType,
+              status: currentSession.value!.status,
+              streamUrl: currentSession.value!.streamUrl,
+              viewerCount: currentSession.value!.viewerCount,
+              startedAt: currentSession.value!.startedAt,
+              astrologer: currentSession.value!.astrologer,
+              isBroadcasting: currentSession.value!.isBroadcasting,
+              isCameraOn: currentSession.value!.isCameraOn,
+              isAudioOn: currentSession.value!.isAudioOn,
+              isOnCall: isOnCall,
+              activeCall: activeCall,
+            );
+            currentSession.refresh();
+          }
+        }
+      }
+    } catch (e) {
+      print('[LIVE] Error fetching call status: $e');
+    }
+  }
+
+  @override
+  void onClose() {
+    _stopCommentsPolling();
+    super.onClose();
+  }
+}
+

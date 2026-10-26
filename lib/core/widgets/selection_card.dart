@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_colors.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
 
 /// Reusable selection card widget (e.g., for Gender selection)
 class SelectionCard extends StatelessWidget {

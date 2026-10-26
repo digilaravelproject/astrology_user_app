@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 class AppStrings {
   // Common
-  static String get appName => 'AstroUser'.tr;
+  static String get appName => 'Surya Path';
   static String get changeLanguage => 'Change Language'.tr;
   static String get selectLanguage => 'Select Language'.tr;
   static String get next => 'NEXT'.tr;
@@ -65,7 +65,7 @@ class AppStrings {
   static String get guest => 'Guest'.tr;
   static String get foundersWords => "Founder's Words for Users".tr;
   static String get founderMessage => "Welcome to our astrology app! Here, you'll find insights and advice to guide you in love, career, and life through the vedic sciences. ✨".tr;
-  static String get yourFounder => "- Your Founder".tr;
+  static String get yourFounder => "- Founder".tr;
   static String get viewAll => "VIEW ALL".tr;
   static String get filter => "Filter".tr;
   static String get all => "All".tr;
@@ -95,6 +95,7 @@ class AppStrings {
   static String get skills => "Skills".tr;
   static String get languages => "Languages".tr;
   static String get experience => "Experience".tr;
+  static String get sortBy => "Sort By".tr;
   // Home Filters (reusing common strings)
   static String get homeFilter => filter;
   static String get homeAll => all;
@@ -188,6 +189,7 @@ class AppStrings {
   static String get kundali => "Kundali".tr;
   static String get matchMaking => "Match Making".tr;
   static String get freeKundli => "Free Kundli".tr;
+  static String get dailyHoroscope => "Daily Horoscope".tr;
   static String get dailyPanchang => "Daily Panchang".tr;
   static String get interestingAstrologyBlogs => "Interesting Astrology Blogs".tr;
   static String get payAmountPrefix => "Pay".tr;
@@ -249,7 +251,9 @@ class AppStrings {
   static String get upgradeToView => 'Upgrade to view'.tr;
   static String get aboutMyself => 'About Myself'.tr;
   static String get lifestyle => 'Lifestyle'.tr;
+  static String get hisPartnerPreferences => 'His Partner Preferences'.tr;
   static String get herPartnerPreferences => 'Her Partner Preferences'.tr;
+
   static String get youIgnoredThisProfile => 'You ignored this profile'.tr;
   static String get removeFromIgnoredList => 'Remove from Ignored list'.tr;
   static String get talkToAstrologer => 'Talk to Astrologer'.tr;
@@ -272,7 +276,7 @@ class AppStrings {
   static String get customerSupport => 'Customer Support'.tr;
   static String get privacyPolicyProfile => privacyPolicy;
   static String get termsAndConditions => 'Terms & Conditions'.tr;
-  static String get refundPolicy => 'Refund Policy'.tr;
+  static String get paymentPolicy => 'Payment Policy'.tr;
   static String get faq => 'Frequently Asked Questions'.tr;
   static String get deleteAccount => 'Delete Account'.tr;
   static String get logOut => 'Log Out'.tr;
@@ -383,6 +387,8 @@ class AppStrings {
   static String get drivingLicence => 'Driving Licence'.tr;
   static String get aadhaarCard => 'Aadhaar Card'.tr;
   static String get panNumber => 'PAN Number'.tr;
+  static String get drivingLicenceNumber => 'Driving Licence Number'.tr;
+  static String get aadhaarCardNumber => 'Aadhaar Card Number'.tr;
   static String get infoSafePrivate => 'Your information will be 100% safe & private.'.tr;
   static String get verifyNow => 'Verify Now'.tr;
   static String get profilesWithPhotosMsg => 'Profiles with Photos get\n3x more Responses'.tr;
@@ -421,4 +427,9 @@ class AppStrings {
   static String get joinedLiveSession => "Joined Live Session".tr;
   static String get durationPrefix => "Duration: ".tr;
   static String get chatSessionEnded => "This chat session has ended.".tr;
+
+
+
+  static String get panchang => 'Panchang'.tr;
+
 }

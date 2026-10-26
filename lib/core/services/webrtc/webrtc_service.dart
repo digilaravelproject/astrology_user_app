@@ -1,0 +1,461 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:get/get.dart' hide navigator;
+import 'package:livekit_client/livekit_client.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/utils/logger.dart';
+
+class WebRTCService {
+  RTCPeerConnection? peerConnection;
+  MediaStream? localStream;
+  MediaStream? remoteStream;
+  Function(MediaStream)? onRemoteStreamAdded;
+  Function(RTCIceConnectionState)? onConnectionStateChanged;
+
+  bool _isRemoteDescriptionSet = false;
+  final List<RTCIceCandidate> _remoteCandidateQueue = [];
+
+  final RxInt currentPingMs = 0.obs;
+  Timer? _pingTimer;
+
+  final Map<String, dynamic> _iceConfig = {
+    'iceServers': [
+      {'urls': AppConstants.webrtcStunServer},
+      {
+        'urls': [
+          AppConstants.liveKitTurnServerUrl,
+          '${AppConstants.liveKitTurnServerUrl}?transport=udp',
+          '${AppConstants.liveKitTurnServerUrl}?transport=tcp',
+        ],
+        'username': AppConstants.liveKitTurnUsername,
+        'credential': AppConstants.liveKitTurnCredential,
+      },
+    ],
+    'sdpSemantics': 'unified-plan',
+  };
+
+  final Map<String, dynamic> _constraints = {
+    'mandatory': {
+      'OfferToReceiveAudio': true,
+      'OfferToReceiveVideo': false,
+    },
+    'optional': [],
+  };
+
+  Future<void> initLocalStream() async {
+    try {
+      final Map<String, dynamic> mediaConstraints = {
+        'audio': {
+          'echoCancellation': true,
+          'noiseSuppression': true,
+          'autoGainControl': true,
+          'googEchoCancellation': true,
+          'googNoiseSuppression': true,
+          'googAutoGainControl': true,
+          'googHighpassFilter': true,
+          'googTypingNoiseDetection': true,
+        },
+        'video': false,
+      };
+      localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      Logger.d('WebRTCService: Local audio stream initialized successfully.');
+      
+      // Configure audio session for two-way communication
+      await initAudioSession();
+
+      // Force microphone unmute and route to earpiece by default (speaker OFF)
+      toggleMute(false);
+      toggleSpeaker(false); 
+    } catch (e) {
+      Logger.e('WebRTCService: Error initializing local stream -> $e');
+      rethrow;
+    }
+  }
+
+  int? _activeSessionId;
+  final List<RTCIceCandidate> _queuedIceCandidates = [];
+
+  int? get activeSessionId => _activeSessionId;
+  set activeSessionId(int? id) {
+    _activeSessionId = id;
+    if (id != null && id > 0 && _queuedIceCandidates.isNotEmpty) {
+      Logger.d('WebRTCService: Flushing ${_queuedIceCandidates.length} queued ICE candidates for session $id.');
+      for (var candidate in _queuedIceCandidates) {
+        _sendIceCandidate(id, candidate);
+      }
+      _queuedIceCandidates.clear();
+    }
+  }
+
+  String _normalizeSdp(String sdp) {
+    String cleanSdp = sdp.trim();
+    if (cleanSdp.startsWith('"') && cleanSdp.endsWith('"')) {
+      cleanSdp = cleanSdp.substring(1, cleanSdp.length - 1);
+    }
+    
+    // Convert all escaped newlines to standard LF
+    cleanSdp = cleanSdp
+        .replaceAll('\\r\\n', '\n')
+        .replaceAll('\\n', '\n')
+        .replaceAll('\\r', '\n')
+        .replaceAll(r'\r\n', '\n')
+        .replaceAll(r'\n', '\n')
+        .replaceAll(r'\r', '\n');
+
+    // Split by LF and join using CRLF to ensure every line ends with \r\n
+    List<String> lines = cleanSdp.split('\n');
+    return lines.map((line) => line.trim()).where((line) => line.isNotEmpty).join('\r\n') + '\r\n';
+  }
+
+  Future<RTCSessionDescription> createOffer(int sessionId) async {
+    try {
+      activeSessionId = sessionId;
+      await initLocalStream();
+      peerConnection = await createPeerConnection(_iceConfig, _constraints);
+
+      peerConnection!.onIceCandidate = (candidate) {
+        final currentId = activeSessionId;
+        if (currentId != null && currentId > 0) {
+          _sendIceCandidate(currentId, candidate);
+        } else {
+          _queuedIceCandidates.add(candidate);
+          Logger.d('WebRTCService: Queued ICE candidate because activeSessionId is not set yet.');
+        }
+      };
+
+      peerConnection!.onIceConnectionState = (state) {
+        Logger.d('WebRTCService: ICE Connection state changed -> $state');
+        if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(currentSpeakerState); // Ensure speaker state is preserved once connection is successful
+        } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
+                   state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+                   state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          _stopPingTimer();
+        }
+        if (onConnectionStateChanged != null) {
+          onConnectionStateChanged!(state);
+        }
+      };
+
+      peerConnection!.onConnectionState = (state) {
+        Logger.d('WebRTCService: Peer connection state changed -> $state');
+        if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(currentSpeakerState);
+        }
+      };
+
+      peerConnection!.onAddStream = (stream) {
+        Logger.d('WebRTCService: Remote stream added via onAddStream.');
+        remoteStream = stream;
+        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+        if (onRemoteStreamAdded != null) {
+          onRemoteStreamAdded!(stream);
+        }
+      };
+
+      peerConnection!.onTrack = (event) {
+        Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
+        if (event.track.kind == 'audio') {
+          event.track.enabled = true;
+        }
+        if (event.streams.isNotEmpty) {
+          remoteStream = event.streams[0];
+          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+          if (onRemoteStreamAdded != null) {
+            onRemoteStreamAdded!(remoteStream!);
+          }
+        }
+      };
+
+      // Add local tracks
+      localStream!.getTracks().forEach((track) {
+        peerConnection!.addTrack(track, localStream!);
+      });
+
+      RTCSessionDescription offer = await peerConnection!.createOffer(_constraints);
+      await peerConnection!.setLocalDescription(offer);
+      Logger.d('WebRTCService: SDP Offer created.');
+      return offer;
+    } catch (e) {
+      Logger.e('WebRTCService: Error creating offer -> $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setRemoteAnswer(String answerSdp) async {
+    try {
+      if (peerConnection == null) {
+        Logger.e('WebRTCService: peerConnection is null. Cannot set remote answer.');
+        return;
+      }
+      final normalized = _normalizeSdp(answerSdp);
+      RTCSessionDescription answer = RTCSessionDescription(normalized, 'answer');
+      await peerConnection!.setRemoteDescription(answer);
+      _isRemoteDescriptionSet = true;
+      Logger.d('WebRTCService: Remote Answer SDP set successfully.');
+      _flushRemoteCandidates();
+    } catch (e) {
+      Logger.e('WebRTCService: Error setting remote answer -> $e');
+      rethrow;
+    }
+  }
+
+  Future<RTCSessionDescription> acceptOffer(int sessionId, String offerSdp) async {
+    try {
+      activeSessionId = sessionId;
+      await initLocalStream();
+      peerConnection = await createPeerConnection(_iceConfig, _constraints);
+
+      // Listeners
+      peerConnection!.onIceCandidate = (candidate) {
+        final currentId = activeSessionId;
+        if (currentId != null && currentId > 0) {
+          _sendIceCandidate(currentId, candidate);
+        } else {
+          _queuedIceCandidates.add(candidate);
+          Logger.d('WebRTCService: Queued ICE candidate because activeSessionId is not set yet.');
+        }
+      };
+
+      peerConnection!.onIceConnectionState = (state) {
+        Logger.d('WebRTCService: ICE Connection state changed -> $state');
+        if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(currentSpeakerState); // Ensure speaker state is preserved once connection is successful
+        } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
+                   state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+                   state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          _stopPingTimer();
+        }
+        if (onConnectionStateChanged != null) {
+          onConnectionStateChanged!(state);
+        }
+      };
+
+      peerConnection!.onConnectionState = (state) {
+        Logger.d('WebRTCService: Peer connection state changed -> $state');
+        if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          _startPingTimer();
+          toggleSpeaker(currentSpeakerState);
+        }
+      };
+
+      peerConnection!.onAddStream = (stream) {
+        Logger.d('WebRTCService: Remote stream added via onAddStream.');
+        remoteStream = stream;
+        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+        if (onRemoteStreamAdded != null) {
+          onRemoteStreamAdded!(stream);
+        }
+      };
+
+      peerConnection!.onTrack = (event) {
+        Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
+        if (event.track.kind == 'audio') {
+          event.track.enabled = true;
+        }
+        if (event.streams.isNotEmpty) {
+          remoteStream = event.streams[0];
+          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+          if (onRemoteStreamAdded != null) {
+            onRemoteStreamAdded!(remoteStream!);
+          }
+        }
+      };
+
+      // Add local tracks
+      localStream!.getTracks().forEach((track) {
+        peerConnection!.addTrack(track, localStream!);
+      });
+
+      final normalized = _normalizeSdp(offerSdp);
+      RTCSessionDescription offer = RTCSessionDescription(normalized, 'offer');
+      await peerConnection!.setRemoteDescription(offer);
+      _isRemoteDescriptionSet = true;
+      _flushRemoteCandidates();
+
+      RTCSessionDescription answer = await peerConnection!.createAnswer(_constraints);
+      await peerConnection!.setLocalDescription(answer);
+      
+      Logger.d('WebRTCService: SDP Answer created & set as local.');
+      return answer;
+    } catch (e) {
+      Logger.e('WebRTCService: Error accepting offer -> $e');
+      rethrow;
+    }
+  }
+
+  Future<void> addRemoteCandidate(String candidateJson) async {
+    try {
+      Map<String, dynamic> candidateMap = jsonDecode(candidateJson);
+      RTCIceCandidate candidate = RTCIceCandidate(
+        candidateMap['candidate']?.toString() ?? candidateMap['iceCandidate']?.toString() ?? '',
+        candidateMap['sdpMid']?.toString() ?? '',
+        candidateMap['sdpMLineIndex'] is int ? candidateMap['sdpMLineIndex'] : int.tryParse(candidateMap['sdpMLineIndex']?.toString() ?? '') ?? 0,
+      );
+
+      if (peerConnection != null && _isRemoteDescriptionSet) {
+        await peerConnection!.addCandidate(candidate);
+        Logger.d('WebRTCService: Ice Candidate added successfully.');
+      } else {
+        _remoteCandidateQueue.add(candidate);
+        Logger.d('WebRTCService: Queued remote ICE candidate. Total queued: ${_remoteCandidateQueue.length}');
+      }
+    } catch (e) {
+      Logger.e('WebRTCService: Error adding remote candidate -> $e');
+    }
+  }
+
+  void _flushRemoteCandidates() {
+    if (_remoteCandidateQueue.isNotEmpty) {
+      Logger.d('WebRTCService: Flushing ${_remoteCandidateQueue.length} queued remote candidates.');
+      for (var candidate in _remoteCandidateQueue) {
+        peerConnection?.addCandidate(candidate).catchError((e) {
+          Logger.e('WebRTCService: Error adding flushed remote candidate -> $e');
+        });
+      }
+      _remoteCandidateQueue.clear();
+    }
+  }
+
+  void toggleMute(bool isMuted) {
+    if (localStream != null) {
+      localStream!.getAudioTracks().forEach((track) {
+        track.enabled = !isMuted;
+      });
+      Logger.d('WebRTCService: Microphones enabled = ${!isMuted}');
+    }
+  }
+
+  bool currentSpeakerState = false;
+
+  Future<void> initAudioSession() async {
+    try {
+      // ignore: experimental_member_use
+      await AudioManager.instance.setAudioSessionOptions(
+        // ignore: experimental_member_use
+        const AudioSessionOptions.communication(),
+      );
+      Logger.d('WebRTCService: LiveKit AudioManager configured for communication.');
+    } catch (e) {
+      Logger.e('WebRTCService: Error configuring audio session -> $e');
+    }
+  }
+
+  void toggleSpeaker(bool isSpeakerOn) {
+    currentSpeakerState = isSpeakerOn;
+    try {
+      AudioManager.instance.setSpeakerOutputPreferred(isSpeakerOn, force: isSpeakerOn);
+      Logger.d('WebRTCService: AudioManager.setSpeakerOutputPreferred($isSpeakerOn, force: $isSpeakerOn) called');
+    } catch (e) {
+      Logger.e('WebRTCService: AudioManager.setSpeakerOutputPreferred error -> $e');
+    }
+
+    try {
+      Helper.setSpeakerphoneOn(isSpeakerOn);
+      Logger.d('WebRTCService: Helper.setSpeakerphoneOn($isSpeakerOn) called');
+    } catch (e) {
+      Logger.e('WebRTCService: Helper.setSpeakerphoneOn error -> $e');
+    }
+    
+    if (localStream != null) {
+      localStream!.getAudioTracks().forEach((track) {
+        // ignore: deprecated_member_use
+        track.enableSpeakerphone(isSpeakerOn);
+      });
+      Logger.d('WebRTCService: Track Speakerphone enabled = $isSpeakerOn');
+    }
+  }
+
+  void _startPingTimer() {
+    _stopPingTimer();
+    _pingTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+      final pc = peerConnection;
+      if (pc == null) {
+        _stopPingTimer();
+        return;
+      }
+      try {
+        final stats = await pc.getStats();
+        for (var report in stats) {
+          if (report.type == 'candidate-pair' && report.values['state'] == 'succeeded') {
+            final double? rtt = report.values['currentRoundTripTime'];
+            if (rtt != null) {
+              currentPingMs.value = (rtt * 1000).toInt();
+            }
+            break;
+          }
+        }
+      } catch (e) {
+        // PeerConnection may have closed concurrently
+        if (peerConnection == null) {
+          _stopPingTimer();
+        } else {
+          Logger.e('WebRTCService: Error getting stats for ping -> $e');
+        }
+      }
+    });
+  }
+
+  void _stopPingTimer() {
+    _pingTimer?.cancel();
+    _pingTimer = null;
+    currentPingMs.value = 0;
+  }
+
+  Future<void> _sendIceCandidate(int sessionId, RTCIceCandidate candidate) async {
+    try {
+      final apiClient = Get.find<ApiClient>();
+      final candidateStr = jsonEncode({
+        'candidate': candidate.candidate,
+        'sdpMid': candidate.sdpMid,
+        'sdpMLineIndex': candidate.sdpMLineIndex,
+      });
+
+      await apiClient.post(
+        AppUrls.sendIceCandidate(sessionId),
+        data: {'candidate': candidateStr},
+        handleError: false,
+        showErrorScreen: false,
+      );
+      Logger.d('WebRTCService: Ice Candidate sent successfully.');
+    } catch (e) {
+      Logger.e('WebRTCService: Error sending ice candidate -> $e');
+    }
+  }
+
+  void dispose() {
+    try {
+      _stopPingTimer();
+      try {
+        // ignore: experimental_member_use
+        AudioManager.instance.deactivateAudioSession();
+        Logger.d('WebRTCService: AudioManager session deactivated');
+      } catch (e) {
+        Logger.e('WebRTCService: Error deactivating audio session -> $e');
+      }
+      toggleSpeaker(false);
+      toggleMute(false);
+      localStream?.getTracks().forEach((track) => track.stop());
+      localStream?.dispose();
+      localStream = null;
+      remoteStream?.dispose();
+      remoteStream = null;
+      peerConnection?.close();
+      peerConnection?.dispose();
+      peerConnection = null;
+      _isRemoteDescriptionSet = false;
+      _remoteCandidateQueue.clear();
+      _queuedIceCandidates.clear();
+      _activeSessionId = null;
+      Logger.d('WebRTCService: Disposed peer connection & streams.');
+    } catch (e) {
+      Logger.e('WebRTCService: Error disposing WebRTC resources -> $e');
+    }
+  }
+}

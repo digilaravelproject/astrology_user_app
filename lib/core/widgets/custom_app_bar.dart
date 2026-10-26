@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import 'package:astro_user/core/theme/app_colors.dart';
 import 'app_text.dart';
+import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -37,6 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: elevation,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
+      surfaceTintColor: Colors.transparent,
       title: titleWidget ?? AppText(
         title,
         fontSize: 18,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import '../services/network/network_info.dart';
-import '../constants/app_strings.dart';
+import 'package:astro_user/core/services/network/network_info.dart';
+import 'package:astro_user/core/constants/app_strings.dart';
 
 class NoInternetScreen extends StatefulWidget {
   const NoInternetScreen({Key? key}) : super(key: key);

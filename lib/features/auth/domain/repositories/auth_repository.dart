@@ -1,13 +1,46 @@
 import 'dart:async';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/services/network/api_client.dart';
-import '../../../../core/services/network/response_model.dart';
+import 'package:dio/dio.dart';
+import 'package:astro_user/core/constants/app_urls.dart';
+
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/services/network/api_client.dart';
+import 'package:astro_user/core/services/network/response_model.dart';
 import 'auth_repository_interface.dart';
 
 class AuthRepository implements AuthRepositoryInterface {
   final ApiClient _apiClient;
 
   AuthRepository(this._apiClient);
+
+  @override
+  Future<ResponseModel> sendOtp(String phone) async {
+    return await _apiClient.post(
+      AppUrls.sendOtp,
+      data: {
+        "phone": phone,
+      },
+      options: Options(headers: {'no_auth': true}),
+    );
+  }
+
+  @override
+  Future<ResponseModel> resendOtp(String phone) async {
+    return await _apiClient.post(
+      AppUrls.resendOtp,
+      data: {
+        "phone": phone,
+      },
+      options: Options(headers: {'no_auth': true}),
+    );
+  }
+
+  @override
+  Future<ResponseModel> updateProfile(int userId, Map<String, dynamic> data) async {
+    return await _apiClient.put(
+      AppUrls.updateProfile(userId),
+      data: data,
+    );
+  }
 
   @override
   Future<ResponseModel> signup(String name, String mobile) async {
@@ -21,6 +54,26 @@ class AuthRepository implements AuthRepositoryInterface {
 
   @override
   Future<ResponseModel> verifyOtp(String mobile, String otp) async {
-    return const ResponseModel(isSuccess: true, message: 'Stub OTP verified');
+    return await _apiClient.post(
+      AppUrls.verifyOtp,
+      data: {
+        "phone": mobile,
+        "otp": otp,
+      },
+      options: Options(headers: {'no_auth': true}),
+    );
+  }
+
+  @override
+  Future<ResponseModel> logout() async {
+    return await _apiClient.post(AppUrls.logout);
+  }
+
+  @override
+  Future<ResponseModel> deleteAccount() async {
+    return await _apiClient.delete(AppUrls.deleteAccount);
   }
 }
+
+
+

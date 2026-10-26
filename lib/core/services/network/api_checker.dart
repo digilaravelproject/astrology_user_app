@@ -3,37 +3,49 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:astro_user/core/services/storage/token_manger.dart';
 import 'package:get/get.dart' as getx;
-import '../../../routes/route_helper.dart';
-import '../../constants/app_constants.dart';
-import '../../utils/custom_snackbar.dart';
-import '../../utils/logger.dart';
-import '../storage/shared_prefs.dart';
+import 'package:astro_user/routes/route_helper.dart';
+import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/utils/custom_snackbar.dart';
+import 'package:astro_user/core/utils/logger.dart';
+import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'response_model.dart';
-import '../../widgets/error_screen.dart';
+import 'package:astro_user/core/widgets/error_screen.dart';
+import 'package:astro_user/core/services/fcm_notification_service.dart' as astro_fcm;
+import 'package:astro_user/core/services/websocket/websocket_service.dart' as astro_ws;
+import 'package:astro_user/core/services/network/api_client.dart';
 
 class ApiChecker {
   static Response checkResponse(Response response, {bool showToaster = false}) {
     switch (response.statusCode) {
       case 200:
-        if (response.data['res'] == 'success') {
-          return response;
+      case 201:
+        if (response.data is Map) {
+          if (response.data.containsKey('auth')) return response;
+          final res = response.data['res']?.toString().toLowerCase();
+          final status = response.data['status']?.toString().toLowerCase();
+          if (res == 'success' || status == 'success' || response.data['success'] == true) {
+            return response;
+          } else {
+            if (showToaster) _showErrorMessage(response);
+            throw DioException(
+              requestOptions: response.requestOptions,
+              response: response,
+              type: DioExceptionType.badResponse,
+              error: response.data['msg'] ?? response.data['message'] ?? 'Something went wrong',
+            );
+          }
         } else {
-          if (showToaster) _showErrorMessage(response);
-          throw DioException(
-            requestOptions: response.requestOptions,
-            response: response,
-            type: DioExceptionType.badResponse,
-            error: response.data['msg'] ?? 'Something went wrong',
-          );
+          return response; // Return as is if not a map
         }
       case 401:
-        _showErrorMessage(response, 'Unauthorized');
+        final errorMessage = response.data is Map ? (response.data['msg'] ?? response.data['message'] ?? 'Unauthorized') : 'Unauthorized';
+        if (!isLoggingOut) _showErrorMessage(response, errorMessage);
         _logout();
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
           type: DioExceptionType.badResponse,
-          error: 'Unauthorized',
+          error: errorMessage,
         );
       case 403:
         _showErrorMessage(response, 'Forbidden');
@@ -143,19 +155,24 @@ class ApiChecker {
 
         case DioExceptionType.badResponse:
           if (error.response?.statusCode == 401) {
-            CustomSnackbar.showError('Session expired. Please login again.');
+            final errorMessage = error.response?.data is Map ? (error.response?.data['msg'] ?? error.response?.data['message'] ?? 'Session expired. Please login again.') : 'Session expired. Please login again.';
+            if (!isLoggingOut) CustomSnackbar.showError(errorMessage);
             _logout();
-            return const ResponseModel(
+            return ResponseModel(
               isSuccess: false,
-              message: 'Unauthorized',
+              message: errorMessage,
               statusCode: 401,
             );
           }
 
           if (error.response?.data != null) {
             try {
+              final data = error.response!.data;
+              if (data is! Map<String, dynamic>) {
+                throw Exception('Response data is not a Map');
+              }
               final responseModel = ResponseModel.fromJson(
-                error.response!.data,
+                data,
                 statusCode: error.response!.statusCode,
               );
 
@@ -167,12 +184,14 @@ class ApiChecker {
                       : responseModel.message,
                 );
               } else {
-                if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
-                  CustomSnackbar.showError(
-                    responseModel.errors!.first.message ?? 'Something went wrong',
-                  );
-                } else {
-                  CustomSnackbar.showError(responseModel.message);
+                if (error.response?.statusCode != 422) {
+                  if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
+                    CustomSnackbar.showError(
+                      responseModel.errors!.first.message ?? 'Something went wrong',
+                    );
+                  } else {
+                    CustomSnackbar.showError(responseModel.message);
+                  }
                 }
               }
 
@@ -232,6 +251,21 @@ class ApiChecker {
             message: 'No internet connection',
           );
 
+        case DioExceptionType.transformTimeout:
+          if (showErrorScreen) {
+            _showErrorScreen(
+              title: 'Processing Timeout',
+              message: 'Data processing timed out. Please try again.',
+            );
+          } else {
+            CustomSnackbar.showError('Processing timeout');
+          }
+          return const ResponseModel(
+            isSuccess: false,
+            message: 'Processing timeout',
+            statusCode: 408,
+          );
+
         case DioExceptionType.unknown:
           if (showErrorScreen) {
             _showErrorScreen(
@@ -272,19 +306,48 @@ class ApiChecker {
     final statusCode = response.statusCode ?? 500;
 
     if (statusCode == 401) {
-      if (showToaster) {
-        CustomSnackbar.showError('Session expired. Please login again.');
+      final errorMessage = response.data is Map ? (response.data['msg'] ?? response.data['message'] ?? 'Session expired. Please login again.') : 'Session expired. Please login again.';
+      if (showToaster && !isLoggingOut) {
+        CustomSnackbar.showError(errorMessage);
       }
       _logout();
-      return const ResponseModel(
+      return ResponseModel(
         isSuccess: false,
-        message: 'Unauthorized',
+        message: errorMessage,
         statusCode: 401,
       );
     }
 
-    if (statusCode != 200) {
+    // Handle 201 status code (created) as success
+    if (statusCode == 201) {
       if (response.data != null) {
+        try {
+          final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
+          return responseModel;
+        } catch (e) {
+          if (showToaster) {
+            CustomSnackbar.showError('Something went wrong');
+          }
+          return ResponseModel(
+            isSuccess: false,
+            message: 'Something went wrong',
+            statusCode: statusCode,
+          );
+        }
+      } else {
+        if (showToaster) {
+          CustomSnackbar.showError('Something went wrong');
+        }
+        return ResponseModel(
+          isSuccess: false,
+          message: 'Something went wrong',
+          statusCode: statusCode,
+        );
+      }
+    }
+
+    if (statusCode != 200) {
+      if (response.data != null && response.data is Map<String, dynamic>) {
         try {
           final responseModel = ResponseModel.fromJson(response.data, statusCode: statusCode);
 
@@ -321,28 +384,48 @@ class ApiChecker {
       }
     }
 
-    if (response.data is Map && (response.data['res']?.toString().toLowerCase() != 'success')) {
-      final message = response.data['msg']?.toString() ?? 'Something went wrong';
-      if (showToaster) CustomSnackbar.showError(message);
+    if (response.data is Map) {
+      final res = response.data['res']?.toString().toLowerCase();
+      final status = response.data['status']?.toString().toLowerCase();
+      final isSuccess = res == 'success' || status == 'success' || response.data['success'] == true || response.data.containsKey('auth');
+      
+      if (!isSuccess) {
+        final message = response.data['msg']?.toString() ?? response.data['message']?.toString() ?? 'Something went wrong';
+        if (showToaster) CustomSnackbar.showError(message);
 
-      return ResponseModel(
-        isSuccess: false,
-        message: message,
-        body: response.data['data'],
-        statusCode: statusCode,
-      );
+        return ResponseModel(
+          isSuccess: false,
+          message: message,
+          body: response.data['data'],
+          statusCode: statusCode,
+        );
+      }
     }
 
-    return ResponseModel.fromJson(response.data, statusCode: statusCode);
+    if (response.data is Map) {
+      return ResponseModel.fromJson(response.data, statusCode: statusCode);
+    } else {
+      return ResponseModel(
+        isSuccess: statusCode == 200 || statusCode == 201,
+        message: statusCode == 200 || statusCode == 201 ? 'Success' : 'Something went wrong',
+        statusCode: statusCode,
+        body: response.data,
+      );
+    }
   }
 
   static void _showErrorMessage(Response response, [String? defaultMessage]) {
-    final message = response.data['msg'] ?? defaultMessage ?? 'Something went wrong';
-    CustomSnackbar.showError(message);
+    if (isLoggingOut) return;
+    String? message;
+    if (response.data is Map) {
+      message = response.data['msg'] ?? response.data['message'];
+    }
+    CustomSnackbar.showError(message ?? defaultMessage ?? 'Something went wrong');
   }
 
   static void _showValidationErrors(Response response) {
-    if (response.data != null) {
+    if (isLoggingOut) return;
+    if (response.data != null && response.data is Map<String, dynamic>) {
       try {
         final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
         if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
@@ -379,10 +462,49 @@ class ApiChecker {
     );
   }
 
-  static void _logout() {
-    SharedPrefs.remove(AppConstants.userData);
+  static bool isLoggingOut = false;
+
+  static void _logout() async {
+    if (isLoggingOut) return;
+    
+    // Prevent logout loop and navigation if already on Login or OTP screens
+    final currentRoute = getx.Get.currentRoute;
+    if (currentRoute == RouteHelper.getLoginRoute() || currentRoute == RouteHelper.getOtpRoute()) {
+      return;
+    }
+
+    isLoggingOut = true;
+
+    try {
+      if (getx.Get.isRegistered<astro_fcm.FCMNotificationService>()) {
+        await astro_fcm.FCMNotificationService.removeDeviceToken();
+      } else {
+        // Since FCMNotificationService uses static methods
+        await astro_fcm.FCMNotificationService.removeDeviceToken();
+      }
+    } catch (_) {}
+
+    try {
+      if (getx.Get.isRegistered<astro_ws.WebSocketService>()) {
+        getx.Get.find<astro_ws.WebSocketService>().disconnect();
+      }
+    } catch (_) {}
+
+    try {
+      if (getx.Get.isRegistered<ApiClient>()) {
+        await getx.Get.find<ApiClient>().clearCache();
+      }
+    } catch (_) {}
+
+    await SharedPrefs.clear();
     SharedPrefs.setBool(AppConstants.isLoggedIn, false);
     TokenManager.clearToken();
-    getx.Get.offAllNamed(RouteHelper.getLoginRoute());
+    if (getx.Get.currentRoute != RouteHelper.getLoginRoute()) {
+      getx.Get.offAllNamed(RouteHelper.getLoginRoute());
+    }
+
+    Future.delayed(const Duration(seconds: 2), () {
+      isLoggingOut = false;
+    });
   }
 }
