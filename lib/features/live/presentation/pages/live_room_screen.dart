@@ -969,21 +969,26 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Scrollable real-time comments list
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height * 0.25,
-                          ),
-                          child: _buildChatList(),
-                        ),
-                        const SizedBox(height: 12),
-                        
-                        // Input controls
+                        // Input controls & comments feed
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Expanded(
-                              child: _buildCommentInput(),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Scrollable real-time comments list (directly above input field, opposite the speaker / call buttons)
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight: MediaQuery.of(context).size.height * 0.25,
+                                    ),
+                                    child: _buildChatList(),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _buildCommentInput(),
+                                ],
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Column(
