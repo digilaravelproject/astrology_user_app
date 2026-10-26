@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart' as sax;
 import 'package:astro_user/core/theme/app_colors.dart';
-import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 
 class LocationResult {
@@ -100,7 +99,6 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
     final List<LocationResult> results = [];
 
     try {
-      // 1. Try Backend Location Search API first
       final backendUrl =
           '${AppUrls.apiUrl}${AppUrls.locationSearch}?query=${Uri.encodeComponent(query)}';
       final response = await _dio.get(backendUrl);
@@ -123,35 +121,6 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
       }
     } catch (e) {
       debugPrint('Backend location search error: $e');
-    }
-
-    // 2. Fallback to Google Geocoding API if backend was empty or failed
-    if (results.isEmpty) {
-      try {
-        final apiKey = AppConstants.googleMapApiKey;
-        final geocodeUrl =
-            'https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(query)}&key=$apiKey';
-        final geoResponse = await _dio.get(geocodeUrl);
-
-        if (geoResponse.statusCode == 200 &&
-            geoResponse.data != null &&
-            geoResponse.data['results'] is List) {
-          final List geoList = geoResponse.data['results'];
-          for (var item in geoList) {
-            final String name = item['formatted_address'] ?? '';
-            final double? lat =
-                (item['geometry']?['location']?['lat'] as num?)?.toDouble();
-            final double? lng =
-                (item['geometry']?['location']?['lng'] as num?)?.toDouble();
-
-            if (name.isNotEmpty && lat != null && lng != null) {
-              results.add(_refineLocationResult(name, null, lat, lng));
-            }
-          }
-        }
-      } catch (e) {
-        debugPrint('Direct Google location search fallback error: $e');
-      }
     }
 
     if (mounted) {
