@@ -125,12 +125,14 @@ class CallWebRTCController extends GetxController {
       final offerDescription = await _orchestrator.webrtcService.createOffer(0);
 
       // Unified endpoint: POST /call/initiate
-      // Backend auto-detects if user has an active package and sets session_type accordingly
+      // When isPackageSession is true, flag it so backend marks session as prepaid and attaches PackageSubSession
       final response = await _apiClient.post(
         AppUrls.initiateCall,
         data: {
           'provider_id': providerId,
           'offer': offerDescription.sdp,
+          if (isPackageSession) 'is_package_session': true,
+          if (isPackageSession) 'is_package': true,
         },
         handleError: true,
         showErrorScreen: false,
@@ -147,6 +149,14 @@ class CallWebRTCController extends GetxController {
           // Detect session_type from new API response
           final sType = sessionData['session_type']?.toString();
           _orchestrator.session.isPackageCall = sType == 'prepaid' || isPackageSession;
+
+          // Save activeSubSessionId if returned by backend for package calls
+          final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
+          final subSessionId = int.tryParse(subSessionData?['id']?.toString() ?? bodyMap?['sub_session_id']?.toString() ?? bodyMap?['data']?['sub_session_id']?.toString() ?? '');
+          if (subSessionId != null && subSessionId > 0) {
+            PackageSessionService.activeSubSessionId = subSessionId;
+          }
+
           final sessionStatus = sessionData['status']?.toString() ?? 'initiated';
 
           if (sessionStatus == 'waiting') {
