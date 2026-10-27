@@ -135,8 +135,6 @@ flutter:
     - assets/icons/bubble_img.png
     - assets/icons/verify.png
     - assets/images/
-    - assets/images/SURYAPATH.jpeg
-    - assets/images/app_icon.png
     - assets/images/app_logo.png
     - assets/images/astro.jpg
     - assets/images/background.png
@@ -145,7 +143,6 @@ flutter:
     - assets/images/bubble_img.png
     - assets/images/live_session_bg.png
     - assets/images/services/
-    - assets/images/splash_logo.gif
     - assets/language/
     - assets/translations/
   # To add assets to your application, add an assets section, like this:
