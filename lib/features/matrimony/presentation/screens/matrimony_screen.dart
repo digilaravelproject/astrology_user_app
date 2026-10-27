@@ -593,12 +593,12 @@ class _MatrimonyScreenState extends State<MatrimonyScreen> {
                               Positioned(
                                 top: 0,
                                 left: 0,
-                                child: _buildCircularProfile('https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                                child: _buildCircularProfile(ImageConstants.indianBride),
                               ),
                               Positioned(
                                 bottom: 0,
                                 right: 0,
-                                child: _buildCircularProfile('https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'),
+                                child: _buildCircularProfile(ImageConstants.indianGroom),
                               ),
                             ],
                           ),

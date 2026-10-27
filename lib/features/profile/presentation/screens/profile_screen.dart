@@ -249,7 +249,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         _buildMenuItem(
           icon: Iconsax.user_remove_copy,
-          title: 'Blocked Astrologers'.tr,
+          title: AppStrings.blockedAstrologers,
           onTap: () => Get.to(() => const BlockedAstrologersScreen(), binding: ProfileBinding()),
         ),
 

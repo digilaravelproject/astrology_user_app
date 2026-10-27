@@ -12,6 +12,8 @@ class ImageConstants {
   static const String appLogo = '${imagePath}app_logo.png';
   static const String app_Logo = '${imagePath}SURYAPATH.jpeg';
   static const String astroMatrimony = '${imagePath}astro_matrimony_premium.png';
+  static const String indianBride = '${imagePath}indian_bride_profile.jpg';
+  static const String indianGroom = '${imagePath}indian_groom_profile.jpg';
 
   // Auth Images
  // static const String loginBackground = '${imagePath}bg_login.jpeg';

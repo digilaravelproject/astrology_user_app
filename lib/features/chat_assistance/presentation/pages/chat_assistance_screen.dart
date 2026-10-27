@@ -8,6 +8,7 @@ import 'package:astro_user/core/widgets/app_text.dart';
 import 'package:astro_user/core/widgets/custom_app_bar.dart';
 import 'package:astro_user/core/widgets/network_ping_indicator.dart';
 import 'package:astro_user/core/widgets/full_screen_image_viewer.dart';
+import 'package:astro_user/core/widgets/resilient_network_image.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/theme/app_colors.dart';
 import 'package:astro_user/features/chat/domain/entities/chat_message.dart';
@@ -309,43 +310,39 @@ class ChatAssistanceScreen extends GetView<ChatAssistanceController> {
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child:
-                        message.image != null &&
-                                message.image!.startsWith('http')
-                            ? Image.network(
-                              message.image!,
-                              height: 150,
-                              width: 200,
-                              fit: BoxFit.cover,
-                            )
-                            : (message.image != null && File(message.image!).existsSync()
-                                ? Image.file(
-                                  File(message.image!),
-                                  height: 150,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                )
-                                : Image.network(
-                                  message.attachmentUrl != null &&
-                                          message.attachmentUrl!.startsWith(
-                                            'http',
-                                          )
-                                      ? message.attachmentUrl!
-                                      : '${AppUrls.baseImageUrl}${message.attachmentUrl ?? ""}',
-                                  height: 150,
-                                  width: 200,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (c, e, s) => Container(
-                                        height: 150,
-                                        width: 200,
-                                        color: Colors.grey,
-                                        child: const Icon(
-                                          Icons.broken_image,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                )),
+                    child: Builder(builder: (context) {
+                      if (message.image != null &&
+                          !message.image!.startsWith('http') &&
+                          File(message.image!).existsSync()) {
+                        return Image.file(
+                          File(message.image!),
+                          height: 150,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      final String? netUrl = (message.image != null && message.image!.startsWith('http'))
+                          ? message.image
+                          : (message.attachmentUrl != null && message.attachmentUrl!.startsWith('http'))
+                              ? message.attachmentUrl
+                              : (message.attachmentUrl != null && message.attachmentUrl!.isNotEmpty)
+                                  ? '${AppUrls.baseImageUrl}${message.attachmentUrl}'
+                                  : null;
+                      if (netUrl != null && netUrl.isNotEmpty) {
+                        return ResilientNetworkImage(
+                          imageUrl: netUrl,
+                          height: 150,
+                          width: 200,
+                          fit: BoxFit.cover,
+                        );
+                      }
+                      return Container(
+                        height: 150,
+                        width: 200,
+                        color: Colors.grey,
+                        child: const Icon(Icons.image_not_supported, color: Colors.white),
+                      );
+                    }),
                   ),
                 )
               else if (message.type == 'document')

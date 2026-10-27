@@ -272,6 +272,7 @@ class AppStrings {
   static String get support => 'Support'.tr;
   static String get share => 'Share'.tr;
   static String get following => 'Following'.tr;
+  static String get blockedAstrologers => 'Blocked Astrologers'.tr;
   static String get wallet => 'Wallet'.tr;
   static String get customerSupport => 'Customer Support'.tr;
   static String get privacyPolicyProfile => privacyPolicy;
