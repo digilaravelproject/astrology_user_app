@@ -80,6 +80,36 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   final String _wsUrl = AppUrls.webSocketUrl;
   
   bool get isConnected => _isConnected;
+  String? get socketId => _socketId;
+  String? getSocketId() => _socketId;
+
+  Future<String?> waitForSocketId({Duration timeout = const Duration(seconds: 5)}) async {
+    if (_isConnected && _socketId != null && _socketId!.isNotEmpty) {
+      return _socketId;
+    }
+    final completer = Completer<String?>();
+    Timer? timeoutTimer;
+    Timer? pollTimer;
+
+    timeoutTimer = Timer(timeout, () {
+      pollTimer?.cancel();
+      if (!completer.isCompleted) {
+        completer.complete(_socketId);
+      }
+    });
+
+    pollTimer = Timer.periodic(const Duration(milliseconds: 100), (t) {
+      if (_isConnected && _socketId != null && _socketId!.isNotEmpty) {
+        t.cancel();
+        timeoutTimer?.cancel();
+        if (!completer.isCompleted) {
+          completer.complete(_socketId);
+        }
+      }
+    });
+
+    return completer.future;
+  }
 
   Future<WebSocketService> init() async {
     WidgetsBinding.instance.addObserver(this);
@@ -308,8 +338,12 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
 
   Future<void> subscribeToChannel(String channelName) async {
     _subscribedChannels.add(channelName);
-    if (!_isConnected || _socketId == null) {
-      Logger.d('Cannot subscribe to channel $channelName, not connected yet. Queued for later.');
+    if (!_isConnected || _socketId == null || _socketId!.isEmpty) {
+      Logger.d('Waiting for WebSocket connection & socket_id before subscribing to $channelName...');
+      await waitForSocketId(timeout: const Duration(seconds: 4));
+    }
+    if (!_isConnected || _socketId == null || _socketId!.isEmpty) {
+      Logger.d('Cannot subscribe to channel $channelName, not connected or socket_id null. Queued for later.');
       return;
     }
     try {
@@ -362,11 +396,11 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   }
 
   Future<void> _authenticateAndSubscribe() async {
-    if (_socketId == null || _userId == null) return;
+    if (_socketId == null || _socketId!.isEmpty) return;
 
     final Set<String> channelsToSubscribe = {
-      AppUrls.privateUserChannel(_userId!),
-      AppUrls.presenceRoomChannel,
+      if (_userId != null) AppUrls.privateUserChannel(_userId!),
+      if (_userId != null) AppUrls.presenceRoomChannel,
       'astrologers',
       'live-sessions',
       ..._subscribedChannels,

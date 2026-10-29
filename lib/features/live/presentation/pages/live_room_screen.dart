@@ -117,15 +117,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     // Fetch gifts listing
     _giftController.fetchGifts();
 
-    // Subscribe to dynamic websocket channel FIRST (must complete before join API)
-    try {
-      final ws = Get.find<WebSocketService>();
-      ws.subscribeToChannel('presence-live-session.${widget.sessionId}');
-    } catch (e) {
-      debugPrint('[LIVE] Error subscribing to websocket channel: $e');
-    }
+    // Subscribe to dynamic websocket channel
+    _subscribeToLiveChannel();
 
-    // Join the session AFTER websocket subscription
+    // Join the session
     _liveController.joinSession(widget.sessionId);
 
     // Listen to session changes to connect to LiveKit
@@ -166,6 +161,19 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
         }
       }
     });
+  }
+
+  Future<void> _subscribeToLiveChannel() async {
+    try {
+      final ws = Get.find<WebSocketService>();
+      if (ws.getSocketId() == null) {
+        debugPrint('[LIVE] Waiting for WebSocket connection / socket_id before authorizing channel...');
+        await ws.waitForSocketId();
+      }
+      await ws.subscribeToChannel('presence-live-session.${widget.sessionId}');
+    } catch (e) {
+      debugPrint('[LIVE] Error subscribing to websocket channel: $e');
+    }
   }
 
   bool _isConnectingLiveKit = false;
@@ -315,6 +323,7 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   void _disconnectLiveKit() async {
     final roomToDispose = _room;
     _room = null;
+    _remoteVideoTrack = null;
     if (roomToDispose != null) {
       try {
         await roomToDispose.disconnect();
@@ -327,7 +336,6 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     if (mounted) {
       setState(() {
         _isLiveKitConnected = false;
-        _remoteVideoTrack = null;
       });
     }
   }

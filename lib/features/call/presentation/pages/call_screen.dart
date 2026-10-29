@@ -227,15 +227,21 @@ class _CallScreenState extends State<CallScreen> {
                           letterSpacing: 0.5,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        status == 'ringing' ? 'Ringing...' : (status == 'waiting' ? 'Waiting in queue...' : 'Connecting P2P...'),
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
+                      if (status != 'ongoing') ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          status == 'ringing'
+                              ? 'Ringing...'
+                              : (status == 'waiting'
+                                  ? 'Waiting in queue...'
+                                  : 'Connecting...'),
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
 
