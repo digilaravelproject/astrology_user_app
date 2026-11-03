@@ -230,17 +230,16 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void showOngoingNotification({int? startedAtMillis}) {
-    if (sessionId != null) {
-      DateTime? startedAt;
-      if (startedAtMillis != null) {
-        startedAt = DateTime.fromMillisecondsSinceEpoch(startedAtMillis);
-      }
-      ForegroundTaskService.startActiveSessionNotification(
-        title: 'Active Call with $providerName',
-        type: 'Call',
-        startedAt: startedAt,
-      );
+    DateTime? startedAt;
+    if (startedAtMillis != null) {
+      startedAt = DateTime.fromMillisecondsSinceEpoch(startedAtMillis);
     }
+    final name = providerName ?? 'Astrologer';
+    ForegroundTaskService.startActiveSessionNotification(
+      title: 'Active Call with $name',
+      type: 'Call',
+      startedAt: startedAt,
+    );
   }
 
   void startRingtone({required bool isIncoming}) {

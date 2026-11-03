@@ -93,8 +93,6 @@ class FloatingCallBubble {
           type: 'Call',
           startedAt: startedAtDate,
         );
-      } else {
-        await ForegroundTaskService.stopService();
       }
 
       final String statusText = (status == 'ongoing') 

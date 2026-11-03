@@ -122,6 +122,7 @@ class CallWebRTCController extends GetxController {
       _orchestrator.session.isPackageCall = isPackageSession;
 
       _orchestrator.status.value = 'dialing';
+      _orchestrator.session.showOngoingNotification();
       final offerDescription = await _orchestrator.webrtcService.createOffer(0);
 
       // Unified endpoint: POST /call/initiate
