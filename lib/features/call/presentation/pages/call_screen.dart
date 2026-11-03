@@ -13,6 +13,7 @@ import 'package:astro_user/core/widgets/network_ping_indicator.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
+import 'package:astro_user/routes/route_helper.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -54,8 +55,34 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (controller.status.value == 'ongoing') {
+          if (controller.sessionId != null && controller.providerName != null) {
+            controller.minimizeToBubble(
+              context,
+              controller.providerName!,
+              controller.providerImage ?? "",
+              shouldPop: false,
+            );
+          }
+          if (Navigator.of(context).canPop()) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getDashboardRoute());
+          }
+        } else {
+          if (Navigator.of(context).canPop()) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getDashboardRoute());
+          }
+        }
+      },
+      child: Scaffold(
+        body: Obx(() {
         final status = controller.status.value;
         final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
         final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
@@ -300,8 +327,9 @@ class _CallScreenState extends State<CallScreen> {
         ),
         );
       }),
-    );
-  }
+    ),
+  );
+}
 
   /// Decides which end dialog to show based on session state
   void _onEndTapped() {
