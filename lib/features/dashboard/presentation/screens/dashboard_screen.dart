@@ -39,10 +39,12 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingObserver {
+class _DashboardScreenState extends State<DashboardScreen>
+    with WidgetsBindingObserver {
   int _selectedIndex = 0;
   DateTime? _lastBackPressTime;
-  final MatrimonyController _matrimonyController = Get.find<MatrimonyController>();
+  final MatrimonyController _matrimonyController =
+      Get.find<MatrimonyController>();
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -98,7 +100,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
       // Wait 500 ms so DashboardController & all bindings are fully initialized
       // before navigating. This is the guaranteed hook point — SplashController
       // previously had a race condition with only 300 ms.
-      Future.delayed(const Duration(milliseconds: 500), _consumePendingNotification);
+      Future.delayed(
+        const Duration(milliseconds: 500),
+        _consumePendingNotification,
+      );
       // ──────────────────────────────────────────────────────────────────────
     });
   }
@@ -133,10 +138,14 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     try {
       // 1. First check if launched from a local notification
       try {
-        final launchDetails = await FlutterLocalNotificationsPlugin().getNotificationAppLaunchDetails();
+        final launchDetails =
+            await FlutterLocalNotificationsPlugin()
+                .getNotificationAppLaunchDetails();
         if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
           final payload = launchDetails.notificationResponse?.payload;
-          debugPrint('[DashboardScreen] Local notification launch payload: $payload');
+          debugPrint(
+            '[DashboardScreen] Local notification launch payload: $payload',
+          );
           if (payload != null && payload.isNotEmpty) {
             // Handle live_ string payload directly (e.g. "live_124") —
             // jsonDecode would fail here because payload is NOT JSON.
@@ -144,12 +153,16 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
               final sessionIdStr = payload.replaceFirst('live_', '');
               final int? sessionId = int.tryParse(sessionIdStr);
               if (sessionId != null && sessionId > 0) {
-                debugPrint('[DashboardScreen] live_ payload → navigating to LiveRoomScreen sessionId=$sessionId');
-                Get.to(() => LiveRoomScreen(
-                  sessionId: sessionId,
-                  astrologerName: 'Astrologer',
-                  astrologerImage: '',
-                ));
+                debugPrint(
+                  '[DashboardScreen] live_ payload → navigating to LiveRoomScreen sessionId=$sessionId',
+                );
+                Get.to(
+                  () => LiveRoomScreen(
+                    sessionId: sessionId,
+                    astrologerName: 'Astrologer',
+                    astrologerImage: '',
+                  ),
+                );
                 return;
               }
             }
@@ -157,34 +170,50 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
             try {
               final Map<String, dynamic> decoded = jsonDecode(payload);
               FCMNotificationService.pendingNotificationData = decoded;
-              debugPrint('[DashboardScreen] Extracted local notification launch JSON payload');
+              debugPrint(
+                '[DashboardScreen] Extracted local notification launch JSON payload',
+              );
             } catch (_) {
-              debugPrint('[DashboardScreen] Payload is not JSON, skipping: $payload');
+              debugPrint(
+                '[DashboardScreen] Payload is not JSON, skipping: $payload',
+              );
             }
           }
         }
       } catch (e) {
-        debugPrint('[DashboardScreen] Error checking local notification launch details: $e');
+        debugPrint(
+          '[DashboardScreen] Error checking local notification launch details: $e',
+        );
       }
 
-      final Map<String, dynamic>? data = FCMNotificationService.pendingNotificationData;
+      final Map<String, dynamic>? data =
+          FCMNotificationService.pendingNotificationData;
       if (data == null) return;
 
       final type = data['type']?.toString().toLowerCase();
       final screen = data['screen']?.toString().toUpperCase();
       final notifType = data['notification_type']?.toString().toLowerCase();
 
-      final bool isLive = type == 'live_stream' || type == 'live' || type == 'live_session' ||
-          screen == 'LIVE_STREAM_SCREEN' || screen == 'LIVE_SESSION_SCREEN' ||
-          notifType == 'live_session' || notifType == 'live_stream' || notifType == 'live';
+      final bool isLive =
+          type == 'live_stream' ||
+          type == 'live' ||
+          type == 'live_session' ||
+          screen == 'LIVE_STREAM_SCREEN' ||
+          screen == 'LIVE_SESSION_SCREEN' ||
+          notifType == 'live_session' ||
+          notifType == 'live_stream' ||
+          notifType == 'live';
 
-      final bool isChatAssistance = type == 'assistance_chat' || screen == 'ASSISTANCE_CHAT_SCREEN' || 
-          notifType == 'assistance_chat' || type == 'chat_assistance';
+      final bool isChatAssistance =
+          type == 'assistance_chat' ||
+          screen == 'ASSISTANCE_CHAT_SCREEN' ||
+          notifType == 'assistance_chat' ||
+          type == 'chat_assistance';
 
       if (isLive) {
         final int? sessionId = FCMNotificationService.pendingLiveSessionId;
         if (sessionId == null || sessionId <= 0) return;
-        
+
         // Clear immediately so repeated rebuilds don't re-navigate
         FCMNotificationService.pendingLiveSessionId = null;
         FCMNotificationService.pendingNotificationData = null;
@@ -199,7 +228,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
             data['astrologerImage']?.toString() ??
             '';
 
-        debugPrint('[DashboardScreen] Consuming pendingLiveSessionId=$sessionId');
+        debugPrint(
+          '[DashboardScreen] Consuming pendingLiveSessionId=$sessionId',
+        );
         Get.to(
           () => LiveRoomScreen(
             sessionId: sessionId,
@@ -218,15 +249,24 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
 
   Future<void> _checkCurrentActiveSession() async {
     try {
-      final response = await Get.find<ApiClient>().get(AppUrls.getCurrentSession);
+      final response = await Get.find<ApiClient>().get(
+        AppUrls.getCurrentSession,
+      );
       if (response.isSuccess && response.body != null) {
         final data = response.body;
-        final session = (data is Map)
-            ? (data['session'] ?? data['data']?['session'] ?? data['data'] ?? data)
-            : null;
+        final session =
+            (data is Map)
+                ? (data['session'] ??
+                    data['data']?['session'] ??
+                    data['data'] ??
+                    data)
+                : null;
         final sessionId = session?['id'];
         final status = session?['status'];
-        final startedAt = session?['started_at'] ?? session?['accepted_at'] ?? session?['created_at'];
+        final startedAt =
+            session?['started_at'] ??
+            session?['accepted_at'] ??
+            session?['created_at'];
         // For user app, other person is provider (astrologer)
         final name = session?['provider']?['name'] ?? 'Astrologer';
 
@@ -237,14 +277,18 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
         DateTime? parsedStart;
         if (startedAt != null) {
           String isoUtc = startedAt.toString().replaceAll(' ', 'T');
-          if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) {
+          if (!isoUtc.endsWith('Z') &&
+              !isoUtc.contains('+') &&
+              !isoUtc.contains('-')) {
             isoUtc += 'Z';
           }
           parsedStart = DateTime.tryParse(isoUtc)?.toLocal();
         }
         final int? startedAtMillis = parsedStart?.millisecondsSinceEpoch;
 
-        if (status == 'ongoing' || status == 'initiated' || status == 'accepted') {
+        if (status == 'ongoing' ||
+            status == 'initiated' ||
+            status == 'accepted') {
           if (sessionId != null) {
             LocalNotificationService.showOngoingChatNotification(
               sessionId: sessionId,
@@ -254,28 +298,30 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
             );
           }
           FloatingChatBubble.show(
-              context: Get.context!,
-              sessionId: sessionId,
-              name: name,
-              imageUrl: '', // We don't have the image in this payload
-              status: status,
-              startedAt: startedAt,
-              onTap: () {
-                final currentStatus = FloatingChatBubble.chatStatus.value;
-                Get.toNamed(
-                  AppRoutes.chatScreen,
-                  arguments: {
-                    'astrologerName': name,
-                    'astrologerImage': '',
-                    'sessionId': sessionId,
-                    'initialStatus': currentStatus,
-                    'startedAtString': startedAt,
-                  },
-                );
-              }
+            context: Get.context!,
+            sessionId: sessionId,
+            name: name,
+            imageUrl: '', // We don't have the image in this payload
+            status: status,
+            startedAt: startedAt,
+            onTap: () {
+              final currentStatus = FloatingChatBubble.chatStatus.value;
+              Get.toNamed(
+                AppRoutes.chatScreen,
+                arguments: {
+                  'astrologerName': name,
+                  'astrologerImage': '',
+                  'sessionId': sessionId,
+                  'initialStatus': currentStatus,
+                  'startedAtString': startedAt,
+                },
+              );
+            },
           );
         } else {
-          LocalNotificationService.cancelOngoingChatNotification(sessionId is int ? sessionId : null);
+          LocalNotificationService.cancelOngoingChatNotification(
+            sessionId is int ? sessionId : null,
+          );
           FloatingChatBubble.dismiss(stopForegroundService: true);
         }
       } else {
@@ -304,14 +350,16 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
               // Background Image/Gradient
               Positioned.fill(
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                   child: Image.asset(
                     "assets/images/astro.jpg",
                     // 'https://img.freepik.com/premium-photo/indian-sadhu-reading-scriptures_53876-25805.jpg', // Placeholder mystic image
                     fit: BoxFit.fill,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFF2E1A47),
-                    ),
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            Container(color: const Color(0xFF2E1A47)),
                   ),
                 ),
               ),
@@ -320,7 +368,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -347,7 +397,11 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, color: Colors.black, size: 20),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
                 ),
               ),
@@ -363,16 +417,25 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.3)),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.star, color: Colors.yellow, size: 16),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 16,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               AppStrings.premiumAstrology,
@@ -428,7 +491,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                             // For now just close, as user might want to browse
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF6F00), // Orange color
+                            backgroundColor: const Color(
+                              0xFFFF6F00,
+                            ), // Orange color
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -493,7 +558,9 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
 
           // Double tap to exit logic on Home tab
           final now = DateTime.now();
-          if (_lastBackPressTime == null || now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
+          if (_lastBackPressTime == null ||
+              now.difference(_lastBackPressTime!) >
+                  const Duration(seconds: 2)) {
             _lastBackPressTime = now;
             CustomSnackbar.showInfo('Press back again to exit app');
             return;
@@ -526,10 +593,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                 return const SizedBox.shrink();
               }),
               Expanded(
-                child: IndexedStack(
-                  index: _selectedIndex,
-                  children: _screens,
-                ),
+                child: IndexedStack(index: _selectedIndex, children: _screens),
               ),
             ],
           ),
