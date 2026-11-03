@@ -10,6 +10,7 @@ import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubble.dart';
 import 'package:astro_user/features/chat/domain/usecases/end_chat_session_usecase.dart';
 import 'package:astro_user/features/chat/domain/usecases/cancel_chat_session_usecase.dart';
@@ -177,6 +178,14 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     });
   }
 
+  void _popOrGoToDashboard() {
+    if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+      Get.back();
+    } else {
+      Get.offAllNamed(RouteHelper.getDashboardRoute());
+    }
+  }
+
   void handleChatEndedByPeer() {
     status.value = 'ended';
     timer?.cancel();
@@ -188,7 +197,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     FloatingChatBubble.dismiss();
     if (Get.isRegistered<AuthController>()) Get.find<AuthController>().checkLoginStatus();
     Future.delayed(const Duration(milliseconds: 400), () {
-      if (Get.isRegistered<ChatController>()) Get.back();
+      if (Get.isRegistered<ChatController>()) _popOrGoToDashboard();
     });
   }
 
@@ -202,7 +211,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
     }
     FloatingChatBubble.dismiss();
-    Get.back();
+    _popOrGoToDashboard();
   }
 
   void handlePackageTerminated() {
@@ -307,7 +316,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
       }
       FloatingChatBubble.dismiss();
       WebSocketService.activeSessionId = null;
-      Get.back();
+      _popOrGoToDashboard();
       if (_orchestrator.sessionId != null) {
         WebSocketService.sessionStatusUpdates[_orchestrator.sessionId!] = 'ended';
       }
@@ -331,7 +340,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
 
   Future<void> cancelChatSession() async {
     if (_orchestrator.sessionId == null) {
-      Get.back();
+      _popOrGoToDashboard();
       return;
     }
     final targetId = _orchestrator.sessionId!;
@@ -341,7 +350,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     ForegroundTaskService.stopService();
     LocalNotificationService.cancelOngoingChatNotification(targetId);
     FloatingChatBubble.dismiss();
-    if (Get.isRegistered<ChatController>()) Get.back();
+    if (Get.isRegistered<ChatController>()) _popOrGoToDashboard();
     try {
       await _cancelChatSessionUseCase.execute(targetId);
     } catch (_) {} finally {

@@ -22,9 +22,16 @@ class CallController extends GetxController {
   set isAcceptedLocally(bool val) => session.isAcceptedLocally = val;
 
   int? get sessionId => session.sessionId;
+  set sessionId(int? val) => session.sessionId = val;
+
   String? get providerName => session.providerName;
+  set providerName(String? val) => session.providerName = val;
+
   String? get providerImage => session.providerImage;
+  set providerImage(String? val) => session.providerImage = val;
+
   int? get providerId => session.providerId;
+  set providerId(int? val) => session.providerId = val;
   bool get isPackageCall => session.isPackageCall;
   bool get isChatAlsoActive => session.isChatAlsoActive;
   RxInt get currentPingMs => webrtcService.currentPingMs;

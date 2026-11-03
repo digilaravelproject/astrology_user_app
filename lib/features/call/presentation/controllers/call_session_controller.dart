@@ -14,6 +14,7 @@ import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'call_controller.dart';
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 
@@ -146,7 +147,13 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     status.value = reason;
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
-    if (wasCallScreenVisible) Get.back();
+    if (wasCallScreenVisible) {
+      if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+        Get.back();
+      } else {
+        Get.offAllNamed(RouteHelper.getDashboardRoute());
+      }
+    }
     if (reason == 'cancelled') {
       CustomSnackbar.showInfo('Call cancelled.');
     } else {
@@ -162,11 +169,15 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
-    if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+    if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
       if (Get.isDialogOpen ?? false) {
         Get.back();
       }
-      Get.back(); // Pop the call screen
+      if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+        Get.back();
+      } else {
+        Get.offAllNamed(RouteHelper.getDashboardRoute());
+      }
     }
   }
 

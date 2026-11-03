@@ -15,6 +15,7 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'call_controller.dart';
 import 'package:astro_user/routes/app_routes.dart';
+import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/features/wallet/presentation/widgets/recharge_bottom_sheet.dart';
 
 class CallWebRTCController extends GetxController {
@@ -236,16 +237,24 @@ class CallWebRTCController extends GetxController {
         
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
-        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
           if (Get.isDialogOpen ?? false) Get.back();
-          Get.back();
+          if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getDashboardRoute());
+          }
         }
       } else {
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
-        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call') {
+        if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
           if (Get.isDialogOpen ?? false) Get.back();
-          Get.back();
+          if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getDashboardRoute());
+          }
         }
       }
     } catch (e) {

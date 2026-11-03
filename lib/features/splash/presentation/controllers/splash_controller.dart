@@ -1,12 +1,20 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/routes/route_helper.dart';
+import 'package:astro_user/routes/app_routes.dart';
 import 'package:astro_user/features/splash/data/datasources/splash_service.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/fcm_notification_service.dart';
+import 'package:astro_user/core/services/cold_start_detector.dart';
+import 'package:astro_user/core/bindings/initial_bindings.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
+import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
+import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
+import 'package:astro_user/features/chat_assistance/presentation/pages/chat_assistance_screen.dart';
+import 'package:astro_user/features/chat_assistance/presentation/bindings/chat_assistance_binding.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SplashController extends GetxController {
@@ -26,6 +34,30 @@ class SplashController extends GetxController {
     try {
       isLoading.value = true;
 
+      // ── FAST PATH: Cold-Start Communication (Call/Chat/Live) ────────────
+      final intent = ColdStartDetector.currentIntent;
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+
+      if (isLoggedIn && intent != null && intent.type != ColdStartType.none) {
+        print('[SPLASH] Cold-start communication intent detected: ${intent.type} (sessionId=${intent.sessionId}). Executing ZERO-LAG fast path.');
+        ColdStartDetector.currentIntent = null; // consume
+
+        // Connect WebSocket in background immediately
+        Get.find<WebSocketService>().connect();
+        FCMNotificationService.registerDeviceToken(null);
+
+        if (intent.type == ColdStartType.call) {
+          _dispatchColdStartCall(intent);
+        } else if (intent.type == ColdStartType.chat) {
+          _dispatchColdStartChat(intent);
+        } else if (intent.type == ColdStartType.live) {
+          _dispatchColdStartLive(intent);
+        } else if (intent.type == ColdStartType.assistanceChat) {
+          _dispatchColdStartAssistance(intent);
+        }
+        return;
+      }
+
       // Initialize splash service
       final isReady = await _splashService.initialize();
 
@@ -43,8 +75,6 @@ class SplashController extends GetxController {
       if (cameraGranted && micGranted && notifGranted) {
         if (isReady) {
           // Check if user is logged in
-          final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
-
           if (isLoggedIn) {
             Get.find<WebSocketService>().connect();
             FCMNotificationService.registerDeviceToken(null);
@@ -76,5 +106,50 @@ class SplashController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void _dispatchColdStartCall(ColdStartIntent intent) {
+    if (!Get.isRegistered<CallController>()) {
+      InitialBindings().dependencies();
+    }
+    final ctrl = Get.find<CallController>();
+    ctrl.sessionId = intent.sessionId;
+    ctrl.isAcceptedLocally = true;
+    ctrl.isCallScreenVisible = true;
+    if (intent.name != null && intent.name!.isNotEmpty) {
+      ctrl.providerName = intent.name;
+    }
+    // Directly replace Splash with CallScreen
+    Get.offAllNamed(AppRoutes.callScreen);
+  }
+
+  void _dispatchColdStartChat(ColdStartIntent intent) {
+    final astroName = intent.name?.isNotEmpty == true ? intent.name! : 'Astrologer';
+    final astroImage = intent.avatar ?? '';
+    final chatScreen = ChatScreen(
+      astrologerName: astroName,
+      astrologerImage: astroImage,
+      sessionId: intent.sessionId,
+      initialStatus: 'ongoing',
+    );
+    // Directly replace Splash with ChatScreen
+    Get.offAll(() => chatScreen, binding: ChatBinding());
+  }
+
+  void _dispatchColdStartLive(ColdStartIntent intent) {
+    final astroName = intent.name?.isNotEmpty == true ? intent.name! : 'Astrologer';
+    final astroImage = intent.avatar ?? '';
+    Get.offAll(() => LiveRoomScreen(
+      sessionId: intent.sessionId,
+      astrologerName: astroName,
+      astrologerImage: astroImage,
+    ));
+  }
+
+  void _dispatchColdStartAssistance(ColdStartIntent intent) {
+    Get.offAll(
+      () => const ChatAssistanceScreen(),
+      binding: ChatAssistanceBinding(),
+    );
   }
 }

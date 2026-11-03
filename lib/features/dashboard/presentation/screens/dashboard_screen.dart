@@ -125,6 +125,11 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
   /// (cold-start via getInitialMessage) or by notificationTapBackground
   /// (local notification tapped while app was in background/killed state).
   void _consumePendingNotification() async {
+    final String currentRoute = Get.currentRoute.toLowerCase();
+    if (currentRoute.contains('call') || currentRoute.contains('chat') || currentRoute.contains('live')) {
+      debugPrint('[DashboardScreen] Communication screen already active ($currentRoute), skipping _consumePendingNotification');
+      return;
+    }
     try {
       // 1. First check if launched from a local notification
       try {
