@@ -43,8 +43,19 @@ class SplashController extends GetxController {
         ColdStartDetector.currentIntent = null; // consume
 
         // Connect WebSocket in background immediately
-        Get.find<WebSocketService>().connect();
-        FCMNotificationService.registerDeviceToken(null);
+        try {
+          if (Get.isRegistered<WebSocketService>()) {
+            Get.find<WebSocketService>().connect();
+          } else {
+            Get.put(WebSocketService(), permanent: true).connect();
+          }
+        } catch (e) {
+          print('[SPLASH] WebSocket fast path connect error: $e');
+        }
+
+        try {
+          FCMNotificationService.registerDeviceToken(null);
+        } catch (_) {}
 
         if (intent.type == ColdStartType.call) {
           _dispatchColdStartCall(intent);
@@ -76,8 +87,18 @@ class SplashController extends GetxController {
         if (isReady) {
           // Check if user is logged in
           if (isLoggedIn) {
-            Get.find<WebSocketService>().connect();
-            FCMNotificationService.registerDeviceToken(null);
+            try {
+              if (Get.isRegistered<WebSocketService>()) {
+                Get.find<WebSocketService>().connect();
+              } else {
+                Get.put(WebSocketService(), permanent: true).connect();
+              }
+            } catch (e) {
+              print('[SPLASH] WebSocket init error: $e');
+            }
+            try {
+              FCMNotificationService.registerDeviceToken(null);
+            } catch (_) {}
             final String currentRoute = Get.currentRoute.toLowerCase();
             final bool isCommunicationActive = currentRoute.contains('call') ||
                 currentRoute.contains('chat') ||
@@ -101,8 +122,13 @@ class SplashController extends GetxController {
         Get.offAllNamed(RouteHelper.getPermissionRoute());
       }
     } catch (e) {
-      // Handle errors
-      Get.offAllNamed(RouteHelper.getLoginRoute());
+      print('[SPLASH] Error during initialization: $e');
+      final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
+      if (isLoggedIn) {
+        Get.offAllNamed(RouteHelper.getDashboardRoute());
+      } else {
+        Get.offAllNamed(RouteHelper.getLoginRoute());
+      }
     } finally {
       isLoading.value = false;
     }
