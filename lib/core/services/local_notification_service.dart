@@ -51,6 +51,7 @@ void notificationTapBackground(NotificationResponse response) {
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  static final Map<int, int> _recentCallNotifications = {};
 
   static Future<void> initialize() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -373,6 +374,17 @@ class LocalNotificationService {
     required String title,
     required String body,
   }) async {
+    final int now = DateTime.now().millisecondsSinceEpoch;
+    _recentCallNotifications.removeWhere((_, time) => now - time > 30000);
+    if (_recentCallNotifications.containsKey(sessionId)) {
+      final int lastTime = _recentCallNotifications[sessionId]!;
+      if (now - lastTime < 15000) {
+        debugPrint('[LocalNotification] Dropping duplicate call notification for session $sessionId within 15s');
+        return;
+      }
+    }
+    _recentCallNotifications[sessionId] = now;
+
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'incoming_call_channel_v1',
       'Incoming Calls',

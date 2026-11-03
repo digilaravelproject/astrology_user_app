@@ -140,13 +140,11 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
               final int? sessionId = int.tryParse(sessionIdStr);
               if (sessionId != null && sessionId > 0) {
                 debugPrint('[DashboardScreen] live_ payload → navigating to LiveRoomScreen sessionId=$sessionId');
-                Future.delayed(const Duration(milliseconds: 1500), () {
-                  Get.to(() => LiveRoomScreen(
-                    sessionId: sessionId,
-                    astrologerName: 'Astrologer',
-                    astrologerImage: '',
-                  ));
-                });
+                Get.to(() => LiveRoomScreen(
+                  sessionId: sessionId,
+                  astrologerName: 'Astrologer',
+                  astrologerImage: '',
+                ));
                 return;
               }
             }
@@ -197,15 +195,13 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
             '';
 
         debugPrint('[DashboardScreen] Consuming pendingLiveSessionId=$sessionId');
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          Get.to(
-            () => LiveRoomScreen(
-              sessionId: sessionId,
-              astrologerName: astrologerName,
-              astrologerImage: astrologerImage,
-            ),
-          );
-        });
+        Get.to(
+          () => LiveRoomScreen(
+            sessionId: sessionId,
+            astrologerName: astrologerName,
+            astrologerImage: astrologerImage,
+          ),
+        );
       } else if (isChatAssistance) {
         FCMNotificationService.pendingNotificationData = null;
         FCMNotificationService.handleNotificationClick(data);

@@ -266,6 +266,7 @@ class CallWebRTCController extends GetxController {
   Future<void> handleCallAccepted(String answerSdp) async {
     _orchestrator.session.stopRingtone();
     _orchestrator.session.ringingTimer?.cancel();
+    _orchestrator.isAcceptedLocally = true;
     _orchestrator.status.value = 'ongoing';
     _orchestrator.durationSeconds.value = 0;
 
@@ -301,7 +302,11 @@ class CallWebRTCController extends GetxController {
             _orchestrator.session.isSummaryShown = false;
             _orchestrator.session.sessionId = int.tryParse(session['id']?.toString() ?? '');
             _orchestrator.webrtcService.activeSessionId = _orchestrator.sessionId;
-            _orchestrator.status.value = sessionStatus!;
+            if (_orchestrator.isAcceptedLocally && (sessionStatus == 'initiated' || sessionStatus == 'ringing' || sessionStatus == 'dialing')) {
+              debugPrint('[CallWebRTCController] User call already accepted locally. Keeping status=${_orchestrator.status.value}');
+            } else {
+              _orchestrator.status.value = sessionStatus!;
+            }
             
             // New API: use session_type field. Fallback to old flags for backward compatibility.
             final sType = session['session_type']?.toString();

@@ -48,9 +48,16 @@ class SplashController extends GetxController {
           if (isLoggedIn) {
             Get.find<WebSocketService>().connect();
             FCMNotificationService.registerDeviceToken(null);
-            Get.offAllNamed(RouteHelper.getDashboardRoute());
-            // DashboardScreen.initState() will consume FCMNotificationService.pendingLiveSessionId
-            // with a guaranteed postFrameCallback + 500 ms delay — no race condition here.
+            final String currentRoute = Get.currentRoute.toLowerCase();
+            final bool isCommunicationActive = currentRoute.contains('call') ||
+                currentRoute.contains('chat') ||
+                currentRoute.contains('live');
+
+            if (!isCommunicationActive) {
+              Get.offAllNamed(RouteHelper.getDashboardRoute());
+            } else {
+              print('[SPLASH] Communication screen already active ($currentRoute). Preserving stack.');
+            }
           } else {
             Get.offAllNamed(RouteHelper.getLoginRoute());
           }

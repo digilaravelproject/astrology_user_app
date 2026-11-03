@@ -249,8 +249,7 @@ class FCMNotificationService {
           pendingNotificationData = Map<String, dynamic>.from(data);
           debugPrint('[FCMNotificationService] Cold-start: pendingNotificationData=$pendingNotificationData');
         } else {
-          // For other types try after a safe delay so routes are ready
-          Future.delayed(const Duration(milliseconds: 4500), () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             handleNotificationClick(data);
           });
         }
