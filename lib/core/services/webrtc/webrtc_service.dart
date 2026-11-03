@@ -52,11 +52,11 @@ class WebRTCService {
         'audio': {
           'echoCancellation': true,
           'noiseSuppression': true,
-          'autoGainControl': false, // Hardware HAL mic gain is already active (+14dB on Android). Software AGC causes severe distortion/clipping ("awaz fatna")
+          'autoGainControl': true,
           'mandatory': {
-            'googEchoCancellation': true, // Speaker echo cancellation
-            'googAutoGainControl': false, // Disable software gain amplification to prevent digital clipping
-            'googAutoGainControl2': false,
+            'googEchoCancellation': true, // Speaker acoustic echo cancellation
+            'googAutoGainControl': false, // Disable legacy aggressive software AGC to avoid clipping/distortion
+            'googAutoGainControl2': true, // Modern WebRTC AGC2 with true peak limiter (prevents distortion while boosting quiet speech)
             'googNoiseSuppression': true, // Background noise suppression
             'googHighpassFilter': true, // Removes low frequency rumble
             'googTypingNoiseDetection': false,
@@ -119,11 +119,11 @@ class WebRTCService {
     if (sdp.isEmpty) return sdp;
 
     // Check if already optimized with current params
-    if (sdp.contains('maxaveragebitrate=48000') && sdp.contains('usedtx=0')) {
+    if (sdp.contains('maxaveragebitrate=64000') && sdp.contains('sprop-stereo=0')) {
       return sdp;
     }
 
-    const opusParams = 'useinbandfec=1; usedtx=0; stereo=0; ptime=20; minptime=20; maxaveragebitrate=48000; maxplaybackrate=48000; sprop-maxcapturerate=48000';
+    const opusParams = 'useinbandfec=1; usedtx=0; stereo=0; sprop-stereo=0; ptime=20; minptime=10; maxaveragebitrate=64000; maxplaybackrate=48000; sprop-maxcapturerate=48000';
 
     // Find the Opus payload type number (e.g. 111)
     final opusMatch = RegExp(r'a=rtpmap:(\d+)\s+opus/48000', caseSensitive: false).firstMatch(sdp);
@@ -191,7 +191,12 @@ class WebRTCService {
       peerConnection!.onAddStream = (stream) {
         Logger.d('WebRTCService: Remote stream added via onAddStream.');
         remoteStream = stream;
-        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+        remoteStream!.getAudioTracks().forEach((track) {
+          track.enabled = true;
+          try {
+            Helper.setVolume(1.0, track);
+          } catch (_) {}
+        });
         toggleSpeaker(currentSpeakerState);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
@@ -202,6 +207,9 @@ class WebRTCService {
         Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
         if (event.track.kind == 'audio') {
           event.track.enabled = true;
+          try {
+            Helper.setVolume(1.0, event.track);
+          } catch (_) {}
         }
         if (event.streams.isNotEmpty) {
           remoteStream = event.streams[0];
@@ -218,7 +226,12 @@ class WebRTCService {
               remoteStream!.addTrack(event.track);
             }
           } catch (_) {}
-          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+          remoteStream!.getAudioTracks().forEach((track) {
+            track.enabled = true;
+            try {
+              Helper.setVolume(1.0, track);
+            } catch (_) {}
+          });
           toggleSpeaker(currentSpeakerState);
           if (onRemoteStreamAdded != null) {
             onRemoteStreamAdded!(remoteStream!);
@@ -307,7 +320,12 @@ class WebRTCService {
       peerConnection!.onAddStream = (stream) {
         Logger.d('WebRTCService: Remote stream added via onAddStream.');
         remoteStream = stream;
-        remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+        remoteStream!.getAudioTracks().forEach((track) {
+          track.enabled = true;
+          try {
+            Helper.setVolume(1.0, track);
+          } catch (_) {}
+        });
         toggleSpeaker(currentSpeakerState);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
@@ -318,6 +336,9 @@ class WebRTCService {
         Logger.d('WebRTCService: Remote track added via onTrack: ${event.track.kind}');
         if (event.track.kind == 'audio') {
           event.track.enabled = true;
+          try {
+            Helper.setVolume(1.0, event.track);
+          } catch (_) {}
         }
         if (event.streams.isNotEmpty) {
           remoteStream = event.streams[0];
@@ -334,7 +355,12 @@ class WebRTCService {
               remoteStream!.addTrack(event.track);
             }
           } catch (_) {}
-          remoteStream!.getAudioTracks().forEach((track) => track.enabled = true);
+          remoteStream!.getAudioTracks().forEach((track) {
+            track.enabled = true;
+            try {
+              Helper.setVolume(1.0, track);
+            } catch (_) {}
+          });
           toggleSpeaker(currentSpeakerState);
           if (onRemoteStreamAdded != null) {
             onRemoteStreamAdded!(remoteStream!);
@@ -482,6 +508,9 @@ class WebRTCService {
         remoteStream!.getAudioTracks().forEach((track) {
           // ignore: deprecated_member_use
           track.enableSpeakerphone(isSpeakerOn);
+          try {
+            Helper.setVolume(1.0, track);
+          } catch (_) {}
         });
       } catch (_) {}
     }
