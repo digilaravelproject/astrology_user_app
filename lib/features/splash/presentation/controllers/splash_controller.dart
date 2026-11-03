@@ -142,6 +142,8 @@ class SplashController extends GetxController {
     ctrl.sessionId = intent.sessionId;
     ctrl.isAcceptedLocally = true;
     ctrl.isCallScreenVisible = true;
+    ctrl.status.value = 'ongoing';
+    ctrl.session.startCallTimer();
     if (intent.name != null && intent.name!.isNotEmpty) {
       ctrl.providerName = intent.name;
     }
