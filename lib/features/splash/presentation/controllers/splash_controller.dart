@@ -29,8 +29,11 @@ class SplashController extends GetxController {
       // Initialize splash service
       final isReady = await _splashService.initialize();
 
-      // Wait for 5 seconds to show splash screen
-      await Future.delayed(const Duration(seconds: 5));
+      // If opening from a push notification (live/call/chat), skip delay; otherwise 2 seconds splash
+      if (FCMNotificationService.pendingLiveSessionId == null &&
+          FCMNotificationService.pendingNotificationData == null) {
+        await Future.delayed(const Duration(seconds: 2));
+      }
 
       // Check permissions
       bool cameraGranted = await Permission.camera.isGranted;
