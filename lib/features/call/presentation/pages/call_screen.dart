@@ -658,7 +658,7 @@ class _CallScreenState extends State<CallScreen> {
 
         final chatSession = switchData['chat_session'];
         final int activeChatSessionId = int.tryParse(chatSession?['id']?.toString() ?? '') ?? 0;
-        final String chatInitialStatus = chatSession?['status']?.toString() ?? 'ongoing';
+        final String chatInitialStatus = chatSession?['status']?.toString() ?? 'initiated';
 
         if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
 
