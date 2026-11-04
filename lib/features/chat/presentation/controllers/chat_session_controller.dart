@@ -116,21 +116,21 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
 
   void setupSessionListeners() {
     _endSub?.cancel();
-    if (WebSocketService.chatEndedSessionId.value == _orchestrator.sessionId) {
+    if (_orchestrator.sessionId != null && _orchestrator.sessionId! > 0 && WebSocketService.chatEndedSessionId.value == _orchestrator.sessionId) {
       handleChatEndedByPeer();
     }
     _endSub = WebSocketService.chatEndedSessionId.listen((endedSessionId) {
-      if (endedSessionId == _orchestrator.sessionId) {
+      if (_orchestrator.sessionId != null && _orchestrator.sessionId! > 0 && endedSessionId == _orchestrator.sessionId) {
         handleChatEndedByPeer();
       }
     });
 
     _dismissSub?.cancel();
-    if (WebSocketService.chatDismissedSessionId.value == _orchestrator.sessionId) {
+    if (_orchestrator.sessionId != null && _orchestrator.sessionId! > 0 && WebSocketService.chatDismissedSessionId.value == _orchestrator.sessionId) {
       handleDismissed();
     }
     _dismissSub = WebSocketService.chatDismissedSessionId.listen((dismissedSessionId) {
-      if (dismissedSessionId == _orchestrator.sessionId) {
+      if (_orchestrator.sessionId != null && _orchestrator.sessionId! > 0 && dismissedSessionId == _orchestrator.sessionId) {
         handleDismissed();
       }
     });

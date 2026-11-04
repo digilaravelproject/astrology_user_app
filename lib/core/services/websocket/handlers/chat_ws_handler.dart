@@ -60,8 +60,16 @@ class ChatWsHandler {
 
       if (Get.isRegistered<ChatController>()) {
         final controller = Get.find<ChatController>();
-        if (controller.sessionId == sessionId) {
+        if (controller.sessionId == sessionId || controller.sessionId == null || controller.sessionId == 0) {
+          if (controller.sessionId == null || controller.sessionId == 0) {
+            controller.sessionId = sessionId;
+            WebSocketState.activeSessionId = sessionId;
+            controller.messaging.loadHistory();
+          }
           controller.status.value = 'ongoing';
+          controller.session.status.value = 'ongoing';
+          controller.session.stopRingtone();
+          controller.session.setupTimer(session['started_at']?.toString());
         }
       }
     } catch (e) {
