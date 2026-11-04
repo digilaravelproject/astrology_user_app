@@ -85,10 +85,13 @@ class _CallScreenState extends State<CallScreen> {
         final status = controller.status.value;
         final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
         final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
+        final bool isPackage = controller.isPackageCall ||
+            (controller.subSessionId != null && controller.subSessionId! > 0) ||
+            (PackageSessionService.activeSubSessionId != null && PackageSessionService.activeSubSessionId! > 0);
 
         return GestureDetector(
           onHorizontalDragEnd: (details) {
-            if (controller.isPackageCall && details.primaryVelocity != null) {
+            if (isPackage && details.primaryVelocity != null) {
               if (details.primaryVelocity! < -300 || details.primaryVelocity! > 300) {
                 _showSwitchToChatDialog(context);
               }
@@ -195,12 +198,37 @@ class _CallScreenState extends State<CallScreen> {
                             ],
                           ),
                         ),
-                        // Align(
-                        //   alignment: Alignment.centerRight,
-                        //   child: Obx(() => NetworkPingIndicator(
-                        //         pingMs: controller.currentPingMs.value,
-                        //       )),
-                        // ),
+                        if (isPackage)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: InkWell(
+                              onTap: () => _showSwitchToChatDialog(context),
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white, size: 16),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      "Chat".tr,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -298,8 +326,8 @@ class _CallScreenState extends State<CallScreen> {
                           onPressed: () => controller.toggleMute(),
                         ),
 
-                        // Switch to Chat (visible during ongoing call)
-                        if (controller.isPackageCall && status == 'ongoing')
+                        // Switch to Chat (visible during package call)
+                        if (isPackage)
                           _buildControlButton(
                             icon: Icons.message,
                             label: 'Chat'.tr,
@@ -643,8 +671,12 @@ class _CallScreenState extends State<CallScreen> {
     // Show loader
     Get.dialog(const Center(child: CircularProgressIndicator(color: AppColors.deepPink)), barrierDismissible: false);
     
+    final bool isPackage = controller.isPackageCall ||
+        (subSessionId > 0) ||
+        (PackageSessionService.activeSubSessionId != null && PackageSessionService.activeSubSessionId! > 0);
+
     try {
-      if (subSessionId > 0 && controller.isPackageCall) {
+      if (subSessionId > 0 && isPackage) {
         // Atomic Switch API on Backend:
         // Automatically completes CallSession, marks call_status = disconnected,
         // broadcasts CallEnded to astrologer, and creates ChatSession!
@@ -661,8 +693,14 @@ class _CallScreenState extends State<CallScreen> {
         PackageSessionService.activeSubSessionId = subSessionId;
 
         final chatSession = switchData['chat_session'];
-        final int activeChatSessionId = int.tryParse(chatSession?['id']?.toString() ?? '') ?? 0;
-        final String chatInitialStatus = chatSession?['status']?.toString() ?? 'initiated';
+        final int activeChatSessionId = int.tryParse(
+          switchData['chat_session_id']?.toString() ??
+          (chatSession is Map ? chatSession['id']?.toString() : null) ??
+          switchData['session_id']?.toString() ??
+          switchData['sub_session']?['chat_session_id']?.toString() ??
+          '',
+        ) ?? 0;
+        final String chatInitialStatus = (chatSession is Map ? chatSession['status']?.toString() : null) ?? 'initiated';
 
         if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
 

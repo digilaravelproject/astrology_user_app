@@ -1404,14 +1404,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       final callSessionData = switchData['call_session'];
                       final int newCallSessionId =
                           int.tryParse(
-                            callSessionData?['id']?.toString() ?? '',
-                          ) ??
-                          (switchData['session_id'] != null
-                              ? int.tryParse(
-                                    switchData['session_id'].toString(),
-                                  ) ??
-                                  0
-                              : 0);
+                            switchData['call_session_id']?.toString() ??
+                            (callSessionData is Map ? callSessionData['id']?.toString() : null) ??
+                            switchData['session_id']?.toString() ??
+                            switchData['sub_session']?['call_session_id']?.toString() ??
+                            '',
+                          ) ?? 0;
 
                       // Clean up chat state locally
                       _controller.cleanUp();
@@ -1419,17 +1417,20 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       // Restore active package sub session ID for the new call
                       PackageSessionService.activeSubSessionId = subSessionId;
 
+                      callController.subSessionId = subSessionId;
+                      callController.isPackageCall = true;
+                      callController.providerName = widget.astrologerName;
+                      callController.providerImage = widget.astrologerImage;
+
                       if (newCallSessionId > 0) {
                         callController.sessionId = newCallSessionId;
                         callController.webrtcService.activeSessionId =
                             newCallSessionId;
-                        callController.subSessionId = subSessionId;
-                        callController.isPackageCall = true;
-                        callController.providerName = widget.astrologerName;
-                        callController.providerImage = widget.astrologerImage;
                         callController.status.value = 'ringing';
                         callController.session.startRingtone(isIncoming: false);
                         callController.session.startRingingTimeout();
+                      } else {
+                        callController.status.value = 'ringing';
                       }
 
                       // Transition directly to CallScreen

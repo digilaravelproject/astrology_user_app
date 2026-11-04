@@ -84,7 +84,13 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
         final session = data['session'];
         if (session != null) {
           final incomingSessionId = int.tryParse(session['id']?.toString() ?? '');
-          if (incomingSessionId == sessionId) {
+          final bool isMatchingSession = (sessionId == null || sessionId == 0 || incomingSessionId == sessionId);
+          if (isMatchingSession && incomingSessionId != null && incomingSessionId > 0) {
+            if (sessionId == null || sessionId == 0) {
+              sessionId = incomingSessionId;
+              _orchestrator.sessionId = incomingSessionId;
+              _orchestrator.webrtcService.activeSessionId = incomingSessionId;
+            }
             String? answer = data['answer']?.toString() ?? session['answer']?.toString();
             if (answer == null || answer.isEmpty) {
               try {
