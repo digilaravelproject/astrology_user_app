@@ -9,7 +9,6 @@ import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
 import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
-import 'package:astro_user/core/widgets/network_ping_indicator.dart';
 import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
@@ -638,72 +637,87 @@ class _CallScreenState extends State<CallScreen> {
     final providerId = controller.providerId;
     final providerName = controller.providerName ?? 'Astrologer';
     final providerImage = controller.providerImage ?? '';
-    final int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
-
-    Map<String, dynamic> spawnData = {};
-    if (subSessionId > 0 && controller.isPackageCall) {
-      try {
-        spawnData = await PackageSessionService.spawnChannel(
-          subSessionId: subSessionId,
-          channelType: 'chat',
-        );
-        controller.cleanUp();
-      } catch (e) {
-        debugPrint("Error spawning chat channel: $e");
-      }
-    } else {
-      if (controller.status.value == 'ongoing') {
-        await controller.endCall();
-      } else {
-        await controller.cancelCall();
-      }
-    }
-
-    // Pop CallScreen
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-    }
+    final int subSessionId = controller.subSessionId ?? PackageSessionService.activeSubSessionId ?? 0;
 
     // Show loader
     Get.dialog(const Center(child: CircularProgressIndicator(color: AppColors.deepPink)), barrierDismissible: false);
     
     try {
+      if (subSessionId > 0 && controller.isPackageCall) {
+        // Atomic Switch API on Backend:
+        // Automatically completes CallSession, marks call_status = disconnected,
+        // broadcasts CallEnded to astrologer, and creates ChatSession!
+        final switchData = await PackageSessionService.switchChannel(
+          subSessionId: subSessionId,
+          fromChannel: 'call',
+          toChannel: 'chat',
+        );
+
+        // Teardown local call WebRTC state
+        controller.cleanUp();
+
+        final chatSession = switchData['chat_session'];
+        final int activeChatSessionId = int.tryParse(chatSession?['id']?.toString() ?? '') ?? 0;
+        final String chatInitialStatus = chatSession?['status']?.toString() ?? 'ongoing';
+
+        if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
+
+        // Replace CallScreen with ChatScreen
+        Get.off(
+          () => ChatScreen(
+            astrologerName: providerName,
+            astrologerImage: providerImage,
+            sessionId: activeChatSessionId,
+            initialStatus: chatInitialStatus,
+            isPackageChat: true,
+            subSessionId: subSessionId,
+          ),
+          binding: ChatBinding(),
+        );
+        return;
+      }
+
+      // Normal non-package call switch
+      if (controller.status.value == 'ongoing') {
+        await controller.endCall();
+      } else {
+        await controller.cancelCall();
+      }
+
       final apiClient = Get.find<ApiClient>();
       int activeChatSessionId = 0;
-      String chatInitialStatus = 'ongoing';
+      String chatInitialStatus = 'initiated';
 
-      if (subSessionId > 0 && controller.isPackageCall) {
-        activeChatSessionId = int.tryParse(spawnData['chat_session_id']?.toString() ?? '') ?? 0;
-        chatInitialStatus = spawnData['chat_status']?.toString() ?? 'ongoing';
-      } else {
-        final response = await apiClient.post(
-          AppUrls.initiateChat,
-          data: {'provider_id': providerId},
-        );
-        if (response.isSuccess && response.body != null) {
-          final body = response.body['data'] ?? response.body;
-          // API returns { data: { session: { id: 487, status: 'initiated' } } }
-          final session = body['session'] ?? body;
-          activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
-          chatInitialStatus = session['status']?.toString() ?? 'initiated';
-        }
+      final response = await apiClient.post(
+        AppUrls.initiateChat,
+        data: {'provider_id': providerId},
+      );
+      if (response.isSuccess && response.body != null) {
+        final body = response.body['data'] ?? response.body;
+        final session = body['session'] ?? body;
+        activeChatSessionId = int.tryParse(session['id']?.toString() ?? '') ?? 0;
+        chatInitialStatus = session['status']?.toString() ?? 'initiated';
       }
 
       if (Get.isDialogOpen ?? false) Get.back(); // Dismiss loader
 
-      Get.to(
+      Get.off(
         () => ChatScreen(
           astrologerName: providerName,
           astrologerImage: providerImage,
           sessionId: activeChatSessionId,
           initialStatus: chatInitialStatus,
-          isPackageChat: controller.isPackageCall || subSessionId > 0,
+          isPackageChat: false,
         ),
         binding: ChatBinding(),
       );
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back();
-      CustomSnackbar.showError("Failed to open chat: $e");
+      CustomSnackbar.showError("Failed to switch to chat: $e");
+    } finally {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
     }
   }
 

@@ -156,6 +156,7 @@ class CallWebRTCController extends GetxController {
           final subSessionData = bodyMap is Map ? (bodyMap['sub_session'] ?? bodyMap['data']?['sub_session']) : null;
           final subSessionId = int.tryParse(subSessionData?['id']?.toString() ?? bodyMap?['sub_session_id']?.toString() ?? bodyMap?['data']?['sub_session_id']?.toString() ?? '');
           if (subSessionId != null && subSessionId > 0) {
+            _orchestrator.subSessionId = subSessionId;
             PackageSessionService.activeSubSessionId = subSessionId;
           }
 

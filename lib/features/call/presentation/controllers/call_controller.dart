@@ -32,7 +32,10 @@ class CallController extends GetxController {
 
   int? get providerId => session.providerId;
   set providerId(int? val) => session.providerId = val;
+  int? get subSessionId => session.subSessionId;
+  set subSessionId(int? val) => session.subSessionId = val;
   bool get isPackageCall => session.isPackageCall;
+  set isPackageCall(bool val) => session.isPackageCall = val;
   bool get isChatAlsoActive => session.isChatAlsoActive;
   RxInt get currentPingMs => webrtcService.currentPingMs;
   RxBool isMuted = false.obs;

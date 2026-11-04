@@ -251,14 +251,17 @@ class ApiClient {
         bool is429 = false;
         bool is401 = false;
         bool isCancel = false;
+        bool isClientError = false;
         if (e is DioException) {
-          if (e.response?.statusCode == 429) is429 = true;
-          if (e.response?.statusCode == 401) is401 = true;
+          final statusCode = e.response?.statusCode ?? 0;
+          if (statusCode == 429) is429 = true;
+          if (statusCode == 401) is401 = true;
+          if (statusCode >= 400 && statusCode < 500 && statusCode != 429) isClientError = true;
           if (e.type == DioExceptionType.cancel) isCancel = true;
         }
 
-        if (isLastAttempt || is401 || isCancel) {
-          if (!is401 && !isCancel) {
+        if (isLastAttempt || is401 || isCancel || isClientError) {
+          if (!is401 && !isCancel && !isClientError) {
             Logger.e('|❌ Max retries reached for POST: $path. Error: $e');
           }
           return ApiChecker.handleError(e, showErrorScreen: showErrorScreen);

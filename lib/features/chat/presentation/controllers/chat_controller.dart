@@ -10,6 +10,7 @@ import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
 import 'package:astro_user/features/auth/data/models/user_model.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 import 'chat_session_controller.dart';
 import 'chat_message_controller.dart';
 
@@ -39,6 +40,7 @@ class ChatController extends GetxController {
   set isPackageChat(bool val) => session.isPackageChat = val;
   bool get isCallAlsoActive => session.isCallAlsoActive;
   set isCallAlsoActive(bool val) => session.isCallAlsoActive = val;
+  int? subSessionId;
 
   void initSession({
     required int sessionId,
@@ -46,7 +48,12 @@ class ChatController extends GetxController {
     required String initialStatus,
     required String astrologerName,
     String? startedAtString,
+    int? subSessionId,
   }) {
+    if (subSessionId != null && subSessionId > 0) {
+      this.subSessionId = subSessionId;
+      PackageSessionService.activeSubSessionId = subSessionId;
+    }
     bool isNewSession = this.sessionId != sessionId;
     if (isNewSession) {
       messaging.messages.clear();
@@ -134,4 +141,21 @@ class ChatController extends GetxController {
   Future<void> cancelChatSession() => session.cancelChatSession();
   Future<void> endChatSession({bool skipSummary = false}) => session.endChatSession(skipSummary: skipSummary);
   void minimizeToBubble(BuildContext ctx, String name, String image, {bool shouldPop = true}) => session.minimizeToBubble(ctx, name, image, shouldPop: shouldPop);
+
+  void cleanUp() {
+    session.stopRingtone();
+    session.timer?.cancel();
+    session.status.value = 'ended';
+    subSessionId = null;
+    PackageSessionService.activeSubSessionId = null;
+    ForegroundTaskService.stopService();
+    if (sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(sessionId!);
+      WebSocketService.sessionStatusUpdates[sessionId!] = 'ended';
+      if (WebSocketService.activeSessionId == sessionId) {
+        WebSocketService.activeSessionId = null;
+      }
+    }
+    FloatingChatBubble.dismiss();
+  }
 }

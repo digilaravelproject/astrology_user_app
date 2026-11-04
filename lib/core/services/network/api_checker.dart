@@ -430,14 +430,18 @@ class ApiChecker {
         final responseModel = ResponseModel.fromJson(response.data, statusCode: response.statusCode);
         if (responseModel.errors != null && responseModel.errors!.isNotEmpty) {
           CustomSnackbar.showError(responseModel.errors!.first.message ?? 'Validation Error');
+        } else if (response.data['message'] != null) {
+          CustomSnackbar.showError(response.data['message'].toString());
         } else if (response.data['msg'] != null) {
-          CustomSnackbar.showError(response.data['msg']);
+          CustomSnackbar.showError(response.data['msg'].toString());
         } else {
           CustomSnackbar.showError('Validation Error');
         }
       } catch (e) {
-        if (response.data['msg'] != null) {
-          CustomSnackbar.showError(response.data['msg']);
+        if (response.data['message'] != null) {
+          CustomSnackbar.showError(response.data['message'].toString());
+        } else if (response.data['msg'] != null) {
+          CustomSnackbar.showError(response.data['msg'].toString());
         } else {
           CustomSnackbar.showError('Validation Error');
         }

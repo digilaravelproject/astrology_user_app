@@ -35,6 +35,7 @@ class ChatScreen extends StatefulWidget {
   final String? startedAtString;
 
   final bool isPackageChat;
+  final int? subSessionId;
 
   const ChatScreen({
     super.key,
@@ -44,6 +45,7 @@ class ChatScreen extends StatefulWidget {
     required this.initialStatus,
     this.startedAtString,
     this.isPackageChat = false,
+    this.subSessionId,
   });
 
   @override
@@ -67,12 +69,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
     _controller = Get.find<ChatController>();
     _controller.isPackageChat = widget.isPackageChat;
+
+    final args = Get.arguments;
+    final int? effectiveSubSessionId = widget.subSessionId ?? (args is Map ? int.tryParse(args['subSessionId']?.toString() ?? '') : null);
+
     _controller.initSession(
       sessionId: widget.sessionId,
       currentUserId: 0,
       initialStatus: widget.initialStatus,
       astrologerName: widget.astrologerName,
       startedAtString: widget.startedAtString,
+      subSessionId: effectiveSubSessionId,
     );
 
     _pulseController = AnimationController(
@@ -1073,22 +1080,50 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               );
 
               try {
-                int subSessionId = PackageSessionService.activeSubSessionId ?? 0;
+                final int subSessionId = _controller.subSessionId ?? PackageSessionService.activeSubSessionId ?? 0;
                 
-                if (subSessionId > 0) {
-                  await PackageSessionService.spawnChannel(
+                if (subSessionId > 0 && widget.isPackageChat) {
+                  // Atomic Switch API on Backend
+                  final switchData = await PackageSessionService.switchChannel(
                     subSessionId: subSessionId,
-                    channelType: 'call',
-                    callType: 'audio',
+                    fromChannel: 'chat',
+                    toChannel: 'call',
+                    offer: 'audio',
                   );
+
+                  // Dismiss loader before route change
+                  if (Get.isDialogOpen ?? false) Get.back();
+
+                  final callSessionData = switchData['call_session'];
+                  final int newCallSessionId = int.tryParse(callSessionData?['id']?.toString() ?? '') ?? 0;
+
+                  // Clean up chat state locally
+                  _controller.cleanUp();
+
+                  // Configure call controller
+                  final callController = Get.find<CallController>();
+                  if (newCallSessionId > 0) {
+                    callController.sessionId = newCallSessionId;
+                    callController.webrtcService.activeSessionId = newCallSessionId;
+                    callController.subSessionId = subSessionId;
+                    callController.isPackageCall = true;
+                    callController.providerName = widget.astrologerName;
+                    callController.providerImage = widget.astrologerImage;
+                    callController.status.value = 'ringing';
+                    callController.session.startRingtone(isIncoming: false);
+                    callController.session.startRingingTimeout();
+                  }
+
+                  // Transition directly to CallScreen
+                  Get.off(() => const CallScreen());
+                  return;
                 }
 
+                // Fallback for non-package chat
                 int providerId = _controller.peerId ?? 0;
-
                 if (providerId <= 0) {
                   final apiClient = Get.find<ApiClient>();
                   final response = await apiClient.get(AppUrls.getCurrentSession);
-                  
                   if (response.isSuccess && response.body['data'] != null) {
                     final data = response.body['data'];
                     final session = (data is Map && data.containsKey('session')) ? data['session'] : data;
@@ -1097,34 +1132,29 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 }
                 
                 if (providerId > 0) {
-                  // If not package session, end chat session cleanly
-                  if (subSessionId <= 0) {
-                    await _controller.endChatSession(skipSummary: true);
-                  }
+                  await _controller.endChatSession(skipSummary: true);
                   
-                  // Close loader dialog
                   if (Get.isDialogOpen ?? false) Get.back();
 
-                  // Initiate call
                   final callController = Get.find<CallController>();
-                  
                   await callController.initiateCall(
                     providerId: providerId,
                     providerName: widget.astrologerName,
                     providerImage: widget.astrologerImage,
-                    isPackageSession: widget.isPackageChat,
+                    isPackageSession: false,
                   );
 
-                  // Navigate to CallScreen so user sees ringing UI
-                  Get.to(() => const CallScreen());
+                  Get.off(() => const CallScreen());
                   return;
                 }
                 
-                Get.back(); // close loader
                 CustomSnackbar.showError("Failed to switch: active session details not found.");
               } catch (e) {
-                Get.back(); // close loader
                 CustomSnackbar.showError("Failed to switch: $e");
+              } finally {
+                if (Get.isDialogOpen ?? false) {
+                  Get.back();
+                }
               }
             },
             child: Text("Switch".tr,

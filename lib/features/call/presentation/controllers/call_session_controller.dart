@@ -17,6 +17,7 @@ import 'package:astro_user/routes/app_routes.dart';
 import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
 import 'package:astro_user/core/constants/app_constants.dart';
+import 'package:astro_user/core/utils/session_bottom_sheet_helper.dart';
 
 class CallSessionController extends GetxController with WidgetsBindingObserver {
   final RxString status = 'idle'.obs;
@@ -30,6 +31,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   bool isLiveCall = false;
   bool isChatAlsoActive = false;
   int? activeChatSessionId;
+  int? subSessionId;
 
   int? sessionId;
   int? liveSessionId;
@@ -285,6 +287,8 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     _orchestrator.isMuted.value = false;
     _orchestrator.isSpeakerOn.value = false;
     sessionId = null;
+    subSessionId = null;
+    PackageSessionService.activeSubSessionId = null;
     isAcceptedLocally = false;
     providerId = null;
     providerName = null;

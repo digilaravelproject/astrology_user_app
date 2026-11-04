@@ -13,17 +13,12 @@ import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/utils/custom_snackbar.dart';
 import 'package:astro_user/features/astrologers/presentation/controllers/astrologer_controller.dart';
-import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
-import 'package:astro_user/features/chat/presentation/pages/chat_screen.dart';
-import 'package:astro_user/features/chat/presentation/bindings/chat_binding.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:astro_user/routes/app_routes.dart';
 
 class SessionBottomSheetHelper {
-  static int? activeSubSessionId;
-
   static void show(BuildContext context, AstrologerModel astro) async {
     // 1. Show loading dialog
     showDialog(
@@ -336,7 +331,7 @@ class SessionBottomSheetHelper {
                                 Navigator.pop(context); // Dismiss loading dialog
                                 Navigator.pop(context); // Dismiss bottom sheet
                                 
-                                activeSubSessionId = result.subSession.id;
+                                PackageSessionService.activeSubSessionId = result.subSession.id;
                                 
                                 Get.toNamed(AppRoutes.chatScreen, arguments: {
                                   'astrologerName': currentAstro.name,
@@ -344,6 +339,7 @@ class SessionBottomSheetHelper {
                                   'sessionId': result.linkedChatSession!.id,
                                   'initialStatus': 'initiated',
                                   'isPackageChat': true,
+                                  'subSessionId': result.subSession.id,
                                 });
                               } catch (e) {
                                 Navigator.pop(context); // Dismiss loading dialog
@@ -588,8 +584,10 @@ class PackageSessionService {
           : {};
       final remainingDuration = int.tryParse(data['remaining_duration']?.toString() ?? '') ?? 0;
       WebSocketService.packageRemainingSeconds.value = remainingDuration;
+      final subSession = PackageSubSession.fromJson(data['sub_session']);
+      activeSubSessionId = subSession.id;
       return StartSubSessionResult(
-        subSession: PackageSubSession.fromJson(data['sub_session']),
+        subSession: subSession,
         remainingDuration: remainingDuration,
         linkedChatSession: data['chat_session'] != null
             ? PackageChatSession.fromJson(data['chat_session'])
@@ -604,6 +602,31 @@ class PackageSessionService {
   }
 
   static int? activeSubSessionId;
+
+  /// Atomically switch channel (Chat <-> Call) within active package session
+  static Future<Map<String, dynamic>> switchChannel({
+    required int subSessionId,
+    required String fromChannel,
+    required String toChannel,
+    String? offer,
+    String? question,
+  }) async {
+    final response = await _apiClient.post(
+      AppUrls.packageSwitchChannel,
+      data: {
+        'sub_session_id': subSessionId,
+        'from_channel': fromChannel,
+        'to_channel': toChannel,
+        if (offer != null) 'offer': offer,
+        if (question != null) 'question': question,
+      },
+    );
+    if (response.isSuccess) {
+      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+    } else {
+      throw Exception(response.message);
+    }
+  }
 
   /// Spawn Dual-Subchannel (WhatsApp-Style Switch)
   static Future<Map<String, dynamic>> spawnChannel({
@@ -637,6 +660,7 @@ class PackageSessionService {
       data: {'sub_session_id': subSessionId},
     );
     if (response.isSuccess) {
+      activeSubSessionId = null;
       final Map<String, dynamic> data = response.body is Map<String, dynamic> 
           ? response.body 
           : {};
