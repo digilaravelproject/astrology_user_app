@@ -1354,6 +1354,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 onPressed: () async {
                   Navigator.of(dialogContext).pop();
 
+                  _controller.session.isSwitchingChannel = true;
+
                   // Show loader
                   Get.dialog(
                     const Center(
@@ -1413,6 +1415,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
                       // Clean up chat state locally
                       _controller.cleanUp();
+
+                      // Restore active package sub session ID for the new call
+                      PackageSessionService.activeSubSessionId = subSessionId;
 
                       if (newCallSessionId > 0) {
                         callController.sessionId = newCallSessionId;

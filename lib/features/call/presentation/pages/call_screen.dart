@@ -634,6 +634,7 @@ class _CallScreenState extends State<CallScreen> {
 
 
   Future<void> _switchToChat() async {
+    controller.session.isSwitchingChannel = true;
     final providerId = controller.providerId;
     final providerName = controller.providerName ?? 'Astrologer';
     final providerImage = controller.providerImage ?? '';
@@ -655,6 +656,9 @@ class _CallScreenState extends State<CallScreen> {
 
         // Teardown local call WebRTC state
         controller.cleanUp();
+
+        // Restore active package sub session ID for the new chat
+        PackageSessionService.activeSubSessionId = subSessionId;
 
         final chatSession = switchData['chat_session'];
         final int activeChatSessionId = int.tryParse(chatSession?['id']?.toString() ?? '') ?? 0;

@@ -41,6 +41,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
 
   bool isPackageChat = false;
   bool isCallAlsoActive = false;
+  bool isSwitchingChannel = false;
 
   Timer? timer;
   String? startedAt;
@@ -186,7 +187,26 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  void cleanUp() {
+    stopRingtone();
+    timer?.cancel();
+    _globalTimerSub?.cancel();
+    _endSub?.cancel();
+    _statusSub?.cancel();
+    _dismissSub?.cancel();
+    _packageTerminatedSub?.cancel();
+    status.value = 'ended';
+    if (_orchestrator.sessionId != null) {
+      LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
+      SharedPrefs.remove('active_session_started_at_${_orchestrator.sessionId}');
+    }
+  }
+
   void handleChatEndedByPeer() {
+    if (isSwitchingChannel) {
+      Logger.d('ChatSessionController: handleChatEndedByPeer ignored because isSwitchingChannel is true');
+      return;
+    }
     status.value = 'ended';
     timer?.cancel();
     ForegroundTaskService.stopService();
@@ -202,6 +222,10 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void handleDismissed() {
+    if (isSwitchingChannel) {
+      Logger.d('ChatSessionController: handleDismissed ignored because isSwitchingChannel is true');
+      return;
+    }
     stopRingtone();
     status.value = 'ended';
     timer?.cancel();
@@ -215,6 +239,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void handlePackageTerminated() {
+    if (isSwitchingChannel) return;
     status.value = 'ended';
     timer?.cancel();
     _globalTimerSub?.cancel();

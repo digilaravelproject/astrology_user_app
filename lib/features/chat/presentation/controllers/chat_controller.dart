@@ -143,9 +143,7 @@ class ChatController extends GetxController {
   void minimizeToBubble(BuildContext ctx, String name, String image, {bool shouldPop = true}) => session.minimizeToBubble(ctx, name, image, shouldPop: shouldPop);
 
   void cleanUp() {
-    session.stopRingtone();
-    session.timer?.cancel();
-    session.status.value = 'ended';
+    session.cleanUp();
     subSessionId = null;
     PackageSessionService.activeSubSessionId = null;
     ForegroundTaskService.stopService();
@@ -155,6 +153,7 @@ class ChatController extends GetxController {
       if (WebSocketService.activeSessionId == sessionId) {
         WebSocketService.activeSessionId = null;
       }
+      sessionId = null;
     }
     FloatingChatBubble.dismiss();
   }

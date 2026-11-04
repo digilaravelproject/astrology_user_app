@@ -30,6 +30,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   bool isPackageCall = false;
   bool isLiveCall = false;
   bool isChatAlsoActive = false;
+  bool isSwitchingChannel = false;
   int? activeChatSessionId;
   int? subSessionId;
 
@@ -146,6 +147,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void handleCallDismissed(String reason) {
+    if (isSwitchingChannel) return;
     status.value = reason;
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
@@ -164,6 +166,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void handleCallEnded(Map<String, dynamic> data) {
+    if (isSwitchingChannel) return;
     if (isSummaryShown) return;
     isSummaryShown = true;
     status.value = 'completed';
@@ -184,6 +187,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   }
 
   void handlePackageTerminated() {
+    if (isSwitchingChannel) return;
     status.value = 'completed';
     cleanUp();
     if (isCallScreenVisible) Get.back();
