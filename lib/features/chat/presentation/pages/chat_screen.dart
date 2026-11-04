@@ -1354,28 +1354,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 onPressed: () async {
                   Navigator.of(dialogContext).pop();
 
-              try {
-                final int subSessionId = _controller.subSessionId ?? PackageSessionService.activeSubSessionId ?? 0;
-                
-                if (subSessionId > 0 && widget.isPackageChat) {
-                  final callController = Get.find<CallController>();
-                  callController.session.isSummaryShown = false;
-                  callController.session.providerId = _controller.peerId ?? 0;
-                  callController.session.providerName = widget.astrologerName;
-                  callController.session.providerImage = widget.astrologerImage;
-                  callController.session.isPackageCall = true;
-                  callController.status.value = 'dialing';
-                  callController.session.showOngoingNotification();
-
-                  // Create real WebRTC Offer for audio call
-                  final offerDescription = await callController.webrtcService.createOffer(0);
-
-                  // Atomic Switch API on Backend with real offer SDP
-                  final switchData = await PackageSessionService.switchChannel(
-                    subSessionId: subSessionId,
-                    fromChannel: 'chat',
-                    toChannel: 'call',
-                    offer: offerDescription.sdp,
+                  // Show loader
+                  Get.dialog(
+                    const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.deepPink,
+                      ),
+                    ),
+                    barrierDismissible: false,
                   );
 
                   try {
@@ -1385,35 +1371,49 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         0;
 
                     if (subSessionId > 0 && widget.isPackageChat) {
-                      // Atomic Switch API on Backend
+                      final callController = Get.find<CallController>();
+                      callController.session.isSummaryShown = false;
+                      callController.session.providerId =
+                          _controller.peerId ?? 0;
+                      callController.session.providerName =
+                          widget.astrologerName;
+                      callController.session.providerImage =
+                          widget.astrologerImage;
+                      callController.session.isPackageCall = true;
+                      callController.status.value = 'dialing';
+                      callController.session.showOngoingNotification();
+
+                      // Create real WebRTC Offer for audio call
+                      final offerDescription =
+                          await callController.webrtcService.createOffer(0);
+
+                      // Atomic Switch API on Backend with real offer SDP
                       final switchData =
                           await PackageSessionService.switchChannel(
                             subSessionId: subSessionId,
                             fromChannel: 'chat',
                             toChannel: 'call',
-                            offer: 'audio',
+                            offer: offerDescription.sdp,
                           );
 
                       // Dismiss loader before route change
                       if (Get.isDialogOpen ?? false) Get.back();
 
-                  if (newCallSessionId > 0) {
-                    callController.sessionId = newCallSessionId;
-                    callController.webrtcService.activeSessionId = newCallSessionId;
-                    callController.subSessionId = subSessionId;
-                    callController.isPackageCall = true;
-                    callController.providerName = widget.astrologerName;
-                    callController.providerImage = widget.astrologerImage;
-                    callController.status.value = 'ringing';
-                    callController.session.startRingtone(isIncoming: false);
-                    callController.session.startRingingTimeout();
-                  }
+                      final callSessionData = switchData['call_session'];
+                      final int newCallSessionId =
+                          int.tryParse(
+                            callSessionData?['id']?.toString() ?? '',
+                          ) ??
+                          (switchData['session_id'] != null
+                              ? int.tryParse(
+                                    switchData['session_id'].toString(),
+                                  ) ??
+                                  0
+                              : 0);
 
                       // Clean up chat state locally
                       _controller.cleanUp();
 
-                      // Configure call controller
-                      final callController = Get.find<CallController>();
                       if (newCallSessionId > 0) {
                         callController.sessionId = newCallSessionId;
                         callController.webrtcService.activeSessionId =
@@ -1470,15 +1470,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       return;
                     }
 
+                    if (Get.isDialogOpen ?? false) Get.back();
                     CustomSnackbar.showError(
                       "Failed to switch: active session details not found.",
                     );
                   } catch (e) {
-                    CustomSnackbar.showError("Failed to switch: $e");
-                  } finally {
                     if (Get.isDialogOpen ?? false) {
                       Get.back();
                     }
+                    CustomSnackbar.showError("Failed to switch: $e");
                   }
                 },
                 child: Text(
