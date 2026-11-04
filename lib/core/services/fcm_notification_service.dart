@@ -2,6 +2,8 @@ import 'package:astro_user/features/chat/presentation/widgets/floating_chat_bubb
 import 'package:astro_user/features/call/presentation/widgets/floating_call_bubble.dart';
 import 'package:astro_user/features/live/presentation/pages/live_room_screen.dart';
 import 'package:astro_user/features/chat/presentation/controllers/chat_controller.dart';
+import 'package:astro_user/features/call/presentation/controllers/call_controller.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'package:astro_user/features/chat_assistance/presentation/controllers/chat_assistance_controller.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -80,6 +82,10 @@ class FCMNotificationService {
             type?.toLowerCase() == 'chat_rejected') {
           LocalNotificationService.cancelOngoingChatNotification(parsedSessionId > 0 ? parsedSessionId : null);
           FloatingChatBubble.dismiss(stopForegroundService: true);
+          try { ForegroundTaskService.stopService(); } catch (_) {}
+          if (Get.isRegistered<ChatController>()) {
+            Get.find<ChatController>().session.handleChatEndedByPeer();
+          }
           return;
         } else if (title.contains('Call Ended') ||
             title.contains('Call Dismissed') ||
@@ -94,6 +100,10 @@ class FCMNotificationService {
             type == 'call_rejected') {
           LocalNotificationService.cancelOngoingCallNotification(parsedSessionId > 0 ? parsedSessionId : null);
           FloatingCallBubble.dismiss(stopForegroundService: true);
+          try { ForegroundTaskService.stopService(); } catch (_) {}
+          if (Get.isRegistered<CallController>()) {
+            Get.find<CallController>().session.handleCallEnded(message.data);
+          }
           return;
         }
 

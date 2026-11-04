@@ -48,6 +48,8 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _dismissedSubscription;
   StreamSubscription? _iceSubscription;
   StreamSubscription? _endedSubscription;
+  StreamSubscription? _endedSessionIdSubscription;
+  StreamSubscription? _statusUpdateSubscription;
   StreamSubscription? _packageTerminatedSub;
 
   CallController get _orchestrator => Get.find<CallController>();
@@ -142,11 +144,31 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     _endedSubscription = WebSocketService.callEndedData.listen((data) {
       if (data.isNotEmpty) {
         final session = data['session'];
-        if (session != null) {
-          final incomingId = int.tryParse(session['id']?.toString() ?? '');
-          if (incomingId == sessionId) {
-            handleCallEnded(data);
-          }
+        final incomingId = int.tryParse((session != null ? session['id'] : null)?.toString() ?? '') ??
+            int.tryParse(data['session_id']?.toString() ?? '') ??
+            int.tryParse(data['id']?.toString() ?? '');
+        if (incomingId != null && (sessionId == null || sessionId == 0 || incomingId == sessionId)) {
+          handleCallEnded(data);
+        } else if (sessionId != null && sessionId! > 0) {
+          handleCallEnded(data);
+        }
+      }
+    });
+
+    _endedSessionIdSubscription = WebSocketService.callEndedSessionId.listen((endedId) {
+      if (endedId > 0 && (sessionId == null || sessionId == 0 || endedId == sessionId)) {
+        handleCallEnded({'session_id': endedId});
+      }
+    });
+
+    _statusUpdateSubscription = WebSocketService.callSessionStatusUpdates.listen((statusMap) {
+      final currentId = sessionId;
+      if (currentId != null && currentId > 0) {
+        final st = statusMap[currentId]?.toLowerCase();
+        if (st == 'completed' || st == 'ended') {
+          handleCallEnded({'session_id': currentId, 'status': st});
+        } else if (st == 'dismissed' || st == 'rejected' || st == 'cancelled') {
+          handleCallDismissed(st!);
         }
       }
     });
@@ -180,15 +202,23 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
-    if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
-      if (Get.isDialogOpen ?? false) {
+    if (wasCallScreenVisible ||
+        Get.currentRoute.toLowerCase().contains('call') ||
+        Get.currentRoute == AppRoutes.callScreen) {
+      while (Get.isDialogOpen ?? false) {
         Get.back();
       }
-      if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
+      if (Get.key.currentState?.canPop() ?? false) {
         Get.back();
       } else {
         Get.offAllNamed(RouteHelper.getDashboardRoute());
       }
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (Get.currentRoute.toLowerCase().contains('call') ||
+            Get.currentRoute == AppRoutes.callScreen) {
+          Get.offAllNamed(RouteHelper.getDashboardRoute());
+        }
+      });
     }
   }
 
@@ -244,11 +274,24 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
       }
     }
     
-    final startedAt = DateTime.fromMillisecondsSinceEpoch(effectiveStartedAtMillis);
+    DateTime startedAt = DateTime.fromMillisecondsSinceEpoch(effectiveStartedAtMillis);
+    if (startedAt.isAfter(DateTime.now())) {
+      // Server clock is ahead of device clock. Calibrate against device clock.
+      startedAt = DateTime.now().subtract(Duration(seconds: durationSeconds.value));
+    }
+    final initialDiff = DateTime.now().difference(startedAt).inSeconds;
+    if (initialDiff > durationSeconds.value) {
+      durationSeconds.value = initialDiff;
+    }
+
     callTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (ForegroundTaskService.globalElapsedSeconds.value == 0) {
         final diff = DateTime.now().difference(startedAt).inSeconds;
-        durationSeconds.value = diff >= 0 ? diff : 0;
+        if (diff > durationSeconds.value) {
+          durationSeconds.value = diff;
+        } else {
+          durationSeconds.value++;
+        }
       }
     });
   }
@@ -353,6 +396,8 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     _dismissedSubscription?.cancel();
     _iceSubscription?.cancel();
     _endedSubscription?.cancel();
+    _endedSessionIdSubscription?.cancel();
+    _statusUpdateSubscription?.cancel();
     _packageTerminatedSub?.cancel();
     cleanUp();
     super.onClose();

@@ -54,35 +54,37 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        if (controller.status.value == 'ongoing') {
-          if (controller.sessionId != null && controller.providerName != null) {
-            controller.minimizeToBubble(
-              context,
-              controller.providerName!,
-              controller.providerImage ?? "",
-              shouldPop: false,
-            );
+    return Obx(() {
+      final isCallActive = controller.status.value == 'ongoing' ||
+          controller.status.value == 'ringing' ||
+          controller.status.value == 'dialing' ||
+          controller.status.value == 'waiting';
+
+      return PopScope(
+        canPop: !isCallActive,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (isCallActive) {
+            if (controller.status.value == 'ongoing') {
+              if (controller.sessionId != null && controller.providerName != null) {
+                controller.minimizeToBubble(
+                  context,
+                  controller.providerName!,
+                  controller.providerImage ?? "",
+                  shouldPop: false,
+                );
+              }
+            }
+            if (Navigator.of(context).canPop()) {
+              Get.back();
+            } else {
+              Get.offAllNamed(RouteHelper.getDashboardRoute());
+            }
           }
-          if (Navigator.of(context).canPop()) {
-            Get.back();
-          } else {
-            Get.offAllNamed(RouteHelper.getDashboardRoute());
-          }
-        } else {
-          if (Navigator.of(context).canPop()) {
-            Get.back();
-          } else {
-            Get.offAllNamed(RouteHelper.getDashboardRoute());
-          }
-        }
-      },
-      child: Scaffold(
-        body: Obx(() {
-        final status = controller.status.value;
+        },
+        child: Scaffold(
+          body: Obx(() {
+          final status = controller.status.value;
         final minutes = (controller.durationSeconds.value ~/ 60).toString().padLeft(2, '0');
         final seconds = (controller.durationSeconds.value % 60).toString().padLeft(2, '0');
         final bool isPackage = controller.isPackageCall ||
@@ -325,6 +327,7 @@ class _CallScreenState extends State<CallScreen> {
       }),
     ),
   );
+  });
 }
 
   /// Decides which end dialog to show based on session state

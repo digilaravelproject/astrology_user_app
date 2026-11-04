@@ -154,7 +154,9 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
             stopRingtone();
             final startedAtStr = WebSocketService.sessionStartTimes[sid];
             final serverStartTime = parseSmartDate(startedAtStr);
-            final effectiveStart = serverStartTime ?? DateTime.now();
+            final effectiveStart = (serverStartTime != null && !serverStartTime.isAfter(DateTime.now()))
+                ? serverStartTime
+                : DateTime.now();
             startedAt = effectiveStart.toUtc().toIso8601String();
             WebSocketService.sessionStartTimes[sid] = startedAt!;
             final diff = DateTime.now().difference(effectiveStart).inSeconds;
@@ -275,9 +277,18 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
 
     final savedStartedAt = sid != null ? SharedPrefs.getString('active_session_started_at_$sid') : null;
     final startedAtStr = startedAtString ?? startedAt ?? savedStartedAt ?? (sid != null ? WebSocketService.sessionStartTimes[sid] : null);
-    final dt = parseSmartDate(startedAtStr);
+    DateTime? dt = parseSmartDate(startedAtStr);
+
+    if (dt != null && dt.isAfter(DateTime.now())) {
+      // Server clock is ahead of device clock. Calibrate against device clock.
+      dt = DateTime.now().subtract(Duration(seconds: elapsedSeconds.value));
+    }
 
     if (dt != null) {
+      final initialDiff = DateTime.now().difference(dt).inSeconds;
+      if (initialDiff > elapsedSeconds.value) {
+        elapsedSeconds.value = initialDiff;
+      }
       timer = Timer.periodic(const Duration(seconds: 1), (t) {
         final st = status.value.toLowerCase();
         if (st == 'ended' || st == 'completed' || st == 'cancelled' || st == 'rejected') {
@@ -286,8 +297,12 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
         }
         if (st == 'ongoing' || st == 'accepted') {
           if (ForegroundTaskService.globalElapsedSeconds.value == 0) {
-            final nowDiff = DateTime.now().difference(dt).inSeconds;
-            elapsedSeconds.value = nowDiff > 0 ? nowDiff : 0;
+            final nowDiff = DateTime.now().difference(dt!).inSeconds;
+            if (nowDiff > elapsedSeconds.value) {
+              elapsedSeconds.value = nowDiff;
+            } else {
+              elapsedSeconds.value++;
+            }
           }
           if (FloatingChatBubble.isActive && FloatingChatBubble.sessionId == sid) {
             FloatingChatBubble.updateStatus(status.value);
@@ -295,6 +310,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
         }
       });
     } else {
+      final DateTime localStart = DateTime.now().subtract(Duration(seconds: elapsedSeconds.value));
       timer = Timer.periodic(const Duration(seconds: 1), (t) {
         final st = status.value.toLowerCase();
         if (st == 'ended' || st == 'completed' || st == 'cancelled' || st == 'rejected') {
@@ -302,7 +318,12 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
           return;
         }
         if (st == 'ongoing' || st == 'accepted') {
-          elapsedSeconds.value++;
+          final nowDiff = DateTime.now().difference(localStart).inSeconds;
+          if (nowDiff > elapsedSeconds.value) {
+            elapsedSeconds.value = nowDiff;
+          } else {
+            elapsedSeconds.value++;
+          }
           if (sid != null && (elapsedSeconds.value % 5 == 0)) { // Save occasionally if not from real startedAt
             final genStart = DateTime.now().subtract(Duration(seconds: elapsedSeconds.value)).toIso8601String();
             startedAt = genStart;
@@ -320,7 +341,8 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     final dateStr = input.toString().trim();
     if (dateStr.isEmpty) return null;
     String isoUtc = dateStr.replaceAll(' ', 'T');
-    if (!isoUtc.endsWith('Z') && !isoUtc.contains('+') && !isoUtc.contains('-')) isoUtc += 'Z';
+    bool hasTimezone = isoUtc.endsWith('Z') || isoUtc.contains(RegExp(r'[+-]\d{2}(:?\d{2})?$'));
+    if (!hasTimezone) isoUtc += 'Z';
     final utcDate = DateTime.tryParse(isoUtc)?.toLocal();
     if (utcDate != null && !utcDate.isAfter(DateTime.now())) return utcDate;
     DateTime? parsed = DateTime.tryParse(dateStr.replaceAll(' ', 'T')) ?? DateTime.tryParse(dateStr);
