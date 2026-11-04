@@ -622,7 +622,16 @@ class PackageSessionService {
       },
     );
     if (response.isSuccess) {
-      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+      if (response.body is Map<String, dynamic>) {
+        final map = response.body as Map<String, dynamic>;
+        return map.containsKey('chat_session_id') ||
+                map.containsKey('call_session_id') ||
+                map.containsKey('sub_session') ||
+                map.containsKey('action_performed')
+            ? map
+            : (map['data'] is Map<String, dynamic> ? map['data'] : map);
+      }
+      return {};
     } else {
       throw Exception(response.message);
     }
@@ -645,7 +654,15 @@ class PackageSessionService {
       },
     );
     if (response.isSuccess) {
-      return response.body is Map<String, dynamic> ? response.body['data'] ?? {} : {};
+      if (response.body is Map<String, dynamic>) {
+        final map = response.body as Map<String, dynamic>;
+        return map.containsKey('sub_session_id') ||
+                map.containsKey('call_session_id') ||
+                map.containsKey('chat_session_id')
+            ? map
+            : (map['data'] is Map<String, dynamic> ? map['data'] : map);
+      }
+      return {};
     } else {
       throw Exception(response.message);
     }
