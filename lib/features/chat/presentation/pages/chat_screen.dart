@@ -26,6 +26,7 @@ import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/features/kundli/kundli_screen.dart';
 import 'package:astro_user/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:swipe_to/swipe_to.dart';
+import 'package:astro_user/routes/app_routes.dart';
 
 class ChatScreen extends StatefulWidget {
   final String astrologerName;
