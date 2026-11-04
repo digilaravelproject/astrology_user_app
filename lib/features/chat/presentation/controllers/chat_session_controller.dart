@@ -42,6 +42,17 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   bool isPackageChat = false;
   bool isCallAlsoActive = false;
   bool isSwitchingChannel = false;
+  Timer? _switchTimeoutTimer;
+
+  void setSwitchingChannel(bool value) {
+    isSwitchingChannel = value;
+    _switchTimeoutTimer?.cancel();
+    if (value) {
+      _switchTimeoutTimer = Timer(const Duration(seconds: 5), () {
+        isSwitchingChannel = false;
+      });
+    }
+  }
 
   Timer? timer;
   String? startedAt;
@@ -197,6 +208,8 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
     _statusSub?.cancel();
     _dismissSub?.cancel();
     _packageTerminatedSub?.cancel();
+    isSwitchingChannel = false;
+    _switchTimeoutTimer?.cancel();
     status.value = 'ended';
     if (_orchestrator.sessionId != null) {
       LocalNotificationService.cancelOngoingChatNotification(_orchestrator.sessionId!);
@@ -460,6 +473,7 @@ class ChatSessionController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     stopRingtone();
+    _switchTimeoutTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     timer?.cancel();
     _endSub?.cancel();

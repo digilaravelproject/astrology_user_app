@@ -1422,6 +1422,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       callController.providerName = widget.astrologerName;
                       callController.providerImage = widget.astrologerImage;
 
+                      // Reset channel switching flags on both controllers
+                      _controller.session.isSwitchingChannel = false;
+                      callController.session.isSwitchingChannel = false;
+                      callController.session.isSummaryShown = false;
+
                       if (newCallSessionId > 0) {
                         callController.sessionId = newCallSessionId;
                         callController.webrtcService.activeSessionId =
@@ -1434,7 +1439,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       }
 
                       // Transition directly to CallScreen
-                      Get.off(() => const CallScreen());
+                      Get.offNamed(AppRoutes.callScreen);
                       return;
                     }
 
@@ -1465,6 +1470,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                       if (Get.isDialogOpen ?? false) Get.back();
 
                       final callController = Get.find<CallController>();
+                      _controller.session.isSwitchingChannel = false;
+                      callController.session.isSwitchingChannel = false;
+                      callController.session.isSummaryShown = false;
+
                       await callController.initiateCall(
                         providerId: providerId,
                         providerName: widget.astrologerName,
@@ -1472,15 +1481,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                         isPackageSession: false,
                       );
 
-                      Get.off(() => const CallScreen());
+                      Get.offNamed(AppRoutes.callScreen);
                       return;
                     }
 
                     if (Get.isDialogOpen ?? false) Get.back();
+                    _controller.session.isSwitchingChannel = false;
                     CustomSnackbar.showError(
                       "Failed to switch: active session details not found.",
                     );
                   } catch (e) {
+                    _controller.session.isSwitchingChannel = false;
                     if (Get.isDialogOpen ?? false) {
                       Get.back();
                     }

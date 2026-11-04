@@ -232,12 +232,14 @@ class CallWebRTCController extends GetxController {
           showErrorScreen: false,
       );
       if (response.isSuccess) {
+        _orchestrator.session.isSwitchingChannel = false;
         if (_orchestrator.session.isSummaryShown) return;
         _orchestrator.session.isSummaryShown = true;
         _orchestrator.status.value = 'completed';
         
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
+        FloatingCallBubble.dismiss(stopForegroundService: true);
         if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
           if (Get.isDialogOpen ?? false) Get.back();
           if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
@@ -247,8 +249,10 @@ class CallWebRTCController extends GetxController {
           }
         }
       } else {
+        _orchestrator.session.isSwitchingChannel = false;
         final wasCallScreenVisible = _orchestrator.isCallScreenVisible;
         _orchestrator.session.cleanUp();
+        FloatingCallBubble.dismiss(stopForegroundService: true);
         if (wasCallScreenVisible || Get.currentRoute == '/CallScreen' || Get.currentRoute == '/call-screen' || Get.currentRoute == '/call' || Get.currentRoute == AppRoutes.callScreen) {
           if (Get.isDialogOpen ?? false) Get.back();
           if (Get.previousRoute.isNotEmpty && Get.previousRoute != '/' && Get.previousRoute != AppRoutes.splash) {
@@ -274,6 +278,8 @@ class CallWebRTCController extends GetxController {
   }
 
   Future<void> handleCallAccepted(String answerSdp) async {
+    _orchestrator.session.isSwitchingChannel = false;
+    _orchestrator.session.isSummaryShown = false;
     _orchestrator.session.stopRingtone();
     _orchestrator.session.ringingTimer?.cancel();
     _orchestrator.isAcceptedLocally = true;
@@ -284,6 +290,14 @@ class CallWebRTCController extends GetxController {
     LocalNotificationService.cancelIncomingCallNotification(_orchestrator.sessionId!);
     _orchestrator.session.startCallTimer(startedAtMillis: acceptedMillis);
     _orchestrator.session.showOngoingNotification(startedAtMillis: acceptedMillis);
+
+    // Update FloatingCallBubble to reflect active call
+    FloatingCallBubble.updateStatus('ongoing');
+
+    // If CallScreen is currently not visible, navigate directly to CallScreen
+    if (!_orchestrator.isCallScreenVisible) {
+      Get.toNamed(AppRoutes.callScreen);
+    }
 
     try {
       await _orchestrator.webrtcService.setRemoteAnswer(answerSdp);

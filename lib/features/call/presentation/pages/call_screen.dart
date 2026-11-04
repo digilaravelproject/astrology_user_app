@@ -29,6 +29,22 @@ class _CallScreenState extends State<CallScreen> {
     super.initState();
     controller = Get.find<CallController>();
     controller.isCallScreenVisible = true;
+    controller.session.isSwitchingChannel = false;
+
+    // Check if call is already ended/completed or invalid
+    final st = controller.status.value.toLowerCase();
+    if (st == 'completed' || st == 'ended' || st == 'cancelled' || st == 'rejected' || controller.sessionId == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FloatingCallBubble.dismiss(stopForegroundService: true);
+        if (Navigator.of(context).canPop()) {
+          Get.back();
+        } else {
+          Get.offAllNamed(RouteHelper.getDashboardRoute());
+        }
+      });
+      return;
+    }
+
     // Defer dismiss to avoid setState() during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FloatingCallBubble.dismiss();
@@ -729,6 +745,7 @@ class _CallScreenState extends State<CallScreen> {
       if (Get.isDialogOpen ?? false) Get.back();
       CustomSnackbar.showError("Failed to switch to chat: $e");
     } finally {
+      controller.session.isSwitchingChannel = false;
       if (Get.isDialogOpen ?? false) {
         Get.back();
       }

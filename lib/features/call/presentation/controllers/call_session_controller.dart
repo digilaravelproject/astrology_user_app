@@ -31,6 +31,18 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   bool isLiveCall = false;
   bool isChatAlsoActive = false;
   bool isSwitchingChannel = false;
+  Timer? _switchTimeoutTimer;
+
+  void setSwitchingChannel(bool value) {
+    isSwitchingChannel = value;
+    _switchTimeoutTimer?.cancel();
+    if (value) {
+      _switchTimeoutTimer = Timer(const Duration(seconds: 5), () {
+        isSwitchingChannel = false;
+      });
+    }
+  }
+
   int? activeChatSessionId;
   int? subSessionId;
 
@@ -202,6 +214,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     
     final wasCallScreenVisible = isCallScreenVisible;
     cleanUp();
+    FloatingCallBubble.dismiss(stopForegroundService: true);
     if (wasCallScreenVisible ||
         Get.currentRoute.toLowerCase().contains('call') ||
         Get.currentRoute == AppRoutes.callScreen) {
@@ -348,6 +361,9 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     providerImage = null;
     isChatAlsoActive = false;
     activeChatSessionId = null;
+    isSwitchingChannel = false;
+    _switchTimeoutTimer?.cancel();
+    isSummaryShown = false;
     if (isCallScreenVisible) isCallScreenVisible = false;
   }
 
@@ -392,6 +408,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
+    _switchTimeoutTimer?.cancel();
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();
     _iceSubscription?.cancel();
