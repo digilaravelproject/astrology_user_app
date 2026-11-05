@@ -31,9 +31,12 @@ class _CallScreenState extends State<CallScreen> {
     controller.isCallScreenVisible = true;
     controller.session.isSwitchingChannel = false;
 
-    // Check if call is already ended/completed or invalid
+    // Check if call is already ended/completed or stale idle
     final st = controller.status.value.toLowerCase();
-    if (st == 'completed' || st == 'ended' || st == 'cancelled' || st == 'rejected' || controller.sessionId == null) {
+    final isCallTerminated = st == 'completed' || st == 'ended' || st == 'cancelled' || st == 'rejected';
+    final isStaleIdle = st == 'idle' && controller.sessionId == null;
+
+    if (isCallTerminated || isStaleIdle) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         FloatingCallBubble.dismiss(stopForegroundService: true);
         if (Navigator.of(context).canPop()) {

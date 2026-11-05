@@ -188,6 +188,11 @@ class WalletHelper {
                         
                         // Find or put CallController
                         final callController = Get.find<CallController>();
+                        callController.status.value = 'dialing';
+                        callController.providerName = name;
+                        callController.providerImage = imageUrl;
+                        callController.session.isSwitchingChannel = false;
+                        callController.session.isSummaryShown = false;
                             
                         // Navigate to webrtc CallScreen
                         Get.toNamed(AppRoutes.callScreen);

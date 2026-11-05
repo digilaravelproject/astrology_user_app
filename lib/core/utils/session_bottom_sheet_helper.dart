@@ -387,6 +387,11 @@ class SessionBottomSheetHelper {
                                 Navigator.pop(context); // Dismiss bottom sheet
                                 
                                 final callController = Get.find<CallController>();
+                                callController.status.value = 'dialing';
+                                callController.providerName = currentAstro.name;
+                                callController.providerImage = currentAstro.profilePhoto != null ? '${AppUrls.baseImageUrl}${currentAstro.profilePhoto}' : '';
+                                callController.session.isSwitchingChannel = false;
+                                callController.session.isSummaryShown = false;
                                     
                                 Get.toNamed(AppRoutes.callScreen);
                                 
