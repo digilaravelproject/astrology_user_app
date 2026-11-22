@@ -312,7 +312,7 @@ class CallWebRTCController extends GetxController {
 
     try {
       await _orchestrator.webrtcService.setRemoteAnswer(answerSdp);
-      _orchestrator.webrtcService.toggleSpeaker(_orchestrator.isSpeakerOn.value);
+      _orchestrator.webrtcService.toggleSpeaker(_orchestrator.isSpeakerOn.value, force: true);
     } catch (e) {
       Logger.e('CallWebRTCController: error in setRemoteAnswer -> $e');
     }
@@ -375,7 +375,7 @@ class CallWebRTCController extends GetxController {
                 if (_orchestrator.webrtcService.peerConnection == null) {
                   await _orchestrator.webrtcService.createOffer(_orchestrator.sessionId!);
                   await _orchestrator.webrtcService.setRemoteAnswer(answer);
-                  _orchestrator.webrtcService.toggleSpeaker(_orchestrator.isSpeakerOn.value);
+                  _orchestrator.webrtcService.toggleSpeaker(_orchestrator.isSpeakerOn.value, force: true);
                 }
               }
 

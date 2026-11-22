@@ -74,7 +74,7 @@ class WebRTCService {
 
       // Apply current mute and speaker routing (earpiece default if false)
       toggleMute(currentMuteState);
-      toggleSpeaker(currentSpeakerState); 
+      toggleSpeaker(currentSpeakerState, force: true); 
     } catch (e) {
       Logger.e('WebRTCService: Error initializing local stream -> $e');
       rethrow;
@@ -170,7 +170,7 @@ class WebRTCService {
         Logger.d('WebRTCService: ICE Connection state changed -> $state');
         if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
           _startPingTimer();
-          toggleSpeaker(currentSpeakerState); // Ensure speaker state is preserved once connection is successful
+          toggleSpeaker(currentSpeakerState, force: true); // Ensure speaker state is preserved once connection is successful
         } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
                    state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
                    state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
@@ -185,7 +185,7 @@ class WebRTCService {
         Logger.d('WebRTCService: Peer connection state changed -> $state');
         if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
           _startPingTimer();
-          toggleSpeaker(currentSpeakerState);
+          toggleSpeaker(currentSpeakerState, force: true);
         }
       };
 
@@ -198,7 +198,7 @@ class WebRTCService {
             Helper.setVolume(1.0, track);
           } catch (_) {}
         });
-        toggleSpeaker(currentSpeakerState);
+        toggleSpeaker(currentSpeakerState, force: true);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
         }
@@ -233,7 +233,7 @@ class WebRTCService {
               Helper.setVolume(1.0, track);
             } catch (_) {}
           });
-          toggleSpeaker(currentSpeakerState);
+          toggleSpeaker(currentSpeakerState, force: true);
           if (onRemoteStreamAdded != null) {
             onRemoteStreamAdded!(remoteStream!);
           }
@@ -299,7 +299,7 @@ class WebRTCService {
         Logger.d('WebRTCService: ICE Connection state changed -> $state');
         if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
           _startPingTimer();
-          toggleSpeaker(currentSpeakerState); // Ensure speaker state is preserved once connection is successful
+          toggleSpeaker(currentSpeakerState, force: true); // Ensure speaker state is preserved once connection is successful
         } else if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected || 
                    state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
                    state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
@@ -314,7 +314,7 @@ class WebRTCService {
         Logger.d('WebRTCService: Peer connection state changed -> $state');
         if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
           _startPingTimer();
-          toggleSpeaker(currentSpeakerState);
+          toggleSpeaker(currentSpeakerState, force: true);
         }
       };
 
@@ -327,7 +327,7 @@ class WebRTCService {
             Helper.setVolume(1.0, track);
           } catch (_) {}
         });
-        toggleSpeaker(currentSpeakerState);
+        toggleSpeaker(currentSpeakerState, force: true);
         if (onRemoteStreamAdded != null) {
           onRemoteStreamAdded!(stream);
         }
@@ -362,7 +362,7 @@ class WebRTCService {
               Helper.setVolume(1.0, track);
             } catch (_) {}
           });
-          toggleSpeaker(currentSpeakerState);
+          toggleSpeaker(currentSpeakerState, force: true);
           if (onRemoteStreamAdded != null) {
             onRemoteStreamAdded!(remoteStream!);
           }
@@ -487,8 +487,11 @@ class WebRTCService {
 
     if (Platform.isAndroid) {
       // Android: Single clean routing path via NativeAudioRouter (uses AudioManager.setCommunicationDevice on Android 12+)
-      // Avoids clashing with WebRTC's internal AudioManager calls that deadlock on Samsung One UI
+      // Also synchronize with WebRTC Helper so C++ audio track layer stays aware
       NativeAudioRouter.setSpeakerphoneOn(isSpeakerOn);
+      try {
+        Helper.setSpeakerphoneOn(isSpeakerOn);
+      } catch (_) {}
     } else {
       // iOS: Route through WebRTC Helper to configure AVAudioSession output port
       try {
