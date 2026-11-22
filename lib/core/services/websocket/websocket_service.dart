@@ -40,6 +40,7 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   Timer? _reconnectTimer;
   int _reconnectAttempts = 0;
   StreamSubscription? _connectivitySubscription;
+  String? _lastConnectivityStr;
   final List<String> _offlineQueue = [];
   
   // ─── State Forwarding Shims ────────────────────────────────────────────────
@@ -120,12 +121,23 @@ class WebSocketService extends GetxService with WidgetsBindingObserver {
   void _setupConnectivityListener() {
     _connectivitySubscription?.cancel();
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((results) {
-      final isConnected = results.any((r) => r != ConnectivityResult.none);
+      final hasConnection = results.any((r) => r != ConnectivityResult.none);
       final isLoggedIn = SharedPrefs.getBool(AppConstants.isLoggedIn) ?? false;
-      if (isConnected && !_isConnected && !_isConnecting && !_isManuallyDisconnected && isLoggedIn) {
-        Logger.d('|🌐 Connectivity restored! Triggering immediate WebSocket reconnect.');
-        _reconnectAttempts = 0;
-        connect();
+      if (!isLoggedIn || _isManuallyDisconnected) return;
+
+      final currentResStr = results.map((r) => r.name).join(',');
+      final isInterfaceChanged = _lastConnectivityStr != null && _lastConnectivityStr != currentResStr;
+      _lastConnectivityStr = currentResStr;
+
+      if (hasConnection) {
+        if (!_isConnected && !_isConnecting) {
+          Logger.d('|🌐 Connectivity restored! Triggering immediate WebSocket reconnect.');
+          _reconnectAttempts = 0;
+          connect();
+        } else if (_isConnected && isInterfaceChanged) {
+          Logger.d('|🌐 Network interface changed ($currentResStr) while connected. Refreshing socket connection...');
+          _forceDisconnectAndReconnect();
+        }
       }
     });
   }

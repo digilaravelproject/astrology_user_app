@@ -23,6 +23,8 @@ import 'package:astro_user/core/services/websocket/websocket_service.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/features/astrologers/presentation/bindings/astrologers_binding.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:astro_user/core/services/foreground_task_service.dart';
 
 class LiveRoomScreen extends StatefulWidget {
   final int sessionId;
@@ -96,6 +98,13 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
   @override
   void initState() {
     super.initState();
+    try {
+      WakelockPlus.enable();
+      ForegroundTaskService.startActiveSessionNotification(
+        title: 'Live Session in Progress',
+        type: 'Live',
+      );
+    } catch (_) {}
     _currentIndex = widget.initialIndex;
     _liveController = Get.find<LiveController>();
 
@@ -354,6 +363,10 @@ class _LiveRoomScreenState extends State<LiveRoomScreen> {
     } catch (e) {
       debugPrint('[LIVE] Error unsubscribing from websocket channel: $e');
     }
+    try {
+      WakelockPlus.disable();
+      ForegroundTaskService.stopService();
+    } catch (_) {}
     super.dispose();
   }
 

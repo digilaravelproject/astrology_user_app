@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:astro_user/core/constants/app_urls.dart';
 import 'package:astro_user/core/services/network/api_client.dart';
 import 'package:astro_user/core/services/websocket/websocket_service.dart';
+import 'package:astro_user/core/services/websocket/websocket_state.dart';
 import 'package:astro_user/core/services/local_notification_service.dart';
 import 'package:astro_user/core/services/sound_vibration_service.dart';
 import 'package:astro_user/core/utils/logger.dart';
@@ -60,6 +61,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
   StreamSubscription? _acceptedSubscription;
   StreamSubscription? _dismissedSubscription;
   StreamSubscription? _iceSubscription;
+  StreamSubscription? _sdpSubscription;
   StreamSubscription? _endedSubscription;
   StreamSubscription? _endedSessionIdSubscription;
   StreamSubscription? _statusUpdateSubscription;
@@ -148,6 +150,39 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
             final receiverId = data['receiverId'] ?? data['receiver_id'];
             if (candidate != null && (receiverId == null || receiverId == WebSocketService.currentUserId)) {
               _orchestrator.webrtcService.addRemoteCandidate(candidate);
+            }
+          }
+        }
+      }
+    });
+
+    _sdpSubscription = WebSocketState.sdpUpdateData.listen((data) async {
+      if (data.isNotEmpty) {
+        final session = data['session'];
+        final incomingId = int.tryParse(session?['id']?.toString() ?? data['session_id']?.toString() ?? '');
+        if (incomingId != null && incomingId == sessionId) {
+          final sdp = data['sdp']?.toString();
+          final type = data['type']?.toString();
+          if (sdp != null && sdp.isNotEmpty && type != null) {
+            Logger.d('CallSessionController: Received WebRtcSdpUpdated type=$type for session $incomingId');
+            if (type == 'offer') {
+              final answer = await _orchestrator.webrtcService.handleIncomingOfferAndCreateAnswer(incomingId, sdp);
+              if (answer != null) {
+                final apiClient = Get.find<ApiClient>();
+                await apiClient.post(
+                  AppUrls.updateSdp(incomingId),
+                  data: {
+                    'sdp': answer.sdp,
+                    'type': 'answer',
+                  },
+                  handleError: false,
+                  showErrorScreen: false,
+                );
+                Logger.d('CallSessionController: Dispatched renegotiation answer.');
+              }
+            } else if (type == 'answer') {
+              await _orchestrator.webrtcService.setRemoteAnswer(sdp);
+              Logger.d('CallSessionController: Processed renegotiation answer.');
             }
           }
         }
@@ -419,6 +454,7 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
     _acceptedSubscription?.cancel();
     _dismissedSubscription?.cancel();
     _iceSubscription?.cancel();
+    _sdpSubscription?.cancel();
     _endedSubscription?.cancel();
     _endedSessionIdSubscription?.cancel();
     _statusUpdateSubscription?.cancel();
