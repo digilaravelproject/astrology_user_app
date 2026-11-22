@@ -197,27 +197,38 @@ class CallWebRTCController extends GetxController {
     }
   }
 
-  Future<void> cancelCall() async {
-    if (_orchestrator.sessionId == null) {
+  bool _isCancelling = false;
+
+  Future<void> cancelCall({bool showSnackbar = true}) async {
+    if (_isCancelling) return;
+    _isCancelling = true;
+
+    final sid = _orchestrator.sessionId;
+    if (sid == null || sid <= 0) {
       final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
       if (wasVisible) Get.back();
+      _isCancelling = false;
       return;
     }
     try {
       final response = await _apiClient.post(
-        AppUrls.cancelCall(_orchestrator.sessionId!),
-        handleError: true,
+        AppUrls.cancelCall(sid),
+        handleError: false,
         showErrorScreen: false,
       );
       if (response.isSuccess) {
         _orchestrator.status.value = 'cancelled';
-        CustomSnackbar.showSuccess('Call cancelled.');
+        if (showSnackbar) {
+          CustomSnackbar.showSuccess('Call cancelled.');
+        }
       }
-    } catch (e) {} finally {
+    } catch (e) {
+    } finally {
       final wasVisible = _orchestrator.isCallScreenVisible;
       _orchestrator.session.cleanUp();
       if (wasVisible) Get.back();
+      _isCancelling = false;
     }
   }
 

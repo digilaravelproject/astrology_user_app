@@ -13,6 +13,7 @@ import 'package:astro_user/features/live/presentation/controllers/live_controlle
 import 'package:astro_user/features/call/presentation/pages/call_screen.dart';
 import 'package:astro_user/core/services/foreground_task_service.dart';
 import 'call_controller.dart';
+import 'call_webrtc_controller.dart';
 import 'package:astro_user/routes/app_routes.dart';
 import 'package:astro_user/routes/route_helper.dart';
 import 'package:astro_user/core/services/storage/shared_prefs.dart';
@@ -253,13 +254,19 @@ class CallSessionController extends GetxController with WidgetsBindingObserver {
 
   void startRingingTimeout() {
     ringingTimer?.cancel();
-    ringingTimer = Timer(const Duration(seconds: 60), () {
+    ringingTimer = Timer(const Duration(seconds: 45), () {
       if (status.value == 'ringing' || status.value == 'dialing' || status.value == 'waiting') {
         status.value = 'missed';
         CustomSnackbar.showError('Call unanswered.');
-        final wasVisible = isCallScreenVisible;
-        cleanUp();
-        if (wasVisible) Get.back();
+
+        // Immediately notify backend & astrologer so ringing CallKit is dismissed
+        if (Get.isRegistered<CallWebRTCController>()) {
+          Get.find<CallWebRTCController>().cancelCall(showSnackbar: false);
+        } else {
+          final wasVisible = isCallScreenVisible;
+          cleanUp();
+          if (wasVisible) Get.back();
+        }
       }
     });
   }
